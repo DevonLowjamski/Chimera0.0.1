@@ -11,6 +11,10 @@
         "ProjectChimera.Systems.Environment",
         "ProjectChimera.Systems.Progression",
         "ProjectChimera.Systems.Events",
+        "ProjectChimera.Systems.Competition",
+        "ProjectChimera.Systems.Narrative",
+        "ProjectChimera.IPM",
+        "ProjectChimera.Systems.Equipment",
         "ProjectChimera.Genetics",
         "Unity.TextMeshPro"
     ],

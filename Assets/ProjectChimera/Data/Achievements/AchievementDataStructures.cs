@@ -122,6 +122,7 @@ namespace ProjectChimera.Data.Achievements
     {
         [Header("Basic Information")]
         public string Id = "";
+        public string AchievementId = ""; // Compatibility property
         public string Name = "";
         public string Description = "";
         public string DetailedDescription = "";
@@ -388,6 +389,8 @@ namespace ProjectChimera.Data.Achievements
     public class AchievementReward
     {
         [Header("Base Rewards")]
+        public string Name = "";
+        public long Value = 0;
         public int ExperiencePoints = 0;
         public int CurrencyAmount = 0;
         public int ReputationPoints = 0;
