@@ -6,7 +6,8 @@
         "ProjectChimera.Data",
         "ProjectChimera.Events",
         "ProjectChimera.Visuals",
-        "ProjectChimera.Systems.Automation"
+        "ProjectChimera.Systems.Automation",
+        "Unity.ugui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
+#if UNITY_URP
 using UnityEngine.Rendering.Universal;
+#endif
 using ProjectChimera.Core;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Economy;
@@ -114,9 +116,11 @@ namespace ProjectChimera.Editor.SceneSetup
             mainCamera.transform.rotation = Quaternion.Euler(30f, 0f, 0f);
             
             // Configure camera for URP
+#if UNITY_URP
             var cameraData = mainCameraGO.AddComponent<UniversalAdditionalCameraData>();
             cameraData.renderType = CameraRenderType.Base;
             cameraData.cameraStack.Clear();
+#endif
             
             // Add audio listener
             mainCameraGO.AddComponent<AudioListener>();
@@ -130,11 +134,15 @@ namespace ProjectChimera.Editor.SceneSetup
             uiCamera.orthographic = true;
             uiCamera.depth = 1;
             
+#if UNITY_URP
             var uiCameraData = uiCameraGO.AddComponent<UniversalAdditionalCameraData>();
             uiCameraData.renderType = CameraRenderType.Overlay;
+#endif
             
             // Add UI camera to main camera stack
+#if UNITY_URP
             cameraData.cameraStack.Add(uiCamera);
+#endif
             
             Debug.Log("Advanced camera system created with URP configuration");
             return mainCameraGO;

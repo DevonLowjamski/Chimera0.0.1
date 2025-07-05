@@ -299,6 +299,34 @@ namespace ProjectChimera.Core
         }
 
         /// <summary>
+        /// Triggers an event by name and data. Used by other systems to raise events.
+        /// </summary>
+        public void TriggerEvent(string eventName, object eventData = null)
+        {
+            if (string.IsNullOrEmpty(eventName))
+            {
+                LogWarning("TriggerEvent called with null or empty event name");
+                return;
+            }
+
+            // Find event channel by name
+            var eventChannel = _eventChannelsById.Values.FirstOrDefault(ch => ch.name == eventName);
+            if (eventChannel == null)
+            {
+                LogWarning($"Event channel not found: {eventName}");
+                return;
+            }
+
+            // Trigger the event
+            OnEventRaised(eventChannel, eventData);
+
+            if (_enableEventDebugging)
+            {
+                LogDebug($"Triggered event: {eventName} with data: {eventData}");
+            }
+        }
+
+        /// <summary>
         /// Updates metrics for a specific event channel.
         /// </summary>
         private void UpdateEventMetrics(ChimeraEventSO eventChannel)

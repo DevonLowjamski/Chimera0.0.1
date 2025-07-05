@@ -1,6 +1,8 @@
 using UnityEngine;
+#if UNITY_URP
 using UnityEngine.Rendering.Universal;
 using URP = UnityEngine.Rendering.Universal;
+#endif
 using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
@@ -112,7 +114,11 @@ namespace ProjectChimera.Systems.Environment
         public LightPerformanceMetrics PerformanceMetrics => _performanceMetrics;
         // public List<InteractivePlantComponent> PlantsInRange => _plantsInRange;
         
+#if UNITY_URP
         private Dictionary<Light, URP.UniversalAdditionalLightData> _lightDataMap;
+#else
+        private Dictionary<Light, object> _lightDataMap; // Fallback for when URP not available
+#endif
         
         protected override void Awake()
         {
@@ -152,6 +158,7 @@ namespace ProjectChimera.Systems.Environment
         
         private void InitializeLightData()
         {
+#if UNITY_URP
             _lightDataMap = new Dictionary<Light, URP.UniversalAdditionalLightData>();
             
             if (_growLights != null)
@@ -169,6 +176,20 @@ namespace ProjectChimera.Systems.Environment
                     }
                 }
             }
+#else
+            _lightDataMap = new Dictionary<Light, object>();
+            // Basic light setup without URP-specific features
+            if (_growLights != null)
+            {
+                foreach (var light in _growLights)
+                {
+                    if (light != null)
+                    {
+                        _lightDataMap[light] = null; // Placeholder
+                    }
+                }
+            }
+#endif
         }
         
         private void Start()
@@ -261,11 +282,13 @@ namespace ProjectChimera.Systems.Environment
             }
             
             // Configure light for URP
+#if UNITY_URP
             var lightData = _primaryLight.GetUniversalAdditionalLightData();
             if (lightData == null)
             {
                 lightData = _primaryLight.gameObject.AddComponent<URP.UniversalAdditionalLightData>();
             }
+#endif
             
             // Setup supplemental lights for spectrum control
             SetupSupplementalLights();
@@ -297,7 +320,9 @@ namespace ProjectChimera.Systems.Environment
                     light.enabled = false;
                     
                     // Add URP data
+#if UNITY_URP
                     lightGO.AddComponent<URP.UniversalAdditionalLightData>();
+#endif
                     
                     _supplementalLights[i] = light;
                 }
