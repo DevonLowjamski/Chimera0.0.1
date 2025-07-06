@@ -554,7 +554,7 @@ namespace ProjectChimera.Data.Cultivation
                     float leafGrowthRate = heightGrowth * 2.5f; // Leaves grow faster than height
                     
                     // Apply environmental factors to leaf development
-                    if (_currentEnvironment != null)
+                    if (_currentEnvironment.IsInitialized())
                     {
                         float lightModifier = Mathf.Clamp(_currentEnvironment.LightIntensity / 600f, 0.5f, 1.5f);
                         leafGrowthRate *= lightModifier;
