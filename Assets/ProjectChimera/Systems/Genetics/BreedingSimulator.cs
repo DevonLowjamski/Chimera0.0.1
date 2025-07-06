@@ -148,7 +148,7 @@ namespace ProjectChimera.Systems.Genetics
                 
                 // Calculate offspring genetic metrics
                 offspring.InbreedingCoefficient = CalculateInbreedingCoefficient(parent1, parent2);
-                offspring.Mutations = breedingResult.MutationsOccurred.Where(m => m.AffectedOffspringId == offspring.GenotypeID).ToList();
+                offspring.Mutations = breedingResult.MutationsOccurred.ToList();
                 
                 return offspring;
             }
@@ -258,7 +258,7 @@ namespace ProjectChimera.Systems.Genetics
         /// </summary>
         private MutationType DetermineMutationType()
         {
-            float rand = _random.NextSingle();
+            float rand = (float)_random.NextDouble();
             if (rand < 0.6f) return MutationType.PointMutation;
             if (rand < 0.8f) return MutationType.Insertion;
             if (rand < 0.9f) return MutationType.Deletion;
@@ -598,13 +598,13 @@ namespace ProjectChimera.Systems.Genetics
             float inbreedingScore = 1f - (inbreedingRisk * 1.2f);
             
             // Fitness compatibility (healthier plants breed better)
-            float fitness1 = genotype1.OverallFitness;
-            float fitness2 = genotype2.OverallFitness;
+            float fitness1 = CalculatePlantFitness(genotype1);
+            float fitness2 = CalculatePlantFitness(genotype2);
             float fitnessScore = (fitness1 + fitness2) * 0.5f;
             
             // Viability check
             float viabilityScore = 1f;
-            if (!genotype1.IsViable || !genotype2.IsViable)
+            if (!IsPlantViable(genotype1) || !IsPlantViable(genotype2))
             {
                 viabilityScore = 0.3f; // Significant penalty for non-viable genotypes
             }
@@ -632,6 +632,69 @@ namespace ProjectChimera.Systems.Genetics
                 InbreedingRisk = 1f, // Maximum risk for failed analysis
                 CompatibilityScore = 0f // No compatibility
             };
+        }
+
+        /// <summary>
+        /// Calculate a plant's overall fitness based on its genetic makeup.
+        /// </summary>
+        private float CalculatePlantFitness(PlantGenotype genotype)
+        {
+            if (genotype == null) return 0f;
+            
+            // Base fitness starts at 1.0
+            float fitness = 1f;
+            
+            // Reduce fitness based on inbreeding coefficient
+            fitness -= genotype.InbreedingCoefficient * 0.3f;
+            
+            // Reduce fitness if there are harmful mutations
+            if (genotype.Mutations != null)
+            {
+                int harmfulMutations = genotype.Mutations.Count(m => m.IsHarmful);
+                fitness -= harmfulMutations * 0.1f;
+            }
+            
+            // Reduce fitness for very old generations (genetic load)
+            if (genotype.Generation > 10)
+            {
+                fitness -= (genotype.Generation - 10) * 0.02f;
+            }
+            
+            return Mathf.Clamp01(fitness);
+        }
+        
+        /// <summary>
+        /// Determine if a plant genotype is viable for breeding.
+        /// </summary>
+        private bool IsPlantViable(PlantGenotype genotype)
+        {
+            if (genotype == null) return false;
+            
+            // Check for lethal mutations
+            if (genotype.Mutations != null)
+            {
+                foreach (var mutation in genotype.Mutations)
+                {
+                    if (mutation.IsHarmful && mutation.PhenotypicEffect < -0.8f)
+                    {
+                        return false; // Lethal mutation
+                    }
+                }
+            }
+            
+            // Check inbreeding coefficient - too high is lethal
+            if (genotype.InbreedingCoefficient > 0.8f)
+            {
+                return false;
+            }
+            
+            // Check if strain origin exists
+            if (genotype.StrainOrigin == null)
+            {
+                return false;
+            }
+            
+            return true;
         }
     }
     
