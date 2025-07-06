@@ -568,7 +568,7 @@ namespace ProjectChimera.UI
             var valueLabel = new Label(geneValue?.ToString() ?? "null");
             valueLabel.style.color = isGenotype ? new Color(0.7f, 0.9f, 0.7f) : new Color(0.9f, 0.8f, 0.6f);
             valueLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
-            valueLabel.style.fontStyle = FontStyle.Bold;
+            valueLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             
             element.Add(nameLabel);
             element.Add(valueLabel);
@@ -600,7 +600,7 @@ namespace ProjectChimera.UI
             var valueLabel = new Label($"{traitValue:F2}");
             valueLabel.style.color = new Color(0.9f, 0.8f, 0.6f);
             valueLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
-            valueLabel.style.fontStyle = FontStyle.Bold;
+            valueLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             
             element.Add(nameLabel);
             element.Add(valueLabel);
