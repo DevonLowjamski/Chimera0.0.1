@@ -7,6 +7,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Cultivation;
 
 namespace ProjectChimera.UI
 {
