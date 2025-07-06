@@ -8,6 +8,7 @@ using UnityEngine.Rendering.Universal;
 using ProjectChimera.Core;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Economy;
+using ProjectChimera.Systems.Genetics;
 using EnvironmentSystems = ProjectChimera.Systems.Environment;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Progression;
