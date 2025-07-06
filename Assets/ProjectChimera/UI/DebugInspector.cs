@@ -830,12 +830,12 @@ namespace ProjectChimera.UI
             var nameLabel = new Label();
             nameLabel.name = "plant-name";
             nameLabel.style.color = new Color(0.9f, 0.9f, 0.9f);
-            nameLabel.style.fontSize = 12;
+            nameLabel.style.fontSize = new Length(12, LengthUnit.Pixel);
             
             var statusLabel = new Label();
             statusLabel.name = "plant-status";
             statusLabel.style.color = new Color(0.7f, 0.7f, 0.7f);
-            statusLabel.style.fontSize = 10;
+            statusLabel.style.fontSize = new Length(10, LengthUnit.Pixel);
             
             item.Add(nameLabel);
             item.Add(statusLabel);
