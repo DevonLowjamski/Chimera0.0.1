@@ -1,6 +1,6 @@
 using UnityEngine;
-using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
 
 /// <summary>
 /// Simple compilation test for ScientificCompetitionManager

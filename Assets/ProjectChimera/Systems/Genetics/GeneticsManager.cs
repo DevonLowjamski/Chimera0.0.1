@@ -1,7 +1,7 @@
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
 using System.Collections.Generic;
 using System.Linq;
 using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
@@ -31,7 +31,7 @@ namespace ProjectChimera.Systems.Genetics
         [Header("Event Channels")]
         [SerializeField] private GameEventSO<BreedingResult> _onBreedingCompleted;
         [SerializeField] private GameEventSO<GeneticMutation> _onMutationOccurred;
-        [SerializeField] private GameEventSO<PlantInstance> _onTraitExpressionCalculated;
+        [SerializeField] private GameEventSO<PlantInstanceSO> _onTraitExpressionCalculated;
         
         // Private fields
         private Dictionary<string, PlantGenotype> _genotypeCache = new Dictionary<string, PlantGenotype>();
@@ -94,7 +94,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Performs breeding between two parent plants and returns offspring genetics.
         /// </summary>
-        public BreedingResult BreedPlants(PlantInstance parent1, PlantInstance parent2, int numberOfOffspring = 1)
+        public BreedingResult BreedPlants(PlantInstanceSO parent1, PlantInstanceSO parent2, int numberOfOffspring = 1)
         {
             if (parent1 == null || parent2 == null)
             {
@@ -142,7 +142,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Calculates trait expression for a plant based on its genotype and environment.
         /// </summary>
-        public TraitExpressionResult CalculateTraitExpression(PlantInstance plant, EnvironmentalConditions environment)
+        public TraitExpressionResult CalculateTraitExpression(PlantInstanceSO plant, EnvironmentalConditions environment)
         {
             if (plant == null)
             {
@@ -170,7 +170,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Analyzes genetic diversity within a population of plants.
         /// </summary>
-        public GeneticDiversityAnalysis AnalyzeGeneticDiversity(List<PlantInstance> population)
+        public GeneticDiversityAnalysis AnalyzeGeneticDiversity(List<PlantInstanceSO> population)
         {
             if (population == null || population.Count == 0)
             {
@@ -192,7 +192,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Optimizes breeding selections using genetic algorithms.
         /// </summary>
-        public BreedingRecommendation OptimizeBreedingSelection(List<PlantInstance> candidates, TraitSelectionCriteria criteria)
+        public BreedingRecommendation OptimizeBreedingSelection(List<PlantInstanceSO> candidates, TraitSelectionCriteria criteria)
         {
             if (candidates == null || candidates.Count < 2)
             {
@@ -214,7 +214,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Simulates multiple generations of breeding with selection pressure.
         /// </summary>
-        public GenerationalSimulationResult SimulateGenerations(List<PlantInstance> foundingPopulation, 
+        public GenerationalSimulationResult SimulateGenerations(List<PlantInstanceSO> foundingPopulation, 
             int generations, TraitSelectionCriteria selectionCriteria)
         {
             var foundingGenotypes = new List<PlantGenotype>();
@@ -231,7 +231,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Gets breeding value prediction for a plant based on genetic markers.
         /// </summary>
-        public BreedingValuePrediction PredictBreedingValue(PlantInstance plant, List<TraitType> targetTraits)
+        public BreedingValuePrediction PredictBreedingValue(PlantInstanceSO plant, List<TraitType> targetTraits)
         {
             var genotype = GetOrGenerateGenotype(plant);
             if (genotype == null)
@@ -254,7 +254,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Gets genetic compatibility between two potential breeding partners.
         /// </summary>
-        public BreedingCompatibility AnalyzeBreedingCompatibility(PlantInstance plant1, PlantInstance plant2)
+        public BreedingCompatibility AnalyzeBreedingCompatibility(PlantInstanceSO plant1, PlantInstanceSO plant2)
         {
             var genotype1 = GetOrGenerateGenotype(plant1);
             var genotype2 = GetOrGenerateGenotype(plant2);
@@ -268,7 +268,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Gets or generates a genotype for a plant instance.
         /// </summary>
-        private PlantGenotype GetOrGenerateGenotype(PlantInstance plant)
+        private PlantGenotype GetOrGenerateGenotype(PlantInstanceSO plant)
         {
             if (plant == null || plant.Strain == null)
                 return null;

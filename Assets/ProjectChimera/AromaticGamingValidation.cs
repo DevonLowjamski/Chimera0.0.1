@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Genetics;
 using System;
 using System.Collections.Generic;
@@ -238,9 +239,9 @@ public class AromaticGamingValidation : MonoBehaviour
     
     private void TestTerpeneProfiles()
     {
-        var terpeneProfiles = new List<TerpeneProfile>
+        var terpeneProfiles = new List<ProjectChimera.Systems.Genetics.TerpeneProfile>
         {
-            new TerpeneProfile
+            new ProjectChimera.Systems.Genetics.TerpeneProfile
             {
                 TerpeneID = "terpene_limonene",
                 TerpeneName = "Limonene",
@@ -250,7 +251,7 @@ public class AromaticGamingValidation : MonoBehaviour
                 IsUnlocked = true,
                 GameDescription = "Bright and uplifting"
             },
-            new TerpeneProfile
+            new ProjectChimera.Systems.Genetics.TerpeneProfile
             {
                 TerpeneID = "terpene_myrcene",
                 TerpeneName = "Myrcene",
@@ -260,7 +261,7 @@ public class AromaticGamingValidation : MonoBehaviour
                 IsUnlocked = true,
                 GameDescription = "Relaxing and mellow"
             },
-            new TerpeneProfile
+            new ProjectChimera.Systems.Genetics.TerpeneProfile
             {
                 TerpeneID = "terpene_pinene",
                 TerpeneName = "Pinene",
@@ -270,7 +271,7 @@ public class AromaticGamingValidation : MonoBehaviour
                 IsUnlocked = true,
                 GameDescription = "Sharp and energizing"
             },
-            new TerpeneProfile
+            new ProjectChimera.Systems.Genetics.TerpeneProfile
             {
                 TerpeneID = "terpene_linalool",
                 TerpeneName = "Linalool",
@@ -574,7 +575,7 @@ public class AromaticGamingValidation : MonoBehaviour
         bool scentSerializable = !string.IsNullOrEmpty(scentJson);
         
         // Test TerpeneProfile serialization
-        var terpene = new TerpeneProfile
+        var terpene = new ProjectChimera.Systems.Genetics.TerpeneProfile
         {
             TerpeneID = "test_terpene",
             TerpeneName = "Test Terpene"
