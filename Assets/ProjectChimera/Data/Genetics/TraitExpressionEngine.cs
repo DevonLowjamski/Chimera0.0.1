@@ -168,7 +168,7 @@ namespace ProjectChimera.Data.Genetics
                     float baseEffect = traitEffect.EffectMagnitude;
                     
                     // Apply environmental modulation if allele supports it
-                    if (allele.EnvironmentallyRegulated && environment != null)
+                    if (allele.EnvironmentallySensitive && environment.IsInitialized())
                     {
                         float envModifier = CalculateEnvironmentalAlleleModifier(allele, environment);
                         baseEffect *= envModifier;
@@ -268,7 +268,7 @@ namespace ProjectChimera.Data.Genetics
         /// </summary>
         private float CalculateEnvironmentalHeightModifier(EnvironmentalConditions environment)
         {
-            if (environment == null) return 1f;
+            if (!environment.IsInitialized()) return 1f;
             
             float modifier = 1f;
             
@@ -347,7 +347,7 @@ namespace ProjectChimera.Data.Genetics
         /// </summary>
         private string GetEnvironmentalFactorSummary(EnvironmentalConditions environment)
         {
-            if (environment == null) return "No environmental data";
+            if (!environment.IsInitialized()) return "No environmental data";
             
             return $"Temp: {environment.Temperature:F1}°C, Light: {environment.LightIntensity:F0} PPFD, CO2: {environment.CO2Level:F0} ppm";
         }

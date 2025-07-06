@@ -408,12 +408,7 @@ namespace ProjectChimera.Data.Cultivation
                     {
                         if (genePair?.Gene != null)
                         {
-                            var alleleCouple = new AlleleCouple
-                            {
-                                Allele1 = genePair.Allele1,
-                                Allele2 = genePair.Allele2
-                            };
-                            
+                            var alleleCouple = new AlleleCouple(genePair.Allele1, genePair.Allele2);                            
                             plantGenotype.Genotype[genePair.Gene.GeneCode ?? genePair.Gene.GeneName] = alleleCouple;
                         }
                     }
