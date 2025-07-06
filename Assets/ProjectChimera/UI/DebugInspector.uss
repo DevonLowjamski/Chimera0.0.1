@@ -1,0 +1,525 @@
+/* Project Chimera - Debug Inspector Styles */
+
+/* Root Container */
+.debug-inspector {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(42, 42, 42);
+    color: rgb(210, 210, 210);
+    font-size: 12px;
+    padding: 10px;
+}
+
+/* Header Section */
+.header-section {
+    flex-direction: column;
+    background-color: rgb(35, 35, 35);
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(60, 130, 60);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.main-title {
+    font-size: 18px;
+    font-style: bold;
+    color: rgb(120, 200, 120);
+    margin-bottom: 5px;
+    -unity-text-align: upper-center;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    -unity-text-align: upper-center;
+    margin-bottom: 15px;
+}
+
+/* Time Controls */
+.time-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(50, 50, 50);
+    padding: 10px;
+    border-radius: 3px;
+}
+
+.section-label {
+    font-size: 14px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+}
+
+.time-buttons {
+    flex-direction: row;
+    align-items: center;
+}
+
+.time-button {
+    width: 40px;
+    height: 30px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 3px;
+    font-size: 16px;
+    background-color: rgb(70, 70, 70);
+    border-color: rgb(100, 100, 100);
+    color: rgb(220, 220, 220);
+}
+
+.time-button:hover {
+    background-color: rgb(90, 90, 90);
+}
+
+.time-button:active {
+    background-color: rgb(60, 130, 60);
+}
+
+.pause-button:active {
+    background-color: rgb(200, 100, 60);
+}
+
+.play-button:active {
+    background-color: rgb(60, 200, 60);
+}
+
+.fast-forward-button:active {
+    background-color: rgb(60, 100, 200);
+}
+
+.time-display {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.time-info {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 2px;
+}
+
+/* Content Container */
+.content-container {
+    flex-direction: row;
+    flex-grow: 1;
+    height: 100%;
+}
+
+/* Panel Styles */
+.left-panel, .center-panel, .right-panel {
+    background-color: rgb(48, 48, 48);
+    border-width: 1px;
+    border-color: rgb(70, 70, 70);
+    border-radius: 5px;
+    padding: 10px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.left-panel {
+    width: 25%;
+    min-width: 200px;
+}
+
+.center-panel {
+    flex-grow: 1;
+    width: 50%;
+}
+
+.right-panel {
+    width: 25%;
+    min-width: 180px;
+}
+
+.panel-title {
+    font-size: 14px;
+    font-style: bold;
+    color: rgb(120, 200, 120);
+    margin-bottom: 10px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 130, 60);
+    padding-bottom: 5px;
+}
+
+/* Plant Selection Panel */
+.plant-list-scroll {
+    height: 300px;
+    background-color: rgb(55, 55, 55);
+    border-width: 1px;
+    border-color: rgb(80, 80, 80);
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+
+.plant-list {
+    background-color: transparent;
+}
+
+.plant-filters {
+    margin-bottom: 15px;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(180, 180, 180);
+    margin-bottom: 5px;
+}
+
+.filter-dropdown {
+    margin-bottom: 5px;
+    background-color: rgb(60, 60, 60);
+    border-color: rgb(90, 90, 90);
+}
+
+.summary-stats {
+    background-color: rgb(52, 52, 52);
+    padding: 8px;
+    border-radius: 3px;
+}
+
+.stats-title {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+    margin-bottom: 5px;
+}
+
+.stat-item {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 2px;
+}
+
+/* Plant Data Panel */
+.plant-overview {
+    background-color: rgb(52, 52, 52);
+    padding: 15px;
+    border-radius: 3px;
+    margin-bottom: 15px;
+    border-left-width: 3px;
+    border-left-color: rgb(60, 130, 60);
+}
+
+.plant-name {
+    font-size: 16px;
+    font-style: bold;
+    color: rgb(120, 200, 120);
+    margin-bottom: 5px;
+}
+
+.plant-info {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+}
+
+/* Genetics Section */
+.genetics-section {
+    margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-style: bold;
+    color: rgb(200, 180, 120);
+    margin-bottom: 8px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(120, 100, 60);
+    padding-bottom: 3px;
+}
+
+.genotype-container, .phenotype-container {
+    margin-bottom: 10px;
+}
+
+.genetics-label {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(180, 180, 180);
+    margin-bottom: 5px;
+}
+
+.genotype-scroll, .phenotype-scroll {
+    height: 80px;
+    background-color: rgb(55, 55, 55);
+    border-width: 1px;
+    border-color: rgb(80, 80, 80);
+    border-radius: 3px;
+}
+
+.genotype-list, .phenotype-list {
+    padding: 5px;
+}
+
+/* Real-time Data Section */
+.realtime-data-section {
+    margin-bottom: 15px;
+}
+
+.primary-stats {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.stat-group {
+    background-color: rgb(52, 52, 52);
+    padding: 10px;
+    border-radius: 3px;
+    width: 30%;
+    margin-right: 2%;
+}
+
+.stat-group:last-child {
+    margin-right: 0;
+}
+
+.stat-group-title {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+    margin-bottom: 8px;
+    -unity-text-align: upper-center;
+}
+
+.stat-progress {
+    margin-bottom: 8px;
+    height: 20px;
+}
+
+.stat-progress .unity-progress-bar__background {
+    background-color: rgb(70, 70, 70);
+    border-radius: 3px;
+}
+
+.stat-progress .unity-progress-bar__progress {
+    background-color: rgb(60, 130, 60);
+    border-radius: 3px;
+}
+
+.health-bar .unity-progress-bar__progress {
+    background-color: rgb(60, 180, 60);
+}
+
+/* Environmental Section */
+.environmental-section {
+    margin-bottom: 15px;
+}
+
+.environmental-grid {
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(52, 52, 52);
+    padding: 10px;
+    border-radius: 3px;
+}
+
+.env-group {
+    flex-direction: column;
+    width: 30%;
+}
+
+.env-stat {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 3px;
+    background-color: rgb(60, 60, 60);
+    padding: 3px 6px;
+    border-radius: 2px;
+    margin-bottom: 3px;
+}
+
+/* System Panel */
+.manager-status {
+    margin-bottom: 15px;
+}
+
+.status-section-title {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(180, 200, 120);
+    margin-bottom: 8px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(100, 120, 60);
+    padding-bottom: 3px;
+}
+
+.manager-list {
+    background-color: rgb(52, 52, 52);
+    padding: 8px;
+    border-radius: 3px;
+}
+
+.manager-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+}
+
+.manager-name {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+}
+
+.status-indicator {
+    font-size: 12px;
+    color: rgb(60, 200, 60);
+}
+
+/* Performance Section */
+.performance-section {
+    margin-bottom: 15px;
+}
+
+.performance-stats {
+    background-color: rgb(52, 52, 52);
+    padding: 8px;
+    border-radius: 3px;
+}
+
+.perf-stat {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 3px;
+    background-color: rgb(60, 60, 60);
+    padding: 2px 5px;
+    border-radius: 2px;
+}
+
+/* Debug Controls */
+.debug-controls {
+    margin-bottom: 15px;
+}
+
+.debug-buttons {
+    flex-direction: column;
+}
+
+.debug-button {
+    height: 25px;
+    margin-bottom: 5px;
+    background-color: rgb(70, 70, 70);
+    border-color: rgb(100, 100, 100);
+    color: rgb(220, 220, 220);
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.debug-button:hover {
+    background-color: rgb(90, 90, 90);
+}
+
+.debug-button:active {
+    background-color: rgb(120, 80, 60);
+}
+
+/* Data Export */
+.data-export {
+    margin-bottom: 15px;
+}
+
+.export-options {
+    background-color: rgb(52, 52, 52);
+    padding: 8px;
+    border-radius: 3px;
+}
+
+.export-toggle {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 5px;
+}
+
+.export-button {
+    height: 25px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    background-color: rgb(60, 100, 140);
+    border-color: rgb(80, 120, 160);
+    color: rgb(220, 220, 220);
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.export-button:hover {
+    background-color: rgb(70, 110, 150);
+}
+
+.export-button:active {
+    background-color: rgb(80, 120, 160);
+}
+
+/* Footer */
+.footer-status {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(35, 35, 35);
+    border-top-width: 1px;
+    border-top-color: rgb(70, 70, 70);
+    padding: 8px 15px;
+    margin-top: 10px;
+}
+
+.footer-info {
+    font-size: 10px;
+    color: rgb(150, 150, 150);
+}
+
+.status-message {
+    font-size: 11px;
+    color: rgb(120, 200, 120);
+    font-style: bold;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .primary-stats {
+        flex-direction: column;
+    }
+    
+    .stat-group {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+    
+    .environmental-grid {
+        flex-direction: column;
+    }
+    
+    .env-group {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* Selection States */
+.plant-list .unity-list-view__item:hover {
+    background-color: rgb(70, 70, 70);
+}
+
+.plant-list .unity-list-view__item--selected {
+    background-color: rgb(60, 130, 60);
+}
+
+/* Scrollbar Styling */
+.unity-scroll-view__vertical-scroller {
+    width: 12px;
+}
+
+.unity-scroll-view__vertical-scroller .unity-slider__tracker {
+    background-color: rgb(60, 60, 60);
+}
+
+.unity-scroll-view__vertical-scroller .unity-slider__dragger {
+    background-color: rgb(100, 100, 100);
+    border-radius: 6px;
+}
+
+.unity-scroll-view__vertical-scroller .unity-slider__dragger:hover {
+    background-color: rgb(120, 120, 120);
+}

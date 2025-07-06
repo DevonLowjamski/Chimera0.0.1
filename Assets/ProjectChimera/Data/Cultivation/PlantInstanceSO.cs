@@ -1,6 +1,7 @@
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
 
 namespace ProjectChimera.Data.Cultivation
 {
@@ -56,6 +57,14 @@ namespace ProjectChimera.Data.Cultivation
         [SerializeField] private System.DateTime _lastFeeding;
         [SerializeField] private System.DateTime _lastTraining; // LST, topping, etc.
         
+        [Header("Genetic Expression")]
+        [SerializeField] private float _calculatedMaxHeight; // Genetically determined max height
+        [SerializeField] private float _lastTraitCalculationAge; // Age when traits were last calculated
+        
+        // Non-serialized runtime references
+        private TraitExpressionEngine _traitExpressionEngine;
+        private TraitExpressionResult _lastTraitExpression;
+        
         // Properties for external access
         public string PlantID => _plantID;
         public string PlantName => _plantName;
@@ -86,6 +95,8 @@ namespace ProjectChimera.Data.Cultivation
         public System.DateTime LastWatering => _lastWatering;
         public System.DateTime LastFeeding => _lastFeeding;
         public System.DateTime LastTraining => _lastTraining;
+        public float CalculatedMaxHeight => _calculatedMaxHeight;
+        public TraitExpressionResult LastTraitExpression => _lastTraitExpression;
 
         /// <summary>
         /// Initializes a new plant instance with the specified strain and genotype.
@@ -135,6 +146,11 @@ namespace ProjectChimera.Data.Cultivation
             _lastWatering = System.DateTime.Now;
             _lastFeeding = System.DateTime.Now.AddDays(-1); // Last fed yesterday
             _lastTraining = System.DateTime.MinValue; // Never trained
+            
+            // Initialize genetic expression system
+            _traitExpressionEngine = new TraitExpressionEngine(true, true); // Enable epistasis and pleiotropy
+            _calculatedMaxHeight = 0f; // Will be calculated on first growth update
+            _lastTraitCalculationAge = -1f; // Force initial calculation
         }
 
         /// <summary>
@@ -167,6 +183,9 @@ namespace ProjectChimera.Data.Cultivation
             // Apply growth stage modifiers
             float stageModifier = GetGrowthStageModifier();
             _dailyGrowthRate = baseGrowthRate * stageModifier * timeMultiplier;
+            
+            // Update genetic trait expression (Phase 0.2: Core Genetic Engine integration)
+            UpdateGeneticTraitExpression(environment);
             
             // Update physical characteristics
             UpdatePhysicalGrowth(timeMultiplier);
@@ -311,28 +330,285 @@ namespace ProjectChimera.Data.Cultivation
             };
         }
 
+        /// <summary>
+        /// Calculate genetic traits using the TraitExpressionEngine.
+        /// Phase 0.2: Integration with genetic expression system.
+        /// </summary>
+        private void UpdateGeneticTraitExpression(EnvironmentalConditions environment)
+        {
+            // Only recalculate if enough time has passed or if never calculated
+            bool shouldRecalculate = _lastTraitCalculationAge < 0f || 
+                                   (_ageInDays - _lastTraitCalculationAge) >= 1f || // Recalculate daily
+                                   _calculatedMaxHeight == 0f;
+            
+            if (!shouldRecalculate || _genotype == null || _traitExpressionEngine == null)
+                return;
+
+            try
+            {
+                // Check if we have the correct genotype type for trait calculation
+                if (_genotype is GenotypeDataSO genotypeData)
+                {
+                    // For now, create a basic PlantGenotype from GenotypeDataSO
+                    // In future iterations, this could be a direct conversion method
+                    var plantGenotype = CreatePlantGenotypeFromData(genotypeData);
+                    
+                    if (plantGenotype != null)
+                    {
+                        // Calculate trait expression using the genetic engine
+                        _lastTraitExpression = _traitExpressionEngine.CalculateExpression(plantGenotype, environment);
+                        
+                        // Update calculated max height from genetic expression
+                        if (_lastTraitExpression != null)
+                        {
+                            _calculatedMaxHeight = _lastTraitExpression.HeightExpression * 100f; // Convert to cm
+                            _lastTraitCalculationAge = _ageInDays;
+                            
+                            Debug.Log($"Plant {_plantName}: Calculated max height {_calculatedMaxHeight:F1}cm from genetics " +
+                                     $"(Fitness: {_lastTraitExpression.OverallFitness:F2})");
+                        }
+                    }
+                }
+                else
+                {
+                    // Fallback for when genetic data is not in expected format
+                    _calculatedMaxHeight = CalculateFallbackMaxHeight();
+                    _lastTraitCalculationAge = _ageInDays;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"Plant {_plantName}: Error calculating genetic traits - {ex.Message}. Using fallback.");
+                _calculatedMaxHeight = CalculateFallbackMaxHeight();
+                _lastTraitCalculationAge = _ageInDays;
+            }
+        }
+        
+        /// <summary>
+        /// Create a PlantGenotype from GenotypeDataSO for trait calculation.
+        /// Temporary bridge method until unified genotype system is implemented.
+        /// </summary>
+        private PlantGenotype CreatePlantGenotypeFromData(GenotypeDataSO genotypeData)
+        {
+            try
+            {
+                var plantGenotype = new PlantGenotype
+                {
+                    GenotypeID = genotypeData.IndividualID ?? "Unknown",
+                    StrainOrigin = _strain,
+                    Generation = 0,
+                    IsFounder = true,
+                    CreationDate = _plantedDate,
+                    InbreedingCoefficient = 0.0f
+                };
+                
+                // Convert GenePairs to Dictionary format expected by PlantGenotype
+                if (genotypeData.GenePairs != null)
+                {
+                    foreach (var genePair in genotypeData.GenePairs)
+                    {
+                        if (genePair?.Gene != null)
+                        {
+                            var alleleCouple = new AlleleCouple
+                            {
+                                Allele1 = genePair.Allele1,
+                                Allele2 = genePair.Allele2
+                            };
+                            
+                            plantGenotype.Genotype[genePair.Gene.GeneCode ?? genePair.Gene.GeneName] = alleleCouple;
+                        }
+                    }
+                }
+                
+                return plantGenotype;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Error creating PlantGenotype from GenotypeDataSO: {ex.Message}");
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Calculate fallback max height when genetic calculation fails.
+        /// </summary>
+        private float CalculateFallbackMaxHeight()
+        {
+            // Use strain-based estimation if available
+            if (_strain != null)
+            {
+                var strainName = _strain.name?.ToLower();
+                if (!string.IsNullOrEmpty(strainName))
+                {
+                    if (strainName.Contains("indica"))
+                        return 120f; // 120cm average for Indica
+                    else if (strainName.Contains("sativa"))
+                        return 200f; // 200cm average for Sativa  
+                    else if (strainName.Contains("auto"))
+                        return 80f; // 80cm average for Autoflower
+                }
+            }
+            
+            return 150f; // Default fallback height
+        }
+
+        /// <summary>
+        /// Update physical growth using genetic trait expression for height limits.
+        /// Phase 0.2: Refactored to use TraitExpressionEngine results.
+        /// </summary>
         private void UpdatePhysicalGrowth(float timeMultiplier)
         {
-            // Height growth
-            float heightGrowth = _dailyGrowthRate * timeMultiplier;
-            _currentHeight += heightGrowth;
+            // Get genetically determined max height (fallback to strain-based if not calculated)
+            float targetMaxHeight = _calculatedMaxHeight > 0f ? _calculatedMaxHeight : CalculateFallbackMaxHeight();
+            
+            // Calculate height growth with genetic constraints
+            float baseHeightGrowth = _dailyGrowthRate * timeMultiplier;
+            
+            // Apply growth curve based on progress toward genetic maximum
+            float heightProgress = _currentHeight / targetMaxHeight;
+            float growthRateModifier = CalculateGrowthCurveModifier(heightProgress);
+            
+            // Apply the growth rate modifier to slow growth as plant approaches max height
+            float adjustedHeightGrowth = baseHeightGrowth * growthRateModifier;
+            
+            // Prevent height from exceeding genetic maximum
+            float newHeight = _currentHeight + adjustedHeightGrowth;
+            _currentHeight = Mathf.Min(newHeight, targetMaxHeight);
             
             // Width follows height with genetic ratio
             float geneticWidthRatio = _genotype != null ? _genotype.GetWidthToHeightRatio() : 0.6f;
             _currentWidth = _currentHeight * geneticWidthRatio;
             
-            // Leaf area development
-            if (_currentGrowthStage == PlantGrowthStage.Vegetative || _currentGrowthStage == PlantGrowthStage.PreFlowering)
+            // Root mass development based on genetic factors
+            UpdateRootDevelopment(timeMultiplier);
+            
+            // Leaf area development with genetic and environmental influences
+            UpdateLeafAreaDevelopment(adjustedHeightGrowth, timeMultiplier);
+            
+            // Update biomass accumulation based on actual growth achieved
+            float actualGrowthAchieved = adjustedHeightGrowth / baseHeightGrowth; // Growth efficiency
+            _biomassAccumulation = _dailyGrowthRate * actualGrowthAchieved * timeMultiplier;
+            
+            // Log genetic-based growth if in debug mode
+            if (Debug.isDebugBuild && _calculatedMaxHeight > 0f)
             {
-                _leafArea += heightGrowth * 2f; // Leaves grow faster than height
+                Debug.Log($"Plant {_plantName}: Height {_currentHeight:F1}cm/{targetMaxHeight:F1}cm " +
+                         $"(Progress: {heightProgress * 100f:F1}%, Growth Rate: {growthRateModifier:F2}x)");
+            }
+        }
+        
+        /// <summary>
+        /// Calculate growth rate modifier based on progress toward genetic maximum.
+        /// Uses sigmoid curve to naturally slow growth as plant approaches maturity.
+        /// </summary>
+        private float CalculateGrowthCurveModifier(float heightProgress)
+        {
+            // Clamp progress to prevent issues
+            heightProgress = Mathf.Clamp01(heightProgress);
+            
+            // Apply sigmoid-like growth curve (rapid early growth, slowing toward maximum)
+            // Formula: 1 / (1 + exp(10 * (progress - 0.7)))
+            // This gives fast growth until 70% of max height, then rapid slowdown
+            float sigmoidInput = 10f * (heightProgress - 0.7f);
+            float sigmoidModifier = 1f / (1f + Mathf.Exp(sigmoidInput));
+            
+            // Ensure minimum growth rate (plants always grow a little)
+            return Mathf.Max(0.1f, sigmoidModifier);
+        }
+        
+        /// <summary>
+        /// Update root development based on genetic factors and growth stage.
+        /// </summary>
+        private void UpdateRootDevelopment(float timeMultiplier)
+        {
+            switch (_currentGrowthStage)
+            {
+                case PlantGrowthStage.Seed:
+                case PlantGrowthStage.Germination:
+                    _rootMassPercentage = Mathf.Min(80f, _rootMassPercentage + (5f * timeMultiplier)); // Rapid root development
+                    break;
+                    
+                case PlantGrowthStage.Seedling:
+                case PlantGrowthStage.Vegetative:
+                    // Root development continues but slows as above-ground mass increases
+                    float targetRootPercentage = GetGeneticRootMassTarget();
+                    if (_rootMassPercentage < targetRootPercentage)
+                    {
+                        _rootMassPercentage += 1f * timeMultiplier;
+                    }
+                    break;
+                    
+                case PlantGrowthStage.Flowering:
+                case PlantGrowthStage.Ripening:
+                    // Root development mostly stops during flowering
+                    break;
             }
             
-            // Root development
-            _rootDevelopmentRate = _dailyGrowthRate * 0.8f; // Roots grow slower than above-ground
-            _rootMassPercentage = Mathf.Clamp(_rootMassPercentage + (_rootDevelopmentRate * 0.1f), 15f, 40f);
+            _rootMassPercentage = Mathf.Clamp(_rootMassPercentage, 10f, 90f);
+        }
+        
+        /// <summary>
+        /// Update leaf area development with genetic and environmental considerations.
+        /// </summary>
+        private void UpdateLeafAreaDevelopment(float heightGrowth, float timeMultiplier)
+        {
+            switch (_currentGrowthStage)
+            {
+                case PlantGrowthStage.Vegetative:
+                case PlantGrowthStage.PreFlowering:
+                    // Rapid leaf development during vegetative growth
+                    float leafGrowthRate = heightGrowth * 2.5f; // Leaves grow faster than height
+                    
+                    // Apply environmental factors to leaf development
+                    if (_currentEnvironment != null)
+                    {
+                        float lightModifier = Mathf.Clamp(_currentEnvironment.LightIntensity / 600f, 0.5f, 1.5f);
+                        leafGrowthRate *= lightModifier;
+                    }
+                    
+                    _leafArea += leafGrowthRate;
+                    break;
+                    
+                case PlantGrowthStage.Flowering:
+                    // Slower leaf development during flowering (energy goes to flowers)
+                    _leafArea += heightGrowth * 0.5f * timeMultiplier;
+                    break;
+                    
+                case PlantGrowthStage.Ripening:
+                    // Leaf area may decrease as plant focuses on seed/flower development
+                    if (_leafArea > 100f) // Maintain minimum leaf area for photosynthesis
+                    {
+                        _leafArea -= heightGrowth * 0.2f * timeMultiplier;
+                    }
+                    break;
+            }
             
-            // Biomass accumulation
-            _biomassAccumulation = (_dailyGrowthRate + _rootDevelopmentRate) * 0.5f;
+            // Genetic maximum leaf area (roughly proportional to height)
+            float maxLeafArea = (_calculatedMaxHeight > 0f ? _calculatedMaxHeight : 150f) * 8f; // 8 cm² per cm height
+            _leafArea = Mathf.Clamp(_leafArea, 0f, maxLeafArea);
+        }
+        
+        /// <summary>
+        /// Get genetic target for root mass percentage.
+        /// </summary>
+        private float GetGeneticRootMassTarget()
+        {
+            // Different strains have different root characteristics
+            if (_strain != null)
+            {
+                var strainName = _strain.name?.ToLower();
+                if (!string.IsNullOrEmpty(strainName))
+                {
+                    if (strainName.Contains("indica"))
+                        return 35f; // Indica tends to have more robust root systems
+                    else if (strainName.Contains("sativa"))
+                        return 25f; // Sativa focuses more on above-ground growth
+                    else if (strainName.Contains("auto"))
+                        return 40f; // Autoflowers need strong roots for fast growth
+                }
+            }
+            
+            return 30f; // Default target
         }
 
         private void UpdateHealthAndVitality(float environmentalStress, float timeMultiplier)
