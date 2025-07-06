@@ -163,11 +163,14 @@ namespace ProjectChimera.Testing
         private AlleleSO CreateTestAllele(string code, float effect)
         {
             var allele = ScriptableObject.CreateInstance<AlleleSO>();
-            allele.AlleleCode = code;
-            allele.AlleleName = $"Test Allele {code}";
-            allele.EffectStrength = effect;
-            allele.IsDominant = code == "H";
-            allele.IsRecessive = code == "h";
+            
+            // Use reflection to set private fields since properties are read-only
+            var alleleType = typeof(AlleleSO);
+            alleleType.GetField("_alleleCode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, code);
+            alleleType.GetField("_alleleName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, $"Test Allele {code}");
+            alleleType.GetField("_effectStrength", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, effect);
+            alleleType.GetField("_isDominant", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, code == "H");
+            alleleType.GetField("_isRecessive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, code == "h");
             
             var heightEffect = new TraitEffect
             {
@@ -176,7 +179,8 @@ namespace ProjectChimera.Testing
                 IsMainEffect = true
             };
             
-            allele.TraitEffects = new List<TraitEffect> { heightEffect };
+            var traitEffects = new List<TraitEffect> { heightEffect };
+            alleleType.GetField("_traitEffects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, traitEffects);
             
             return allele;
         }

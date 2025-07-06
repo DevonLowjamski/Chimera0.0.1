@@ -124,15 +124,28 @@ namespace ProjectChimera.Testing
         private GeneDefinitionSO CreateHeightGene()
         {
             var gene = ScriptableObject.CreateInstance<GeneDefinitionSO>();
-            gene.GeneName = "Height Main Gene";
-            gene.GeneSymbol = "HGT1";
-            gene.GeneCode = _testGeneLocusName;
-            gene.DominanceType = DominanceType.Incomplete; // Allows for intermediate expression
-            gene.InheritancePattern = InheritancePattern.Mendelian;
-            gene.EnvironmentallyRegulated = true;
             
-            // Add Height to influenced traits
-            gene.InfluencedTraits = new List<PlantTrait> { PlantTrait.Height };
+            // Use reflection to set private fields since properties are read-only
+            var geneType = typeof(GeneDefinitionSO);
+            geneType.GetField("_geneName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, "Height Main Gene");
+            geneType.GetField("_geneSymbol", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, "HGT1");
+            geneType.GetField("_geneCode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, _testGeneLocusName);
+            geneType.GetField("_dominanceType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, DominanceType.Incomplete);
+            geneType.GetField("_inheritancePattern", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, InheritancePattern.Mendelian);
+            geneType.GetField("_environmentallyRegulated", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, true);
+            
+            // Create influenced traits list
+            var influencedTraits = new List<TraitInfluence>
+            {
+                new TraitInfluence
+                {
+                    TraitType = PlantTrait.Height,
+                    InfluenceStrength = 1.0f,
+                    IsPositiveEffect = true,
+                    InfluenceDescription = "Primary height control gene"
+                }
+            };
+            geneType.GetField("_influencedTraits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(gene, influencedTraits);
             
             LogDebug($"Created height gene: {gene.GeneName}");
             return gene;
@@ -144,13 +157,15 @@ namespace ProjectChimera.Testing
         private AlleleSO CreateDominantAllele()
         {
             var allele = ScriptableObject.CreateInstance<AlleleSO>();
-            allele.AlleleCode = "H";
-            allele.AlleleName = "Tall Height Allele";
-            allele.ParentGene = _heightGene;
-            allele.IsDominant = true;
-            allele.IsRecessive = false;
-            allele.EffectStrength = _dominantAlleleEffect;
-            allele.EnvironmentallyRegulated = true;
+            
+            // Use reflection to set private fields since properties are read-only
+            var alleleType = typeof(AlleleSO);
+            alleleType.GetField("_alleleCode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, "H");
+            alleleType.GetField("_alleleName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, "Tall Height Allele");
+            alleleType.GetField("_parentGene", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, _heightGene);
+            alleleType.GetField("_isDominant", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, true);
+            alleleType.GetField("_isRecessive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, false);
+            alleleType.GetField("_effectStrength", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, _dominantAlleleEffect);
             
             // Create trait effect for height
             var heightEffect = new TraitEffect
@@ -160,7 +175,8 @@ namespace ProjectChimera.Testing
                 IsMainEffect = true
             };
             
-            allele.TraitEffects = new List<TraitEffect> { heightEffect };
+            var traitEffects = new List<TraitEffect> { heightEffect };
+            alleleType.GetField("_traitEffects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, traitEffects);
             
             LogDebug($"Created dominant allele: {allele.AlleleCode} (effect: +{_dominantAlleleEffect * 100:F0}%)");
             return allele;
@@ -172,13 +188,15 @@ namespace ProjectChimera.Testing
         private AlleleSO CreateRecessiveAllele()
         {
             var allele = ScriptableObject.CreateInstance<AlleleSO>();
-            allele.AlleleCode = "h";
-            allele.AlleleName = "Short Height Allele";
-            allele.ParentGene = _heightGene;
-            allele.IsDominant = false;
-            allele.IsRecessive = true;
-            allele.EffectStrength = _recessiveAlleleEffect;
-            allele.EnvironmentallyRegulated = true;
+            
+            // Use reflection to set private fields since properties are read-only
+            var alleleType = typeof(AlleleSO);
+            alleleType.GetField("_alleleCode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, "h");
+            alleleType.GetField("_alleleName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, "Short Height Allele");
+            alleleType.GetField("_parentGene", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, _heightGene);
+            alleleType.GetField("_isDominant", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, false);
+            alleleType.GetField("_isRecessive", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, true);
+            alleleType.GetField("_effectStrength", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, _recessiveAlleleEffect);
             
             // Create trait effect for height
             var heightEffect = new TraitEffect
@@ -188,7 +206,8 @@ namespace ProjectChimera.Testing
                 IsMainEffect = true
             };
             
-            allele.TraitEffects = new List<TraitEffect> { heightEffect };
+            var traitEffects = new List<TraitEffect> { heightEffect };
+            alleleType.GetField("_traitEffects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(allele, traitEffects);
             
             LogDebug($"Created recessive allele: {allele.AlleleCode} (effect: {_recessiveAlleleEffect * 100:F0}%)");
             return allele;
