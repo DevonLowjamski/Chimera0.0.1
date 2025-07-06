@@ -107,7 +107,6 @@ namespace ProjectChimera.UI
         private void Start()
         {
             InitializeUI();
-            SetupEventHandlers();
             StartRealTimeUpdates();
             
             isInitialized = true;
@@ -561,11 +560,11 @@ namespace ProjectChimera.UI
             
             var nameLabel = new Label(geneName);
             nameLabel.style.color = new Color(0.8f, 0.8f, 0.8f);
-            nameLabel.style.fontSize = 11;
+            nameLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
             
             var valueLabel = new Label(geneValue?.ToString() ?? "null");
             valueLabel.style.color = isGenotype ? new Color(0.7f, 0.9f, 0.7f) : new Color(0.9f, 0.8f, 0.6f);
-            valueLabel.style.fontSize = 11;
+            valueLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
             valueLabel.style.fontStyle = FontStyle.Bold;
             
             element.Add(nameLabel);
@@ -586,15 +585,18 @@ namespace ProjectChimera.UI
             element.style.paddingRight = 5;
             element.style.backgroundColor = new Color(0.3f, 0.3f, 0.2f, 0.5f);
             element.style.marginBottom = 2;
-            element.style.borderRadius = 2;
+            element.style.borderTopLeftRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderTopRightRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderBottomLeftRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderBottomRightRadius = new Length(2, LengthUnit.Pixel);
             
             var nameLabel = new Label(traitName);
             nameLabel.style.color = new Color(0.8f, 0.8f, 0.8f);
-            nameLabel.style.fontSize = 11;
+            nameLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
             
             var valueLabel = new Label($"{traitValue:F2}");
             valueLabel.style.color = new Color(0.9f, 0.8f, 0.6f);
-            valueLabel.style.fontSize = 11;
+            valueLabel.style.fontSize = new Length(11, LengthUnit.Pixel);
             valueLabel.style.fontStyle = FontStyle.Bold;
             
             element.Add(nameLabel);
@@ -608,7 +610,7 @@ namespace ProjectChimera.UI
             if (selectedPlant == null) return;
             
             // Update growth progress bars
-            var maxHeight = selectedPlant.Strain?.MaxHeight ?? 200f; // Default max height
+            var maxHeight = selectedPlant.Strain?.BaseHeight ?? 200f; // Default max height
             heightProgress.value = selectedPlant.CurrentHeight / maxHeight * 100f;
             biomassProgress.value = selectedPlant.BiomassAccumulation * 10f; // Scale for display
             maturityProgress.value = (selectedPlant.AgeInDays / 90f) * 100f; // Assume 90 days to maturity
@@ -684,7 +686,7 @@ namespace ProjectChimera.UI
             fpsLabel.text = $"FPS: {lastFPS:F1}";
             
             // Update Memory Usage
-            lastMemoryUsage = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory(false) / 1024 / 1024;
+            lastMemoryUsage = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory() / 1024 / 1024;
             memoryLabel.text = $"Memory: {lastMemoryUsage} MB";
             
             // Update Plant Count
