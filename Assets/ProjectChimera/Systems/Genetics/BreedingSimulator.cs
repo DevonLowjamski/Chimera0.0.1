@@ -1,6 +1,6 @@
 using UnityEngine;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
 using System.Collections.Generic;
 
 namespace ProjectChimera.Systems.Genetics
