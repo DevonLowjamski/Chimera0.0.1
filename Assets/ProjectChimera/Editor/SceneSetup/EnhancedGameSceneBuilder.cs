@@ -9,6 +9,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Economy;
 using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Progression;
 using ProjectChimera.Systems.Community;
 using ProjectChimera.Systems.Construction;

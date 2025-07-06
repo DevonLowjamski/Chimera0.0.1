@@ -11,10 +11,10 @@ using ProjectChimera.UI.Core;
 using ProjectChimera.UI.Panels;
 using ProjectChimera.Systems.AI;
 using ProjectChimera.Systems.Automation;
-using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Systems.Cultivation;
-using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Automation;
 using ProjectChimera.Data.UI;
 

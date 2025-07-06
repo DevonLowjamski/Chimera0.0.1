@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Tutorial;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Genetics;
 
 namespace ProjectChimera.Systems.Tutorial

@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Genetics;
 using System;
 using System.Collections.Generic;

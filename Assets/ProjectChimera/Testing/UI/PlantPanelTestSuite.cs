@@ -9,10 +9,10 @@ using ProjectChimera.Core;
 using ProjectChimera.Testing.Core;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.UI.Core;
 using ProjectChimera.UI.Panels;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Genetics;
 
 namespace ProjectChimera.Testing.UI
 {

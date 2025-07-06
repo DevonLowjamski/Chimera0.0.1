@@ -1,8 +1,8 @@
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.Genetics;
-using ProjectChimera.Systems.Progression;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Progression;
+using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Data.Progression;
 
 namespace ProjectChimera

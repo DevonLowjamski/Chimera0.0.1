@@ -126,7 +126,7 @@
                 
             </ui:VisualElement>
             
-            <!-- Right Panel - Advanced Controls & Status -->
+            <!-- Right Panel - Advanced Controls &amp; Status -->
             <ui:VisualElement name="status-panel" class="status-section">
                 
                 <!-- Equipment Status -->

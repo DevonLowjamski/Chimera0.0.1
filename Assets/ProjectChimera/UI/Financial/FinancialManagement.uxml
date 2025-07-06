@@ -6,7 +6,7 @@
         <ui:VisualElement name="header-section" class="financial-header">
             <ui:VisualElement class="header-left">
                 <ui:Label text="💰 Financial Management Center" class="panel-title" />
-                <ui:Label text="Portfolio & Trading Dashboard" class="panel-subtitle" />
+                <ui:Label text="Portfolio &amp; Trading Dashboard" class="panel-subtitle" />
             </ui:VisualElement>
             
             <ui:VisualElement class="tab-navigation">
@@ -46,7 +46,7 @@
                         </ui:VisualElement>
                         
                         <ui:VisualElement class="summary-card">
-                            <ui:Label text="Daily P&L" class="card-label" />
+                            <ui:Label text="Daily P&amp;L" class="card-label" />
                             <ui:Label name="daily-pnl-display" text="+2.3%" class="card-value positive" />
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -57,7 +57,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 
-                <!-- Quick Stats & Recent Activity -->
+                <!-- Quick Stats &amp; Recent Activity -->
                 <ui:VisualElement class="overview-content">
                     <ui:VisualElement name="quick-stats-container" class="stats-panel">
                         <ui:Label text="📊 Quick Statistics" class="section-title" />
@@ -159,7 +159,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 
-                <!-- Investment Opportunities & Active Investments -->
+                <!-- Investment Opportunities &amp; Active Investments -->
                 <ui:VisualElement class="investment-content">
                     <ui:VisualElement name="investment-opportunities" class="opportunities-panel">
                         <ui:Label text="🚀 Investment Opportunities" class="section-title" />
@@ -229,8 +229,8 @@
                     </ui:VisualElement>
                     
                     <ui:VisualElement name="profit-loss-statement" class="pnl-panel">
-                        <ui:Label text="💰 Profit & Loss Statement" class="panel-title" />
-                        <!-- P&L statement populated dynamically -->
+                        <ui:Label text="💰 Profit &amp; Loss Statement" class="panel-title" />
+                        <!-- P&amp;L statement populated dynamically -->
                     </ui:VisualElement>
                     
                     <ui:VisualElement name="tax-reporting" class="tax-panel">
@@ -246,7 +246,7 @@
         <!-- Footer Status -->
         <ui:VisualElement name="footer-status" class="financial-footer">
             <ui:Label text="🟢 Market Open | Connected to Trading Systems" class="footer-status-message" />
-            <ui:Label text="Portfolio: $125,000 (+2.3%) | Cash: $25,000 | P&L: +$8,500" class="footer-summary" />
+            <ui:Label text="Portfolio: $125,000 (+2.3%) | Cash: $25,000 | P&amp;L: +$8,500" class="footer-summary" />
             <ui:Label text="Last Update: 10 seconds ago" class="footer-timestamp" />
         </ui:VisualElement>
         

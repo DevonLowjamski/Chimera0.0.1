@@ -15,9 +15,9 @@ using ProjectChimera.Systems.Analytics;
 using ProjectChimera.Systems.Automation;
 using ProjectChimera.Systems.Settings;
 using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
 using SettingsManager = ProjectChimera.Systems.Settings.SettingsManager;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Genetics;
 
 namespace ProjectChimera.Testing.Systems
 {

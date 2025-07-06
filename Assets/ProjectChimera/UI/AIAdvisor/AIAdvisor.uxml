@@ -140,7 +140,7 @@
             
         </ui:VisualElement>
         
-        <!-- Bottom Panel - Quick Actions & Settings -->
+        <!-- Bottom Panel - Quick Actions &amp; Settings -->
         <ui:VisualElement name="bottom-panel" class="advisor-bottom">
             
             <!-- Quick Actions -->
