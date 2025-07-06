@@ -1,6 +1,5 @@
 using UnityEngine;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Systems.Cultivation;
 using System.Collections.Generic;
 using System.Linq;
 using System;
