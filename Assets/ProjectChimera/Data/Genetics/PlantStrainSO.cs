@@ -407,6 +407,9 @@ namespace ProjectChimera.Data.Genetics
         public List<string> ParentIDs = new List<string>();
         public float InbreedingCoefficient;
         public List<GeneticMutation> Mutations = new List<GeneticMutation>();
+        
+        // Additional properties for UI compatibility
+        public float OverallFitness = 1.0f;
     }
 
     /// <summary>

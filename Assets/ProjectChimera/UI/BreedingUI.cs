@@ -386,14 +386,14 @@ namespace ProjectChimera.UI
         {
             if (parent == null)
             {
-                nameLabel?.SetText("No parent selected");
-                genotypeLabel?.SetText("");
+                            if (nameLabel != null) nameLabel.text = "No parent selected";
+            if (genotypeLabel != null) genotypeLabel.text = "";
                 traitsList?.Clear();
                 return;
             }
             
-            nameLabel?.SetText($"{parent.GenotypeID}");
-            genotypeLabel?.SetText($"Strain: {parent.StrainOrigin?.name ?? "Unknown"} | Generation: {parent.Generation} | Fitness: {parent.OverallFitness:F2}");
+            if (nameLabel != null) nameLabel.text = $"{parent.GenotypeID}";
+            if (genotypeLabel != null) genotypeLabel.text = $"Strain: {parent.StrainOrigin?.name ?? "Unknown"} | Generation: {parent.Generation} | Fitness: {parent.OverallFitness:F2}";
             
             // Update traits list
             traitsList?.Clear();
@@ -470,11 +470,11 @@ namespace ProjectChimera.UI
             }
             
             // Update details label
-            _compatibilityDetailsLabel?.SetText($"Analysis of {_currentCompatibility.Parent1ID} × {_currentCompatibility.Parent2ID}");
+            if (_compatibilityDetailsLabel != null) _compatibilityDetailsLabel.text = $"Analysis of {_currentCompatibility.Parent1ID} × {_currentCompatibility.Parent2ID}";
             
             // Update breeding recommendation
             var recommendation = GetBreedingRecommendation(_currentCompatibility);
-            _breedingRecommendationLabel?.SetText(recommendation);
+            if (_breedingRecommendationLabel != null) _breedingRecommendationLabel.text = recommendation;
         }
         
         private string GetBreedingRecommendation(BreedingCompatibility compatibility)
@@ -516,7 +516,7 @@ namespace ProjectChimera.UI
             if (_lastBreedingResult.MutationsOccurred.Count > 0)
                 resultText += $" ({_lastBreedingResult.MutationsOccurred.Count} mutations)";
             
-            _breedingResultsLabel?.SetText(resultText);
+            if (_breedingResultsLabel != null) _breedingResultsLabel.text = resultText;
             
             // Update offspring list
             if (_offspringList != null)
@@ -787,22 +787,22 @@ namespace ProjectChimera.UI
         
         private void UpdateMutationRateLabel(float value)
         {
-            _mutationRateLabel?.SetText($"Mutation Rate: {value:F1}x");
+            if (_mutationRateLabel != null) _mutationRateLabel.text = $"Mutation Rate: {value:F1}x";
         }
         
         private void UpdateInbreedingDepressionLabel(float value)
         {
-            _inbreedingDepressionLabel?.SetText($"Inbreeding Depression: {value:F1}%");
+            if (_inbreedingDepressionLabel != null) _inbreedingDepressionLabel.text = $"Inbreeding Depression: {value:F1}%";
         }
         
         private void UpdateFitnessThresholdLabel(float value)
         {
-            _fitnessThresholdLabel?.SetText($"Fitness Threshold: {value:F1}");
+            if (_fitnessThresholdLabel != null) _fitnessThresholdLabel.text = $"Fitness Threshold: {value:F1}";
         }
         
         private void UpdateBreedingStatus(string status)
         {
-            _breedingStatusLabel?.SetText(status);
+            if (_breedingStatusLabel != null) _breedingStatusLabel.text = status;
             Debug.Log($"BreedingUI: {status}");
         }
         
