@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
 
-namespace ProjectChimera.Systems.Genetics
+namespace ProjectChimera.Data.Genetics
 {
     /// <summary>
     /// Trait expression engine for genetics system implementation with Height trait calculation.

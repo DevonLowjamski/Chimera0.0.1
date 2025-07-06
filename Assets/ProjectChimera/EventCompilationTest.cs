@@ -1,5 +1,5 @@
 using UnityEngine;
-using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Progression;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Progression;

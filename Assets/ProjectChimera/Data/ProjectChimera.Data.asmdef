@@ -2,8 +2,7 @@
     "name": "ProjectChimera.Data",
     "rootNamespace": "ProjectChimera.Data",
     "references": [
-        "ProjectChimera.Core",
-        "ProjectChimera.Genetics"
+        "ProjectChimera.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

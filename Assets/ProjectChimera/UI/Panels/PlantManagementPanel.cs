@@ -10,7 +10,7 @@ using ProjectChimera.Data;
 using ProjectChimera.Data.UI;
 // using ProjectChimera.Systems.Cultivation;
 // using ProjectChimera.Systems.Environment;
-// using ProjectChimera.Systems.Genetics;
+// using ProjectChimera.Data.Genetics;
 
 namespace ProjectChimera.UI.Panels
 {

@@ -7,7 +7,7 @@ using ProjectChimera.UI.Core;
 using ProjectChimera.UI.Components;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.UI;
-// using ProjectChimera.Systems.Genetics;
+// using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Cultivation;
 // Explicit alias to resolve ambiguous reference between Systems.Cultivation.PlantInstance and Data.UI.PlantInstance
 using PlantInstance = ProjectChimera.Systems.Cultivation.PlantInstance;
