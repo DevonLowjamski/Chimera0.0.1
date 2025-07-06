@@ -1,6 +1,6 @@
 using UnityEngine;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
 using System;
 
 /// <summary>
