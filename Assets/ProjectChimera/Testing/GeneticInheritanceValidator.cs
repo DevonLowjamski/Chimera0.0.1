@@ -191,10 +191,13 @@ namespace ProjectChimera.Testing
             strain.name = "Test Validation Strain";
             strain.StrainName = "Test Validation Strain";
             strain.StrainType = StrainType.Hybrid;
-            strain.BaseHeight = 150f;
-            strain.BaseWidth = 90f;
-            strain.BaseBiomass = 100f;
-            strain.FloweringTimeWeeks = 8;
+            
+            // Use reflection to set private fields since properties are read-only
+            var strainType = typeof(PlantStrainSO);
+            strainType.GetField("_baseHeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 1.5f); // 1.5m base height
+            strainType.GetField("_widthModifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 0.9f); // Width modifier
+            strainType.GetField("_baseYieldGrams", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 100f); // Base yield
+            strainType.GetField("_baseFloweringTime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 56); // 8 weeks in days
             
             return strain;
         }

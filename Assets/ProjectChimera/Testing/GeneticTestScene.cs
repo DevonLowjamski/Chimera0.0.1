@@ -222,12 +222,15 @@ namespace ProjectChimera.Testing
             strain.name = _testStrainName;
             strain.StrainName = _testStrainName;
             strain.StrainType = StrainType.Hybrid;
-            strain.BaseHeight = 150f; // 150cm base height
-            strain.BaseWidth = 90f;
-            strain.BaseBiomass = 100f;
-            strain.FloweringTimeWeeks = 8;
             
-            LogDebug($"Created test strain: {strain.StrainName} (base height: {strain.BaseHeight}cm)");
+            // Use reflection to set private fields since properties are read-only
+            var strainType = typeof(PlantStrainSO);
+            strainType.GetField("_baseHeight", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 1.5f); // 1.5m base height
+            strainType.GetField("_widthModifier", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 0.9f); // Width modifier
+            strainType.GetField("_baseYieldGrams", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 100f); // Base yield
+            strainType.GetField("_baseFloweringTime", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(strain, 56); // 8 weeks in days
+            
+            LogDebug($"Created test strain: {strain.StrainName} (base height: {strain.BaseHeight}m)");
             return strain;
         }
         
@@ -237,12 +240,15 @@ namespace ProjectChimera.Testing
         private GenotypeDataSO CreateGenotype(string genotypeId, AlleleSO allele1, AlleleSO allele2)
         {
             var genotype = ScriptableObject.CreateInstance<GenotypeDataSO>();
-            genotype.IndividualID = $"TEST_{genotypeId}";
-            genotype.Species = "Cannabis sativa";
-            genotype.ParentStrain = _testStrain;
-            genotype.IsViable = true;
-            genotype.OverallFitness = CalculateFitnessFromAlleles(allele1, allele2);
-            genotype.GeneticDiversity = 0.5f;
+            
+            // Use reflection to set private fields since properties are read-only
+            var genotypeType = typeof(GenotypeDataSO);
+            genotypeType.GetField("_individualID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, $"TEST_{genotypeId}");
+            genotypeType.GetField("_species", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, null); // Will be set by strain
+            genotypeType.GetField("_parentStrain", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, _testStrain);
+            genotypeType.GetField("_isViable", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, true);
+            genotypeType.GetField("_overallFitness", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, CalculateFitnessFromAlleles(allele1, allele2));
+            genotypeType.GetField("_geneticDiversity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, 0.5f);
             
             // Create gene pair for height
             var genePair = new GenePair
@@ -252,7 +258,8 @@ namespace ProjectChimera.Testing
                 Allele2 = allele2
             };
             
-            genotype.GenePairs = new List<GenePair> { genePair };
+            var genePairs = new List<GenePair> { genePair };
+            genotypeType.GetField("_genePairs", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, genePairs);
             
             // Calculate predicted height trait
             var predictedHeight = CalculatePredictedHeight(allele1, allele2);
@@ -265,7 +272,8 @@ namespace ProjectChimera.Testing
                 PredictionRange = new Vector2(predictedHeight * 0.8f, predictedHeight * 1.2f)
             };
             
-            genotype.PredictedTraits = new List<PredictedTrait> { predictedTrait };
+            var predictedTraits = new List<PredictedTrait> { predictedTrait };
+            genotypeType.GetField("_predictedTraits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(genotype, predictedTraits);
             
             LogDebug($"Created genotype {genotypeId}: predicted height {predictedHeight:F1}cm (fitness: {genotype.OverallFitness:F2})");
             return genotype;
