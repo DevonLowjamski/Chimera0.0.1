@@ -556,7 +556,10 @@ namespace ProjectChimera.UI
             element.style.paddingRight = 5;
             element.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
             element.style.marginBottom = 2;
-            element.style.borderRadius = 2;
+            element.style.borderTopLeftRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderTopRightRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderBottomLeftRadius = new Length(2, LengthUnit.Pixel);
+            element.style.borderBottomRightRadius = new Length(2, LengthUnit.Pixel);
             
             var nameLabel = new Label(geneName);
             nameLabel.style.color = new Color(0.8f, 0.8f, 0.8f);
