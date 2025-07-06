@@ -1,7 +1,7 @@
 using UnityEngine;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Progression;
-using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Data.Progression;
 
 /// <summary>

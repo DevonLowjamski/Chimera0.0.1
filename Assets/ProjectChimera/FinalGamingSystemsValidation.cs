@@ -3,6 +3,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Systems.Progression;
 using ProjectChimera.Systems.IPM;
+using ProjectChimera.Systems.Genetics;
 
 namespace ProjectChimera
 {
