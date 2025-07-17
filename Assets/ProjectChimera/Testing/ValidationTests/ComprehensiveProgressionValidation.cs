@@ -111,7 +111,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
     private void TestExperienceTracking()
     {
         // Test player profile experience tracking
-        var profile = new PlayerProgressionProfile
+        var profile = new ComprehensiveProgressionManager.PlayerProgressionProfile
         {
             PlayerID = "validation_player",
             CurrentLevel = 1,
@@ -209,9 +209,9 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
     private void TestMilestoneCreation()
     {
         // Test milestone data structure
-        var milestones = new List<ProgressionMilestone>
+        var milestones = new List<ComprehensiveProgressionManager.ProgressionMilestone>
         {
-            new ProgressionMilestone
+            new ComprehensiveProgressionManager.ProgressionMilestone
             {
                 MilestoneID = "milestone_first_steps",
                 MilestoneName = "First Steps",
@@ -224,7 +224,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 CompletionDate = DateTime.MinValue,
                 UnlockRewards = new List<string> { "New Science features", "Bonus experience multiplier" }
             },
-            new ProgressionMilestone
+            new ComprehensiveProgressionManager.ProgressionMilestone
             {
                 MilestoneID = "milestone_master_breeder",
                 MilestoneName = "Master Breeder",
@@ -237,7 +237,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 CompletionDate = DateTime.MinValue,
                 UnlockRewards = new List<string> { "Advanced gameplay mechanics", "Exclusive content access", "Special visual effects" }
             },
-            new ProgressionMilestone
+            new ComprehensiveProgressionManager.ProgressionMilestone
             {
                 MilestoneID = "milestone_ultimate_cultivator",
                 MilestoneName = "Ultimate Cultivator",
@@ -315,9 +315,9 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
     private void TestUnlockCreation()
     {
         // Test progression unlock data structure
-        var unlocks = new List<ProgressionUnlock>
+        var unlocks = new List<ComprehensiveProgressionManager.ProgressionUnlock>
         {
-            new ProgressionUnlock
+            new ComprehensiveProgressionManager.ProgressionUnlock
             {
                 UnlockID = "unlock_advanced_breeding_tools",
                 UnlockName = "Advanced Breeding Tools",
@@ -326,9 +326,9 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 RequiredLevel = 5,
                 IsUnlocked = false,
                 UnlockDate = DateTime.MinValue,
-                UnlockType = UnlockType.Feature
+                UnlockType = ComprehensiveProgressionManager.UnlockType.Feature
             },
-            new ProgressionUnlock
+            new ComprehensiveProgressionManager.ProgressionUnlock
             {
                 UnlockID = "unlock_golden_greenhouse_theme",
                 UnlockName = "Golden Greenhouse Theme",
@@ -337,9 +337,9 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 RequiredLevel = 10,
                 IsUnlocked = false,
                 UnlockDate = DateTime.MinValue,
-                UnlockType = UnlockType.Cosmetic
+                UnlockType = ComprehensiveProgressionManager.UnlockType.Cosmetic
             },
-            new ProgressionUnlock
+            new ComprehensiveProgressionManager.ProgressionUnlock
             {
                 UnlockID = "unlock_master_class_content",
                 UnlockName = "Master Class Content",
@@ -348,7 +348,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 RequiredLevel = 40,
                 IsUnlocked = false,
                 UnlockDate = DateTime.MinValue,
-                UnlockType = UnlockType.Elite
+                UnlockType = ComprehensiveProgressionManager.UnlockType.Elite
             }
         };
         
@@ -363,12 +363,12 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
     private void TestUnlockTypes()
     {
         // Test different unlock types and their characteristics
-        var unlockTypes = new List<(UnlockType type, string description, List<string> examples)>
+        var unlockTypes = new List<(ComprehensiveProgressionManager.UnlockType type, string description, List<string> examples)>
         {
-            (UnlockType.Feature, "Gameplay functionality", new List<string> { "Advanced Breeding Tools", "IPM Arsenal", "Research Laboratory" }),
-            (UnlockType.Cosmetic, "Visual enhancements", new List<string> { "Golden Greenhouse Theme", "Master Cultivator Badge", "Elite Facility Designs" }),
-            (UnlockType.Elite, "High-level content", new List<string> { "Speed Cultivation Mode", "Automation Systems", "Master Class Content" }),
-            (UnlockType.Legendary, "Ultimate rewards", new List<string> { "Legendary Plant Strains", "Ultimate Challenge Modes" })
+            (ComprehensiveProgressionManager.UnlockType.Feature, "Gameplay functionality", new List<string> { "Advanced Breeding Tools", "IPM Arsenal", "Research Laboratory" }),
+            (ComprehensiveProgressionManager.UnlockType.Cosmetic, "Visual enhancements", new List<string> { "Golden Greenhouse Theme", "Master Cultivator Badge", "Elite Facility Designs" }),
+            (ComprehensiveProgressionManager.UnlockType.Elite, "High-level content", new List<string> { "Speed Cultivation Mode", "Automation Systems", "Master Class Content" }),
+            (ComprehensiveProgressionManager.UnlockType.Legendary, "Ultimate rewards", new List<string> { "Legendary Plant Strains", "Ultimate Challenge Modes" })
         };
         
         Debug.Log($"✅ Unlock types: {unlockTypes.Count} types");
@@ -414,9 +414,9 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
     private void TestBonusCreation()
     {
         // Test cross-system bonus data structure
-        var bonuses = new List<CrossSystemBonus>
+        var bonuses = new List<ComprehensiveProgressionManager.CrossSystemBonus>
         {
-            new CrossSystemBonus
+            new ComprehensiveProgressionManager.CrossSystemBonus
             {
                 BonusID = "bonus_science_synergy",
                 BonusName = "Science Synergy",
@@ -426,7 +426,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 IsActive = false,
                 ActivationCount = 0
             },
-            new CrossSystemBonus
+            new ComprehensiveProgressionManager.CrossSystemBonus
             {
                 BonusID = "bonus_ultimate_mastery",
                 BonusName = "Ultimate Mastery",
@@ -436,7 +436,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
                 IsActive = false,
                 ActivationCount = 0
             },
-            new CrossSystemBonus
+            new ComprehensiveProgressionManager.CrossSystemBonus
             {
                 BonusID = "bonus_facility_genius",
                 BonusName = "Facility Genius",
@@ -501,7 +501,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         Debug.Log("=== Testing Player Profiles ===");
         
         // Test player profile creation and management
-        var profile = new PlayerProgressionProfile
+        var profile = new ComprehensiveProgressionManager.PlayerProgressionProfile
         {
             PlayerID = "validation_player",
             CurrentLevel = 15,
@@ -548,7 +548,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         TestProfileAnalysis(profile);
     }
     
-    private void TestProfileAnalysis(PlayerProgressionProfile profile)
+    private void TestProfileAnalysis(ComprehensiveProgressionManager.PlayerProgressionProfile profile)
     {
         // Calculate profile statistics
         var topSystem = profile.SystemExperience.OrderByDescending(kvp => kvp.Value).First();
@@ -588,7 +588,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         Debug.Log($"✅ Testing comprehensive progression data structures:");
         
         // Test PlayerProgressionProfile serialization
-        var profile = new PlayerProgressionProfile
+        var profile = new ComprehensiveProgressionManager.PlayerProgressionProfile
         {
             PlayerID = "test_player",
             CurrentLevel = 5
@@ -597,7 +597,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         bool profileSerializable = !string.IsNullOrEmpty(profileJson);
         
         // Test ProgressionMilestone serialization
-        var milestone = new ProgressionMilestone
+        var milestone = new ComprehensiveProgressionManager.ProgressionMilestone
         {
             MilestoneID = "test_milestone",
             MilestoneName = "Test Milestone"
@@ -606,7 +606,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         bool milestoneSerializable = !string.IsNullOrEmpty(milestoneJson);
         
         // Test ProgressionUnlock serialization
-        var unlock = new ProgressionUnlock
+        var unlock = new ComprehensiveProgressionManager.ProgressionUnlock
         {
             UnlockID = "test_unlock",
             UnlockName = "Test Unlock"
@@ -615,7 +615,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         bool unlockSerializable = !string.IsNullOrEmpty(unlockJson);
         
         // Test ProgressionReward serialization
-        var reward = new ProgressionReward
+        var reward = new ComprehensiveProgressionManager.ProgressionReward
         {
             RewardID = "test_reward",
             RewardName = "Test Reward"
@@ -624,7 +624,7 @@ public class ComprehensiveProgressionValidation : MonoBehaviour
         bool rewardSerializable = !string.IsNullOrEmpty(rewardJson);
         
         // Test CrossSystemBonus serialization
-        var bonus = new CrossSystemBonus
+        var bonus = new ComprehensiveProgressionManager.CrossSystemBonus
         {
             BonusID = "test_bonus",
             BonusName = "Test Bonus"

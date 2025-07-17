@@ -4,8 +4,7 @@
     "references": [
         "ProjectChimera.Core",
         "ProjectChimera.Data",
-        "ProjectChimera.Systems.Genetics",
-        "ProjectChimera.Systems.Progression"
+        "ProjectChimera.Systems.Genetics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
