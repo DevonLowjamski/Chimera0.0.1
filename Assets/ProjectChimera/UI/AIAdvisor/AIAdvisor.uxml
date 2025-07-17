@@ -1,0 +1,190 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <!-- AI Advisor Interface Layout -->
+    <ui:VisualElement name="ai-advisor" class="advisor-root">
+        
+        <!-- Header with AI Status -->
+        <ui:VisualElement name="header-section" class="advisor-header">
+            <ui:VisualElement class="header-left">
+                <ui:Label text="🧠 AI Advisor" class="panel-title" />
+                <ui:Label text="Intelligent Facility Assistant" class="panel-subtitle" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="ai-status-section">
+                <ui:VisualElement name="advisor-avatar" class="advisor-avatar mood-analytical">
+                    <ui:Label text="🤖" class="avatar-icon" />
+                </ui:VisualElement>
+                
+                <ui:VisualElement class="status-info">
+                    <ui:Label name="advisor-status" text="Online" class="status-label online" />
+                    <ui:Label name="advisor-mood" text="Analytical" class="mood-label" />
+                    <ui:ProgressBar name="ai-confidence-bar" value="0.85" title="AI Confidence: 85%" class="confidence-bar" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="main-content" class="advisor-main">
+            
+            <!-- Left Panel - Chat Interface -->
+            <ui:VisualElement name="chat-panel" class="chat-section">
+                
+                <!-- Chat Header -->
+                <ui:VisualElement class="chat-header">
+                    <ui:Label text="💬 Conversation" class="section-title" />
+                    <ui:VisualElement class="chat-controls">
+                        <ui:Button name="voice-input-button" text="🎤" class="voice-btn" />
+                        <ui:Button text="📋" class="chat-menu-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Chat Messages -->
+                <ui:VisualElement name="chat-container" class="chat-container">
+                    <ui:ScrollView name="chat-messages-scroll" class="chat-scroll">
+                        <ui:VisualElement name="chat-messages-container" class="messages-container">
+                            <!-- Chat messages populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                    
+                    <!-- Typing Indicator -->
+                    <ui:VisualElement name="typing-indicator" class="typing-indicator hidden">
+                        <ui:Label text="AI is thinking..." class="typing-text" />
+                        <ui:VisualElement class="typing-dots">
+                            <ui:VisualElement class="dot" />
+                            <ui:VisualElement class="dot" />
+                            <ui:VisualElement class="dot" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Chat Input -->
+                <ui:VisualElement class="chat-input-section">
+                    <ui:TextField name="chat-input-field" placeholder-text="Ask me anything about your facility..." class="chat-input" multiline="false" />
+                    <ui:Button name="send-message-button" text="📤" class="send-btn" />
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Right Panel - AI Features -->
+            <ui:VisualElement name="features-panel" class="features-section">
+                
+                <!-- Recommendations Panel -->
+                <ui:VisualElement name="recommendations-panel" class="feature-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="💡 Recommendations" class="section-title" />
+                        <ui:VisualElement class="panel-controls">
+                            <ui:Label name="recommendations-count" text="3 Active" class="count-label" />
+                            <ui:Button name="refresh-recommendations-button" text="🔄" class="refresh-btn" />
+                            <ui:Button name="dismiss-all-button" text="✖" class="dismiss-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:ScrollView class="panel-scroll">
+                        <ui:VisualElement name="recommendations-list" class="recommendations-list">
+                            <!-- Recommendations populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                
+                <!-- Insights Panel -->
+                <ui:VisualElement name="insights-panel" class="feature-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="🔍 Insights" class="section-title" />
+                        <ui:Label name="insights-score" text="Impact Score: 8.2/10" class="score-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="insights-metrics">
+                        <ui:VisualElement class="metric-row">
+                            <ui:Label text="System Health" class="metric-label" />
+                            <ui:ProgressBar name="system-health-bar" value="0.87" title="87%" class="health-bar" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="metric-row">
+                            <ui:Label text="Optimization Score" class="metric-label" />
+                            <ui:ProgressBar name="optimization-score-bar" value="0.75" title="75%" class="optimization-bar" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:ScrollView class="panel-scroll">
+                        <ui:VisualElement name="insights-list" class="insights-list">
+                            <!-- Insights populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:ScrollView>
+                </ui:VisualElement>
+                
+                <!-- Analytics Panel -->
+                <ui:VisualElement name="analytics-panel" class="feature-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="📊 Predictive Analytics" class="section-title" />
+                        <ui:Label name="prediction-accuracy" text="Accuracy: 92%" class="accuracy-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="analytics-content">
+                        <ui:VisualElement name="predictions-container" class="predictions-section">
+                            <ui:Label text="🔮 Predictions" class="subsection-title" />
+                            <!-- Predictions populated dynamically -->
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="trends-container" class="trends-section">
+                            <ui:Label text="📈 Trends" class="subsection-title" />
+                            <!-- Trends populated dynamically -->
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="alerts-container" class="alerts-section">
+                            <ui:Label text="⚠️ Alerts" class="subsection-title" />
+                            <!-- Alerts populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+        <!-- Bottom Panel - Quick Actions &amp; Settings -->
+        <ui:VisualElement name="bottom-panel" class="advisor-bottom">
+            
+            <!-- Quick Actions -->
+            <ui:VisualElement name="quick-actions-panel" class="quick-actions">
+                <ui:Label text="⚡ Quick Actions" class="section-title" />
+                
+                <ui:VisualElement class="actions-grid">
+                    <ui:Button name="optimize-all-button" text="🚀 Optimize All" class="action-btn optimize-btn" />
+                    <ui:Button name="emergency-analysis-button" text="🚨 Emergency Analysis" class="action-btn emergency-btn" />
+                    <ui:Button name="generate-report-button" text="📋 Generate Report" class="action-btn report-btn" />
+                    <ui:Button name="schedule-maintenance-button" text="🔧 Schedule Maintenance" class="action-btn maintenance-btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- AI Settings -->
+            <ui:VisualElement name="settings-panel" class="ai-settings">
+                <ui:Label text="⚙️ AI Configuration" class="section-title" />
+                
+                <ui:VisualElement class="settings-grid">
+                    <ui:VisualElement class="setting-row">
+                        <ui:Label text="Personality" class="setting-label" />
+                        <ui:Slider name="ai-personality-slider" low-value="0" high-value="1" value="0.5" class="personality-slider" />
+                        <ui:Label text="Professional" class="setting-value" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="setting-row">
+                        <ui:Label text="Analysis Depth" class="setting-label" />
+                        <ui:Slider name="analysis-depth-slider" low-value="0" high-value="1" value="0.7" class="depth-slider" />
+                        <ui:Label text="Detailed" class="setting-value" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="setting-row">
+                        <ui:Label text="Response Style" class="setting-label" />
+                        <ui:DropdownField name="response-style-dropdown" class="style-dropdown" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="toggles-row">
+                        <ui:Toggle name="enable-notifications-toggle" text="Notifications" value="true" class="setting-toggle" />
+                        <ui:Toggle name="enable-predictions-toggle" text="Predictions" value="true" class="setting-toggle" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+</ui:UXML>

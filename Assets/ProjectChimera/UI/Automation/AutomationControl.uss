@@ -1,0 +1,780 @@
+/* 
+ * Project Chimera - Automation Control Styles
+ * Advanced automation interface styling with IoT device management theme
+ */
+
+/* === ROOT AND LAYOUT === */
+.automation-root {
+    flex-direction: column;
+    height: 100%;
+    background-color: rgb(8, 12, 20);
+    color: rgb(220, 220, 220);
+    font-size: 14px;
+}
+
+/* === HEADER SECTION === */
+.automation-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, rgb(15, 25, 40), rgb(25, 35, 50));
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(120, 200, 80);
+    min-height: 80px;
+}
+
+.header-left {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.panel-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(120, 255, 120);
+    margin-bottom: 4px;
+}
+
+.panel-subtitle {
+    font-size: 14px;
+    color: rgb(150, 200, 150);
+    font-weight: 500;
+}
+
+.header-right {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.status-indicators {
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+
+.status-label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 16px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: rgba(120, 200, 80, 0.2);
+    color: rgb(120, 255, 120);
+    border-width: 1px;
+    border-color: rgb(120, 200, 80);
+}
+
+.network-health {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+    margin-bottom: 4px;
+}
+
+.health-bar {
+    width: 150px;
+    height: 8px;
+    border-radius: 4px;
+}
+
+.health-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 40, 50);
+    border-radius: 4px;
+}
+
+.health-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(255, 120, 120), rgb(255, 200, 100), rgb(120, 255, 120));
+    border-radius: 4px;
+}
+
+/* === TAB NAVIGATION === */
+.tab-navigation {
+    flex-direction: row;
+    background-color: rgb(18, 24, 32);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+    padding: 0 24px;
+}
+
+.nav-tab {
+    padding: 12px 24px;
+    background-color: transparent;
+    color: rgb(150, 180, 220);
+    border-width: 0;
+    border-bottom-width: 3px;
+    border-bottom-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    transition-duration: 0.3s;
+    margin-right: 4px;
+}
+
+.nav-tab:hover {
+    background-color: rgba(120, 200, 80, 0.1);
+    color: rgb(120, 255, 120);
+}
+
+.tab-active {
+    color: rgb(120, 255, 120);
+    border-bottom-color: rgb(120, 200, 80);
+    background-color: rgba(120, 200, 80, 0.15);
+}
+
+/* === MAIN CONTENT === */
+.automation-main {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.tab-panel {
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+/* === PANEL SECTION HEADERS === */
+.panel-section-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgb(15, 22, 30);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+.section-info {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 4px;
+}
+
+.count-label {
+    font-size: 12px;
+    color: rgb(120, 200, 80);
+    font-family: "Roboto Mono", monospace;
+}
+
+.section-controls {
+    flex-direction: row;
+    align-items: center;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    margin-left: 8px;
+    border-radius: 6px;
+    border-width: 0;
+    font-weight: 500;
+    transition-duration: 0.2s;
+}
+
+.create-btn {
+    background-color: rgb(120, 200, 80);
+    color: white;
+}
+
+.create-btn:hover {
+    background-color: rgb(140, 220, 100);
+    scale: 1.05;
+}
+
+.import-btn, .export-btn, .add-btn {
+    background-color: rgb(60, 120, 180);
+    color: white;
+}
+
+.import-btn:hover, .export-btn:hover, .add-btn:hover {
+    background-color: rgb(80, 140, 200);
+    scale: 1.05;
+}
+
+.scan-btn, .refresh-btn {
+    background-color: rgb(180, 120, 60);
+    color: white;
+}
+
+.scan-btn:hover, .refresh-btn:hover {
+    background-color: rgb(200, 140, 80);
+    scale: 1.05;
+}
+
+.calibrate-btn, .group-btn {
+    background-color: rgb(120, 80, 180);
+    color: white;
+}
+
+.calibrate-btn:hover, .group-btn:hover {
+    background-color: rgb(140, 100, 200);
+    scale: 1.05;
+}
+
+/* === CONTENT SECTIONS === */
+.rules-content, .sensors-content, .devices-content, .schedules-content, .templates-content {
+    flex-grow: 1;
+    flex-direction: row;
+    overflow: hidden;
+    padding: 16px;
+}
+
+.content-section {
+    flex-direction: column;
+    background-color: rgb(12, 18, 25);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+    margin-right: 12px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.content-section:last-child {
+    margin-right: 0;
+}
+
+.subsection-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(180, 200, 230);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+/* === RULES SPECIFIC === */
+.rules-list-section {
+    width: 40%;
+}
+
+.rule-builder-section {
+    width: 60%;
+}
+
+.rules-scroll {
+    flex-grow: 1;
+    max-height: 300px;
+}
+
+.rules-list {
+    flex-direction: column;
+}
+
+.stats-container {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top-width: 1px;
+    border-top-color: rgb(45, 65, 85);
+}
+
+.stat-item {
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: rgb(150, 180, 220);
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(120, 255, 120);
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === RULE BUILDER === */
+.rule-builder {
+    flex-direction: column;
+    overflow: auto;
+}
+
+.builder-section {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+}
+
+.builder-section-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 8px;
+}
+
+.rule-input {
+    margin-bottom: 8px;
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 4px;
+    color: rgb(220, 220, 220);
+}
+
+.description-field {
+    min-height: 60px;
+}
+
+.rule-options {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.rule-toggle {
+    margin-right: 20px;
+    color: rgb(220, 220, 220);
+}
+
+.priority-section {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.priority-label {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+    margin-right: 8px;
+}
+
+.priority-slider {
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.priority-slider > .unity-base-slider__dragger {
+    background-color: rgb(120, 200, 80);
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    border-width: 2px;
+    border-color: rgb(100, 180, 60);
+}
+
+.priority-slider > .unity-base-slider__tracker {
+    background-color: rgb(60, 60, 80);
+    height: 4px;
+    border-radius: 2px;
+}
+
+.priority-value {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(120, 255, 120);
+    min-width: 20px;
+    font-family: "Roboto Mono", monospace;
+}
+
+.trigger-config {
+    flex-direction: column;
+}
+
+.trigger-dropdown, .trigger-input {
+    margin-bottom: 8px;
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 4px;
+    color: rgb(220, 220, 220);
+}
+
+.section-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.add-btn {
+    background-color: rgb(120, 200, 80);
+    color: white;
+    border-width: 0;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.add-btn:hover {
+    background-color: rgb(140, 220, 100);
+    scale: 1.05;
+}
+
+.conditions-list, .actions-list {
+    flex-direction: column;
+    min-height: 40px;
+    background-color: rgb(30, 40, 55);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.rule-controls {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top-width: 1px;
+    border-top-color: rgb(45, 65, 85);
+}
+
+.control-btn {
+    padding: 10px 20px;
+    margin-left: 8px;
+    border-radius: 6px;
+    border-width: 0;
+    font-weight: 500;
+    transition-duration: 0.2s;
+}
+
+.test-btn {
+    background-color: rgb(180, 120, 60);
+    color: white;
+}
+
+.test-btn:hover {
+    background-color: rgb(200, 140, 80);
+}
+
+.save-btn {
+    background-color: rgb(120, 200, 80);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: rgb(140, 220, 100);
+}
+
+.reset-btn {
+    background-color: rgb(120, 120, 120);
+    color: white;
+}
+
+.reset-btn:hover {
+    background-color: rgb(140, 140, 140);
+}
+
+/* === SENSORS SPECIFIC === */
+.network-overview {
+    width: 30%;
+}
+
+.network-map-section {
+    width: 40%;
+}
+
+.sensors-list-section {
+    width: 30%;
+}
+
+.sensor-details-section, .sensor-alerts-section {
+    width: 50%;
+}
+
+.network-metrics, .device-metrics {
+    flex-direction: column;
+}
+
+.metric-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(120, 255, 120);
+    margin-left: 8px;
+    font-family: "Roboto Mono", monospace;
+}
+
+.online-count {
+    color: rgb(120, 255, 120);
+}
+
+.quality-bar {
+    flex-grow: 1;
+    height: 6px;
+    border-radius: 3px;
+    margin: 0 8px;
+}
+
+.quality-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 40, 50);
+    border-radius: 3px;
+}
+
+.quality-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(120, 200, 80), rgb(150, 220, 100));
+    border-radius: 3px;
+}
+
+.network-map {
+    flex-grow: 1;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(70, 100, 140);
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.sensors-scroll, .devices-scroll, .schedules-scroll, .templates-scroll {
+    flex-grow: 1;
+}
+
+.sensors-list, .devices-list, .schedules-list, .templates-list {
+    flex-direction: column;
+}
+
+.details-panel, .controls-panel {
+    flex-grow: 1;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(70, 100, 140);
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.alerts-container, .groups-container, .events-container {
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.placeholder-text {
+    color: rgb(120, 140, 160);
+    font-style: italic;
+    text-align: center;
+}
+
+/* === DEVICES SPECIFIC === */
+.device-network-section {
+    width: 25%;
+}
+
+.device-groups-section {
+    width: 25%;
+}
+
+.devices-list-section {
+    width: 30%;
+}
+
+.device-controls-section {
+    width: 20%;
+}
+
+/* === SCHEDULES SPECIFIC === */
+.schedule-calendar-section {
+    width: 50%;
+}
+
+.upcoming-events-section {
+    width: 25%;
+}
+
+.schedules-list-section {
+    width: 25%;
+}
+
+.schedule-calendar {
+    flex-grow: 1;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(70, 100, 140);
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+/* === TEMPLATES SPECIFIC === */
+.filter-dropdown {
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 4px;
+    color: rgb(220, 220, 220);
+    margin-right: 8px;
+}
+
+.search-field {
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 4px;
+    color: rgb(220, 220, 220);
+    margin-right: 8px;
+    min-width: 200px;
+}
+
+.templates-list-section {
+    width: 60%;
+}
+
+.template-preview-section {
+    width: 40%;
+}
+
+.template-preview {
+    flex-grow: 1;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(70, 100, 140);
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* === STATUS BAR === */
+.status-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 24px;
+    background-color: rgb(15, 22, 30);
+    border-top-width: 1px;
+    border-top-color: rgb(45, 65, 85);
+    min-height: 40px;
+}
+
+.status-section {
+    flex-direction: row;
+    align-items: center;
+}
+
+.status-text {
+    font-size: 11px;
+    color: rgb(150, 180, 220);
+    margin-right: 16px;
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === INTERACTIVE ELEMENTS === */
+.rule-item, .sensor-item, .device-item, .schedule-item, .template-item {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    background-color: rgb(25, 35, 50);
+    border-radius: 4px;
+    border-left-width: 3px;
+    border-left-color: rgb(120, 200, 80);
+    transition-duration: 0.2s;
+}
+
+.rule-item:hover, .sensor-item:hover, .device-item:hover, .schedule-item:hover, .template-item:hover {
+    background-color: rgb(30, 40, 55);
+    transform: translateX(2px);
+}
+
+.rule-enabled {
+    border-left-color: rgb(120, 200, 80);
+}
+
+.rule-disabled {
+    border-left-color: rgb(120, 120, 120);
+    opacity: 0.7;
+}
+
+.sensor-online {
+    border-left-color: rgb(120, 255, 120);
+}
+
+.sensor-offline {
+    border-left-color: rgb(255, 120, 120);
+}
+
+.device-connected {
+    border-left-color: rgb(120, 200, 255);
+}
+
+.device-disconnected {
+    border-left-color: rgb(200, 100, 100);
+}
+
+/* === ANIMATIONS === */
+@keyframes network-pulse {
+    0% { box-shadow: 0 0 10px rgba(120, 200, 80, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(120, 200, 80, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(120, 200, 80, 0.3); }
+}
+
+.automation-header {
+    animation: network-pulse 4s infinite;
+}
+
+@keyframes data-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.health-bar > .unity-progress-bar__progress {
+    background-size: 200% 200%;
+    animation: data-flow 3s ease infinite;
+}
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.rule-item, .sensor-item, .device-item {
+    animation: fade-in-up 0.3s ease-out;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 1400px) {
+    .rules-content, .sensors-content, .devices-content, .schedules-content, .templates-content {
+        flex-direction: column;
+    }
+    
+    .content-section {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 12px;
+        max-height: 250px;
+    }
+    
+    .content-section:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* === SCROLLBARS === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: rgb(30, 30, 40);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(120, 200, 80);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(140, 220, 100);
+}

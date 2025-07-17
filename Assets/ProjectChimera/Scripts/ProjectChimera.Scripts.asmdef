@@ -1,0 +1,27 @@
+{
+    "name": "ProjectChimera.Scripts",
+    "rootNamespace": "ProjectChimera.Scripts",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Systems.Economy",
+        "ProjectChimera.Systems.Community",
+        "ProjectChimera.Systems.Construction",
+        "ProjectChimera.Systems.Tutorial",
+        "ProjectChimera.Systems.Facilities",
+        "Unity.TextMeshPro",
+        "Unity.ugui",
+        "Cinemachine"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

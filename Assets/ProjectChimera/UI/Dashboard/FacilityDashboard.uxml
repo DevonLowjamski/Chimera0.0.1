@@ -1,0 +1,314 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <!-- Main Facility Dashboard Layout -->
+    <ui:VisualElement name="facility-dashboard" class="dashboard-root">
+        
+        <!-- Header Section -->
+        <ui:VisualElement name="header-section" class="dashboard-header">
+            <ui:VisualElement class="header-left">
+                <ui:Label name="facility-name" text="Project Chimera Facility" class="facility-name-label" />
+                <ui:Label name="system-time" text="00:00:00" class="system-time-label" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="header-center">
+                <ui:Label name="overall-status" text="Optimal" class="overall-status-label status-optimal" />
+                <ui:ProgressBar name="facility-efficiency" value="0.85" title="Facility Efficiency: 85%" class="facility-efficiency-bar" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="header-right">
+                <ui:Button name="emergency-stop-btn" text="🚨 Emergency" class="emergency-button" />
+                <ui:Button name="optimize-all-btn" text="⚡ Optimize" class="optimize-button" />
+                <ui:Button name="refresh-data-btn" text="🔄 Refresh" class="refresh-button" />
+                <ui:Button name="theme-toggle-btn" text="🌙" class="theme-toggle-button" />
+                <ui:Button name="settings-btn" text="⚙️" class="settings-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="main-content" class="dashboard-main">
+            
+            <!-- Navigation Panel -->
+            <ui:VisualElement name="navigation-panel" class="nav-panel">
+                <ui:Label text="SYSTEMS" class="nav-section-header" />
+                <ui:Button name="environmental-btn" text="🌡️ Environmental" class="nav-button" />
+                <ui:Button name="economic-btn" text="💰 Economic" class="nav-button" />
+                <ui:Button name="automation-btn" text="🤖 Automation" class="nav-button" />
+                <ui:Button name="ai-advisor-btn" text="🧠 AI Advisor" class="nav-button" />
+                
+                <ui:Label text="QUICK STATS" class="nav-section-header" />
+                <ui:VisualElement class="quick-stats">
+                    <ui:VisualElement class="stat-item">
+                        <ui:Label text="Active Sensors" class="stat-label" />
+                        <ui:Label name="quick-sensors" text="12" class="stat-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-item">
+                        <ui:Label text="Net Worth" class="stat-label" />
+                        <ui:Label name="quick-networth" text="$125K" class="stat-value" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-item">
+                        <ui:Label text="Efficiency" class="stat-label" />
+                        <ui:Label name="quick-efficiency" text="87%" class="stat-value" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Content Panels -->
+            <ui:VisualElement name="content-area" class="content-area">
+                
+                <!-- Environmental Panel -->
+                <ui:VisualElement name="environmental-panel" class="dashboard-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="🌡️ Environmental Systems" class="panel-title" />
+                        <ui:Button text="⚙️" class="panel-settings-btn" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="panel-content">
+                        <!-- Climate Metrics -->
+                        <ui:VisualElement class="metrics-grid">
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Temperature" class="metric-label" />
+                                <ui:Label name="temperature-display" text="24.5°C" class="metric-value" />
+                                <ui:VisualElement class="metric-trend trend-stable" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Humidity" class="metric-label" />
+                                <ui:Label name="humidity-display" text="58.2%" class="metric-value" />
+                                <ui:VisualElement class="metric-trend trend-up" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="CO₂ Level" class="metric-label" />
+                                <ui:Label name="co2-display" text="1150 ppm" class="metric-value" />
+                                <ui:VisualElement class="metric-trend trend-down" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Lighting" class="metric-label" />
+                                <ui:Label name="lighting-status" text="Operational" class="metric-value" />
+                                <ui:VisualElement class="metric-indicator status-optimal" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- System Efficiency Bars -->
+                        <ui:VisualElement class="efficiency-section">
+                            <ui:Label text="System Efficiency" class="section-title" />
+                            <ui:VisualElement class="efficiency-bars">
+                                <ui:VisualElement class="efficiency-item">
+                                    <ui:Label text="HVAC" class="efficiency-label" />
+                                    <ui:ProgressBar name="hvac-efficiency" value="0.89" class="efficiency-bar" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="efficiency-item">
+                                    <ui:Label text="Lighting" class="efficiency-label" />
+                                    <ui:ProgressBar name="lighting-efficiency" value="0.92" class="efficiency-bar" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Economic Panel -->
+                <ui:VisualElement name="economic-panel" class="dashboard-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="💰 Economic Performance" class="panel-title" />
+                        <ui:Button text="📊" class="panel-settings-btn" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="panel-content">
+                        <!-- Financial Metrics -->
+                        <ui:VisualElement class="metrics-grid">
+                            <ui:VisualElement class="metric-card financial-card">
+                                <ui:Label text="Net Worth" class="metric-label" />
+                                <ui:Label name="net-worth-display" text="$125,000" class="metric-value large-value" />
+                                <ui:VisualElement name="economic-trend" class="metric-trend trend-up" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Daily Revenue" class="metric-label" />
+                                <ui:Label name="daily-revenue-display" text="$2,850" class="metric-value" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Profit Margin" class="metric-label" />
+                                <ui:Label name="profit-margin-display" text="18.5%" class="metric-value trend-positive" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Cash Flow" class="metric-label" />
+                                <ui:Label name="cash-flow-display" text="$8,500" class="metric-value trend-positive" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- Market Opportunities -->
+                        <ui:VisualElement class="opportunities-section">
+                            <ui:Label text="Market Opportunities" class="section-title" />
+                            <ui:VisualElement class="opportunity-list">
+                                <ui:VisualElement class="opportunity-item">
+                                    <ui:Label text="🏆 Premium Strain Demand" class="opportunity-title" />
+                                    <ui:Label text="+$1,200 potential" class="opportunity-value" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="opportunity-item">
+                                    <ui:Label text="📈 Bulk Contract Available" class="opportunity-title" />
+                                    <ui:Label text="+$3,500 potential" class="opportunity-value" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Automation Panel -->
+                <ui:VisualElement name="automation-panel" class="dashboard-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="🤖 Automation Status" class="panel-title" />
+                        <ui:Button text="🔧" class="panel-settings-btn" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="panel-content">
+                        <!-- Automation Metrics -->
+                        <ui:VisualElement class="metrics-grid">
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Active Sensors" class="metric-label" />
+                                <ui:Label name="active-sensors" text="12" class="metric-value" />
+                                <ui:VisualElement class="metric-indicator alert-none" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Automation Rules" class="metric-label" />
+                                <ui:Label name="active-rules" text="8" class="metric-value" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Active Alerts" class="metric-label" />
+                                <ui:Label name="active-alerts" text="2" class="metric-value alert-low" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="System Uptime" class="metric-label" />
+                                <ui:Label name="system-uptime" text="99.2%" class="metric-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- Automation Achievements -->
+                        <ui:VisualElement class="achievements-section">
+                            <ui:Label text="Automation Milestones" class="section-title" />
+                            <ui:VisualElement class="milestone-list">
+                                <ui:VisualElement class="milestone-item completed">
+                                    <ui:Label text="🏅 First Sensor Network" class="milestone-title" />
+                                    <ui:Label text="Completed" class="milestone-status" />
+                                </ui:VisualElement>
+                                <ui:VisualElement class="milestone-item progress">
+                                    <ui:Label text="⚡ Energy Optimizer" class="milestone-title" />
+                                    <ui:ProgressBar value="0.65" class="milestone-progress" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- AI Advisor Panel -->
+                <ui:VisualElement name="ai-advisor-panel" class="dashboard-panel">
+                    <ui:VisualElement class="panel-header">
+                        <ui:Label text="🧠 AI Advisor" class="panel-title" />
+                        <ui:Label name="ai-status" text="Active" class="ai-status ai-active" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="panel-content">
+                        <!-- AI Metrics -->
+                        <ui:VisualElement class="ai-metrics">
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="System Efficiency" class="metric-label" />
+                                <ui:ProgressBar name="system-efficiency-score" value="0.87" title="87%" class="efficiency-score-bar" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="metric-card">
+                                <ui:Label text="Optimization Opportunities" class="metric-label" />
+                                <ui:Label name="optimization-opportunities" text="4" class="metric-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- Recommendations -->
+                        <ui:VisualElement class="recommendations-section">
+                            <ui:Label text="Current Recommendations" class="section-title" />
+                            <ui:VisualElement name="recommendations-list" class="recommendations-list">
+                                <!-- Recommendations will be populated dynamically -->
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Sidebar with Alerts and Achievements -->
+            <ui:VisualElement name="sidebar" class="sidebar">
+                
+                <!-- Alerts Panel -->
+                <ui:VisualElement name="alerts-panel" class="sidebar-panel">
+                    <ui:Label text="🚨 Active Alerts" class="sidebar-panel-title" />
+                    <ui:VisualElement class="alerts-content">
+                        <!-- Alerts will be populated dynamically -->
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Achievements Panel -->
+                <ui:VisualElement name="achievements-panel" class="sidebar-panel">
+                    <ui:Label text="🏆 Recent Achievements" class="sidebar-panel-title" />
+                    <ui:VisualElement class="achievements-content">
+                        <ui:VisualElement class="achievement-item rarity-epic">
+                            <ui:Label text="🌟 Master Cultivator" class="achievement-title" />
+                            <ui:Label text="Achieved 95% yield efficiency" class="achievement-desc" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="achievement-item rarity-rare">
+                            <ui:Label text="⚡ Energy Saver" class="achievement-title" />
+                            <ui:Label text="Reduced consumption by 20%" class="achievement-desc" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Player Progress Panel -->
+                <ui:VisualElement name="progress-panel" class="sidebar-panel">
+                    <ui:Label text="📊 Player Progress" class="sidebar-panel-title" />
+                    <ui:VisualElement class="progress-content">
+                        <ui:VisualElement class="level-display">
+                            <ui:Label text="Level 15" class="player-level" />
+                            <ui:Label text="Master Grower" class="player-title" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="experience-bar">
+                            <ui:Label text="Experience" class="exp-label" />
+                            <ui:ProgressBar value="0.68" title="1,350 / 2,000 XP" class="exp-progress" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="skill-summary">
+                            <ui:VisualElement class="skill-item">
+                                <ui:Label text="🌱 Cultivation" class="skill-name" />
+                                <ui:Label text="85%" class="skill-level" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="skill-item">
+                                <ui:Label text="⚗️ Processing" class="skill-name" />
+                                <ui:Label text="72%" class="skill-level" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="skill-item">
+                                <ui:Label text="💼 Business" class="skill-name" />
+                                <ui:Label text="63%" class="skill-level" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+        <!-- Footer Status Bar -->
+        <ui:VisualElement name="footer-status" class="dashboard-footer">
+            <ui:Label text="🟢 All Systems Operational" class="status-message" />
+            <ui:Label text="Last Updated: 2 seconds ago" class="update-timestamp" />
+            <ui:VisualElement class="performance-indicators">
+                <ui:Label text="FPS: 60" class="perf-indicator" />
+                <ui:Label text="Memory: 256MB" class="perf-indicator" />
+                <ui:Label text="Systems: 7/7" class="perf-indicator" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+</ui:UXML>

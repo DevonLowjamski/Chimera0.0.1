@@ -1,0 +1,776 @@
+/* 
+ * Project Chimera - Financial Management Styles
+ * Trading and investment-focused UI styling with financial data visualization
+ */
+
+/* === ROOT AND LAYOUT === */
+.financial-root {
+    flex-direction: column;
+    height: 100%;
+    background-color: rgb(12, 18, 25);
+    color: rgb(220, 220, 220);
+    font-size: 14px;
+}
+
+/* === HEADER SECTION === */
+.financial-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgb(22, 28, 38);
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(45, 85, 125);
+    min-height: 80px;
+}
+
+.header-left {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.panel-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(255, 200, 100);
+    margin-bottom: 4px;
+}
+
+.panel-subtitle {
+    font-size: 14px;
+    color: rgb(150, 180, 150);
+    font-weight: 500;
+}
+
+/* === TAB NAVIGATION === */
+.tab-navigation {
+    flex-direction: row;
+    align-items: center;
+}
+
+.nav-tab {
+    padding: 12px 20px;
+    margin-left: 4px;
+    background-color: transparent;
+    color: rgb(180, 180, 200);
+    border-width: 0;
+    border-bottom-width: 3px;
+    border-bottom-color: transparent;
+    border-radius: 0;
+    font-weight: 500;
+    transition-duration: 0.3s;
+}
+
+.nav-tab:hover {
+    background-color: rgba(255, 200, 100, 0.1);
+    color: rgb(220, 220, 240);
+    border-bottom-color: rgba(255, 200, 100, 0.5);
+}
+
+.nav-tab.tab-active {
+    background-color: rgba(255, 200, 100, 0.15);
+    color: rgb(255, 200, 100);
+    border-bottom-color: rgb(255, 200, 100);
+}
+
+/* === MAIN CONTENT === */
+.financial-main {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.tab-panel {
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    overflow: auto;
+}
+
+.tab-panel.hidden {
+    display: none;
+}
+
+/* === OVERVIEW PANEL === */
+.summary-section {
+    margin-bottom: 24px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 80, 100);
+}
+
+.summary-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    width: calc(25% - 12px);
+    margin: 6px;
+    padding: 16px;
+    background-color: rgb(25, 32, 42);
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: rgb(55, 70, 90);
+    position: relative;
+    transition-duration: 0.3s;
+}
+
+.summary-card:hover {
+    border-color: rgb(100, 140, 200);
+    transform: translateY(-2px);
+}
+
+.primary-card {
+    background: linear-gradient(135deg, rgba(255, 200, 100, 0.1), rgba(255, 180, 50, 0.05));
+    border-color: rgb(255, 200, 100);
+}
+
+.card-label {
+    font-size: 12px;
+    color: rgb(150, 150, 170);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.card-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(220, 240, 255);
+    font-family: "Roboto Mono", monospace;
+}
+
+.large-value {
+    font-size: 28px;
+    color: rgb(255, 200, 100);
+}
+
+/* === TREND INDICATORS === */
+.trend-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.trend-up {
+    background-color: rgb(100, 255, 150);
+    box-shadow: 0 0 8px rgba(100, 255, 150, 0.5);
+}
+
+.trend-down {
+    background-color: rgb(255, 120, 120);
+    box-shadow: 0 0 8px rgba(255, 120, 120, 0.5);
+}
+
+.trend-stable {
+    background-color: rgb(255, 200, 100);
+    box-shadow: 0 0 8px rgba(255, 200, 100, 0.5);
+}
+
+.positive {
+    color: rgb(100, 255, 150);
+}
+
+.negative {
+    color: rgb(255, 120, 120);
+}
+
+/* === PROFIT MARGIN BAR === */
+.profit-margin-section {
+    margin-top: 16px;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: rgb(150, 150, 170);
+    margin-bottom: 8px;
+}
+
+.profit-bar {
+    height: 12px;
+    border-radius: 6px;
+}
+
+.profit-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 40, 50);
+    border-radius: 6px;
+}
+
+.profit-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(255, 120, 120), rgb(255, 200, 100), rgb(100, 255, 150));
+    border-radius: 6px;
+}
+
+/* === OVERVIEW CONTENT === */
+.overview-content {
+    flex-direction: row;
+}
+
+.stats-panel, .activity-panel {
+    width: 50%;
+    margin: 0 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+}
+
+.transactions-list {
+    flex-direction: column;
+}
+
+.transaction-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: rgb(25, 32, 42);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(55, 70, 90);
+    transition-duration: 0.2s;
+}
+
+.transaction-item:hover {
+    background-color: rgb(30, 37, 47);
+    border-color: rgb(80, 120, 180);
+}
+
+.transaction-type {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 12px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.buy-type {
+    background-color: rgba(100, 255, 150, 0.2);
+    color: rgb(100, 255, 150);
+    border-width: 1px;
+    border-color: rgb(100, 255, 150);
+}
+
+.sell-type {
+    background-color: rgba(255, 120, 120, 0.2);
+    color: rgb(255, 120, 120);
+    border-width: 1px;
+    border-color: rgb(255, 120, 120);
+}
+
+.transaction-pair, .transaction-amount, .transaction-price, .transaction-time {
+    font-size: 11px;
+    color: rgb(180, 180, 200);
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === TRADING PANEL === */
+.trading-section {
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.trading-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pair-selector {
+    min-width: 180px;
+    background-color: rgb(30, 37, 47);
+    border-color: rgb(70, 120, 180);
+    border-radius: 8px;
+    color: rgb(220, 220, 220);
+}
+
+.price-display {
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.current-price, .price-change {
+    flex: 1;
+    padding: 16px;
+    background-color: rgb(25, 32, 42);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(55, 70, 90);
+    margin-right: 12px;
+}
+
+.price-label, .change-label {
+    font-size: 12px;
+    color: rgb(150, 150, 170);
+    margin-bottom: 6px;
+}
+
+.price-value, .change-value {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: "Roboto Mono", monospace;
+    color: rgb(220, 240, 255);
+}
+
+.trade-inputs {
+    margin-bottom: 20px;
+}
+
+.input-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.input-label {
+    font-size: 14px;
+    color: rgb(150, 150, 170);
+    min-width: 80px;
+    margin-right: 12px;
+}
+
+.trade-input {
+    flex-grow: 1;
+    background-color: rgb(30, 37, 47);
+    border-color: rgb(70, 80, 100);
+    border-radius: 6px;
+    color: rgb(220, 220, 220);
+    font-family: "Roboto Mono", monospace;
+    padding: 8px 12px;
+}
+
+.trade-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.trade-btn {
+    flex: 1;
+    margin: 4px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-width: 0;
+    font-weight: bold;
+    font-size: 13px;
+    transition-duration: 0.2s;
+}
+
+.buy-btn {
+    background-color: rgb(50, 150, 50);
+    color: white;
+}
+
+.buy-btn:hover {
+    background-color: rgb(70, 170, 70);
+    scale: 1.02;
+}
+
+.sell-btn {
+    background-color: rgb(180, 50, 50);
+    color: white;
+}
+
+.sell-btn:hover {
+    background-color: rgb(200, 70, 70);
+    scale: 1.02;
+}
+
+.market-buy-btn {
+    background-color: rgb(80, 120, 255);
+    color: white;
+}
+
+.market-buy-btn:hover {
+    background-color: rgb(100, 140, 255);
+    scale: 1.02;
+}
+
+.market-sell-btn {
+    background-color: rgb(255, 120, 80);
+    color: white;
+}
+
+.market-sell-btn:hover {
+    background-color: rgb(255, 140, 100);
+    scale: 1.02;
+}
+
+/* === TRADING DATA === */
+.trading-data {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.data-panel {
+    width: calc(33.33% - 12px);
+    margin: 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 16px;
+    min-height: 300px;
+}
+
+.panel-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 80, 100);
+}
+
+/* === INVESTMENT PANEL === */
+.investment-section {
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.investment-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.portfolio-actions {
+    flex-direction: row;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    margin-left: 8px;
+    border-radius: 8px;
+    border-width: 0;
+    font-weight: bold;
+    transition-duration: 0.2s;
+}
+
+.rebalance-btn {
+    background-color: rgb(120, 80, 200);
+    color: white;
+}
+
+.rebalance-btn:hover {
+    background-color: rgb(140, 100, 220);
+    scale: 1.05;
+}
+
+.add-btn {
+    background-color: rgb(80, 160, 80);
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: rgb(100, 180, 100);
+    scale: 1.05;
+}
+
+.portfolio-overview {
+    background-color: rgb(25, 32, 42);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(55, 70, 90);
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 200px;
+}
+
+.risk-management {
+    background-color: rgb(25, 32, 42);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(55, 70, 90);
+    padding: 16px;
+}
+
+.control-label {
+    font-size: 12px;
+    color: rgb(150, 150, 170);
+    margin-bottom: 8px;
+}
+
+.risk-slider {
+    margin-bottom: 12px;
+}
+
+.risk-slider > .unity-base-slider__dragger {
+    background-color: rgb(255, 180, 50);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+    border-color: rgb(235, 160, 30);
+}
+
+.risk-slider > .unity-base-slider__tracker {
+    background-color: rgb(60, 60, 80);
+    height: 6px;
+    border-radius: 3px;
+}
+
+.return-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(255, 200, 100);
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === INVESTMENT CONTENT === */
+.investment-content {
+    flex-direction: row;
+}
+
+.opportunities-panel, .active-investments-panel {
+    width: 50%;
+    margin: 0 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+    min-height: 400px;
+}
+
+/* === MARKET PANEL === */
+.market-section {
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.market-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.timeframe-selector {
+    min-width: 120px;
+    background-color: rgb(30, 37, 47);
+    border-color: rgb(70, 120, 180);
+    border-radius: 8px;
+    color: rgb(220, 220, 220);
+}
+
+.market-analysis {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.chart-panel {
+    width: calc(50% - 12px);
+    margin: 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 16px;
+    min-height: 300px;
+}
+
+.trends-panel, .news-panel {
+    width: calc(25% - 12px);
+    margin: 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 16px;
+    min-height: 300px;
+}
+
+/* === REPORTS PANEL === */
+.reports-section {
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.reports-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.report-actions {
+    flex-direction: row;
+}
+
+.generate-btn {
+    background-color: rgb(80, 120, 200);
+    color: white;
+}
+
+.generate-btn:hover {
+    background-color: rgb(100, 140, 220);
+    scale: 1.05;
+}
+
+.export-btn {
+    background-color: rgb(120, 120, 120);
+    color: white;
+}
+
+.export-btn:hover {
+    background-color: rgb(140, 140, 140);
+    scale: 1.05;
+}
+
+.reports-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.performance-panel, .pnl-panel, .tax-panel {
+    width: calc(33.33% - 12px);
+    margin: 6px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 60, 80);
+    padding: 16px;
+    min-height: 350px;
+}
+
+/* === FOOTER === */
+.financial-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: rgb(22, 28, 38);
+    border-top-width: 1px;
+    border-top-color: rgb(45, 45, 65);
+    min-height: 50px;
+}
+
+.footer-status-message {
+    font-size: 13px;
+    color: rgb(150, 255, 150);
+    font-weight: 500;
+}
+
+.footer-summary {
+    font-size: 12px;
+    color: rgb(255, 200, 100);
+    font-family: "Roboto Mono", monospace;
+}
+
+.footer-timestamp {
+    font-size: 11px;
+    color: rgb(120, 120, 140);
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 1400px) {
+    .summary-card {
+        width: calc(50% - 12px);
+    }
+    
+    .data-panel {
+        width: calc(50% - 12px);
+    }
+    
+    .chart-panel {
+        width: calc(100% - 12px);
+    }
+    
+    .trends-panel, .news-panel {
+        width: calc(50% - 12px);
+    }
+}
+
+@media (max-width: 1000px) {
+    .summary-card, .data-panel, .opportunities-panel, .active-investments-panel {
+        width: calc(100% - 12px);
+    }
+    
+    .overview-content, .investment-content {
+        flex-direction: column;
+    }
+    
+    .tab-navigation {
+        flex-wrap: wrap;
+    }
+    
+    .nav-tab {
+        margin-bottom: 4px;
+    }
+}
+
+/* === ANIMATIONS === */
+@keyframes profit-glow {
+    0% { box-shadow: 0 0 10px rgba(100, 255, 150, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(100, 255, 150, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(100, 255, 150, 0.3); }
+}
+
+.primary-card {
+    animation: profit-glow 3s infinite;
+}
+
+@keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.price-ticker {
+    animation: ticker 30s linear infinite;
+}
+
+/* === SCROLLBARS === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: rgb(30, 30, 40);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(80, 80, 100);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(100, 100, 120);
+}

@@ -1,0 +1,21 @@
+{
+    "name": "ProjectChimera.Systems.Community",
+    "rootNamespace": "ProjectChimera.Systems.Community",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems.Economy",
+        "ProjectChimera.Systems.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

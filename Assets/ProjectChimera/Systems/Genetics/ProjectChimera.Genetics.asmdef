@@ -1,0 +1,17 @@
+{
+    "name": "ProjectChimera.Systems.Genetics",
+    "rootNamespace": "ProjectChimera.Systems.Genetics",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

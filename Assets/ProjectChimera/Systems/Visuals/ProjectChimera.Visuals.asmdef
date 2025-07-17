@@ -1,0 +1,20 @@
+{
+    "name": "ProjectChimera.Systems.Visuals",
+    "rootNamespace": "ProjectChimera.Systems.Visuals",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems.Environment"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

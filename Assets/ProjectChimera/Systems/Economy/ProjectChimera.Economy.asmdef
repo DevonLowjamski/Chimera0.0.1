@@ -1,0 +1,19 @@
+{
+    "name": "ProjectChimera.Systems.Economy",
+    "rootNamespace": "ProjectChimera.Systems.Economy",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

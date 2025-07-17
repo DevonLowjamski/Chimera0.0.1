@@ -1,0 +1,25 @@
+{
+    "name": "ProjectChimera.Systems.SpeedTree",
+    "rootNamespace": "ProjectChimera.Systems.SpeedTree",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems",
+        "ProjectChimera.Systems.Effects",
+        "ProjectChimera.Systems.Progression",
+        "ProjectChimera.Systems.Prefabs",
+        "ProjectChimera.Systems.Automation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

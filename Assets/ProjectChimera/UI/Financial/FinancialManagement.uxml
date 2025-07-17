@@ -1,0 +1,254 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <!-- Financial Management Panel Layout -->
+    <ui:VisualElement name="financial-management" class="financial-root">
+        
+        <!-- Header with Navigation Tabs -->
+        <ui:VisualElement name="header-section" class="financial-header">
+            <ui:VisualElement class="header-left">
+                <ui:Label text="💰 Financial Management Center" class="panel-title" />
+                <ui:Label text="Portfolio &amp; Trading Dashboard" class="panel-subtitle" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="tab-navigation">
+                <ui:Button name="overview-tab" text="📊 Overview" class="nav-tab tab-active" />
+                <ui:Button name="trading-tab" text="📈 Trading" class="nav-tab" />
+                <ui:Button name="investments-tab" text="💼 Investments" class="nav-tab" />
+                <ui:Button name="market-tab" text="🌍 Market" class="nav-tab" />
+                <ui:Button name="reports-tab" text="📋 Reports" class="nav-tab" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="main-content" class="financial-main">
+            
+            <!-- Overview Panel -->
+            <ui:VisualElement name="overview-panel" class="tab-panel">
+                
+                <!-- Portfolio Summary -->
+                <ui:VisualElement name="portfolio-summary" class="summary-section">
+                    <ui:Label text="📈 Portfolio Summary" class="section-title" />
+                    
+                    <ui:VisualElement class="summary-grid">
+                        <ui:VisualElement class="summary-card primary-card">
+                            <ui:Label text="Net Worth" class="card-label" />
+                            <ui:Label name="net-worth-display" text="$125,000" class="card-value large-value" />
+                            <ui:VisualElement class="trend-indicator trend-up" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="summary-card">
+                            <ui:Label text="Cash Balance" class="card-label" />
+                            <ui:Label name="cash-balance-display" text="$25,000" class="card-value" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="summary-card">
+                            <ui:Label text="Portfolio Value" class="card-label" />
+                            <ui:Label name="portfolio-value-display" text="$100,000" class="card-value" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="summary-card">
+                            <ui:Label text="Daily P&amp;L" class="card-label" />
+                            <ui:Label name="daily-pnl-display" text="+2.3%" class="card-value positive" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="profit-margin-section">
+                        <ui:Label text="Profit Margin" class="metric-label" />
+                        <ui:ProgressBar name="profit-margin-bar" value="0.68" title="68% Profit Margin" class="profit-bar" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Quick Stats &amp; Recent Activity -->
+                <ui:VisualElement class="overview-content">
+                    <ui:VisualElement name="quick-stats-container" class="stats-panel">
+                        <ui:Label text="📊 Quick Statistics" class="section-title" />
+                        <!-- Quick stats content populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="recent-activity-panel" class="activity-panel">
+                        <ui:Label text="🕒 Recent Transactions" class="section-title" />
+                        <ui:VisualElement name="recent-transactions-list" class="transactions-list">
+                            <!-- Recent transactions populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Trading Panel -->
+            <ui:VisualElement name="trading-panel" class="tab-panel hidden">
+                
+                <!-- Trading Controls -->
+                <ui:VisualElement name="trading-controls" class="trading-section">
+                    <ui:VisualElement class="trading-header">
+                        <ui:Label text="📈 Active Trading" class="section-title" />
+                        <ui:DropdownField name="trading-pair-selector" label="Trading Pair" class="pair-selector" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="price-display">
+                        <ui:VisualElement class="current-price">
+                            <ui:Label text="Current Price" class="price-label" />
+                            <ui:Label name="current-price-display" text="$125.50" class="price-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="price-change">
+                            <ui:Label text="24h Change" class="change-label" />
+                            <ui:Label name="price-change-display" text="+2.5%" class="change-value positive" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="trade-inputs">
+                        <ui:VisualElement class="input-row">
+                            <ui:Label text="Amount:" class="input-label" />
+                            <ui:FloatField name="trade-amount-field" value="0" class="trade-input" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="input-row">
+                            <ui:Label text="Price:" class="input-label" />
+                            <ui:FloatField name="trade-price-field" value="0" class="trade-input" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="trade-buttons">
+                        <ui:Button name="buy-button" text="🟢 BUY (Limit)" class="trade-btn buy-btn" />
+                        <ui:Button name="sell-button" text="🔴 SELL (Limit)" class="trade-btn sell-btn" />
+                        <ui:Button name="market-buy-button" text="🚀 Market Buy" class="trade-btn market-buy-btn" />
+                        <ui:Button name="market-sell-button" text="💥 Market Sell" class="trade-btn market-sell-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Trading Data -->
+                <ui:VisualElement class="trading-data">
+                    <ui:VisualElement name="order-book-container" class="data-panel">
+                        <ui:Label text="📋 Order Book" class="panel-title" />
+                        <!-- Order book data populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="trade-history-container" class="data-panel">
+                        <ui:Label text="🕒 Trade History" class="panel-title" />
+                        <!-- Trade history populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="open-orders-container" class="data-panel">
+                        <ui:Label text="⏳ Open Orders" class="panel-title" />
+                        <!-- Open orders populated dynamically -->
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Investments Panel -->
+            <ui:VisualElement name="investments-panel" class="tab-panel hidden">
+                
+                <!-- Portfolio Management -->
+                <ui:VisualElement name="portfolio-management" class="investment-section">
+                    <ui:VisualElement class="investment-header">
+                        <ui:Label text="💼 Investment Portfolio" class="section-title" />
+                        <ui:VisualElement class="portfolio-actions">
+                            <ui:Button name="rebalance-button" text="⚖️ Rebalance" class="action-btn rebalance-btn" />
+                            <ui:Button name="add-investment-button" text="➕ Add Investment" class="action-btn add-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="portfolio-summary" class="portfolio-overview">
+                        <!-- Portfolio allocation chart and summary -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="risk-management">
+                        <ui:Label text="Risk Tolerance" class="control-label" />
+                        <ui:Slider name="risk-tolerance-slider" low-value="0" high-value="1" value="0.5" class="risk-slider" />
+                        <ui:Label name="expected-return-label" text="Expected Return: 8.5%" class="return-display" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Investment Opportunities &amp; Active Investments -->
+                <ui:VisualElement class="investment-content">
+                    <ui:VisualElement name="investment-opportunities" class="opportunities-panel">
+                        <ui:Label text="🚀 Investment Opportunities" class="section-title" />
+                        <!-- Investment opportunities populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="active-investments" class="active-investments-panel">
+                        <ui:Label text="📈 Active Investments" class="section-title" />
+                        <!-- Active investments populated dynamically -->
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Market Panel -->
+            <ui:VisualElement name="market-panel" class="tab-panel hidden">
+                
+                <!-- Market Overview -->
+                <ui:VisualElement name="market-overview" class="market-section">
+                    <ui:VisualElement class="market-header">
+                        <ui:Label text="🌍 Market Analysis" class="section-title" />
+                        <ui:DropdownField name="timeframe-selector" label="Timeframe" class="timeframe-selector" />
+                    </ui:VisualElement>
+                    
+                    <!-- Market overview widgets populated dynamically -->
+                </ui:VisualElement>
+                
+                <!-- Charts and Analysis -->
+                <ui:VisualElement class="market-analysis">
+                    <ui:VisualElement name="price-chart-container" class="chart-panel">
+                        <ui:Label text="📊 Price Chart" class="panel-title" />
+                        <!-- Price chart populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="market-trends-container" class="trends-panel">
+                        <ui:Label text="📈 Market Trends" class="panel-title" />
+                        <!-- Market trends populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="news-container" class="news-panel">
+                        <ui:Label text="📰 Market News" class="panel-title" />
+                        <!-- Market news populated dynamically -->
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Reports Panel -->
+            <ui:VisualElement name="reports-panel" class="tab-panel hidden">
+                
+                <!-- Report Generation -->
+                <ui:VisualElement name="report-controls" class="reports-section">
+                    <ui:VisualElement class="reports-header">
+                        <ui:Label text="📋 Financial Reports" class="section-title" />
+                        <ui:VisualElement class="report-actions">
+                            <ui:Button name="generate-report-button" text="📊 Generate Report" class="action-btn generate-btn" />
+                            <ui:Button name="export-data-button" text="💾 Export Data" class="action-btn export-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Report Content -->
+                <ui:VisualElement class="reports-content">
+                    <ui:VisualElement name="performance-charts" class="performance-panel">
+                        <ui:Label text="📈 Performance Analytics" class="panel-title" />
+                        <!-- Performance charts populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="profit-loss-statement" class="pnl-panel">
+                        <ui:Label text="💰 Profit &amp; Loss Statement" class="panel-title" />
+                        <!-- P&amp;L statement populated dynamically -->
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="tax-reporting" class="tax-panel">
+                        <ui:Label text="🧾 Tax Reporting" class="panel-title" />
+                        <!-- Tax reporting populated dynamically -->
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+        <!-- Footer Status -->
+        <ui:VisualElement name="footer-status" class="financial-footer">
+            <ui:Label text="🟢 Market Open | Connected to Trading Systems" class="footer-status-message" />
+            <ui:Label text="Portfolio: $125,000 (+2.3%) | Cash: $25,000 | P&amp;L: +$8,500" class="footer-summary" />
+            <ui:Label text="Last Update: 10 seconds ago" class="footer-timestamp" />
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+</ui:UXML>

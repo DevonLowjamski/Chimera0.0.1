@@ -1,0 +1,21 @@
+{
+    "name": "ProjectChimera.Systems.Tutorial",
+    "rootNamespace": "ProjectChimera.Systems.Tutorial",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

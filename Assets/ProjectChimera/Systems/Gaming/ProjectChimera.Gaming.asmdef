@@ -1,0 +1,25 @@
+{
+    "name": "ProjectChimera.Systems.Gaming",
+    "rootNamespace": "ProjectChimera.Systems.Gaming",
+    "references": [
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.TextMeshPro",
+        "Unity.Timeline",
+        "Unity.Cinemachine",
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Systems.Economy",
+        "ProjectChimera.Systems.Progression"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

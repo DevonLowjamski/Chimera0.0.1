@@ -1,0 +1,298 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <!-- 
+    Project Chimera - Research &amp; Progression UXML Layout
+    Comprehensive skill tree and research interface with gaming progression elements
+    -->
+    
+    <ui:VisualElement name="research-root" class="research-root">
+        
+        <!-- Header Section with Player Status -->
+        <ui:VisualElement name="research-header" class="research-header">
+            <ui:VisualElement name="header-left" class="header-left">
+                <ui:Label text="Research &amp; Progression" name="panel-title" class="panel-title" />
+                <ui:Label text="Skill Development &amp; Technology Research" name="panel-subtitle" class="panel-subtitle" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="player-status-section" class="player-status">
+                <ui:VisualElement name="level-display" class="level-display">
+                    <ui:Label text="Level 15" name="player-level-display" class="level-text" />
+                    <ui:VisualElement name="experience-section" class="experience-section">
+                        <ui:Label text="8,450 / 10,000 XP" name="experience-display" class="experience-text" />
+                        <ui:ProgressBar value="0.845" name="experience-bar" class="experience-bar" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="resources-display" class="resources-display">
+                    <ui:VisualElement name="resource-item" class="resource-item">
+                        <ui:Label text="Skill Points" class="resource-label" />
+                        <ui:Label text="12" name="skill-points-display" class="resource-value skill-points" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="resource-item" class="resource-item">
+                        <ui:Label text="Research Points" class="resource-label" />
+                        <ui:Label text="2,450" name="research-points-display" class="resource-value research-points" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Navigation Tabs -->
+        <ui:VisualElement name="tab-navigation" class="tab-navigation">
+            <ui:Button text="Skill Tree" name="skills-tab" class="nav-tab tab-active" />
+            <ui:Button text="Research" name="research-tab" class="nav-tab" />
+            <ui:Button text="Achievements" name="achievements-tab" class="nav-tab" />
+            <ui:Button text="Statistics" name="statistics-tab" class="nav-tab" />
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="research-main" class="research-main">
+            
+            <!-- Skill Tree Panel -->
+            <ui:VisualElement name="skill-tree-panel" class="tab-panel">
+                <ui:VisualElement name="skill-tree-content" class="skill-tree-content">
+                    
+                    <!-- Skill Tree Controls -->
+                    <ui:VisualElement name="skill-tree-controls" class="tree-controls">
+                        <ui:VisualElement name="controls-left" class="controls-section">
+                            <ui:DropdownField label="Category" name="skill-category-dropdown" class="category-filter" />
+                            <ui:Button text="Reset Skills" name="reset-skills-button" class="control-btn reset-btn" />
+                            <ui:Button text="Export Build" name="export-build-button" class="control-btn export-btn" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-right" class="controls-section">
+                            <ui:Label text="Use mouse wheel to zoom, drag to pan" class="help-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Main Skill Tree Area -->
+                    <ui:VisualElement name="skill-tree-main" class="skill-tree-main">
+                        <!-- Skill Tree Viewport -->
+                        <ui:VisualElement name="skill-tree-container" class="skill-tree-container">
+                            <ui:VisualElement name="skill-tree-viewport" class="skill-tree-viewport">
+                                <ui:VisualElement name="skill-nodes-container" class="skill-nodes-container">
+                                    <!-- Skill nodes will be generated dynamically -->
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- Skill Preview Panel -->
+                        <ui:VisualElement name="skill-preview-panel" class="skill-preview-panel">
+                            <ui:VisualElement name="selected-skill-panel" class="selected-skill">
+                                <ui:Label text="Select a skill to view details" name="skill-name-label" class="skill-preview-title" />
+                                
+                                <ui:ScrollView name="skill-details-scroll" class="skill-details-scroll">
+                                    <ui:VisualElement name="skill-details-content" class="skill-details-content">
+                                        <ui:Label text="No skill selected" name="skill-description-label" class="skill-description" />
+                                        
+                                        <ui:VisualElement name="skill-requirements" class="skill-section">
+                                            <ui:Label text="Requirements" class="section-header" />
+                                            <ui:Label text="None" name="skill-requirements-label" class="section-content" />
+                                        </ui:VisualElement>
+                                        
+                                        <ui:VisualElement name="skill-benefits" class="skill-section">
+                                            <ui:Label text="Benefits" class="section-header" />
+                                            <ui:Label text="None" name="skill-benefits-label" class="section-content" />
+                                        </ui:VisualElement>
+                                        
+                                        <ui:VisualElement name="skill-progress" class="skill-section">
+                                            <ui:Label text="Progress" class="section-header" />
+                                            <ui:ProgressBar value="0" name="skill-progress-bar" class="skill-progress-bar" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                </ui:ScrollView>
+                                
+                                <ui:VisualElement name="skill-actions" class="skill-actions">
+                                    <ui:Button text="Unlock Skill" name="unlock-skill-button" class="unlock-skill-btn" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Research Panel -->
+            <ui:VisualElement name="research-panel" class="tab-panel hidden">
+                <ui:VisualElement name="research-content" class="research-content">
+                    
+                    <!-- Research Controls -->
+                    <ui:VisualElement name="research-controls" class="research-controls">
+                        <ui:VisualElement name="research-status" class="research-status">
+                            <ui:Label text="Active Research" class="status-title" />
+                            <ui:Label text="3/5 Active" name="active-research-count" class="status-value" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="research-actions" class="research-actions">
+                            <ui:Button text="Pause All" name="pause-all-research-button" class="control-btn pause-btn" />
+                            <ui:Button text="Clear Queue" name="clear-queue-button" class="control-btn clear-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Research Layout -->
+                    <ui:VisualElement name="research-layout" class="research-layout">
+                        
+                        <!-- Active Research Section -->
+                        <ui:VisualElement name="active-research-section" class="research-section">
+                            <ui:Label text="Active Research Projects" class="section-title" />
+                            <ui:ScrollView name="active-research-scroll" class="research-scroll">
+                                <ui:VisualElement name="active-research-container" class="research-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                        
+                        <!-- Available Research Section -->
+                        <ui:VisualElement name="available-research-section" class="research-section">
+                            <ui:Label text="Available Research" class="section-title" />
+                            <ui:ScrollView name="available-research-scroll" class="research-scroll">
+                                <ui:VisualElement name="available-research-container" class="research-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                        
+                        <!-- Research Details Panel -->
+                        <ui:VisualElement name="research-details-section" class="research-section">
+                            <ui:VisualElement name="research-details-panel" class="research-details-panel">
+                                <ui:Label text="Research Details" class="section-title" />
+                                
+                                <ui:VisualElement name="research-info" class="research-info">
+                                    <ui:Label text="Select a research project" name="research-title-label" class="research-title" />
+                                    <ui:Label text="No research selected" name="research-description-label" class="research-description" />
+                                    
+                                    <ui:VisualElement name="research-stats" class="research-stats">
+                                        <ui:VisualElement name="stat-row" class="stat-row">
+                                            <ui:Label text="Cost:" class="stat-label" />
+                                            <ui:Label text="0 RP" name="research-cost-label" class="stat-value" />
+                                        </ui:VisualElement>
+                                        <ui:VisualElement name="stat-row" class="stat-row">
+                                            <ui:Label text="Duration:" class="stat-label" />
+                                            <ui:Label text="0 minutes" name="research-time-label" class="stat-value" />
+                                        </ui:VisualElement>
+                                    </ui:VisualElement>
+                                    
+                                    <ui:VisualElement name="research-progress-section" class="progress-section">
+                                        <ui:Label text="Progress" class="section-header" />
+                                        <ui:ProgressBar value="0" name="research-progress-bar" class="research-progress-bar" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                                
+                                <ui:VisualElement name="research-controls-panel" class="research-controls-panel">
+                                    <ui:Button text="Start Research" name="start-research-button" class="research-btn start-btn" />
+                                    <ui:Button text="Cancel" name="cancel-research-button" class="research-btn cancel-btn" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        
+                        <!-- Research Queue Section -->
+                        <ui:VisualElement name="research-queue-section" class="research-section">
+                            <ui:Label text="Research Queue" class="section-title" />
+                            <ui:ScrollView name="research-queue-scroll" class="research-scroll">
+                                <ui:VisualElement name="research-queue-container" class="research-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Achievements Panel -->
+            <ui:VisualElement name="achievements-panel" class="tab-panel hidden">
+                <ui:VisualElement name="achievements-content" class="achievements-content">
+                    
+                    <!-- Achievement Controls -->
+                    <ui:VisualElement name="achievements-controls" class="achievements-controls">
+                        <ui:VisualElement name="achievements-filters" class="achievements-filters">
+                            <ui:DropdownField label="Category" name="achievement-category-filter" class="category-filter" />
+                            <ui:TextField placeholder-text="Search achievements..." name="achievement-search-field" class="search-field" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="achievements-status" class="achievements-status">
+                            <ui:Label text="Progress" class="status-title" />
+                            <ui:Label text="15/50 Earned" name="achievement-progress-label" class="status-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Achievements Layout -->
+                    <ui:VisualElement name="achievements-layout" class="achievements-layout">
+                        
+                        <!-- Achievements List -->
+                        <ui:VisualElement name="achievements-list-section" class="achievements-list-section">
+                            <ui:ScrollView name="achievements-scroll" class="achievements-scroll">
+                                <ui:VisualElement name="achievements-list" class="achievements-list" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                        
+                        <!-- Achievement Details -->
+                        <ui:VisualElement name="achievement-details-section" class="achievement-details-section">
+                            <ui:VisualElement name="achievement-details-panel" class="achievement-details-panel">
+                                <ui:Label text="Achievement Details" class="section-title" />
+                                <ui:Label text="Select an achievement to view details" class="placeholder-text" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Statistics Panel -->
+            <ui:VisualElement name="statistics-panel" class="tab-panel hidden">
+                <ui:VisualElement name="statistics-content" class="statistics-content">
+                    
+                    <!-- Statistics Overview -->
+                    <ui:VisualElement name="stats-overview" class="stats-overview">
+                        <ui:Label text="Player Statistics" class="section-title" />
+                        
+                        <ui:VisualElement name="stats-grid" class="stats-grid">
+                            <ui:VisualElement name="stat-card" class="stat-card">
+                                <ui:Label text="Total Experience" class="stat-card-title" />
+                                <ui:Label text="125,450" name="total-experience-label" class="stat-card-value" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement name="stat-card" class="stat-card">
+                                <ui:Label text="Skills Unlocked" class="stat-card-title" />
+                                <ui:Label text="28" name="skills-unlocked-label" class="stat-card-value" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement name="stat-card" class="stat-card">
+                                <ui:Label text="Research Completed" class="stat-card-title" />
+                                <ui:Label text="15" name="research-completed-label" class="stat-card-value" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement name="stat-card" class="stat-card">
+                                <ui:Label text="Achievements Earned" class="stat-card-title" />
+                                <ui:Label text="15" name="achievements-earned-label" class="stat-card-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Progress Charts -->
+                    <ui:VisualElement name="progress-charts-section" class="charts-section">
+                        <ui:Label text="Progress Charts" class="section-title" />
+                        <ui:VisualElement name="progress-charts" class="progress-charts">
+                            <ui:Label text="Progress visualization charts would be implemented here" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Recent Milestones -->
+                    <ui:VisualElement name="milestones-section" class="milestones-section">
+                        <ui:Label text="Recent Milestones" class="section-title" />
+                        <ui:VisualElement name="milestones-container" class="milestones-container">
+                            <ui:Label text="Recent achievements and milestones will appear here" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Quick Actions Bar -->
+        <ui:VisualElement name="quick-actions-bar" class="quick-actions-bar">
+            <ui:VisualElement name="quick-actions-left" class="quick-actions-section">
+                <ui:Button text="Auto-Allocate Skills" class="quick-action-btn auto-btn" />
+                <ui:Button text="Optimal Research Path" class="quick-action-btn optimize-btn" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="quick-actions-center" class="quick-actions-section">
+                <ui:Label text="Next Level: 1,550 XP" class="progress-info" />
+                <ui:Label text="Next Research: 3h 24m" class="progress-info" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="quick-actions-right" class="quick-actions-section">
+                <ui:Button text="Save Progress" class="quick-action-btn save-btn" />
+                <ui:Button text="Share Build" class="quick-action-btn share-btn" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

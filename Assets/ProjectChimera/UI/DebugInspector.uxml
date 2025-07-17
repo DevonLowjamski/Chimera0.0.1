@@ -1,0 +1,209 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="PlantDataRow" src="project://database/Assets/ProjectChimera/UI/PlantDataRow.uxml?fileID=9196751381966915502&amp;guid=PLACEHOLDER&amp;type=3#PlantDataRow" />
+    <Style src="project://database/Assets/ProjectChimera/UI/DebugInspector.uss?fileID=7433441132597879392&amp;guid=PLACEHOLDER&amp;type=3#DebugInspector" />
+    
+    <!-- Main Debug Inspector Container -->
+    <ui:VisualElement name="debug-inspector-root" class="debug-inspector">
+        
+        <!-- Header Section -->
+        <ui:VisualElement name="header-section" class="header-section">
+            <ui:Label text="Project Chimera - Debug Inspector" name="main-title" class="main-title" />
+            <ui:Label text="Real-time Plant Data Visualization &amp; System Control" name="subtitle" class="subtitle" />
+            
+            <!-- Time Control Section -->
+            <ui:VisualElement name="time-controls" class="time-controls">
+                <ui:Label text="Time Control" class="section-label" />
+                <ui:VisualElement name="time-buttons" class="time-buttons">
+                    <ui:Button text="⏸" name="pause-button" class="time-button pause-button" />
+                    <ui:Button text="▶" name="play-button" class="time-button play-button" />
+                    <ui:Button text="⏩" name="fast-forward-button" class="time-button fast-forward-button" />
+                </ui:VisualElement>
+                <ui:VisualElement name="time-display" class="time-display">
+                    <ui:Label text="Time Scale: 1.0x" name="time-scale-label" class="time-info" />
+                    <ui:Label text="Game Day: 1" name="game-day-label" class="time-info" />
+                    <ui:Label text="Season: Spring" name="season-label" class="time-info" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Content Container -->
+        <ui:VisualElement name="content-container" class="content-container">
+            
+            <!-- Left Panel: Plant Selection -->
+            <ui:VisualElement name="plant-selection-panel" class="left-panel">
+                <ui:Label text="Plant Selection" class="panel-title" />
+                
+                <!-- Plant List -->
+                <ui:ScrollView name="plant-list-scroll" class="plant-list-scroll">
+                    <ui:ListView name="plant-list" class="plant-list" />
+                </ui:ScrollView>
+                
+                <!-- Plant Filter Controls -->
+                <ui:VisualElement name="plant-filters" class="plant-filters">
+                    <ui:Label text="Filters" class="filter-label" />
+                    <ui:DropdownField label="Growth Stage" name="growth-stage-filter" class="filter-dropdown" />
+                    <ui:DropdownField label="Health Status" name="health-filter" class="filter-dropdown" />
+                    <ui:DropdownField label="Strain" name="strain-filter" class="filter-dropdown" />
+                </ui:VisualElement>
+                
+                <!-- Summary Stats -->
+                <ui:VisualElement name="summary-stats" class="summary-stats">
+                    <ui:Label text="Summary" class="stats-title" />
+                    <ui:Label text="Total Plants: 0" name="total-plants-label" class="stat-item" />
+                    <ui:Label text="Healthy: 0" name="healthy-plants-label" class="stat-item" />
+                    <ui:Label text="Flowering: 0" name="flowering-plants-label" class="stat-item" />
+                    <ui:Label text="Ready to Harvest: 0" name="harvest-ready-label" class="stat-item" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Center Panel: Plant Data Visualization -->
+            <ui:VisualElement name="plant-data-panel" class="center-panel">
+                <ui:Label text="Selected Plant Data" class="panel-title" />
+                
+                <!-- Plant Overview -->
+                <ui:VisualElement name="plant-overview" class="plant-overview">
+                    <ui:Label text="No Plant Selected" name="plant-name-label" class="plant-name" />
+                    <ui:Label text="Select a plant from the list to view detailed information" name="plant-info-label" class="plant-info" />
+                </ui:VisualElement>
+                
+                <!-- Genotype/Phenotype Section -->
+                <ui:VisualElement name="genetics-section" class="genetics-section">
+                    <ui:Label text="Genetic Information" class="section-title" />
+                    
+                    <!-- Genotype Display -->
+                    <ui:VisualElement name="genotype-container" class="genotype-container">
+                        <ui:Label text="Genotype" class="genetics-label" />
+                        <ui:ScrollView name="genotype-scroll" class="genotype-scroll">
+                            <ui:VisualElement name="genotype-list" class="genotype-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                    
+                    <!-- Phenotype Display -->
+                    <ui:VisualElement name="phenotype-container" class="phenotype-container">
+                        <ui:Label text="Expressed Traits (Phenotype)" class="genetics-label" />
+                        <ui:ScrollView name="phenotype-scroll" class="phenotype-scroll">
+                            <ui:VisualElement name="phenotype-list" class="phenotype-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Real-time Data Section -->
+                <ui:VisualElement name="realtime-data-section" class="realtime-data-section">
+                    <ui:Label text="Live Plant Data" class="section-title" />
+                    
+                    <!-- Primary Stats -->
+                    <ui:VisualElement name="primary-stats" class="primary-stats">
+                        <ui:VisualElement name="growth-stats" class="stat-group">
+                            <ui:Label text="Growth" class="stat-group-title" />
+                            <ui:ProgressBar title="Height" value="0" name="height-progress" class="stat-progress" />
+                            <ui:ProgressBar title="Biomass" value="0" name="biomass-progress" class="stat-progress" />
+                            <ui:ProgressBar title="Maturity" value="0" name="maturity-progress" class="stat-progress" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="health-stats" class="stat-group">
+                            <ui:Label text="Health" class="stat-group-title" />
+                            <ui:ProgressBar title="Overall Health" value="100" name="health-progress" class="stat-progress health-bar" />
+                            <ui:ProgressBar title="Water Status" value="50" name="water-progress" class="stat-progress" />
+                            <ui:ProgressBar title="Nutrition" value="75" name="nutrition-progress" class="stat-progress" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="production-stats" class="stat-group">
+                            <ui:Label text="Production" class="stat-group-title" />
+                            <ui:ProgressBar title="THC Level" value="0" name="thc-progress" class="stat-progress" />
+                            <ui:ProgressBar title="CBD Level" value="0" name="cbd-progress" class="stat-progress" />
+                            <ui:ProgressBar title="Trichome Density" value="0" name="trichome-progress" class="stat-progress" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Environmental Factors -->
+                <ui:VisualElement name="environmental-section" class="environmental-section">
+                    <ui:Label text="Environmental Conditions" class="section-title" />
+                    <ui:VisualElement name="environmental-grid" class="environmental-grid">
+                        <ui:VisualElement name="temp-humidity" class="env-group">
+                            <ui:Label text="Temperature: --°C" name="temperature-label" class="env-stat" />
+                            <ui:Label text="Humidity: --%RH" name="humidity-label" class="env-stat" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="light-co2" class="env-group">
+                            <ui:Label text="Light: -- PPFD" name="light-label" class="env-stat" />
+                            <ui:Label text="CO₂: -- ppm" name="co2-label" class="env-stat" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="nutrients-ph" class="env-group">
+                            <ui:Label text="pH: --" name="ph-label" class="env-stat" />
+                            <ui:Label text="EC: -- mS/cm" name="ec-label" class="env-stat" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Right Panel: System Status &amp; Controls -->
+            <ui:VisualElement name="system-panel" class="right-panel">
+                <ui:Label text="System Status" class="panel-title" />
+                
+                <!-- Manager Status -->
+                <ui:VisualElement name="manager-status" class="manager-status">
+                    <ui:Label text="Core Systems" class="status-section-title" />
+                    <ui:VisualElement name="manager-list" class="manager-list">
+                        <ui:VisualElement name="data-manager-status" class="manager-item">
+                            <ui:Label text="DataManager" class="manager-name" />
+                            <ui:Label text="●" name="data-manager-indicator" class="status-indicator" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="time-manager-status" class="manager-item">
+                            <ui:Label text="TimeManager" class="manager-name" />
+                            <ui:Label text="●" name="time-manager-indicator" class="status-indicator" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="plant-manager-status" class="manager-item">
+                            <ui:Label text="PlantManager" class="manager-name" />
+                            <ui:Label text="●" name="plant-manager-indicator" class="status-indicator" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="genetics-manager-status" class="manager-item">
+                            <ui:Label text="GeneticsManager" class="manager-name" />
+                            <ui:Label text="●" name="genetics-manager-indicator" class="status-indicator" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Performance Metrics -->
+                <ui:VisualElement name="performance-section" class="performance-section">
+                    <ui:Label text="Performance" class="status-section-title" />
+                    <ui:VisualElement name="performance-stats" class="performance-stats">
+                        <ui:Label text="FPS: --" name="fps-label" class="perf-stat" />
+                        <ui:Label text="Memory: -- MB" name="memory-label" class="perf-stat" />
+                        <ui:Label text="Plant Count: 0" name="plant-count-label" class="perf-stat" />
+                        <ui:Label text="Update Time: -- ms" name="update-time-label" class="perf-stat" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Debug Controls -->
+                <ui:VisualElement name="debug-controls" class="debug-controls">
+                    <ui:Label text="Debug Controls" class="status-section-title" />
+                    <ui:VisualElement name="debug-buttons" class="debug-buttons">
+                        <ui:Button text="Force Plant Update" name="force-update-button" class="debug-button" />
+                        <ui:Button text="Trigger Growth Event" name="growth-event-button" class="debug-button" />
+                        <ui:Button text="Reset Plant Data" name="reset-data-button" class="debug-button" />
+                        <ui:Button text="Export Debug Log" name="export-log-button" class="debug-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Data Export -->
+                <ui:VisualElement name="data-export" class="data-export">
+                    <ui:Label text="Data Export" class="status-section-title" />
+                    <ui:VisualElement name="export-options" class="export-options">
+                        <ui:Toggle label="Include Genetic Data" name="export-genetics-toggle" class="export-toggle" />
+                        <ui:Toggle label="Include Environmental Data" name="export-environment-toggle" class="export-toggle" />
+                        <ui:Toggle label="Include Growth History" name="export-history-toggle" class="export-toggle" />
+                        <ui:Button text="Export CSV" name="export-csv-button" class="export-button" />
+                        <ui:Button text="Export JSON" name="export-json-button" class="export-button" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Footer Status Bar -->
+        <ui:VisualElement name="footer-status" class="footer-status">
+            <ui:Label text="Debug Inspector v1.0 | Project Chimera" name="version-label" class="footer-info" />
+            <ui:Label text="Ready" name="status-message" class="status-message" />
+            <ui:Label text="Last Update: --" name="last-update-label" class="footer-info" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

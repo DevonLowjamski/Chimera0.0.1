@@ -1,0 +1,548 @@
+/* Advanced Breeding UI Styles - Phase 3.3 */
+
+/* Main Container */
+.main-container {
+    flex-grow: 1;
+    background-color: rgb(35, 35, 35);
+    color: rgb(210, 210, 210);
+    font-size: 14px;
+    padding: 10px;
+}
+
+/* Header Section */
+.header-section {
+    background-color: rgb(45, 45, 45);
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(0, 150, 75);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.header-title {
+    font-size: 24px;
+    font-style: bold;
+    color: rgb(0, 200, 100);
+    margin-bottom: 5px;
+    -unity-text-align: middle-center;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: rgb(150, 150, 150);
+    -unity-text-align: middle-center;
+    font-style: italic;
+}
+
+/* Main Content Layout */
+.main-content {
+    flex-direction: row;
+    flex-grow: 1;
+    margin-top: 10px;
+}
+
+.panel {
+    flex-grow: 1;
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(40, 40, 40);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(60, 60, 60);
+}
+
+.left-panel {
+    flex-basis: 30%;
+    max-width: 350px;
+}
+
+.center-panel {
+    flex-basis: 40%;
+    margin: 5px 10px;
+}
+
+.right-panel {
+    flex-basis: 30%;
+    max-width: 350px;
+}
+
+/* Section Containers */
+.section-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgb(45, 45, 45);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(65, 65, 65);
+}
+
+.section-title {
+    font-size: 16px;
+    font-style: bold;
+    color: rgb(0, 180, 90);
+    margin-bottom: 12px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(0, 150, 75);
+    padding-bottom: 5px;
+}
+
+.subsection-title {
+    font-size: 14px;
+    font-style: bold;
+    color: rgb(180, 180, 180);
+    margin-bottom: 8px;
+    margin-top: 10px;
+}
+
+/* Parent Selection Styles */
+.parent-container {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgb(50, 50, 50);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(70, 70, 70);
+}
+
+.parent-label {
+    font-size: 14px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+    margin-bottom: 5px;
+}
+
+.parent-dropdown {
+    height: 30px;
+    margin-bottom: 8px;
+    background-color: rgb(60, 60, 60);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(80, 80, 80);
+}
+
+.parent-dropdown:hover {
+    border-color: rgb(0, 150, 75);
+}
+
+.parent-dropdown:focus {
+    border-color: rgb(0, 200, 100);
+    border-width: 2px;
+}
+
+.parent-info {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.trait-label {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    background-color: rgb(55, 55, 55);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 1px;
+}
+
+/* Button Styles */
+.button-row {
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.control-button {
+    height: 30px;
+    background-color: rgb(70, 70, 70);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(90, 90, 90);
+    color: rgb(200, 200, 200);
+    flex-basis: 45%;
+}
+
+.control-button:hover {
+    background-color: rgb(80, 80, 80);
+    border-color: rgb(0, 150, 75);
+}
+
+.control-button:active {
+    background-color: rgb(60, 60, 60);
+}
+
+.tool-button {
+    height: 30px;
+    margin-bottom: 5px;
+    background-color: rgb(70, 70, 70);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(90, 90, 90);
+    color: rgb(200, 200, 200);
+}
+
+.tool-button:hover {
+    background-color: rgb(80, 80, 80);
+    border-color: rgb(0, 150, 75);
+}
+
+/* Genetic Analysis Styles */
+.analysis-container {
+    margin-top: 10px;
+}
+
+.analysis-label {
+    font-size: 13px;
+    color: rgb(190, 190, 190);
+    margin-bottom: 5px;
+    padding: 3px 6px;
+    background-color: rgb(55, 55, 55);
+    border-radius: 3px;
+}
+
+.progress-container {
+    margin-top: 10px;
+}
+
+.progress-label {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 3px;
+}
+
+.diversity-bar {
+    height: 20px;
+    border-radius: 10px;
+    background-color: rgb(60, 60, 60);
+}
+
+.diversity-bar .unity-progress-bar__background {
+    background-color: rgb(60, 60, 60);
+    border-radius: 10px;
+}
+
+.diversity-bar .unity-progress-bar__progress {
+    background-color: rgb(0, 150, 75);
+    border-radius: 10px;
+}
+
+/* Breeding Goals Styles */
+.toggle-container {
+    margin-bottom: 15px;
+}
+
+.goal-toggle {
+    margin-bottom: 5px;
+    color: rgb(190, 190, 190);
+}
+
+.goal-toggle:checked {
+    color: rgb(0, 200, 100);
+}
+
+.slider-container {
+    margin-top: 10px;
+}
+
+.target-container {
+    margin-bottom: 10px;
+}
+
+.slider-label {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 3px;
+}
+
+.target-slider {
+    height: 20px;
+}
+
+.target-slider .unity-base-slider__tracker {
+    background-color: rgb(60, 60, 60);
+    border-radius: 10px;
+}
+
+.target-slider .unity-base-slider__dragger {
+    background-color: rgb(0, 150, 75);
+    border-color: rgb(0, 200, 100);
+    border-radius: 10px;
+}
+
+/* Trait Prediction Styles */
+.prediction-container {
+    margin-top: 10px;
+}
+
+.trait-prediction {
+    margin-bottom: 12px;
+}
+
+.prediction-bar {
+    height: 25px;
+    border-radius: 12px;
+    margin-top: 3px;
+}
+
+.thc-bar .unity-progress-bar__progress {
+    background-color: rgb(200, 100, 0);
+}
+
+.cbd-bar .unity-progress-bar__progress {
+    background-color: rgb(0, 150, 200);
+}
+
+.yield-bar .unity-progress-bar__progress {
+    background-color: rgb(150, 200, 0);
+}
+
+.height-bar .unity-progress-bar__progress {
+    background-color: rgb(200, 0, 150);
+}
+
+.probability-container {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: rgb(55, 55, 55);
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: rgb(75, 75, 75);
+}
+
+.probability-label {
+    font-size: 14px;
+    font-style: bold;
+    color: rgb(0, 200, 100);
+    -unity-text-align: middle-center;
+}
+
+/* Punnett Square Styles */
+.punnett-container {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgb(50, 50, 50);
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: rgb(70, 70, 70);
+}
+
+.punnett-grid {
+    flex-direction: column;
+}
+
+.punnett-row {
+    flex-direction: row;
+    margin-bottom: 2px;
+}
+
+.punnett-cell {
+    flex-basis: 25%;
+    height: 40px;
+    margin: 1px;
+    padding: 5px;
+    background-color: rgb(60, 60, 60);
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: rgb(80, 80, 80);
+    justify-content: center;
+    align-items: center;
+}
+
+.genotype-label {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+}
+
+.probability-label {
+    font-size: 10px;
+    color: rgb(150, 150, 150);
+}
+
+/* Pedigree Chart Styles */
+.pedigree-container {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgb(50, 50, 50);
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: rgb(70, 70, 70);
+    min-height: 200px;
+}
+
+.pedigree-chart {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 1;
+}
+
+.pedigree-node {
+    padding: 8px;
+    margin: 5px;
+    background-color: rgb(60, 60, 60);
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: rgb(80, 80, 80);
+    min-width: 120px;
+    align-items: center;
+}
+
+.pedigree-node.parent1 {
+    border-color: rgb(200, 100, 0);
+}
+
+.pedigree-node.parent2 {
+    border-color: rgb(0, 150, 200);
+}
+
+.pedigree-node.offspring {
+    border-color: rgb(0, 200, 100);
+    background-color: rgb(50, 70, 50);
+}
+
+.strain-name {
+    font-size: 12px;
+    font-style: bold;
+    color: rgb(200, 200, 200);
+    -unity-text-align: middle-center;
+}
+
+.strain-type {
+    font-size: 10px;
+    color: rgb(150, 150, 150);
+    -unity-text-align: middle-center;
+}
+
+.probability {
+    font-size: 11px;
+    color: rgb(0, 200, 100);
+    -unity-text-align: middle-center;
+    font-style: bold;
+}
+
+/* Advanced Tools Styles */
+.button-container {
+    margin-bottom: 15px;
+}
+
+.simulation-container {
+    margin-top: 15px;
+}
+
+.parameter-container {
+    margin-bottom: 10px;
+}
+
+.parameter-label {
+    font-size: 12px;
+    color: rgb(180, 180, 180);
+    margin-bottom: 3px;
+}
+
+.parameter-slider {
+    height: 18px;
+}
+
+.parameter-toggle {
+    margin-bottom: 5px;
+    color: rgb(180, 180, 180);
+}
+
+.parameter-toggle:checked {
+    color: rgb(0, 200, 100);
+}
+
+/* Status Section Styles */
+.status-container {
+    margin-top: 10px;
+}
+
+.status-label {
+    font-size: 12px;
+    margin-bottom: 3px;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.status-ready {
+    color: rgb(0, 200, 100);
+    background-color: rgb(0, 50, 25);
+}
+
+.status-active {
+    color: rgb(200, 150, 0);
+    background-color: rgb(50, 40, 0);
+}
+
+.status-enabled {
+    color: rgb(0, 150, 200);
+    background-color: rgb(0, 30, 50);
+}
+
+/* Footer Section */
+.footer-section {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: rgb(45, 45, 45);
+    border-top-width: 1px;
+    border-top-color: rgb(65, 65, 65);
+    border-radius: 5px;
+}
+
+.footer-text {
+    font-size: 11px;
+    color: rgb(120, 120, 120);
+    -unity-text-align: middle-center;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .panel {
+        max-width: none;
+        flex-basis: auto;
+    }
+    
+    .header-title {
+        font-size: 20px;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    transition-duration: 0.3s;
+    transition-property: opacity;
+    opacity: 1;
+}
+
+.fade-out {
+    transition-duration: 0.3s;
+    transition-property: opacity;
+    opacity: 0;
+}
+
+.highlight {
+    border-color: rgb(0, 200, 100);
+    border-width: 2px;
+    background-color: rgb(45, 55, 45);
+}
+
+/* Hover Effects */
+.section-container:hover {
+    border-color: rgb(80, 80, 80);
+}
+
+.trait-prediction:hover .prediction-bar {
+    transform: scale(1.02);
+    transition-duration: 0.2s;
+    transition-property: transform;
+}
+
+/* Focus States */
+*:focus {
+    border-color: rgb(0, 200, 100);
+    border-width: 2px;
+}

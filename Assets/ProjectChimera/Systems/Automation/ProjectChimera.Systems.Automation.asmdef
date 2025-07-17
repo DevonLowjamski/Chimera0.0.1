@@ -1,0 +1,19 @@
+{
+    "name": "ProjectChimera.Systems.Automation",
+    "rootNamespace": "ProjectChimera.Systems.Automation",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Events"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

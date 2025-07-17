@@ -1,0 +1,1072 @@
+/* 
+ * Project Chimera - Research & Progression Styles
+ * Gaming-focused skill tree and research interface styling
+ */
+
+/* === ROOT AND LAYOUT === */
+.research-root {
+    flex-direction: column;
+    height: 100%;
+    background-color: rgb(8, 12, 20);
+    color: rgb(220, 220, 220);
+    font-size: 14px;
+}
+
+/* === HEADER SECTION === */
+.research-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, rgb(20, 15, 40), rgb(40, 25, 60));
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(180, 120, 255);
+    min-height: 90px;
+}
+
+.header-left {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.panel-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(200, 150, 255);
+    margin-bottom: 4px;
+}
+
+.panel-subtitle {
+    font-size: 14px;
+    color: rgb(170, 130, 220);
+    font-weight: 500;
+}
+
+/* === PLAYER STATUS === */
+.player-status {
+    flex-direction: row;
+    align-items: center;
+}
+
+.level-display {
+    flex-direction: column;
+    align-items: center;
+    margin-right: 24px;
+}
+
+.level-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(255, 200, 100);
+    margin-bottom: 4px;
+    font-family: "Roboto Mono", monospace;
+}
+
+.experience-section {
+    flex-direction: column;
+    align-items: center;
+    min-width: 160px;
+}
+
+.experience-text {
+    font-size: 12px;
+    color: rgb(180, 150, 220);
+    margin-bottom: 4px;
+    font-family: "Roboto Mono", monospace;
+}
+
+.experience-bar {
+    width: 160px;
+    height: 12px;
+    border-radius: 6px;
+}
+
+.experience-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 30, 60);
+    border-radius: 6px;
+}
+
+.experience-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(100, 150, 255), rgb(200, 150, 255));
+    border-radius: 6px;
+}
+
+.resources-display {
+    flex-direction: column;
+}
+
+.resource-item {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.resource-label {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+    min-width: 100px;
+    margin-right: 8px;
+}
+
+.resource-value {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: "Roboto Mono", monospace;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border-width: 1px;
+}
+
+.skill-points {
+    color: rgb(255, 200, 100);
+    background-color: rgba(255, 200, 100, 0.1);
+    border-color: rgb(255, 200, 100);
+}
+
+.research-points {
+    color: rgb(120, 200, 255);
+    background-color: rgba(120, 200, 255, 0.1);
+    border-color: rgb(120, 200, 255);
+}
+
+/* === TAB NAVIGATION === */
+.tab-navigation {
+    flex-direction: row;
+    background-color: rgb(18, 24, 32);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+    padding: 0 24px;
+}
+
+.nav-tab {
+    padding: 12px 24px;
+    background-color: transparent;
+    color: rgb(150, 180, 220);
+    border-width: 0;
+    border-bottom-width: 3px;
+    border-bottom-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    transition-duration: 0.3s;
+    margin-right: 4px;
+}
+
+.nav-tab:hover {
+    background-color: rgba(180, 120, 255, 0.1);
+    color: rgb(200, 150, 255);
+}
+
+.tab-active {
+    color: rgb(200, 150, 255);
+    border-bottom-color: rgb(180, 120, 255);
+    background-color: rgba(180, 120, 255, 0.15);
+}
+
+/* === MAIN CONTENT === */
+.research-main {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.tab-panel {
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+/* === SKILL TREE PANEL === */
+.skill-tree-content {
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tree-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgb(15, 22, 30);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+.controls-section {
+    flex-direction: row;
+    align-items: center;
+}
+
+.category-filter {
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 6px;
+    color: rgb(220, 220, 220);
+    margin-right: 12px;
+}
+
+.control-btn {
+    padding: 8px 16px;
+    margin-left: 8px;
+    border-radius: 6px;
+    border-width: 0;
+    font-weight: 500;
+    transition-duration: 0.2s;
+}
+
+.reset-btn {
+    background-color: rgb(200, 100, 100);
+    color: white;
+}
+
+.reset-btn:hover {
+    background-color: rgb(220, 120, 120);
+    scale: 1.05;
+}
+
+.export-btn {
+    background-color: rgb(100, 150, 200);
+    color: white;
+}
+
+.export-btn:hover {
+    background-color: rgb(120, 170, 220);
+    scale: 1.05;
+}
+
+.help-text {
+    font-size: 12px;
+    color: rgb(120, 140, 160);
+    font-style: italic;
+}
+
+/* === SKILL TREE MAIN === */
+.skill-tree-main {
+    flex-grow: 1;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.skill-tree-container {
+    width: 70%;
+    background-color: rgb(10, 16, 22);
+    border-right-width: 2px;
+    border-right-color: rgb(45, 65, 85);
+    overflow: hidden;
+}
+
+.skill-tree-viewport {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-nodes-container {
+    position: relative;
+    min-width: 1200px;
+    min-height: 800px;
+}
+
+/* === SKILL NODES === */
+.skill-node {
+    position: absolute;
+    width: 140px;
+    height: 100px;
+    background-color: rgb(25, 35, 50);
+    border-radius: 12px;
+    border-width: 2px;
+    padding: 8px;
+    align-items: center;
+    justify-content: center;
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+.skill-node:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(180, 120, 255, 0.3);
+}
+
+.skill-locked {
+    border-color: rgb(80, 80, 100);
+    opacity: 0.7;
+}
+
+.skill-unlocked {
+    border-color: rgb(180, 120, 255);
+    background-color: rgb(35, 25, 60);
+}
+
+.tier-1 {
+    border-left-color: rgb(100, 200, 100);
+    border-left-width: 4px;
+}
+
+.tier-2 {
+    border-left-color: rgb(100, 150, 255);
+    border-left-width: 4px;
+}
+
+.tier-3 {
+    border-left-color: rgb(255, 150, 100);
+    border-left-width: 4px;
+}
+
+.tier-4 {
+    border-left-color: rgb(255, 100, 150);
+    border-left-width: 4px;
+}
+
+.tier-5 {
+    border-left-color: rgb(255, 200, 100);
+    border-left-width: 4px;
+}
+
+.skill-node-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(220, 220, 240);
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.skill-node-cost {
+    font-size: 10px;
+    color: rgb(255, 200, 100);
+    font-family: "Roboto Mono", monospace;
+    margin-bottom: 2px;
+}
+
+.skill-node-tier {
+    font-size: 9px;
+    color: rgb(150, 180, 220);
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === SKILL PREVIEW PANEL === */
+.skill-preview-panel {
+    width: 30%;
+    background-color: rgb(12, 18, 25);
+    padding: 16px;
+    overflow: auto;
+}
+
+.selected-skill {
+    flex-direction: column;
+    height: 100%;
+}
+
+.skill-preview-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(200, 150, 255);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.skill-details-scroll {
+    flex-grow: 1;
+    margin-bottom: 16px;
+}
+
+.skill-details-content {
+    flex-direction: column;
+}
+
+.skill-description {
+    font-size: 13px;
+    color: rgb(180, 180, 200);
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+}
+
+.skill-section {
+    margin-bottom: 12px;
+    padding: 8px;
+    background-color: rgb(18, 24, 32);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+}
+
+.section-header {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(180, 150, 220);
+    margin-bottom: 6px;
+}
+
+.section-content {
+    font-size: 11px;
+    color: rgb(160, 160, 180);
+    white-space: pre-wrap;
+}
+
+.skill-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.skill-progress-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 30, 60);
+    border-radius: 4px;
+}
+
+.skill-progress-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(180, 120, 255), rgb(220, 160, 255));
+    border-radius: 4px;
+}
+
+.skill-actions {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.unlock-skill-btn {
+    padding: 12px 24px;
+    background-color: rgb(180, 120, 255);
+    color: white;
+    border-width: 0;
+    border-radius: 8px;
+    font-weight: bold;
+    transition-duration: 0.2s;
+}
+
+.unlock-skill-btn:hover {
+    background-color: rgb(200, 140, 255);
+    scale: 1.05;
+}
+
+.unlock-skill-btn:disabled {
+    background-color: rgb(80, 80, 100);
+    color: rgb(140, 140, 160);
+    scale: 1;
+}
+
+/* === RESEARCH PANEL === */
+.research-content {
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.research-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgb(15, 22, 30);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+.research-status {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.status-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 4px;
+}
+
+.status-value {
+    font-size: 12px;
+    color: rgb(120, 200, 255);
+    font-family: "Roboto Mono", monospace;
+}
+
+.research-actions {
+    flex-direction: row;
+    align-items: center;
+}
+
+.pause-btn {
+    background-color: rgb(200, 150, 100);
+    color: white;
+}
+
+.pause-btn:hover {
+    background-color: rgb(220, 170, 120);
+}
+
+.clear-btn {
+    background-color: rgb(200, 100, 100);
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: rgb(220, 120, 120);
+}
+
+/* === RESEARCH LAYOUT === */
+.research-layout {
+    flex-grow: 1;
+    flex-direction: row;
+    overflow: hidden;
+    padding: 16px;
+}
+
+.research-section {
+    flex-direction: column;
+    background-color: rgb(12, 18, 25);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+    margin-right: 12px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.research-section:last-child {
+    margin-right: 0;
+}
+
+.active-research-section {
+    width: 30%;
+}
+
+.available-research-section {
+    width: 25%;
+}
+
+.research-details-section {
+    width: 30%;
+}
+
+.research-queue-section {
+    width: 15%;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(180, 200, 230);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+.research-scroll {
+    flex-grow: 1;
+}
+
+.research-container {
+    flex-direction: column;
+}
+
+/* === RESEARCH ITEMS === */
+.active-research-item, .available-research-item {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-left-width: 3px;
+    transition-duration: 0.2s;
+}
+
+.active-research-item {
+    border-left-color: rgb(120, 200, 255);
+}
+
+.available-research-item {
+    border-left-color: rgb(100, 150, 200);
+    cursor: pointer;
+}
+
+.available-research-item:hover {
+    background-color: rgb(30, 40, 55);
+    transform: translateX(2px);
+}
+
+.research-name {
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(220, 220, 240);
+    margin-bottom: 4px;
+}
+
+.research-cost, .research-time {
+    font-size: 10px;
+    color: rgb(150, 180, 220);
+    font-family: "Roboto Mono", monospace;
+    margin-bottom: 2px;
+}
+
+.research-progress {
+    height: 6px;
+    border-radius: 3px;
+    margin-top: 4px;
+}
+
+.research-progress > .unity-progress-bar__background {
+    background-color: rgb(40, 40, 50);
+    border-radius: 3px;
+}
+
+.research-progress > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(120, 200, 255), rgb(160, 220, 255));
+    border-radius: 3px;
+}
+
+.start-research-btn {
+    padding: 4px 8px;
+    background-color: rgb(120, 200, 255);
+    color: white;
+    border-width: 0;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.start-research-btn:hover {
+    background-color: rgb(140, 220, 255);
+}
+
+/* === RESEARCH DETAILS === */
+.research-details-panel {
+    flex-direction: column;
+    height: 100%;
+}
+
+.research-info {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.research-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgb(200, 220, 255);
+    margin-bottom: 8px;
+}
+
+.research-description {
+    font-size: 12px;
+    color: rgb(180, 180, 200);
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+}
+
+.research-stats {
+    margin-bottom: 12px;
+}
+
+.stat-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: rgb(150, 180, 220);
+}
+
+.stat-value {
+    font-size: 11px;
+    font-weight: bold;
+    color: rgb(220, 220, 240);
+    font-family: "Roboto Mono", monospace;
+}
+
+.progress-section {
+    margin-bottom: 16px;
+}
+
+.research-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.research-progress-bar > .unity-progress-bar__background {
+    background-color: rgb(40, 40, 50);
+    border-radius: 4px;
+}
+
+.research-progress-bar > .unity-progress-bar__progress {
+    background: linear-gradient(90deg, rgb(120, 200, 255), rgb(160, 220, 255));
+    border-radius: 4px;
+}
+
+.research-controls-panel {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.research-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border-width: 0;
+    font-weight: 500;
+    transition-duration: 0.2s;
+}
+
+.start-btn {
+    background-color: rgb(120, 200, 80);
+    color: white;
+}
+
+.start-btn:hover {
+    background-color: rgb(140, 220, 100);
+}
+
+.cancel-btn {
+    background-color: rgb(200, 100, 100);
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: rgb(220, 120, 120);
+}
+
+/* === ACHIEVEMENTS PANEL === */
+.achievements-content {
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.achievements-controls {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgb(15, 22, 30);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(45, 65, 85);
+}
+
+.achievements-filters {
+    flex-direction: row;
+    align-items: center;
+}
+
+.search-field {
+    background-color: rgb(25, 35, 50);
+    border-color: rgb(70, 100, 140);
+    border-radius: 6px;
+    color: rgb(220, 220, 220);
+    margin-left: 12px;
+    min-width: 200px;
+}
+
+.achievements-status {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.achievements-layout {
+    flex-grow: 1;
+    flex-direction: row;
+    overflow: hidden;
+    padding: 16px;
+}
+
+.achievements-list-section {
+    width: 70%;
+    background-color: rgb(12, 18, 25);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+    margin-right: 12px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.achievement-details-section {
+    width: 30%;
+    background-color: rgb(12, 18, 25);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+    padding: 16px;
+}
+
+.achievements-scroll {
+    flex-grow: 1;
+}
+
+.achievements-list {
+    flex-direction: column;
+}
+
+.achievement-item {
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background-color: rgb(25, 35, 50);
+    border-radius: 6px;
+    border-left-width: 4px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+}
+
+.achievement-item:hover {
+    background-color: rgb(30, 40, 55);
+    transform: translateX(2px);
+}
+
+.achievement-earned {
+    border-left-color: rgb(255, 200, 100);
+    background-color: rgb(35, 30, 25);
+}
+
+.achievement-locked {
+    border-left-color: rgb(100, 100, 120);
+    opacity: 0.7;
+}
+
+.achievement-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: rgb(220, 220, 240);
+    margin-bottom: 4px;
+}
+
+.achievement-description {
+    font-size: 11px;
+    color: rgb(160, 160, 180);
+    margin-bottom: 4px;
+}
+
+.achievement-status {
+    font-size: 10px;
+    font-weight: bold;
+    font-family: "Roboto Mono", monospace;
+}
+
+.achievement-details-panel {
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+/* === STATISTICS PANEL === */
+.statistics-content {
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: auto;
+    padding: 24px;
+}
+
+.stats-overview {
+    margin-bottom: 24px;
+}
+
+.stats-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.stat-card {
+    width: 200px;
+    height: 100px;
+    background-color: rgb(25, 35, 50);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(70, 100, 140);
+    margin: 8px;
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+    transition-duration: 0.3s;
+}
+
+.stat-card:hover {
+    background-color: rgb(30, 40, 55);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(100, 150, 255, 0.2);
+}
+
+.stat-card-title {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.stat-card-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(200, 150, 255);
+    font-family: "Roboto Mono", monospace;
+    text-align: center;
+}
+
+.charts-section, .milestones-section {
+    background-color: rgb(15, 22, 30);
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgb(45, 65, 85);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-charts, .milestones-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.placeholder-text {
+    color: rgb(120, 140, 160);
+    font-style: italic;
+    text-align: center;
+}
+
+/* === QUICK ACTIONS BAR === */
+.quick-actions-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: rgb(15, 22, 30);
+    border-top-width: 1px;
+    border-top-color: rgb(45, 65, 85);
+    min-height: 60px;
+}
+
+.quick-actions-section {
+    flex-direction: row;
+    align-items: center;
+}
+
+.quick-action-btn {
+    padding: 8px 16px;
+    margin: 0 4px;
+    border-radius: 6px;
+    border-width: 0;
+    font-weight: 500;
+    font-size: 12px;
+    transition-duration: 0.2s;
+}
+
+.auto-btn {
+    background-color: rgb(120, 180, 120);
+    color: white;
+}
+
+.auto-btn:hover {
+    background-color: rgb(140, 200, 140);
+}
+
+.optimize-btn {
+    background-color: rgb(180, 120, 255);
+    color: white;
+}
+
+.optimize-btn:hover {
+    background-color: rgb(200, 140, 255);
+}
+
+.save-btn {
+    background-color: rgb(100, 150, 200);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: rgb(120, 170, 220);
+}
+
+.share-btn {
+    background-color: rgb(200, 150, 100);
+    color: white;
+}
+
+.share-btn:hover {
+    background-color: rgb(220, 170, 120);
+}
+
+.progress-info {
+    font-size: 11px;
+    color: rgb(150, 180, 220);
+    margin: 0 8px;
+    font-family: "Roboto Mono", monospace;
+}
+
+/* === ANIMATIONS === */
+@keyframes skill-unlock {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.skill-unlocked {
+    animation: skill-unlock 0.5s ease-out;
+}
+
+@keyframes progress-pulse {
+    0% { box-shadow: 0 0 10px rgba(180, 120, 255, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(180, 120, 255, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(180, 120, 255, 0.3); }
+}
+
+.experience-bar {
+    animation: progress-pulse 3s infinite;
+}
+
+@keyframes research-progress {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+.research-progress > .unity-progress-bar__progress {
+    background-size: 200% 100%;
+    animation: research-progress 2s linear infinite;
+}
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.achievement-item, .research-item, .stat-card {
+    animation: fade-in-up 0.3s ease-out;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 1400px) {
+    .skill-tree-main, .research-layout, .achievements-layout {
+        flex-direction: column;
+    }
+    
+    .skill-tree-container, .skill-preview-panel {
+        width: 100%;
+        height: 50%;
+    }
+    
+    .research-section, .achievements-list-section, .achievement-details-section {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 12px;
+        max-height: 200px;
+    }
+}
+
+/* === SCROLLBARS === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: rgb(30, 30, 40);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(180, 120, 255);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(200, 140, 255);
+}
