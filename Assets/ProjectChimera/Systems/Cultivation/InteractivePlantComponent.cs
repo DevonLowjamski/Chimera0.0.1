@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Facilities;
+using ProjectChimera.Data.Cultivation;
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
 
 namespace ProjectChimera.Systems.Cultivation
 {
@@ -59,7 +61,7 @@ namespace ProjectChimera.Systems.Cultivation
             Humidity = 60f,
             LightIntensity = 400f,
             CO2Level = 400f,
-            AirCirculation = 1f
+            AirFlow = 1f
         };
         
         // Events - Fixed delegate signatures

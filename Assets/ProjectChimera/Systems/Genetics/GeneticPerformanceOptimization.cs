@@ -327,11 +327,11 @@ namespace ProjectChimera.Systems.Genetics
             Interlocked.Increment(ref _cacheMisses);
         }
         
-        public GeneticPerformanceStats GetStats()
+        public GeneticsPerformanceStats GetStats()
         {
             lock (_statsLock)
             {
-                return new GeneticPerformanceStats
+                return new GeneticsPerformanceStats
                 {
                     TotalCalculations = _totalCalculations,
                     AverageCalculationTimeMs = _totalCalculations > 0 ? 
@@ -426,7 +426,7 @@ namespace ProjectChimera.Systems.Genetics
     /// Performance statistics structure.
     /// </summary>
     [Serializable]
-    public struct GeneticPerformanceStats
+    public struct GeneticsPerformanceStats
     {
         public long TotalCalculations;
         public double AverageCalculationTimeMs;
@@ -514,7 +514,7 @@ namespace ProjectChimera.Systems.Genetics
             public DateTime Timestamp;
             public int PlantCount;
             public double UpdateTimeMs;
-            public GeneticPerformanceStats GeneticStats;
+            public GeneticsPerformanceStats GeneticStats;
         }
         
         public GeneticPerformanceMonitor()
@@ -525,7 +525,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Record a batch update performance data point.
         /// </summary>
-        public void RecordBatchUpdate(int plantCount, GeneticPerformanceStats geneticStats)
+        public void RecordBatchUpdate(int plantCount, GeneticsPerformanceStats geneticStats)
         {
             lock (_historyLock)
             {
@@ -632,13 +632,13 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Get performance statistics for monitoring and optimization.
         /// </summary>
-        public GeneticPerformanceStats GetPerformanceStats()
+        public GeneticsPerformanceStats GetPerformanceStats()
         {
             lock (_historyLock)
             {
                 if (_performanceHistory.Count == 0)
                 {
-                    return new GeneticPerformanceStats
+                    return new GeneticsPerformanceStats
                     {
                         TotalCalculations = 0,
                         AverageCalculationTimeMs = 0.0,

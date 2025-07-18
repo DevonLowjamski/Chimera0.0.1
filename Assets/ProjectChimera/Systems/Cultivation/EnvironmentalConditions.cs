@@ -7,7 +7,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// Real-time environmental conditions affecting plant growth and health.
     /// </summary>
     [System.Serializable]
-    public class EnvironmentalConditions
+    public class CultivationEnvironmentalConditions
     {
         [Header("Climate Parameters")]
         [Range(-10f, 50f)] public float Temperature = 24f; // Celsius
@@ -42,9 +42,9 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Creates default optimal growing conditions.
         /// </summary>
-        public static EnvironmentalConditions CreateOptimal()
+        public static CultivationEnvironmentalConditions CreateOptimal()
         {
-            return new EnvironmentalConditions
+            return new CultivationEnvironmentalConditions
             {
                 Temperature = 24f,
                 Humidity = 60f,
@@ -71,9 +71,9 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Creates stressed environmental conditions for testing.
         /// </summary>
-        public static EnvironmentalConditions CreateStressed()
+        public static CultivationEnvironmentalConditions CreateStressed()
         {
-            return new EnvironmentalConditions
+            return new CultivationEnvironmentalConditions
             {
                 Temperature = 32f, // Too hot
                 Humidity = 85f, // Too humid
@@ -100,7 +100,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Compares this condition set with another and returns a similarity score.
         /// </summary>
-        public float CompareWith(EnvironmentalConditions other)
+        public float CompareWith(CultivationEnvironmentalConditions other)
         {
             if (other == null)
                 return 0f;
@@ -159,7 +159,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Applies gradual changes to environmental conditions.
         /// </summary>
-        public void ApplyGradualChange(EnvironmentalConditions target, float changeRate, float deltaTime)
+        public void ApplyGradualChange(CultivationEnvironmentalConditions target, float changeRate, float deltaTime)
         {
             float change = changeRate * deltaTime;
             
@@ -199,9 +199,9 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Creates a copy of these environmental conditions.
         /// </summary>
-        public EnvironmentalConditions Clone()
+        public CultivationEnvironmentalConditions Clone()
         {
-            return new EnvironmentalConditions
+            return new CultivationEnvironmentalConditions
             {
                 Temperature = this.Temperature,
                 Humidity = this.Humidity,
@@ -241,7 +241,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Creates default indoor environmental conditions (compatibility method).
         /// </summary>
-        public static EnvironmentalConditions CreateIndoorDefault()
+        public static CultivationEnvironmentalConditions CreateIndoorDefault()
         {
             return CreateOptimal(); // Use existing optimal conditions as indoor default
         }

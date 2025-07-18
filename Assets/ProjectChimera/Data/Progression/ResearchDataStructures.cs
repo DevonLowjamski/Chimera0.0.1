@@ -270,6 +270,8 @@ namespace ProjectChimera.Data.Progression
         public TechnologyReadiness TechnologyReadinessLevel = TechnologyReadiness.Proof_of_Concept;
         public List<string> ApplicationAreas = new List<string>();
         [TextArea(2, 4)] public string TechnologyDescription;
+        // PC-012-8: Added for research integration
+        [Range(0f, 1f)] public float ImpactLevel = 0.5f;
     }
     
     [System.Serializable]
@@ -625,7 +627,9 @@ namespace ProjectChimera.Data.Progression
         Technology_Development,
         Market_Research,
         Regulatory_Compliance,
-        Sustainability
+        Sustainability,
+        // PC-012-8: Added for research integration
+        Analytics
     }
     
     public enum ResearchType
@@ -919,7 +923,14 @@ namespace ProjectChimera.Data.Progression
         Analytical_Technology,
         Automation_Technology,
         Control_Technology,
-        Monitoring_Technology
+        Monitoring_Technology,
+        // PC-012-8: Additional technology types for research integration
+        Cultivation,
+        Genetics,
+        Equipment,
+        Automation,
+        Processing,
+        Analytics
     }
     
     public enum TechnologyReadiness

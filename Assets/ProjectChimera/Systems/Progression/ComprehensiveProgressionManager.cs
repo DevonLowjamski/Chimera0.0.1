@@ -5,6 +5,7 @@ using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Cultivation;
+// PC-012-9: Reference to Achievement class in same namespace
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -835,18 +836,21 @@ namespace ProjectChimera.Systems.Progression
         // 6. Cross-system multiplier for using multiple systems
         result.CrossSystemMultiplier = CalculateCrossSystemMultiplier(profile.PlayerID, systemName);
         
-        // 7. Contextual bonuses (streaks, first-time bonuses, etc.)
+        // 7. PC-012-7: Skill-based bonuses from skill tree progression
+        result.SkillTreeMultiplier = CalculateSkillTreeMultiplier(profile.PlayerID, systemName);
+        
+        // 8. Contextual bonuses (streaks, first-time bonuses, etc.)
         result.ContextualBonuses = CalculateContextualBonuses(contextualBonuses, profile, systemName);
         
-        // 8. Calculate final experience
+        // 9. Calculate final experience
         float multipliedExperience = baseExperience * result.SystemRateMultiplier * result.QualityMultiplier * 
-                                   result.DifficultyMultiplier * result.LevelScalingFactor * result.CrossSystemMultiplier;
+                                   result.DifficultyMultiplier * result.LevelScalingFactor * result.CrossSystemMultiplier * result.SkillTreeMultiplier;
         
         float bonusExperience = (multipliedExperience * result.EfficiencyBonus) + result.ContextualBonuses;
         
         result.FinalExperience = multipliedExperience + bonusExperience;
         
-        // 9. Apply experience caps to prevent exploitation
+        // 10. Apply experience caps to prevent exploitation
         result.FinalExperience = ApplyExperienceCaps(result.FinalExperience, systemName, profile);
         
         return result;
@@ -906,6 +910,282 @@ namespace ProjectChimera.Systems.Progression
     }
     
     /// <summary>
+    /// PC-012-7: Calculate skill tree multiplier based on player's skill progression
+    /// </summary>
+    private float CalculateSkillTreeMultiplier(string playerId, string systemName)
+    {
+        // Get the SkillTreeManager to access player's skill progression
+        var skillTreeManager = GameManager.Instance?.GetManager<SkillTreeManager>();
+        if (skillTreeManager == null) return 1.0f;
+        
+        float multiplier = 1.0f;
+        
+        // System-specific skill bonuses
+        switch (systemName)
+        {
+            case "Cultivation":
+                multiplier += GetCultivationSkillBonus(skillTreeManager, playerId);
+                break;
+            case "Genetics":
+                multiplier += GetGeneticsSkillBonus(skillTreeManager, playerId);
+                break;
+            case "Business":
+                multiplier += GetBusinessSkillBonus(skillTreeManager, playerId);
+                break;
+            case "Research":
+                multiplier += GetResearchSkillBonus(skillTreeManager, playerId);
+                break;
+            case "Economy":
+                multiplier += GetEconomySkillBonus(skillTreeManager, playerId);
+                break;
+            default:
+                multiplier += GetGeneralSkillBonus(skillTreeManager, playerId);
+                break;
+        }
+        
+        // Cap the skill tree multiplier to prevent excessive bonuses
+        return Mathf.Clamp(multiplier, 1.0f, 2.5f); // Maximum 2.5x bonus from skills
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get cultivation-specific skill bonuses
+    /// </summary>
+    private float GetCultivationSkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Example cultivation skills (would be data-driven in real implementation)
+        // Plant Care Mastery: +5% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "plant_care_mastery", 0.05f);
+        
+        // Growth Optimization: +3% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "growth_optimization", 0.03f);
+        
+        // Harvest Efficiency: +4% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "harvest_efficiency", 0.04f);
+        
+        // Environmental Control: +6% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "environmental_control", 0.06f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get genetics-specific skill bonuses
+    /// </summary>
+    private float GetGeneticsSkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Breeding Mastery: +8% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "breeding_mastery", 0.08f);
+        
+        // Genetic Analysis: +6% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "genetic_analysis", 0.06f);
+        
+        // Trait Selection: +5% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "trait_selection", 0.05f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get business-specific skill bonuses
+    /// </summary>
+    private float GetBusinessSkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Market Analysis: +7% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "market_analysis", 0.07f);
+        
+        // Customer Relations: +4% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "customer_relations", 0.04f);
+        
+        // Profit Optimization: +5% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "profit_optimization", 0.05f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get research-specific skill bonuses
+    /// </summary>
+    private float GetResearchSkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Scientific Method: +10% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "scientific_method", 0.10f);
+        
+        // Data Analysis: +8% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "data_analysis", 0.08f);
+        
+        // Innovation: +6% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "innovation", 0.06f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get economy-specific skill bonuses
+    /// </summary>
+    private float GetEconomySkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Financial Management: +5% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "financial_management", 0.05f);
+        
+        // Market Timing: +8% XP per level
+        bonus += GetSkillLevelBonus(skillManager, "market_timing", 0.08f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get general skill bonuses that apply to all systems
+    /// </summary>
+    private float GetGeneralSkillBonus(SkillTreeManager skillManager, string playerId)
+    {
+        float bonus = 0f;
+        
+        // Learning Efficiency: +3% XP per level to all systems
+        bonus += GetSkillLevelBonus(skillManager, "learning_efficiency", 0.03f);
+        
+        // Focus: +2% XP per level to all systems
+        bonus += GetSkillLevelBonus(skillManager, "focus", 0.02f);
+        
+        return bonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Helper method to get skill level bonus from real skill tree data
+    /// </summary>
+    private float GetSkillLevelBonus(SkillTreeManager skillManager, string skillId, float bonusPerLevel)
+    {
+        // Try to find the skill node by ID
+        var skillNode = GetSkillNodeByIdentifier(skillId);
+        if (skillNode != null)
+        {
+            int skillLevel = skillManager.GetSkillLevel(skillNode);
+            return skillLevel * bonusPerLevel;
+        }
+        
+        // If specific skill not found, look for similar skills in the domain
+        float domainBonus = GetDomainBasedSkillBonus(skillManager, skillId, bonusPerLevel);
+        return domainBonus;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get player's skill level for a specific skill from actual skill tree
+    /// </summary>
+    private int GetPlayerSkillLevel(string skillId)
+    {
+        var skillTreeManager = GameManager.Instance?.GetManager<SkillTreeManager>();
+        if (skillTreeManager == null) return 0;
+        
+        var skillNode = GetSkillNodeByIdentifier(skillId);
+        if (skillNode != null)
+        {
+            return skillTreeManager.GetSkillLevel(skillNode);
+        }
+        
+        return 0;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Find skill node by identifier string
+    /// </summary>
+    private SkillNodeSO GetSkillNodeByIdentifier(string skillId)
+    {
+        // Load all skill nodes from Resources or find them in the scene
+        // For now, use a mapping approach that matches common skill identifiers
+        var skillMapping = new Dictionary<string, string>
+        {
+            { "plant_care_mastery", "PlantCare" },
+            { "growth_optimization", "GrowthOptimization" },
+            { "harvest_efficiency", "HarvestEfficiency" },
+            { "environmental_control", "EnvironmentalControl" },
+            { "breeding_mastery", "BreedingMastery" },
+            { "genetic_analysis", "GeneticAnalysis" },
+            { "trait_selection", "TraitSelection" },
+            { "market_analysis", "MarketAnalysis" },
+            { "customer_relations", "CustomerRelations" },
+            { "profit_optimization", "ProfitOptimization" },
+            { "scientific_method", "ScientificMethod" },
+            { "data_analysis", "DataAnalysis" },
+            { "innovation", "Innovation" },
+            { "financial_management", "FinancialManagement" },
+            { "market_timing", "MarketTiming" },
+            { "learning_efficiency", "LearningEfficiency" },
+            { "focus", "Focus" }
+        };
+        
+        if (skillMapping.TryGetValue(skillId, out string skillName))
+        {
+            // Try to load from Resources
+            var skillNode = Resources.Load<SkillNodeSO>($"Skills/{skillName}");
+            if (skillNode != null) return skillNode;
+            
+            // Try alternative paths
+            skillNode = Resources.Load<SkillNodeSO>($"ProjectChimera/Skills/{skillName}");
+            if (skillNode != null) return skillNode;
+            
+            skillNode = Resources.Load<SkillNodeSO>($"Data/Progression/{skillName}");
+            if (skillNode != null) return skillNode;
+        }
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// PC-012-7: Get domain-based skill bonus when specific skill not found
+    /// </summary>
+    private float GetDomainBasedSkillBonus(SkillTreeManager skillManager, string skillId, float bonusPerLevel)
+    {
+        // Map skill IDs to domains and categories
+        var domainMapping = new Dictionary<string, (SkillDomain domain, SkillCategory category)>
+        {
+            { "plant_care_mastery", (SkillDomain.Cultivation, SkillCategory.Cultivation) },
+            { "growth_optimization", (SkillDomain.Growing, SkillCategory.Cultivation) },
+            { "harvest_efficiency", (SkillDomain.Cultivation, SkillCategory.Cultivation) },
+            { "environmental_control", (SkillDomain.Cultivation, SkillCategory.Cultivation) },
+            { "breeding_mastery", (SkillDomain.Breeding, SkillCategory.Genetics) },
+            { "genetic_analysis", (SkillDomain.Genetics, SkillCategory.Genetics) },
+            { "trait_selection", (SkillDomain.Genetics, SkillCategory.Genetics) },
+            { "market_analysis", (SkillDomain.Business, SkillCategory.Business) },
+            { "customer_relations", (SkillDomain.Business, SkillCategory.Business) },
+            { "profit_optimization", (SkillDomain.Business, SkillCategory.Business) },
+            { "scientific_method", (SkillDomain.Research, SkillCategory.Research) },
+            { "data_analysis", (SkillDomain.Research, SkillCategory.Research) },
+            { "innovation", (SkillDomain.Research, SkillCategory.Research) },
+            { "financial_management", (SkillDomain.Finance, SkillCategory.Business) },
+            { "market_timing", (SkillDomain.Business, SkillCategory.Business) },
+            { "learning_efficiency", (SkillDomain.Management, SkillCategory.Basic) },
+            { "focus", (SkillDomain.Management, SkillCategory.Basic) }
+        };
+        
+        if (domainMapping.TryGetValue(skillId, out var mapping))
+        {
+            // Get all unlocked skills in the relevant category
+            var categorySkills = skillManager.GetUnlockedSkillsInCategory(mapping.category);
+            
+            // Calculate average skill level in the category
+            if (categorySkills.Count > 0)
+            {
+                float totalLevels = categorySkills.Sum(skill => skillManager.GetSkillLevel(skill));
+                float averageLevel = totalLevels / categorySkills.Count;
+                
+                // Apply a reduced bonus based on category mastery
+                return averageLevel * bonusPerLevel * 0.5f; // 50% of the bonus since it's not the exact skill
+            }
+        }
+        
+        return 0f;
+    }
+    
+    /// <summary>
     /// Apply experience caps to prevent exploitation
     /// </summary>
     private float ApplyExperienceCaps(float experience, string systemName, PlayerProgressionProfile profile)
@@ -941,6 +1221,7 @@ namespace ProjectChimera.Systems.Progression
                        $"  Difficulty: {result.DifficultyMultiplier:F2}x\n" +
                        $"  Level Scaling: {result.LevelScalingFactor:F2}x\n" +
                        $"  Cross-System: {result.CrossSystemMultiplier:F2}x\n" +
+                       $"  🌟 Skill Tree: {result.SkillTreeMultiplier:F2}x\n" +
                        $"  Efficiency Bonus: +{result.EfficiencyBonus * 100:F1}%\n" +
                        $"  Contextual Bonuses: +{result.ContextualBonuses:F1}\n" +
                        $"  📊 Final XP: {result.FinalExperience:F1}";
@@ -961,11 +1242,31 @@ namespace ProjectChimera.Systems.Progression
         
         try
         {
+            // PC-012-9: Subscribe to achievement system events for progression integration
+            try
+            {
+                // Check if AchievementSystemManager exists and subscribe to events
+                if (typeof(AchievementSystemManager) != null)
+                {
+                    AchievementSystemManager.OnExperienceGained += OnAchievementExperienceGained;
+                    LogInfo("✅ Subscribed to achievement experience events");
+                    
+                    AchievementSystemManager.OnPlayerLevelUp += OnAchievementPlayerLevelUp;
+                    LogInfo("✅ Subscribed to achievement level up events");
+                    
+                    AchievementSystemManager.OnAchievementUnlocked += OnAchievementUnlocked;
+                    LogInfo("✅ Subscribed to achievement unlock events");
+                }
+            }
+            catch (System.Exception achievementEx)
+            {
+                LogWarning($"Achievement system integration failed: {achievementEx.Message}");
+            }
+            
             // TODO: Implement ScriptableObject event channel subscriptions
             // Direct manager references cause circular assembly dependencies
             // Use event channels instead: Resources.Load<GameEventSO<PlantInstance>>("Events/PlantHarvestedEvent")
             
-            LogInfo("⚠️  Event subscriptions temporarily disabled to avoid circular dependencies");
             LogInfo("💡 Will implement ScriptableObject event channels in next phase");
             LogInfo("✅ Game event subscriptions completed successfully");
         }
@@ -984,6 +1285,23 @@ namespace ProjectChimera.Systems.Progression
         
         try
         {
+            // PC-012-9: Unsubscribe from achievement system events
+            try
+            {
+                if (typeof(AchievementSystemManager) != null)
+                {
+                    AchievementSystemManager.OnExperienceGained -= OnAchievementExperienceGained;
+                    AchievementSystemManager.OnPlayerLevelUp -= OnAchievementPlayerLevelUp;
+                    AchievementSystemManager.OnAchievementUnlocked -= OnAchievementUnlocked;
+                    
+                    LogInfo("✅ Achievement system events unsubscribed");
+                }
+            }
+            catch (System.Exception achievementEx)
+            {
+                LogWarning($"Achievement system unsubscription failed: {achievementEx.Message}");
+            }
+            
             // TODO: Implement ScriptableObject event channel unsubscriptions
             // Direct manager references cause circular assembly dependencies
             LogInfo("⚠️  Event unsubscriptions temporarily disabled to avoid circular dependencies");
@@ -995,6 +1313,71 @@ namespace ProjectChimera.Systems.Progression
             LogError($"Error unsubscribing from game events: {ex.Message}");
         }
     }
+    
+    #region PC-012-9: Achievement System Integration Event Handlers
+    
+    /// <summary>
+    /// Handle experience gained events from achievement system
+    /// </summary>
+    private void OnAchievementExperienceGained(string systemName, float experienceAmount)
+    {
+        try
+        {
+            // Award experience through the progression system
+            AwardExperience(systemName, experienceAmount, "current_player", "Achievement-based experience");
+            LogInfo($"✅ Achievement experience integrated: {experienceAmount} XP in {systemName}");
+        }
+        catch (System.Exception ex)
+        {
+            LogError($"Achievement experience integration failed: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Handle player level up events from achievement system
+    /// </summary>
+    private void OnAchievementPlayerLevelUp(int oldLevel, int newLevel)
+    {
+        try
+        {
+            // Sync with our progression system level tracking
+            var profile = GetOrCreatePlayerProfile("current_player");
+            
+            // Award bonus experience for level milestone
+            float bonusExperience = newLevel * 100f; // 100 XP per level as bonus
+            AwardExperience("Progression", bonusExperience, "current_player", $"Level {newLevel} milestone bonus");
+            
+            LogInfo($"🎉 Player level up integrated: {oldLevel} -> {newLevel} (+{bonusExperience} bonus XP)");
+        }
+        catch (System.Exception ex)
+        {
+            LogError($"Achievement level up integration failed: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Handle achievement unlocked events
+    /// </summary>
+    private void OnAchievementUnlocked(Achievement achievement)
+    {
+        try
+        {
+            if (achievement != null)
+            {
+                // Award experience based on achievement points
+                float experienceBonus = achievement.Points * 2f; // 2 XP per achievement point
+                AwardExperience("Achievement", experienceBonus, "current_player", $"Achievement unlock: {achievement.AchievementName}");
+                
+                LogInfo($"🏆 Achievement unlock integrated: {achievement.AchievementName} (+{experienceBonus} XP)");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            LogError($"Achievement unlock integration failed: {ex.Message}");
+        }
+    }
+    
+    #endregion
     
     #endregion
     
@@ -1146,6 +1529,7 @@ namespace ProjectChimera.Systems.Progression
         public float EfficiencyBonus;
         public float LevelScalingFactor;
         public float CrossSystemMultiplier;
+        public float SkillTreeMultiplier;
         public float ContextualBonuses;
         public float FinalExperience;
         
@@ -1156,7 +1540,230 @@ namespace ProjectChimera.Systems.Progression
         {
             return $"Base: {BaseExperience:F1} → Final: {FinalExperience:F1} " +
                    $"(Quality: {QualityMultiplier:F2}x, Difficulty: {DifficultyMultiplier:F2}x, " +
-                   $"Cross-System: {CrossSystemMultiplier:F2}x)";
+                   $"Cross-System: {CrossSystemMultiplier:F2}x, Skills: {SkillTreeMultiplier:F2}x)";
+        }
+    }
+    
+    #endregion
+    
+    #region PC-012-7: Skill Tree Integration with Game Mechanics
+    
+    /// <summary>
+    /// Apply skill-based bonuses to cultivation mechanics
+    /// </summary>
+    public CultivationBonuses GetCultivationBonuses(string playerId = "current_player")
+    {
+        var bonuses = new CultivationBonuses();
+        
+        // Plant growth speed bonus
+        bonuses.GrowthSpeedMultiplier = 1.0f + (GetPlayerSkillLevel("growth_optimization") * 0.1f);
+        
+        // Yield increase bonus
+        bonuses.YieldMultiplier = 1.0f + (GetPlayerSkillLevel("harvest_efficiency") * 0.08f);
+        
+        // Plant health bonus
+        bonuses.HealthBonusMultiplier = 1.0f + (GetPlayerSkillLevel("plant_care_mastery") * 0.05f);
+        
+        // Disease resistance bonus
+        bonuses.DiseaseResistanceBonus = GetPlayerSkillLevel("plant_immunity") * 0.15f;
+        
+        // Environmental tolerance bonus
+        bonuses.EnvironmentalToleranceBonus = GetPlayerSkillLevel("environmental_control") * 0.12f;
+        
+        LogInfo($"🌱 Cultivation bonuses applied: Growth {bonuses.GrowthSpeedMultiplier:F2}x, " +
+                $"Yield {bonuses.YieldMultiplier:F2}x, Health {bonuses.HealthBonusMultiplier:F2}x");
+        
+        return bonuses;
+    }
+    
+    /// <summary>
+    /// Apply skill-based bonuses to genetics mechanics
+    /// </summary>
+    public GeneticsBonuses GetGeneticsBonuses(string playerId = "current_player")
+    {
+        var bonuses = new GeneticsBonuses();
+        
+        // Breeding success rate bonus
+        bonuses.BreedingSuccessRateBonus = GetPlayerSkillLevel("breeding_mastery") * 0.1f;
+        
+        // Mutation chance bonus
+        bonuses.MutationChanceBonus = GetPlayerSkillLevel("genetic_manipulation") * 0.05f;
+        
+        // Trait expression stability bonus
+        bonuses.TraitStabilityBonus = GetPlayerSkillLevel("genetic_stability") * 0.08f;
+        
+        // Analysis accuracy bonus
+        bonuses.AnalysisAccuracyBonus = GetPlayerSkillLevel("genetic_analysis") * 0.12f;
+        
+        LogInfo($"🧬 Genetics bonuses applied: Breeding Success +{bonuses.BreedingSuccessRateBonus:P1}, " +
+                $"Analysis Accuracy +{bonuses.AnalysisAccuracyBonus:P1}");
+        
+        return bonuses;
+    }
+    
+    /// <summary>
+    /// Apply skill-based bonuses to business mechanics
+    /// </summary>
+    public BusinessBonuses GetBusinessBonuses(string playerId = "current_player")
+    {
+        var bonuses = new BusinessBonuses();
+        
+        // Price negotiation bonus
+        bonuses.PriceNegotiationBonus = GetPlayerSkillLevel("market_analysis") * 0.05f;
+        
+        // Customer satisfaction bonus
+        bonuses.CustomerSatisfactionBonus = GetPlayerSkillLevel("customer_relations") * 0.08f;
+        
+        // Profit margin bonus
+        bonuses.ProfitMarginBonus = GetPlayerSkillLevel("profit_optimization") * 0.06f;
+        
+        // Contract completion bonus
+        bonuses.ContractCompletionBonus = GetPlayerSkillLevel("business_efficiency") * 0.1f;
+        
+        LogInfo($"💼 Business bonuses applied: Price Negotiation +{bonuses.PriceNegotiationBonus:P1}, " +
+                $"Profit Margin +{bonuses.ProfitMarginBonus:P1}");
+        
+        return bonuses;
+    }
+    
+    /// <summary>
+    /// Apply skill-based bonuses to research mechanics
+    /// </summary>
+    public ResearchBonuses GetResearchBonuses(string playerId = "current_player")
+    {
+        var bonuses = new ResearchBonuses();
+        
+        // Research speed bonus
+        bonuses.ResearchSpeedMultiplier = 1.0f + (GetPlayerSkillLevel("scientific_method") * 0.15f);
+        
+        // Discovery chance bonus
+        bonuses.DiscoveryChanceBonus = GetPlayerSkillLevel("innovation") * 0.08f;
+        
+        // Data accuracy bonus
+        bonuses.DataAccuracyBonus = GetPlayerSkillLevel("data_analysis") * 0.1f;
+        
+        LogInfo($"🔬 Research bonuses applied: Speed {bonuses.ResearchSpeedMultiplier:F2}x, " +
+                $"Discovery Chance +{bonuses.DiscoveryChanceBonus:P1}");
+        
+        return bonuses;
+    }
+    
+    /// <summary>
+    /// Check if player has unlocked a specific skill-based feature
+    /// </summary>
+    public bool IsSkillFeatureUnlocked(string featureId, string playerId = "current_player")
+    {
+        // This would check against actual skill tree data
+        // For now, use skill level requirements
+        return featureId switch
+        {
+            "automated_watering" => GetPlayerSkillLevel("automation") >= 2,
+            "advanced_breeding" => GetPlayerSkillLevel("breeding_mastery") >= 3,
+            "market_prediction" => GetPlayerSkillLevel("market_analysis") >= 4,
+            "genetic_engineering" => GetPlayerSkillLevel("genetic_manipulation") >= 5,
+            "quality_control" => GetPlayerSkillLevel("quality_assurance") >= 3,
+            "environmental_automation" => GetPlayerSkillLevel("environmental_control") >= 4,
+            _ => false
+        };
+    }
+    
+    /// <summary>
+    /// Get all unlocked skill features for a player
+    /// </summary>
+    public List<string> GetUnlockedSkillFeatures(string playerId = "current_player")
+    {
+        var features = new List<string>();
+        
+        var featureIds = new[]
+        {
+            "automated_watering", "advanced_breeding", "market_prediction",
+            "genetic_engineering", "quality_control", "environmental_automation"
+        };
+        
+        foreach (var featureId in featureIds)
+        {
+            if (IsSkillFeatureUnlocked(featureId, playerId))
+            {
+                features.Add(featureId);
+            }
+        }
+        
+        return features;
+    }
+    
+    #endregion
+    
+    #region PC-012-7: Skill Tree Bonus Data Structures
+    
+    /// <summary>
+    /// Skill-based bonuses for cultivation mechanics
+    /// </summary>
+    [System.Serializable]
+    public class CultivationBonuses
+    {
+        public float GrowthSpeedMultiplier = 1.0f;
+        public float YieldMultiplier = 1.0f;
+        public float HealthBonusMultiplier = 1.0f;
+        public float DiseaseResistanceBonus = 0f;
+        public float EnvironmentalToleranceBonus = 0f;
+        
+        public string GetSummary()
+        {
+            return $"Growth: {GrowthSpeedMultiplier:F2}x, Yield: {YieldMultiplier:F2}x, " +
+                   $"Health: {HealthBonusMultiplier:F2}x, Disease Resist: +{DiseaseResistanceBonus:P1}";
+        }
+    }
+    
+    /// <summary>
+    /// Skill-based bonuses for genetics mechanics
+    /// </summary>
+    [System.Serializable]
+    public class GeneticsBonuses
+    {
+        public float BreedingSuccessRateBonus = 0f;
+        public float MutationChanceBonus = 0f;
+        public float TraitStabilityBonus = 0f;
+        public float AnalysisAccuracyBonus = 0f;
+        
+        public string GetSummary()
+        {
+            return $"Breeding Success: +{BreedingSuccessRateBonus:P1}, " +
+                   $"Analysis Accuracy: +{AnalysisAccuracyBonus:P1}";
+        }
+    }
+    
+    /// <summary>
+    /// Skill-based bonuses for business mechanics
+    /// </summary>
+    [System.Serializable]
+    public class BusinessBonuses
+    {
+        public float PriceNegotiationBonus = 0f;
+        public float CustomerSatisfactionBonus = 0f;
+        public float ProfitMarginBonus = 0f;
+        public float ContractCompletionBonus = 0f;
+        
+        public string GetSummary()
+        {
+            return $"Price Negotiation: +{PriceNegotiationBonus:P1}, " +
+                   $"Profit Margin: +{ProfitMarginBonus:P1}";
+        }
+    }
+    
+    /// <summary>
+    /// Skill-based bonuses for research mechanics
+    /// </summary>
+    [System.Serializable]
+    public class ResearchBonuses
+    {
+        public float ResearchSpeedMultiplier = 1.0f;
+        public float DiscoveryChanceBonus = 0f;
+        public float DataAccuracyBonus = 0f;
+        
+        public string GetSummary()
+        {
+            return $"Research Speed: {ResearchSpeedMultiplier:F2}x, " +
+                   $"Discovery Chance: +{DiscoveryChanceBonus:P1}";
         }
     }
     

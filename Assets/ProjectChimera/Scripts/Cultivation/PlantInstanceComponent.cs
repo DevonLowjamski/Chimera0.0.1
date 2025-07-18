@@ -11,6 +11,7 @@ using System.Collections.Generic;
 // Explicit aliases to resolve type conflicts
 using HarvestResult = ProjectChimera.Data.Facilities.HarvestResult;
 using HarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults;
+using SystemsHarvestResults = ProjectChimera.Systems.Cultivation.SystemsHarvestResults;
 using PlantInstance = ProjectChimera.Systems.Cultivation.PlantInstance;
 using Camera = UnityEngine.Camera;
 using GameManager = ProjectChimera.Core.GameManager;
@@ -254,7 +255,7 @@ namespace ProjectChimera.Scripts.Cultivation
         /// <summary>
         /// Harvest the plant
         /// </summary>
-        public HarvestResults HarvestPlant()
+        public SystemsHarvestResults HarvestPlant()
         {
             if (_plantInstance == null || !IsHarvestable)
             {

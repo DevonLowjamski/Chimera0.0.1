@@ -9,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions; // Use Cultivation version
 using EnvironmentalManager = ProjectChimera.Systems.Environment.EnvironmentalManager; // Add EnvironmentalManager alias
+using SystemsHarvestResults = ProjectChimera.Systems.Cultivation.SystemsHarvestResults; // Use Systems version
+using HarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
+using CultivationHarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
 
 namespace ProjectChimera.Systems.Cultivation
 {
@@ -640,7 +643,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Harvests the plant and returns harvest results.
         /// </summary>
-        public HarvestResults Harvest()
+        public SystemsHarvestResults Harvest()
         {
             if (_currentGrowthStage != PlantGrowthStage.Harvest)
             {
@@ -895,26 +898,5 @@ namespace ProjectChimera.Systems.Cultivation
         public float CO2Response = 1f;
     }
     
-    /// <summary>
-    /// Results from harvesting a plant.
-    /// </summary>
-    [System.Serializable]
-    public class HarvestResults
-    {
-        public string PlantID;
-        public float TotalYieldGrams;
-        public float QualityScore;
-        public CannabinoidProfile Cannabinoids;
-        public TerpeneProfile Terpenes;
-        public int FloweringDays;
-        public float FinalHealth;
-        public DateTime HarvestDate;
-        
-        // Compatibility property for PlantManager.cs
-        public float TotalYield 
-        { 
-            get => TotalYieldGrams; 
-            set => TotalYieldGrams = value; 
-        }
-    }
+    // Note: HarvestResults moved to IPlantService.cs to avoid namespace conflicts
 }

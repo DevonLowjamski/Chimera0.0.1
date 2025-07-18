@@ -238,6 +238,39 @@ namespace ProjectChimera.Data.Environment
         {
             return Temperature > 0f && Humidity > 0f && LightIntensity > 0f;
         }
+
+        /// <summary>
+        /// Creates environmental conditions with typical indoor cultivation values.
+        /// </summary>
+        public static EnvironmentalConditions CreateIndoorDefault()
+        {
+            var conditions = new EnvironmentalConditions
+            {
+                Temperature = 24f,
+                Humidity = 55f,
+                CO2Level = 800f,
+                LightIntensity = 400f,
+                AirVelocity = 0.3f,
+                AirFlow = 0.3f,
+                AirCirculation = 0.3f,
+                DailyLightIntegral = 25f,
+                BarometricPressure = 1013.25f,
+                VaporPressureDeficit = 1.0f,
+                OxygenLevel = 21f,
+                AirQualityIndex = 1.0f,
+                TemperatureStability = 1f,
+                HumidityStability = 1f,
+                LightStability = 1f,
+                CanopyTemperature = 22f,
+                RootZoneTemperature = 20f,
+                CanopyHumidity = 55f,
+                SonicEnvironment = 40f,
+                SeasonalContext = new SeasonalContext()
+            };
+            
+            conditions.UpdateVPD();
+            return conditions;
+        }
     }
     
     /// <summary>

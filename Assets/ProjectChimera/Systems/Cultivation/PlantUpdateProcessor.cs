@@ -1,17 +1,21 @@
 using UnityEngine;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Systems.Genetics; // Added for advanced TraitExpressionEngine
 using TraitExpressionEngine = ProjectChimera.Systems.Genetics.TraitExpressionEngine; // Use Systems version
 using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult; // Resolve ambiguous reference
 using StressResponse = ProjectChimera.Systems.Genetics.StressResponse; // Resolve ambiguous reference  
 using StressFactor = ProjectChimera.Systems.Genetics.StressFactor; // Resolve ambiguous reference
 using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions; // Use Cultivation version to match PlantInstance
-using CultivationEnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
-using SystemsEnvironmentalConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions; // Add explicit alias for Systems version
 using PlantGenotype = ProjectChimera.Data.Genetics.PlantGenotype;
 using EnvironmentalManager = ProjectChimera.Systems.Environment.EnvironmentalManager; // Add EnvironmentalManager alias
 using GxE_ProfileSO = ProjectChimera.Data.Environment.GxE_ProfileSO; // Add specific alias for GxE_ProfileSO to avoid namespace conflicts
 using GameManager = ProjectChimera.Core.GameManager; // Add GameManager for accessing managers
+using GeneticPerformanceStats = ProjectChimera.Systems.Cultivation.GeneticPerformanceStats; // Use Systems version
+using GeneticsPerformanceStats = ProjectChimera.Systems.Genetics.GeneticsPerformanceStats; // Use Genetics version
+using HarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
+using SystemsHarvestResults = ProjectChimera.Systems.Cultivation.SystemsHarvestResults; // Use Systems version
+using CultivationEnvironmentalConditions = ProjectChimera.Systems.Cultivation.CultivationEnvironmentalConditions; // Use Systems version
 using System.Collections.Generic;
 
 namespace ProjectChimera.Systems.Cultivation
@@ -341,7 +345,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// Note: This method is currently not used in the main flow since PlantInstance.GetCurrentEnvironmentalConditions() 
         /// already returns Data.Cultivation.EnvironmentalConditions, but kept for future use cases where conversion is needed.
         /// </summary>
-        private ProjectChimera.Data.Cultivation.EnvironmentalConditions ConvertToDataCultivationConditions(ProjectChimera.Systems.Cultivation.EnvironmentalConditions systemsConditions)
+        private ProjectChimera.Data.Cultivation.EnvironmentalConditions ConvertToDataCultivationConditions(CultivationEnvironmentalConditions systemsConditions)
         {
             // Create a new Data.Cultivation.EnvironmentalConditions struct using the static factory method
             var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
@@ -444,7 +448,17 @@ namespace ProjectChimera.Systems.Cultivation
         {
             if (_enableAdvancedGenetics && _traitExpressionEngine != null)
             {
-                return _traitExpressionEngine.GetPerformanceMetrics().GetStats();
+                var geneticsStats = _traitExpressionEngine.GetPerformanceMetrics().GetStats();
+                // Convert GeneticsPerformanceStats to GeneticPerformanceStats
+                return new GeneticPerformanceStats
+                {
+                    TotalCalculations = geneticsStats.TotalCalculations,
+                    AverageCalculationTimeMs = geneticsStats.AverageCalculationTimeMs,
+                    CacheHitRatio = geneticsStats.CacheHitRatio,
+                    BatchCalculations = geneticsStats.BatchCalculations,
+                    AverageBatchTimeMs = geneticsStats.AverageBatchTimeMs,
+                    AverageUpdateTimeMs = 0.0 // Default value
+                };
             }
             
             return new GeneticPerformanceStats
@@ -453,7 +467,8 @@ namespace ProjectChimera.Systems.Cultivation
                 AverageCalculationTimeMs = 0.0,
                 CacheHitRatio = 0.0,
                 BatchCalculations = 0,
-                AverageBatchTimeMs = 0.0
+                AverageBatchTimeMs = 0.0,
+                AverageUpdateTimeMs = 0.0
             };
         }
         
@@ -524,9 +539,9 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Calculates harvest results based on plant's final state.
         /// </summary>
-        public HarvestResults CalculateHarvestResults(float finalHealth, float qualityPotential, PhenotypicTraits traits)
+        public SystemsHarvestResults CalculateHarvestResults(float finalHealth, float qualityPotential, PhenotypicTraits traits)
         {
-            var results = new HarvestResults
+            var results = new SystemsHarvestResults
             {
                 FinalHealth = finalHealth,
                 QualityScore = CalculateQualityScore(finalHealth, qualityPotential),

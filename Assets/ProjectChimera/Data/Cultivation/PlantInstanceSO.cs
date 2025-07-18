@@ -730,9 +730,9 @@ namespace ProjectChimera.Data.Cultivation
         /// <summary>
         /// Harvests this plant and returns the harvest results.
         /// </summary>
-        public HarvestResults Harvest()
+        public DataHarvestResults Harvest()
         {
-            var results = new HarvestResults
+            var results = new DataHarvestResults
             {
                 PlantID = _plantID,
                 StrainName = StrainName,
@@ -763,7 +763,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Results from harvesting a plant (Data layer version).
     /// </summary>
     [System.Serializable]
-    public class HarvestResults
+    public class DataHarvestResults
     {
         public string PlantID;
         public string StrainName;

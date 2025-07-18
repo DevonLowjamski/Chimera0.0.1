@@ -1133,6 +1133,11 @@ namespace ProjectChimera.Data.Progression
         public float SocialInfluenceScore = 0f;
         public int MentorshipCount = 0;
         
+        // PC-012-11: Social and Community Achievement Tracking
+        public List<string> CommunityInteractions = new List<string>();
+        public int ConsecutiveCommunityDays = 0;
+        public System.DateTime LastCommunityContribution = System.DateTime.MinValue;
+        
         // Properties for PlayerShowcase compatibility
         public float CompletionPercentage = 0f;
         public float TotalScore = 0f;

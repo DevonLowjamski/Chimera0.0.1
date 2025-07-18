@@ -11,9 +11,11 @@ using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalCon
 using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult; // Resolve ambiguous reference
 using StressResponse = ProjectChimera.Systems.Genetics.StressResponse; // Resolve ambiguous reference
 using StressFactor = ProjectChimera.Systems.Genetics.StressFactor; // Resolve ambiguous reference
-using GeneticPerformanceStats = ProjectChimera.Systems.Genetics.GeneticPerformanceStats; // Use Systems version
-using SystemsHarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
-using DataHarvestResults = ProjectChimera.Data.Cultivation.HarvestResults; // Data version
+using GeneticPerformanceStats = ProjectChimera.Systems.Cultivation.GeneticPerformanceStats; // Use Systems version
+using GeneticsPerformanceStats = ProjectChimera.Systems.Genetics.GeneticsPerformanceStats; // Use Genetics version
+using SystemsHarvestResults = ProjectChimera.Systems.Cultivation.SystemsHarvestResults; // Use Systems version
+using HarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
+using CultivationHarvestResults = ProjectChimera.Systems.Cultivation.HarvestResults; // Use Systems version
 
 namespace ProjectChimera.Systems.Cultivation
 {
@@ -670,7 +672,16 @@ namespace ProjectChimera.Systems.Cultivation
                 if (_enableGeneticPerformanceMonitoring && _geneticPerformanceMonitor != null)
                 {
                     var performanceStats = _updateProcessor.GetPerformanceMetrics();
-                    _geneticPerformanceMonitor.RecordBatchUpdate(plantsToProcessThisFrame.Count, performanceStats);
+                    // Convert GeneticPerformanceStats to GeneticsPerformanceStats
+                    var geneticsStats = new GeneticsPerformanceStats
+                    {
+                        TotalCalculations = performanceStats.TotalCalculations,
+                        AverageCalculationTimeMs = performanceStats.AverageCalculationTimeMs,
+                        CacheHitRatio = performanceStats.CacheHitRatio,
+                        BatchCalculations = performanceStats.BatchCalculations,
+                        AverageBatchTimeMs = performanceStats.AverageBatchTimeMs
+                    };
+                    _geneticPerformanceMonitor.RecordBatchUpdate(plantsToProcessThisFrame.Count, geneticsStats);
                 }
             }
             else
@@ -936,11 +947,22 @@ namespace ProjectChimera.Systems.Cultivation
                     AverageCalculationTimeMs = 0.0,
                     CacheHitRatio = 0.0,
                     BatchCalculations = 0,
-                    AverageBatchTimeMs = 0.0
+                    AverageBatchTimeMs = 0.0,
+                    AverageUpdateTimeMs = 0.0
                 };
             }
             
-            return _geneticPerformanceMonitor.GetPerformanceStats();
+            var geneticsStats = _geneticPerformanceMonitor.GetPerformanceStats();
+            // Convert GeneticsPerformanceStats to GeneticPerformanceStats
+            return new GeneticPerformanceStats
+            {
+                TotalCalculations = geneticsStats.TotalCalculations,
+                AverageCalculationTimeMs = geneticsStats.AverageCalculationTimeMs,
+                CacheHitRatio = geneticsStats.CacheHitRatio,
+                BatchCalculations = geneticsStats.BatchCalculations,
+                AverageBatchTimeMs = geneticsStats.AverageBatchTimeMs,
+                AverageUpdateTimeMs = 0.0 // Default value since this might not exist in GeneticsPerformanceStats
+            };
         }
         
         /// <summary>
@@ -1070,138 +1092,5 @@ namespace ProjectChimera.Systems.Cultivation
         }
     }
     
-    /// <summary>
-    /// Statistics about all plants managed by the PlantManager.
-    /// </summary>
-    [System.Serializable]
-    public class PlantManagerStatistics
-    {
-        public int TotalPlants;
-        public int[] PlantsByStage = new int[System.Enum.GetValues(typeof(PlantGrowthStage)).Length];
-        public float AverageHealth;
-        public float AverageStress;
-        public int UnhealthyPlants;
-        public int HighStressPlants;
-    }
-    
-    public enum PlantRemovalReason
-    {
-        Harvested,
-        Died,
-        Removed,
-        Other
-    }
-    
-    /// <summary>
-    /// Phase 3.1: Enhanced statistics including genetic performance data.
-    /// </summary>
-    [System.Serializable]
-    public class EnhancedPlantManagerStatistics : PlantManagerStatistics
-    {
-        public bool AdvancedGeneticsEnabled;
-        public GeneticPerformanceStats GeneticStats;
-        public GeneticDiversityStats GeneticDiversityStats;
-    }
-    
-
-    
-    /// <summary>
-    /// Phase 3.2: Genetic diversity statistics for population analysis.
-    /// </summary>
-    [System.Serializable]
-    public class GeneticDiversityStats
-    {
-        [Header("Genetic Diversity Metrics")]
-        public int StrainDiversity;
-        public string MostCommonStrain;
-        public float AverageGeneticFitness;
-        public float TraitExpressionVariance;
-        
-        public override string ToString()
-        {
-            return $"Diversity: {StrainDiversity}, Common: {MostCommonStrain}, Fitness: {AverageGeneticFitness:F2}, Variance: {TraitExpressionVariance:F3}";
-        }
-    }
-
-    /// <summary>
-    /// Cultivation event tracker for achievement and progression systems.
-    /// </summary>
-    public class CultivationEventTracker
-    {
-        private Dictionary<string, int> _plantCounts = new Dictionary<string, int>();
-        private Dictionary<string, float> _harvestTotals = new Dictionary<string, float>();
-        private List<PlantInstance> _healthyPlants = new List<PlantInstance>();
-        private int _totalPlantsCreated = 0;
-        private int _totalPlantsHarvested = 0;
-        private int _totalPlantDeaths = 0;
-        private float _totalYieldHarvested = 0f;
-        private float _highestQualityAchieved = 0f;
-
-        public void OnPlantCreated(PlantInstance plant)
-        {
-            _totalPlantsCreated++;
-            
-            if (plant.Strain != null)
-            {
-                string strainName = plant.Strain.StrainName;
-                if (_plantCounts.ContainsKey(strainName))
-                    _plantCounts[strainName]++;
-                else
-                    _plantCounts[strainName] = 1;
-            }
-        }
-
-        public void OnPlantHarvested(PlantInstance plant, HarvestResults harvestResults)
-        {
-            _totalPlantsHarvested++;
-            _totalYieldHarvested += harvestResults.TotalYield;
-            
-            if (harvestResults.QualityScore > _highestQualityAchieved)
-                _highestQualityAchieved = harvestResults.QualityScore;
-            
-            if (plant.Strain != null)
-            {
-                string strainName = plant.Strain.StrainName;
-                if (_harvestTotals.ContainsKey(strainName))
-                    _harvestTotals[strainName] += harvestResults.TotalYield;
-                else
-                    _harvestTotals[strainName] = harvestResults.TotalYield;
-            }
-        }
-
-        public void OnPlantDied(PlantInstance plant)
-        {
-            _totalPlantDeaths++;
-            _healthyPlants.Remove(plant);
-        }
-
-        public void OnPlantHealthChanged(PlantInstance plant)
-        {
-            if (plant.CurrentHealth > 0.8f && !_healthyPlants.Contains(plant))
-            {
-                _healthyPlants.Add(plant);
-            }
-            else if (plant.CurrentHealth <= 0.8f && _healthyPlants.Contains(plant))
-            {
-                _healthyPlants.Remove(plant);
-            }
-        }
-
-        public void OnPlantGrowthStageChanged(PlantInstance plant)
-        {
-            // Track growth milestones for achievements
-            if (plant.CurrentGrowthStage == PlantGrowthStage.Flowering && plant.CurrentHealth > 0.9f)
-            {
-                // High-health flowering achievement
-            }
-        }
-
-        // Properties for accessing tracked data
-        public int TotalPlantsCreated => _totalPlantsCreated;
-        public int TotalPlantsHarvested => _totalPlantsHarvested;
-        public float TotalYieldHarvested => _totalYieldHarvested;
-        public float HighestQualityAchieved => _highestQualityAchieved;
-        public int HealthyPlantsCount => _healthyPlants.Count;
-        public int StrainDiversity => _plantCounts.Count;
-    }
+    // Note: Common types moved to IPlantService.cs to avoid duplication
 }
