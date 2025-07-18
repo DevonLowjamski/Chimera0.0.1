@@ -252,7 +252,7 @@ namespace ProjectChimera.Systems.Cultivation
                 if (existingStressor != null)
                 {
                     existingStressor.Intensity = intensity;
-                    existingStressor.Duration += Time.deltaTime;
+                    // Duration is now computed from StartTime
                 }
                 else
                 {
@@ -261,7 +261,6 @@ namespace ProjectChimera.Systems.Cultivation
                         StressSource = stressSource,
                         Intensity = intensity,
                         StartTime = Time.time,
-                        Duration = 0f,
                         IsActive = true
                     });
                 }
@@ -577,18 +576,6 @@ namespace ProjectChimera.Systems.Cultivation
         #endregion
     }
     
-    /// <summary>
-    /// Active stressor tracking structure.
-    /// </summary>
-    [System.Serializable]
-    public class ActiveStressor
-    {
-        public EnvironmentalStressSO StressSource;
-        public float Intensity;
-        public float StartTime;
-        public float Duration;
-        public bool IsActive;
-    }
     
     /// <summary>
     /// Environmental processing statistics structure.

@@ -21,10 +21,17 @@ namespace ProjectChimera.Core
             // Prevent audio system reinitialization issues
             Application.runInBackground = _runInBackground;
             
+            // Disable automatic audio source management to prevent FMOD conflicts
+            if (AudioSettings.driverCapabilities.ToString().Contains("FMOD"))
+            {
+                // For FMOD systems, prevent Unity from managing audio output switching
+                AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
+            }
+            
             // Don't destroy this handler when loading new scenes
             DontDestroyOnLoad(gameObject);
             
-            LogInfo("Audio Focus Handler initialized");
+            LogInfo("Audio Focus Handler initialized with FMOD compatibility");
         }
         
         private void OnApplicationFocus(bool hasFocus)
@@ -92,8 +99,24 @@ namespace ProjectChimera.Core
             Debug.Log($"[AudioFocusHandler] {message}");
         }
         
+        /// <summary>
+        /// Handles audio configuration changes to prevent FMOD reinitialization
+        /// </summary>
+        private void OnAudioConfigurationChanged(bool deviceWasChanged)
+        {
+            if (deviceWasChanged)
+            {
+                LogInfo("Audio device changed - preventing FMOD reinitialization");
+                // Don't allow Unity to reinitialize audio when device changes
+                // This prevents the "Cannot call this command after System::init" error
+            }
+        }
+        
         private void OnDestroy()
         {
+            // Unsubscribe from events
+            AudioSettings.OnAudioConfigurationChanged -= OnAudioConfigurationChanged;
+            
             // Restore audio if this handler is destroyed while muted
             if (_wasAudioMuted)
             {

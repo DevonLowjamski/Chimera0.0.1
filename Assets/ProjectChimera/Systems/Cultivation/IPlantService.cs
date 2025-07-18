@@ -149,6 +149,22 @@ namespace ProjectChimera.Systems.Cultivation
         // Harvest events
         System.Action<PlantInstance> OnPlantHarvested { get; set; }
     }
+    
+    /// <summary>
+    /// PC013-4c: Interface for plant yield calculation service
+    /// Handles harvest yield computations, quality assessments, and yield predictions
+    /// </summary>
+    public interface IPlantYieldCalculationService : IPlantService
+    {
+        bool EnableYieldVariability { get; set; }
+        bool EnablePostHarvestProcessing { get; set; }
+        float HarvestQualityMultiplier { get; set; }
+        
+        SystemsHarvestResults HarvestPlant(string plantID);
+        float CalculateExpectedYield(PlantInstance plantInstance);
+        float GetStageYieldModifier(PlantGrowthStage stage);
+        YieldCalculationStatistics GetYieldStatistics();
+    }
 
     /// <summary>
     /// Interface for plant statistics and reporting service

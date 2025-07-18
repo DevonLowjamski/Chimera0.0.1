@@ -75,6 +75,9 @@ namespace ProjectChimera.Core
         {
             LogDebug("Initializing Game Manager");
 
+            // Initialize audio focus handler to prevent FMOD errors
+            InitializeAudioFocusHandler();
+
             // Set game start time
             GameStartTime = System.DateTime.Now;
 
@@ -364,6 +367,26 @@ namespace ProjectChimera.Core
             else if (!pauseStatus && IsGamePaused)
             {
                 ResumeGame();
+            }
+        }
+
+        /// <summary>
+        /// Initializes the AudioFocusHandler to prevent FMOD System::init errors
+        /// </summary>
+        private void InitializeAudioFocusHandler()
+        {
+            // Check if AudioFocusHandler already exists
+            var existingHandler = FindObjectOfType<AudioFocusHandler>();
+            if (existingHandler == null)
+            {
+                // Create a new GameObject with AudioFocusHandler component
+                var audioHandlerObject = new GameObject("AudioFocusHandler");
+                audioHandlerObject.AddComponent<AudioFocusHandler>();
+                LogInfo("AudioFocusHandler created to prevent FMOD errors");
+            }
+            else
+            {
+                LogInfo("AudioFocusHandler already exists");
             }
         }
 

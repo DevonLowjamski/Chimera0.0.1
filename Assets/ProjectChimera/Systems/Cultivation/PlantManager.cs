@@ -88,6 +88,11 @@ namespace ProjectChimera.Systems.Cultivation
         private float _lastCacheCleanupTime = 0f;
         private GeneticPerformanceMonitor _geneticPerformanceMonitor;
         
+        // PC013-4: Specialized services following Single Responsibility Principle
+        private IPlantGrowthService _growthService;
+        private IPlantEnvironmentalProcessingService _environmentalService;
+        private IPlantYieldCalculationService _yieldService;
+        
         // Manager references removed to prevent cyclic assembly dependencies
 
         // Achievement tracking - now event-based
@@ -129,6 +134,9 @@ namespace ProjectChimera.Systems.Cultivation
                 _geneticPerformanceMonitor = new GeneticPerformanceMonitor();
             }
             
+            // PC013-4: Initialize specialized services with dependency injection
+            InitializeSpecializedServices();
+            
             // Initialize achievement tracking
             if (_enableAchievementTracking)
             {
@@ -147,6 +155,11 @@ namespace ProjectChimera.Systems.Cultivation
         protected override void OnManagerShutdown()
         {
             LogInfo("PlantManager shutting down - CultivationManager handles plant cleanup");
+            
+            // PC013-4: Shutdown specialized services
+            _growthService?.Shutdown();
+            _environmentalService?.Shutdown();
+            _yieldService?.Shutdown();
             
             // Clear update tracking only - CultivationManager handles plant cleanup
             _plantsToUpdate.Clear();
@@ -525,8 +538,67 @@ namespace ProjectChimera.Systems.Cultivation
         
         /// <summary>
         /// Harvests a plant and returns the harvest results.
+        /// PC013-4: Refactored to use specialized YieldCalculationService
         /// </summary>
         public SystemsHarvestResults HarvestPlant(string plantID)
+        {
+            // PC013-4: Delegate to specialized yield calculation service
+            if (_yieldService != null)
+            {
+                var harvestResults = _yieldService.HarvestPlant(plantID);
+                if (harvestResults != null)
+                {
+                    // Get the PlantInstance for event tracking
+                    var plantInstance = _plantsToUpdate.FirstOrDefault(p => p.PlantID == plantID);
+                    
+                    // Track harvest achievements before unregistering
+                    if (_enableAchievementTracking && _eventTracker != null && plantInstance != null)
+                    {
+                        _eventTracker.OnPlantHarvested(plantInstance, harvestResults);
+                    }
+                    
+                    // Invoke OnPlantHarvested event for other systems
+                    if (plantInstance != null)
+                    {
+                        OnPlantHarvested?.Invoke(plantInstance);
+                    }
+                    
+                    // Trigger harvest events for progression system to listen to
+                    _onPlantHarvested?.Raise();
+                    
+                    // Quality-based events
+                    if (harvestResults.QualityScore >= 0.9f)
+                    {
+                        _onQualityHarvest?.Raise();
+                    }
+                    if (harvestResults.QualityScore >= 0.95f)
+                    {
+                        _onPerfectQuality?.Raise();
+                    }
+                    
+                    // Yield-based events
+                    if (harvestResults.TotalYieldGrams >= 50f)
+                    {
+                        _onHighYieldAchieved?.Raise();
+                    }
+                    
+                    UnregisterPlant(plantID, PlantRemovalReason.Harvested);
+                    
+                    LogInfo($"Harvested plant {plantID}: {harvestResults.TotalYieldGrams}g yield, {harvestResults.QualityScore:F2} quality");
+                    
+                    return harvestResults;
+                }
+            }
+            
+            // Fallback to legacy implementation if service is not available
+            LogWarning("YieldCalculationService not available - using legacy harvest implementation");
+            return HarvestPlantLegacy(plantID);
+        }
+        
+        /// <summary>
+        /// Legacy harvest implementation for fallback
+        /// </summary>
+        private SystemsHarvestResults HarvestPlantLegacy(string plantID)
         {
             var plant = GetPlant(plantID);
             if (plant == null)
@@ -551,48 +623,10 @@ namespace ProjectChimera.Systems.Cultivation
                 QualityScore = dataHarvestResults.QualityScore,
                 Cannabinoids = new CannabinoidProfile(), // Create empty profile
                 Terpenes = new TerpeneProfile(), // Create empty profile
-                FloweringDays = (int)plant.DaysInCurrentStage,
+                FloweringDays = (int)plant.AgeInDays,
                 FinalHealth = plant.OverallHealth,
                 HarvestDate = dataHarvestResults.HarvestDate
             };
-            
-            // Get the PlantInstance for event tracking
-            var plantInstance = _plantsToUpdate.FirstOrDefault(p => p.PlantID == plantID);
-            
-            // Track harvest achievements before unregistering
-            if (_enableAchievementTracking && _eventTracker != null && plantInstance != null)
-            {
-                _eventTracker.OnPlantHarvested(plantInstance, harvestResults);
-            }
-            
-            // Invoke OnPlantHarvested event for other systems
-            if (plantInstance != null)
-            {
-                OnPlantHarvested?.Invoke(plantInstance);
-            }
-            
-            // Trigger harvest events for progression system to listen to
-            _onPlantHarvested?.Raise();
-            
-            // Quality-based events
-            if (harvestResults.QualityScore >= 0.9f)
-            {
-                _onQualityHarvest?.Raise();
-            }
-            if (harvestResults.QualityScore >= 0.95f)
-            {
-                _onPerfectQuality?.Raise();
-            }
-            
-            // Yield-based events
-            if (harvestResults.TotalYieldGrams >= 50f)
-            {
-                _onHighYieldAchieved?.Raise();
-            }
-            
-            UnregisterPlant(plantID, PlantRemovalReason.Harvested);
-            
-            LogInfo($"Harvested plant {plantID}: {harvestResults.TotalYieldGrams}g yield, {harvestResults.QualityScore:F2} quality");
             
             return harvestResults;
         }
@@ -662,10 +696,21 @@ namespace ProjectChimera.Systems.Cultivation
             if (plantsToProcessThisFrame.Count == 0)
                 return;
             
-            // Use batch processing for improved performance if advanced genetics is enabled
+            // PC013-4: Use specialized services with batch processing for improved performance
             if (_enableAdvancedGenetics && plantsToProcessThisFrame.Count > 10)
             {
-                // Use optimized batch processing
+                // Use specialized services for batch processing
+                if (_growthService != null)
+                {
+                    _growthService.UpdatePlantGrowthBatch(plantsToProcessThisFrame, deltaTime);
+                }
+                
+                if (_environmentalService != null)
+                {
+                    _environmentalService.UpdatePlantEnvironmentalProcessingBatch(plantsToProcessThisFrame, deltaTime);
+                }
+                
+                // Fallback to update processor for other systems
                 _updateProcessor.UpdatePlantsBatch(plantsToProcessThisFrame, deltaTime, _globalGrowthModifier);
                 
                 // Update genetic performance monitoring
@@ -686,11 +731,23 @@ namespace ProjectChimera.Systems.Cultivation
             }
             else
             {
-                // Use individual processing for smaller batches
+                // PC013-4: Use specialized services for individual processing
                 foreach (var plant in plantsToProcessThisFrame)
                 {
                     if (plant != null && plant.IsActive)
                     {
+                        // Use specialized services for individual processing
+                        if (_growthService != null)
+                        {
+                            _growthService.UpdatePlantGrowth(plant, deltaTime);
+                        }
+                        
+                        if (_environmentalService != null)
+                        {
+                            _environmentalService.UpdatePlantEnvironmentalProcessing(plant, deltaTime);
+                        }
+                        
+                        // Fallback to update processor for other systems
                         _updateProcessor.UpdatePlant(plant, deltaTime, _globalGrowthModifier);
                     }
                 }
@@ -857,6 +914,35 @@ namespace ProjectChimera.Systems.Cultivation
             LogInfo("Initialized default growth curve");
         }
         
+        /// <summary>
+        /// PC013-4: Initialize specialized services with dependency injection
+        /// </summary>
+        private void InitializeSpecializedServices()
+        {
+            LogInfo("Initializing specialized plant services...");
+            
+            // Initialize growth service
+            _growthService = new PlantGrowthService();
+            _growthService.GlobalGrowthModifier = _globalGrowthModifier;
+            _growthService.Initialize();
+            
+            // Initialize environmental processing service
+            _environmentalService = new PlantEnvironmentalProcessingService();
+            _environmentalService.EnableStressSystem = _enableStressSystem;
+            _environmentalService.EnableGxEInteractions = _enableGxEInteractions;
+            _environmentalService.StressRecoveryRate = _stressRecoveryRate;
+            _environmentalService.Initialize();
+            
+            // Initialize yield calculation service with dependency injection
+            _yieldService = new PlantYieldCalculationService(_environmentalService);
+            _yieldService.EnableYieldVariability = _enableYieldVariability;
+            _yieldService.EnablePostHarvestProcessing = _enablePostHarvestProcessing;
+            _yieldService.HarvestQualityMultiplier = _harvestQualityMultiplier;
+            _yieldService.Initialize();
+            
+            LogInfo("Specialized plant services initialized successfully");
+        }
+
         private void InitializeAchievementTracking()
         {
             var gameManager = GameManager.Instance;
@@ -873,8 +959,25 @@ namespace ProjectChimera.Systems.Cultivation
 
         /// <summary>
         /// Calculate expected yield for a plant instance based on its current state and growth conditions
+        /// PC013-4: Refactored to use specialized YieldCalculationService
         /// </summary>
         public float CalculateExpectedYield(PlantInstance plantInstance)
+        {
+            // PC013-4: Delegate to specialized yield calculation service
+            if (_yieldService != null)
+            {
+                return _yieldService.CalculateExpectedYield(plantInstance);
+            }
+            
+            // Fallback to legacy implementation if service is not available
+            LogWarning("YieldCalculationService not available - using legacy yield calculation");
+            return CalculateExpectedYieldLegacy(plantInstance);
+        }
+        
+        /// <summary>
+        /// Legacy yield calculation implementation for fallback
+        /// </summary>
+        private float CalculateExpectedYieldLegacy(PlantInstance plantInstance)
         {
             if (plantInstance == null)
             {
@@ -911,8 +1014,24 @@ namespace ProjectChimera.Systems.Cultivation
         
         /// <summary>
         /// Get yield modifier based on growth stage
+        /// PC013-4: Refactored to use specialized YieldCalculationService
         /// </summary>
         private float GetStageYieldModifier(PlantGrowthStage stage)
+        {
+            // PC013-4: Delegate to specialized yield calculation service
+            if (_yieldService != null)
+            {
+                return _yieldService.GetStageYieldModifier(stage);
+            }
+            
+            // Fallback to legacy implementation if service is not available
+            return GetStageYieldModifierLegacy(stage);
+        }
+        
+        /// <summary>
+        /// Legacy stage yield modifier implementation for fallback
+        /// </summary>
+        private float GetStageYieldModifierLegacy(PlantGrowthStage stage)
         {
             return stage switch
             {
