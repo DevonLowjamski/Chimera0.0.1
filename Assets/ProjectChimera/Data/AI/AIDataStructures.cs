@@ -50,6 +50,14 @@ namespace ProjectChimera.Data.AI
         public List<string> RelatedSystems = new List<string>();
         public string DismissalReason;
         public Dictionary<string, object> Metadata = new Dictionary<string, object>();
+        
+        // Additional properties for refactored services compatibility
+        public string Id { get { return RecommendationId; } set { RecommendationId = value; } }
+        public DateTime CreationTime { get { return CreatedAt; } set { CreatedAt = value; } }
+        public DateTime ExpirationTime { get { return ExpiresAt; } set { ExpiresAt = value; } }
+        public DateTime? CompletionTime { get { return ImplementedAt; } set { ImplementedAt = value; } }
+        public float EstimatedImpact { get { return ImpactScore; } set { ImpactScore = value; } }
+        public bool IsActive { get { return Status == RecommendationStatus.Active; } set { if (value) Status = RecommendationStatus.Active; } }
     }
 
     [System.Serializable]
@@ -67,6 +75,12 @@ namespace ProjectChimera.Data.AI
         public List<string> RelatedMetrics = new List<string>();
         public string ActionableAdvice;
         public Dictionary<string, float> ImpactMetrics = new Dictionary<string, float>();
+        
+        // Additional properties for refactored services compatibility
+        public string Id { get { return InsightId; } set { InsightId = value; } }
+        public DateTime CreationTime { get { return DiscoveredAt; } set { DiscoveredAt = value; } }
+        public float ConfidenceScore { get { return ConfidenceLevel; } set { ConfidenceLevel = value; } }
+        public bool IsActive { get; set; } = true;
     }
 
     [System.Serializable]
@@ -86,6 +100,13 @@ namespace ProjectChimera.Data.AI
         public List<OptimizationStep> ImplementationSteps = new List<OptimizationStep>();
         public Dictionary<string, float> ExpectedOutcomes = new Dictionary<string, float>();
         public List<string> Risks = new List<string>();
+        
+        // Additional properties for refactored services compatibility
+        public string Id { get { return OpportunityId; } set { OpportunityId = value; } }
+        public DateTime CreationTime { get { return DiscoveredAt; } set { DiscoveredAt = value; } }
+        public string ImplementationDetails { get { return ImplementationPlan; } set { ImplementationPlan = value; } }
+        public float PotentialImpact { get { return BenefitScore; } set { BenefitScore = value; } }
+        public string Category { get; set; } = "General";
         public float ImplementationCost;
         public int EstimatedTimeToImplement; // days
     }
@@ -186,6 +207,9 @@ namespace ProjectChimera.Data.AI
         public float StorageUsage; // GB
         public int ActiveProcesses;
         public float CPUUtilization;
+        
+        // Additional properties for refactored services compatibility
+        public float ProcessingLoad { get { return CPUUtilization / 100f; } set { CPUUtilization = value * 100f; } }
     }
 
     [System.Serializable]
@@ -199,6 +223,11 @@ namespace ProjectChimera.Data.AI
         public float AutomationEfficiency;
         public int PlayerLevel;
         public float ExperiencePoints;
+        
+        // Additional properties for refactored services compatibility
+        public List<string> ActiveManagers { get; set; } = new List<string>();
+        public float SystemHealth { get { return (SkillProgress + ResearchProgress + AutomationEfficiency) / 3f; } set { /* computed property, setter ignored */ } }
+        public int ActiveManagerCount { get { return ActiveManagers?.Count ?? 0; } }
     }
 
     [System.Serializable]
@@ -423,6 +452,9 @@ namespace ProjectChimera.Data.AI
     public enum InsightSeverity
     {
         Critical,
+        High,
+        Medium,
+        Low,
         Warning,
         Info,
         Positive,
@@ -803,6 +835,12 @@ namespace ProjectChimera.Data.AI
         public float MarketShare;
         public float GrowthRate;
         public DateTime LastUpdated;
+        
+        // Additional properties for MarketAnalysisService compatibility
+        public Dictionary<string, PriceData> ProductPrices = new Dictionary<string, PriceData>();
+        public float MarketVolatility;
+        public float OverallTrend;
+        public Dictionary<string, DemandData> DemandData = new Dictionary<string, DemandData>();
     }
 
     [System.Serializable]
@@ -847,5 +885,23 @@ namespace ProjectChimera.Data.AI
         Stable,
         Volatile,
         Cyclical
+    }
+    
+    /// <summary>
+    /// Market analysis supporting data structures
+    /// </summary>
+    [System.Serializable]
+    public class PriceData
+    {
+        public float CurrentPrice;
+        public float OptimalPrice;
+        public float TrendDirection;
+    }
+    
+    [System.Serializable]
+    public class DemandData
+    {
+        public float CurrentDemand;
+        public float SeasonalFactor;
     }
 }

@@ -25,6 +25,13 @@ namespace ProjectChimera.Data.AI
         public List<AIRecommendation> GeneratedRecommendations;
         public float OverallScore;
         public string Summary;
+        
+        // Additional properties for RefactoredAIAdvisorManager compatibility
+        public float SystemEfficiencyScore;
+        public int ActiveRecommendationCount;
+        public int CriticalInsightCount;
+        public int OptimizationOpportunityCount;
+        public float OverallSystemHealth;
     }
 
     public enum AIAnalysisType

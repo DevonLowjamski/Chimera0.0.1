@@ -80,6 +80,8 @@ namespace ProjectChimera.Data.Cultivation
         public float RootMassPercentage => _rootMassPercentage;
         public float LeafArea => _leafArea;
         public float OverallHealth => _overallHealth;
+        public float CurrentHealth => _overallHealth; // Alias for compatibility
+        public float OverallGrowthProgress => _maturityLevel; // Growth progress based on maturity
         public float MaturityLevel => _maturityLevel;
         public float Vigor => _vigor;
         public float StressLevel => _stressLevel;
