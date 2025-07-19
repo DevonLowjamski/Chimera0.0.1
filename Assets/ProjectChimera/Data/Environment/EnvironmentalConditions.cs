@@ -23,6 +23,7 @@ namespace ProjectChimera.Data.Environment
         [Header("Air Movement & Quality")]
         public float AirVelocity = 0.3f;                   // m/s
         public float AirFlow = 0.3f;                       // m/s (alias for AirVelocity)
+        public float AirflowRate = 0.3f;                   // m/s (alias for AirFlow)
         public float AirCirculation = 0.3f;                // m/s (alias for AirFlow)
         public Vector3 AirFlowDirection = Vector3.forward;  // Directional airflow
         public float AirExchangeRate = 1.0f;               // air changes per hour
@@ -77,28 +78,41 @@ namespace ProjectChimera.Data.Environment
         {
             var stress = new EnvironmentalStressIndicators();
             
-            // Temperature stress
-            stress.TemperatureStress = CalculateParameterStress(Temperature, optimalParams.TemperatureRange);
-            stress.HeatStress = Temperature > optimalParams.StressThresholds.HeatStressThreshold ? 
-                (Temperature - optimalParams.StressThresholds.HeatStressThreshold) / 10f : 0f;
-            stress.ColdStress = Temperature < optimalParams.StressThresholds.ColdStressThreshold ? 
-                (optimalParams.StressThresholds.ColdStressThreshold - Temperature) / 10f : 0f;
-            
-            // Humidity stress
-            stress.HumidityStress = CalculateParameterStress(Humidity, optimalParams.HumidityRange);
-            stress.VPDStress = CalculateParameterStress(VaporPressureDeficit, optimalParams.VPDRange);
-            
-            // Light stress
-            stress.LightStress = CalculateParameterStress(LightIntensity, optimalParams.LightIntensityRange);
-            stress.LightBurn = LightIntensity > optimalParams.StressThresholds.LightBurnThreshold ?
-                (LightIntensity - optimalParams.StressThresholds.LightBurnThreshold) / 500f : 0f;
-            
-            // CO2 stress
-            stress.CO2Stress = CalculateParameterStress(CO2Level, optimalParams.CO2Range);
-            
-            // Air quality stress
-            stress.AirQualityStress = 1f - AirQualityIndex;
-            stress.AirMovementStress = CalculateParameterStress(AirVelocity, optimalParams.AirVelocityRange);
+            if (optimalParams != null)
+            {
+                // Temperature stress
+                stress.TemperatureStress = CalculateParameterStress(Temperature, optimalParams.TemperatureRange);
+                stress.HeatStress = Temperature > optimalParams.StressThresholds.HeatStressThreshold ? 
+                    (Temperature - optimalParams.StressThresholds.HeatStressThreshold) / 10f : 0f;
+                stress.ColdStress = Temperature < optimalParams.StressThresholds.ColdStressThreshold ? 
+                    (optimalParams.StressThresholds.ColdStressThreshold - Temperature) / 10f : 0f;
+                
+                // Humidity stress
+                stress.HumidityStress = CalculateParameterStress(Humidity, optimalParams.HumidityRange);
+                stress.VPDStress = CalculateParameterStress(VaporPressureDeficit, optimalParams.VPDRange);
+                
+                // Light stress
+                stress.LightStress = CalculateParameterStress(LightIntensity, optimalParams.LightIntensityRange);
+                stress.LightBurn = LightIntensity > optimalParams.StressThresholds.LightBurnThreshold ?
+                    (LightIntensity - optimalParams.StressThresholds.LightBurnThreshold) / 500f : 0f;
+                
+                // CO2 stress
+                stress.CO2Stress = CalculateParameterStress(CO2Level, optimalParams.CO2Range);
+                
+                // Air quality stress
+                stress.AirQualityStress = 1f - AirQualityIndex;
+                stress.AirMovementStress = CalculateParameterStress(AirVelocity, optimalParams.AirVelocityRange);
+            }
+            else
+            {
+                // Default stress calculation when no optimal params provided
+                stress.TemperatureStress = Mathf.Abs(Temperature - 22f) / 10f; // Default optimal temp 22°C
+                stress.HumidityStress = Mathf.Abs(Humidity - 55f) / 20f; // Default optimal humidity 55%
+                stress.LightStress = Mathf.Abs(LightIntensity - 400f) / 200f; // Default optimal light 400 PPFD
+                stress.CO2Stress = Mathf.Abs(CO2Level - 800f) / 400f; // Default optimal CO2 800ppm
+                stress.AirQualityStress = 1f - AirQualityIndex;
+                stress.AirMovementStress = Mathf.Abs(AirVelocity - 0.3f) / 0.5f; // Default optimal airflow 0.3 m/s
+            }
             
             // Environmental instability stress
             stress.InstabilityStress = (2f - TemperatureStability - HumidityStability) / 2f;
@@ -116,16 +130,31 @@ namespace ProjectChimera.Data.Environment
         /// </summary>
         public float GetEnvironmentalQuality(EnvironmentalParametersSO optimalParams)
         {
-            float tempQuality = GetParameterQuality(Temperature, optimalParams.TemperatureRange);
-            float humidityQuality = GetParameterQuality(Humidity, optimalParams.HumidityRange);
-            float lightQuality = GetParameterQuality(LightIntensity, optimalParams.LightIntensityRange);
-            float co2Quality = GetParameterQuality(CO2Level, optimalParams.CO2Range);
-            float vpdQuality = GetParameterQuality(VaporPressureDeficit, optimalParams.VPDRange);
+            float tempQuality, humidityQuality, lightQuality, co2Quality, vpdQuality;
+            
+            if (optimalParams != null)
+            {
+                tempQuality = GetParameterQuality(Temperature, optimalParams.TemperatureRange);
+                humidityQuality = GetParameterQuality(Humidity, optimalParams.HumidityRange);
+                lightQuality = GetParameterQuality(LightIntensity, optimalParams.LightIntensityRange);
+                co2Quality = GetParameterQuality(CO2Level, optimalParams.CO2Range);
+                vpdQuality = GetParameterQuality(VaporPressureDeficit, optimalParams.VPDRange);
+            }
+            else
+            {
+                // Default quality calculation when no optimal params provided
+                tempQuality = 1f - Mathf.Abs(Temperature - 22f) / 10f; // Default optimal temp 22°C
+                humidityQuality = 1f - Mathf.Abs(Humidity - 55f) / 20f; // Default optimal humidity 55%
+                lightQuality = 1f - Mathf.Abs(LightIntensity - 400f) / 200f; // Default optimal light 400 PPFD
+                co2Quality = 1f - Mathf.Abs(CO2Level - 800f) / 400f; // Default optimal CO2 800ppm
+                vpdQuality = 1f - Mathf.Abs(VaporPressureDeficit - 1.0f) / 1.0f; // Default optimal VPD 1.0 kPa
+            }
+            
             float airQuality = AirQualityIndex;
             float stabilityQuality = (TemperatureStability + HumidityStability + LightStability) / 3f;
             
             // Weighted average with emphasis on critical parameters
-            return (tempQuality * 0.20f + humidityQuality * 0.15f + lightQuality * 0.20f + 
+            return Mathf.Clamp01(tempQuality * 0.20f + humidityQuality * 0.15f + lightQuality * 0.20f + 
                    co2Quality * 0.15f + vpdQuality * 0.15f + airQuality * 0.10f + 
                    stabilityQuality * 0.05f);
         }
@@ -215,8 +244,8 @@ namespace ProjectChimera.Data.Environment
         private float CalculateTerpenePotential()
         {
             float tempSwingFactor = 1f - TemperatureStability; // Stress enhances terpenes
-            float spectrumFactor = LightSpectrumData.GetTerpeneEnhancingRatio();
-            float stressFactor = Mathf.Clamp01(CalculateStressIndicators(null).OverallStressIndex * 2f);
+            float spectrumFactor = LightSpectrumData != null ? LightSpectrumData.GetTerpeneEnhancingRatio() : 0f;
+            float stressFactor = 0.5f; // Simplified stress calculation when optimal params are null
             
             return (tempSwingFactor + spectrumFactor + stressFactor) / 3f;
         }
@@ -252,6 +281,7 @@ namespace ProjectChimera.Data.Environment
                 LightIntensity = 400f,
                 AirVelocity = 0.3f,
                 AirFlow = 0.3f,
+                AirflowRate = 0.3f,
                 AirCirculation = 0.3f,
                 DailyLightIntegral = 25f,
                 BarometricPressure = 1013.25f,
@@ -265,7 +295,8 @@ namespace ProjectChimera.Data.Environment
                 RootZoneTemperature = 20f,
                 CanopyHumidity = 55f,
                 SonicEnvironment = 40f,
-                SeasonalContext = new SeasonalContext()
+                SeasonalContext = new SeasonalContext(),
+                LightSpectrumData = new LightSpectrumData()
             };
             
             conditions.UpdateVPD();

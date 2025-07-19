@@ -29,6 +29,13 @@ namespace ProjectChimera.Data.Environment
         [Header("Specialized Cannabis Wavelengths")]
         [Range(0f, 50f)] public float Cannabis_Specific_285nm = 1f;    // THC synthesis
         [Range(0f, 50f)] public float Cannabis_Specific_365nm = 8f;    // Terpene production
+        
+        [Header("Percentage-based Properties for System Compatibility")]
+        public float RedPercent { get => Red_630_660nm; set => Red_630_660nm = value; }
+        public float BluePercent { get => Blue_420_490nm; set => Blue_420_490nm = value; }
+        public float GreenPercent { get => Green_490_550nm; set => Green_490_550nm = value; }
+        public float FarRedPercent { get => FarRed_700_850nm; set => FarRed_700_850nm = value; }
+        public float UVPercent { get => UV_A_315_400nm; set => UV_A_315_400nm = value; }
         [Range(0f, 100f)] public float Cannabis_Specific_385nm = 12f;  // Resin production
         [Range(0f, 100f)] public float Cannabis_Specific_660nm = 100f; // Peak photosynthesis
         [Range(0f, 80f)] public float Cannabis_Specific_730nm = 30f;   // Flowering hormone

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
+using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 
 namespace ProjectChimera.Systems.Environment
 {
@@ -257,7 +258,7 @@ namespace ProjectChimera.Systems.Environment
         
         private LightSpectrumData CreateDefaultSpectrum()
         {
-            return new LightSpectrumData
+            return new ProjectChimera.Data.Environment.LightSpectrumData
             {
                 UV_A_315_400nm = 15f,          // UV-A 315-400nm
                 Blue_420_490nm = 100f,         // Blue 420-490nm  
@@ -393,23 +394,23 @@ namespace ProjectChimera.Systems.Environment
         {
             _spectrumProfiles = new Dictionary<PlantGrowthStage, LightSpectrumData>
             {
-                [PlantGrowthStage.Seed] = new LightSpectrumData
+                [PlantGrowthStage.Seed] = new ProjectChimera.Data.Environment.LightSpectrumData
                 {
                     UV_A_315_400nm = 2f, Blue_420_490nm = 30f, Green_490_550nm = 20f, Red_630_660nm = 35f, FarRed_700_850nm = 13f
                 },
-                [PlantGrowthStage.Seedling] = new LightSpectrumData
+                [PlantGrowthStage.Seedling] = new ProjectChimera.Data.Environment.LightSpectrumData
                 {
                     UV_A_315_400nm = 3f, Blue_420_490nm = 35f, Green_490_550nm = 18f, Red_630_660nm = 32f, FarRed_700_850nm = 12f
                 },
-                [PlantGrowthStage.Vegetative] = new LightSpectrumData
+                [PlantGrowthStage.Vegetative] = new ProjectChimera.Data.Environment.LightSpectrumData
                 {
                     UV_A_315_400nm = 5f, Blue_420_490nm = 25f, Green_490_550nm = 15f, Red_630_660nm = 40f, FarRed_700_850nm = 15f
                 },
-                [PlantGrowthStage.Flowering] = new LightSpectrumData
+                [PlantGrowthStage.Flowering] = new ProjectChimera.Data.Environment.LightSpectrumData
                 {
                     UV_A_315_400nm = 8f, Blue_420_490nm = 15f, Green_490_550nm = 12f, Red_630_660nm = 50f, FarRed_700_850nm = 15f
                 },
-                [PlantGrowthStage.Harvest] = new LightSpectrumData
+                [PlantGrowthStage.Harvest] = new ProjectChimera.Data.Environment.LightSpectrumData
                 {
                     UV_A_315_400nm = 10f, Blue_420_490nm = 10f, Green_490_550nm = 10f, Red_630_660nm = 55f, FarRed_700_850nm = 15f
                 }
@@ -620,7 +621,7 @@ namespace ProjectChimera.Systems.Environment
             float blueIntensity = Mathf.Lerp(0.3f, 0.15f, dayProgress);
             float redIntensity = Mathf.Lerp(0.35f, 0.55f, dayProgress);
             
-            return new LightSpectrumData
+            return new ProjectChimera.Data.Environment.LightSpectrumData
             {
                 UV_A_315_400nm = Mathf.Lerp(0.03f, 0.08f, dayProgress),
                 Blue_420_490nm = blueIntensity,
@@ -632,7 +633,7 @@ namespace ProjectChimera.Systems.Environment
         
         private LightSpectrumData LerpSpectrum(LightSpectrumData a, LightSpectrumData b, float t)
         {
-            return new LightSpectrumData
+            return new ProjectChimera.Data.Environment.LightSpectrumData
             {
                 UV_A_315_400nm = Mathf.Lerp(a.UV_A_315_400nm, b.UV_A_315_400nm, t),
                 Blue_420_490nm = Mathf.Lerp(a.Blue_420_490nm, b.Blue_420_490nm, t),
@@ -786,7 +787,7 @@ namespace ProjectChimera.Systems.Environment
         
         // private LightSpectrumData CalculateOptimizedSpectrum(IEnumerable<IGrouping<PlantGrowthStage, InteractivePlantComponent>> stageGroups)
         // {
-        //     var result = new LightSpectrumData();
+        //     var result = new ProjectChimera.Data.Environment.LightSpectrumData();
         //     float totalWeight = 0f;
         //     
         //     foreach (var group in stageGroups)

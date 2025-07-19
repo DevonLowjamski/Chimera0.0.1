@@ -122,7 +122,7 @@ namespace ProjectChimera.Data.Environment
         public LightSpectrumData CurrentSpectrum;
         public float OperatingHours;
         [Range(0.1f, 1.5f)] public float EfficiencyRating = 1f;
-        public MaintenanceStatus MaintenanceStatus;
+        public LightingMaintenanceStatus MaintenanceStatus;
         public System.DateTime InstallationDate;
         public System.DateTime LastMaintenanceDate;
         public List<LightingAlarm> FixtureAlarms = new List<LightingAlarm>();
@@ -411,7 +411,7 @@ namespace ProjectChimera.Data.Environment
         public float EnergyConsumption;
         public float EfficiencyRating;
         public float PPFD;
-        public MaintenanceStatus MaintenanceStatus;
+        public LightingMaintenanceStatus MaintenanceStatus;
     }
 
     [System.Serializable]
@@ -608,6 +608,15 @@ namespace ProjectChimera.Data.Environment
         Acknowledged,
         Cleared,
         Disabled
+    }
+
+    public enum LightingMaintenanceStatus
+    {
+        Good,
+        Fair,
+        Poor,
+        Critical,
+        MaintenanceRequired
     }
 
     // Additional types needed by AdvancedGrowLightSystem

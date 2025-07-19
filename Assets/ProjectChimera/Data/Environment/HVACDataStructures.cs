@@ -143,6 +143,17 @@ namespace ProjectChimera.Data.Environment
         public HVACZoneStatus ZoneStatus;
         public System.DateTime CreatedAt;
         public System.DateTime LastUpdated;
+        
+        // Compatibility properties for HVACSystemManager
+        public bool IsActive 
+        { 
+            get => ZoneStatus == HVACZoneStatus.Active || ZoneStatus == HVACZoneStatus.Heating || ZoneStatus == HVACZoneStatus.Cooling; 
+        }
+        
+        public HVACOperationMode OperationMode 
+        { 
+            get => ControlParameters?.OperationMode ?? HVACOperationMode.Manual; 
+        }
     }
 
     [System.Serializable]
@@ -175,6 +186,7 @@ namespace ProjectChimera.Data.Environment
         [Range(0.1f, 10f)] public float ControlGain = 1f;
         public bool EnableNightMode = true;
         public NightModeSettings NightModeSettings;
+        public HVACOperationMode OperationMode = HVACOperationMode.Auto;
     }
 
     [System.Serializable]
@@ -514,6 +526,8 @@ namespace ProjectChimera.Data.Environment
     {
         Active,
         Standby,
+        Heating,
+        Cooling,
         Maintenance,
         Alarm,
         Offline
@@ -565,6 +579,15 @@ namespace ProjectChimera.Data.Environment
         Energy_Efficiency_Low,
         Maintenance_Required,
         Filter_Replacement
+    }
+
+    public enum HVACOperationMode
+    {
+        Off,
+        Manual,
+        Auto,
+        Eco,
+        Emergency
     }
 
     public enum HVACAlarmPriority

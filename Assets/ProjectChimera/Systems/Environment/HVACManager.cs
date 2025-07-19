@@ -5,6 +5,12 @@ using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Equipment;
+using HVACZone = ProjectChimera.Data.Environment.HVACZone;
+using HVACZoneSettings = ProjectChimera.Data.Environment.HVACZoneSettings;
+using ActiveHVACEquipment = ProjectChimera.Data.Environment.ActiveHVACEquipment;
+using HVACControlParameters = ProjectChimera.Data.Environment.HVACControlParameters;
+using HVACZoneStatus = ProjectChimera.Data.Environment.HVACZoneStatus;
+using MaintenanceStatus = ProjectChimera.Data.Environment.MaintenanceStatus;
 
 namespace ProjectChimera.Systems.Environment
 {

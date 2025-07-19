@@ -6,6 +6,7 @@ using ProjectChimera.Data.AI;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Economy;
 using ProjectChimera.Systems.Environment;
+using DataEnvironmentalAnalysisResult = ProjectChimera.Data.AI.EnvironmentalAnalysisResult;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 
@@ -337,9 +338,9 @@ namespace ProjectChimera.Systems.AI
 
     public class EnvironmentalAnalysisEngine
     {
-        public EnvironmentalAnalysisResult AnalyzeEnvironmentalData(EnvironmentalManager environmentalManager)
+        public DataEnvironmentalAnalysisResult AnalyzeEnvironmentalData(EnvironmentalManager environmentalManager)
         {
-            var result = new EnvironmentalAnalysisResult
+            var result = new DataEnvironmentalAnalysisResult
             {
                 ZoneAnalysis = new Dictionary<string, ZoneAnalysis>(),
                 EnvironmentalAlerts = new List<string>(),
@@ -428,7 +429,7 @@ namespace ProjectChimera.Systems.AI
                 (z.TemperatureStability + z.HumidityStability + z.EfficiencyScore) / 3f);
         }
 
-        private List<string> GenerateEnvironmentalAlerts(EnvironmentalAnalysisResult analysis)
+        private List<string> GenerateEnvironmentalAlerts(DataEnvironmentalAnalysisResult analysis)
         {
             var alerts = new List<string>();
 
@@ -450,7 +451,7 @@ namespace ProjectChimera.Systems.AI
             return alerts;
         }
 
-        private List<string> GenerateOptimizationSuggestions(EnvironmentalAnalysisResult analysis)
+        private List<string> GenerateOptimizationSuggestions(DataEnvironmentalAnalysisResult analysis)
         {
             var suggestions = new List<string>();
 
@@ -473,7 +474,7 @@ namespace ProjectChimera.Systems.AI
             return suggestions;
         }
 
-        private float CalculateEnvironmentalScore(EnvironmentalAnalysisResult analysis)
+        private float CalculateEnvironmentalScore(DataEnvironmentalAnalysisResult analysis)
         {
             float efficiencyScore = analysis.EnergyEfficiency;
             float stabilityScore = analysis.OverallStability;

@@ -3,6 +3,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
+using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 using SeasonType = ProjectChimera.Data.Environment.SeasonType;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,7 +197,7 @@ namespace ProjectChimera.Systems.Environment
             var prediction = environment.CurrentConditions.PredictCannabinoidProduction();
             
             // Enhanced prediction based on light spectrum
-            if (_enableAdvancedLightSpectrumData && environment.CurrentConditions.LightSpectrumData != null)
+            if (_enableAdvancedLightSpectrumData && environment.CurrentConditions.LightSpectrumData.GetTotalPAR() > 0f)
             {
                 var lightResponse = environment.CurrentConditions.LightSpectrumData.GetCannabinoidResponse();
                 prediction.THCPotential *= lightResponse.THCEnhancement;

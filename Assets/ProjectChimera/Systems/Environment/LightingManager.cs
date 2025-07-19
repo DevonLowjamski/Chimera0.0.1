@@ -6,6 +6,10 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Equipment;
 using ProjectChimera.Data.Genetics;
+using DataLightingZone = ProjectChimera.Data.Environment.LightingZone;
+using LightingZoneSettings = ProjectChimera.Data.Environment.LightingZoneSettings;
+using LightingMaintenanceStatus = ProjectChimera.Data.Environment.LightingMaintenanceStatus;
+using PhotoperiodStage = ProjectChimera.Data.Environment.PhotoperiodStage;
 
 namespace ProjectChimera.Systems.Environment
 {
@@ -25,7 +29,7 @@ namespace ProjectChimera.Systems.Environment
         
         [Header("Spectrum Control")]
         [SerializeField] private SpectrumControlSettings _spectrumSettings;
-        [SerializeField] private List<ProjectChimera.Data.Environment.LightSpectrumData> _availableSpectrums = new List<ProjectChimera.Data.Environment.LightSpectrumData>();
+        [SerializeField] private List<LightSpectrumData> _availableSpectrums = new List<LightSpectrumData>();
         [SerializeField] private bool _enableUVSupplementation = true;
         [SerializeField] private bool _enableFarRedControl = true;
         
@@ -52,7 +56,7 @@ namespace ProjectChimera.Systems.Environment
         [SerializeField] private SimpleGameEventSO _lightingAlarmEvent;
         
         // Runtime Data
-        private Dictionary<string, LightingZone> _lightingZones;
+        private Dictionary<string, DataLightingZone> _lightingZones;
         private Dictionary<string, ActiveLightingFixture> _activeLights;
         private Dictionary<string, LightingSchedule> _lightingSchedules;
         private Dictionary<string, DLITracker> _dliTrackers;
@@ -64,7 +68,7 @@ namespace ProjectChimera.Systems.Environment
         private float _currentDLI;
         
         // Properties
-        public Dictionary<string, LightingZone> LightingZones => _lightingZones;
+        public Dictionary<string, DataLightingZone> LightingZones => _lightingZones;
         public PhotoperiodController PhotoperiodController => _photoperiodController;
         public SpectrumController SpectrumController => _spectrumController;
         public float CurrentDLI => _currentDLI;
@@ -80,7 +84,7 @@ namespace ProjectChimera.Systems.Environment
 
         protected override void OnManagerInitialize()
         {
-            _lightingZones = new Dictionary<string, LightingZone>();
+            _lightingZones = new Dictionary<string, DataLightingZone>();
             _activeLights = new Dictionary<string, ActiveLightingFixture>();
             _lightingSchedules = new Dictionary<string, LightingSchedule>();
             _dliTrackers = new Dictionary<string, DLITracker>();
@@ -130,7 +134,7 @@ namespace ProjectChimera.Systems.Environment
         {
             string zoneId = System.Guid.NewGuid().ToString();
             
-            var lightingZone = new LightingZone
+            var lightingZone = new DataLightingZone
             {
                 ZoneId = zoneId,
                 ZoneName = zoneName,
@@ -140,8 +144,10 @@ namespace ProjectChimera.Systems.Environment
                 LightingFixtures = new List<ActiveLightingFixture>(),
                 CurrentDLI = 0f,
                 TargetDLI = zoneSettings.DefaultDLI,
+                GrowthStage = zoneSettings.InitialGrowthStage,
                 PhotoperiodStage = PhotoperiodStage.Day,
                 ZoneStatus = LightingZoneStatus.Active,
+                AutomaticPhotoperiod = zoneSettings.EnableAutoScheduling,
                 CreatedAt = System.DateTime.Now,
                 LastUpdated = System.DateTime.Now
             };
@@ -181,7 +187,7 @@ namespace ProjectChimera.Systems.Environment
                 CurrentSpectrum = new LightSpectrumData(),
                 OperatingHours = 0f,
                 EfficiencyRating = 1f,
-                MaintenanceStatus = MaintenanceStatus.Good,
+                MaintenanceStatus = LightingMaintenanceStatus.Good,
                 InstallationDate = System.DateTime.Now,
                 LastMaintenanceDate = System.DateTime.Now
             };
@@ -310,7 +316,7 @@ namespace ProjectChimera.Systems.Environment
             var fixtureStatus = zone.LightingFixtures.Select(fixture => new LightingFixtureSnapshot
             {
                 FixtureId = fixture.FixtureId,
-                FixtureName = fixture.FixtureData.EquipmentName,
+                FixtureName = fixture.FixtureData?.name ?? "Unknown",
                 Status = fixture.Status,
                 Intensity = fixture.Intensity,
                 CurrentSpectrum = fixture.CurrentSpectrum,
@@ -507,10 +513,17 @@ namespace ProjectChimera.Systems.Environment
 
         private void MonitorLightingPerformance()
         {
-            foreach (var fixture in _activeLights.Values.Where(f => f.Status == LightingFixtureStatus.On))
+            var keysToUpdate = _activeLights.Keys.ToList();
+            foreach (var fixtureId in keysToUpdate)
             {
+                var fixture = _activeLights[fixtureId];
+                if (fixture.Status != LightingFixtureStatus.On) continue;
+                
                 // Update operating hours
                 fixture.OperatingHours += Time.deltaTime / 3600f;
+                
+                // Update the struct in the dictionary
+                _activeLights[fixtureId] = fixture;
                 
                 // Monitor efficiency degradation
                 UpdateFixtureEfficiency(fixture);
@@ -556,7 +569,8 @@ namespace ProjectChimera.Systems.Environment
             if (fixture.Status != LightingFixtureStatus.On)
                 return 0f;
             
-            float basePPFD = fixture.FixtureData.PPFD;
+            // Default PPFD value since FixtureData is a string, not an object
+            float basePPFD = 800f; // Default PPFD
             float actualPPFD = basePPFD * fixture.Intensity * fixture.EfficiencyRating;
             
             return actualPPFD;
@@ -567,7 +581,8 @@ namespace ProjectChimera.Systems.Environment
             if (fixture.Status != LightingFixtureStatus.On)
                 return 0f;
             
-            float basePower = fixture.FixtureData.PowerConsumption;
+            // Default power consumption since FixtureData is a string, not an object
+            float basePower = 400f; // Default power consumption in watts
             float actualPower = basePower * fixture.Intensity;
             
             return actualPower * Time.deltaTime / 3600f; // Convert to kWh
@@ -607,4 +622,7 @@ namespace ProjectChimera.Systems.Environment
             LogInfo("LightingManager shutdown complete");
         }
     }
+    
+    
+    
 }

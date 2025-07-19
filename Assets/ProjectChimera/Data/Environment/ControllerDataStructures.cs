@@ -151,6 +151,37 @@ namespace ProjectChimera.Data.Environment
         }
         
         public float WhiteBalance { get; set; } = 0.08f;
+        
+        // Percentage properties for compatibility with EnvironmentalOrchestrator
+        public float RedPercent 
+        { 
+            get => redPercentage; 
+            set => redPercentage = value; 
+        }
+        
+        public float BluePercent 
+        { 
+            get => bluePercentage; 
+            set => bluePercentage = value; 
+        }
+        
+        public float GreenPercent 
+        { 
+            get => greenPercentage; 
+            set => greenPercentage = value; 
+        }
+        
+        public float FarRedPercent 
+        { 
+            get => farRedPercentage; 
+            set => farRedPercentage = value; 
+        }
+        
+        public float UVPercent 
+        { 
+            get => uvPercentage; 
+            set => uvPercentage = value; 
+        }
     }
 
     [System.Serializable]

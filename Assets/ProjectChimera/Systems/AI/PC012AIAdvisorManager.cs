@@ -7,6 +7,7 @@ using ProjectChimera.Data.AI;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Economy;
 using ProjectChimera.Systems.Environment;
+using DataEnvironmentalAnalysisResult = ProjectChimera.Data.AI.EnvironmentalAnalysisResult;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using AIPriority = ProjectChimera.Data.AI.RecommendationPriority;
@@ -218,7 +219,7 @@ namespace ProjectChimera.Systems.AI
             }
         }
         
-        private void GenerateEnvironmentalRecommendations(EnvironmentalAnalysisResult analysis)
+        private void GenerateEnvironmentalRecommendations(DataEnvironmentalAnalysisResult analysis)
         {
             if (analysis == null) return;
             

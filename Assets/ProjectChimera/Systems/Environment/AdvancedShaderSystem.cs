@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
+using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 // Explicit alias to resolve Camera namespace conflict
 using Camera = UnityEngine.Camera;
 
@@ -260,7 +261,7 @@ namespace ProjectChimera.Systems.Environment
             propertyBlock.SetFloat(MoistureLevel, plantData.WaterLevel / 100f);
             
             // Update spectrum response
-            if (plantData.LightSpectrum != null)
+            if (plantData.LightSpectrum.GetTotalPAR() > 0f)
             {
                 ApplySpectrumEffects(propertyBlock, plantData.LightSpectrum);
             }
@@ -383,7 +384,7 @@ namespace ProjectChimera.Systems.Environment
             if (!_enableSpectrumVisualization || lightSystem == null) return;
             
             var spectrum = lightSystem.CurrentSpectrum;
-            if (spectrum == null) return;
+            if (spectrum.GetTotalPAR() <= 0f) return;
             
             // Set spectrum data for visualization shader
             _spectrumVisualizationMaterial.SetFloat(SpectrumR, spectrum.Red_630_660nm);
@@ -400,7 +401,7 @@ namespace ProjectChimera.Systems.Environment
         
         private void ApplySpectrumEffects(MaterialPropertyBlock propertyBlock, LightSpectrumData spectrum)
         {
-            if (spectrum == null) return;
+            if (spectrum.GetTotalPAR() <= 0f) return;
             
             // Apply spectrum values to shader properties
             propertyBlock.SetFloat(SpectrumR, spectrum.Red_630_660nm);
