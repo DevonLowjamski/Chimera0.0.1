@@ -439,7 +439,7 @@ namespace ProjectChimera.Systems.Environment
             var floweringSchedule = CreateDefaultFloweringSchedule();
         }
 
-        private void InitializeZoneDefaults(LightingZone zone)
+        private void InitializeZoneDefaults(DataLightingZone zone)
         {
             // Set default spectrum based on zone settings
             zone.CurrentSpectrum = GetDefaultSpectrumForGrowthStage(zone.GrowthStage);
@@ -600,14 +600,14 @@ namespace ProjectChimera.Systems.Environment
         private float CalculateZoneTotalEnergyConsumption(LightingZone zone) { return zone.LightingFixtures.Sum(f => CalculateFixtureEnergyConsumption(f)); }
         private List<string> IdentifyLightingOptimizationOpportunities(LightingZone zone) { return new List<string>(); }
         private LightSpectrumData GetDefaultSpectrumForGrowthStage(PlantGrowthStage growthStage) { return new LightSpectrumData(); }
-        private LightingSchedule CreateDefaultScheduleForZone(LightingZone zone) { return new LightingSchedule { ScheduleId = System.Guid.NewGuid().ToString(), ZoneId = zone.ZoneId }; }
+        private LightingSchedule CreateDefaultScheduleForZone(DataLightingZone zone) { return new LightingSchedule { ScheduleId = System.Guid.NewGuid().ToString(), ZoneId = zone.ZoneId }; }
         private LightingSchedule CreateDefaultVegetativeSchedule() { return new LightingSchedule(); }
         private LightingSchedule CreateDefaultFloweringSchedule() { return new LightingSchedule(); }
-        private void ProcessZoneSchedule(LightingZone zone, LightingSchedule schedule) { }
-        private void UpdateZoneSpectrum(LightingZone zone) { }
-        private void ProcessAdaptiveDLIControl(LightingZone zone) { }
-        private void ProcessEnergyOptimization(LightingZone zone) { }
-        private void CheckZoneLightingAlarms(LightingZone zone) { }
+        private void ProcessZoneSchedule(DataLightingZone zone, LightingSchedule schedule) { }
+        private void UpdateZoneSpectrum(DataLightingZone zone) { }
+        private void ProcessAdaptiveDLIControl(DataLightingZone zone) { }
+        private void ProcessEnergyOptimization(DataLightingZone zone) { }
+        private void CheckZoneLightingAlarms(DataLightingZone zone) { }
         private void UpdateFixtureEfficiency(ActiveLightingFixture fixture) { }
         private void CheckFixtureMaintenanceNeeds(ActiveLightingFixture fixture) { }
         private void ProcessAdaptiveLightingControl(LightingZone zone) { }

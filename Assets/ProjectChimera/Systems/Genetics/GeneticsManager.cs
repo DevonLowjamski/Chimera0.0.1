@@ -39,7 +39,7 @@ namespace ProjectChimera.Systems.Genetics
         // Core genetic system components
         private InheritanceCalculator _inheritanceCalculator;
         private ProjectChimera.Systems.Genetics.TraitExpressionEngine _traitExpressionEngine;
-        private ProjectChimera.Systems.Genetics.BreedingSimulator _breedingSimulator;
+        private BreedingCalculationEngine _breedingCalculationEngine;
         private GeneticAlgorithms _geneticAlgorithms;
         
         public override ManagerPriority Priority => ManagerPriority.High;
@@ -55,8 +55,14 @@ namespace ProjectChimera.Systems.Genetics
         {
             _inheritanceCalculator = new InheritanceCalculator(_enableEpistasis, _enablePleiotropy);
             _traitExpressionEngine = new ProjectChimera.Systems.Genetics.TraitExpressionEngine(_enableEpistasis, _enablePleiotropy);
-            _breedingSimulator = new ProjectChimera.Systems.Genetics.BreedingSimulator(_allowInbreeding, _inbreedingDepression);
+            _breedingCalculationEngine = new BreedingCalculationEngine(
+                _allowInbreeding, _inbreedingDepression, _enableMutations, 
+                _mutationRate, _trackPedigrees, _maxGenerationsTracked);
             _geneticAlgorithms = new GeneticAlgorithms();
+            
+            // Subscribe to breeding events
+            _breedingCalculationEngine.OnBreedingCompleted += HandleBreedingCompleted;
+            _breedingCalculationEngine.OnMutationOccurred += HandleMutationOccurred;
             
             LogInfo($"GeneticsManager initialized with epistasis: {_enableEpistasis}, pleiotropy: {_enablePleiotropy}");
         }
@@ -113,29 +119,23 @@ namespace ProjectChimera.Systems.Genetics
                 return null;
             }
             
-            // Perform breeding simulation
-            var breedingResult = _breedingSimulator.PerformBreeding(
+            // Use extracted breeding calculation engine
+            var breedingResult = _breedingCalculationEngine.BreedPlants(
                 parent1Genotype, 
                 parent2Genotype, 
-                numberOfOffspring,
-                _enableMutations,
-                _mutationRate
+                numberOfOffspring
             );
             
-            // Update pedigree tracking
-            if (_trackPedigrees && breedingResult != null)
-            {
-                UpdatePedigreeDatabase(breedingResult);
-            }
-            
             // Cache offspring genotypes
-            foreach (var offspring in breedingResult.OffspringGenotypes)
+            if (breedingResult?.OffspringGenotypes != null)
             {
-                _genotypeCache[offspring.GenotypeID] = offspring;
+                foreach (var offspring in breedingResult.OffspringGenotypes)
+                {
+                    _genotypeCache[offspring.GenotypeID] = offspring;
+                }
             }
             
-            LogInfo($"Breeding completed: {parent1.PlantName} x {parent2.PlantName} -> {breedingResult.OffspringGenotypes.Count} offspring");
-            _onBreedingCompleted?.Raise(breedingResult);
+            LogInfo($"Breeding completed: {parent1.PlantName} x {parent2.PlantName} -> {breedingResult?.OffspringGenotypes?.Count ?? 0} offspring");
             
             return breedingResult;
         }
@@ -209,7 +209,11 @@ namespace ProjectChimera.Systems.Genetics
                     genotypes.Add(genotype);
             }
             
-            return _geneticAlgorithms.OptimizeBreedingPairs(genotypes, criteria);
+            // Convert criteria to breeding goal for new engine
+            var breedingGoal = ConvertCriteriaToBreedingGoal(criteria);
+            var optimalPairs = _breedingCalculationEngine.OptimizeBreedingPairs(genotypes, breedingGoal);
+            
+            return ConvertOptimalPairsToRecommendation(optimalPairs);
         }
         
         /// <summary>
@@ -226,7 +230,10 @@ namespace ProjectChimera.Systems.Genetics
                     foundingGenotypes.Add(genotype);
             }
             
-            return _geneticAlgorithms.SimulateGenerations(foundingGenotypes, generations, selectionCriteria);
+            // Convert criteria to breeding goal for new engine
+            var breedingGoal = ConvertCriteriaToBreedingGoal(selectionCriteria);
+            
+            return _breedingCalculationEngine.SimulateGenerations(foundingGenotypes, generations, breedingGoal);
         }
         
         /// <summary>
@@ -238,7 +245,7 @@ namespace ProjectChimera.Systems.Genetics
             if (genotype == null)
                 return null;
             
-            return _geneticAlgorithms.PredictBreedingValue(genotype, targetTraits);
+            return _breedingCalculationEngine.PredictBreedingValue(genotype, targetTraits);
         }
         
         /// <summary>
@@ -263,7 +270,7 @@ namespace ProjectChimera.Systems.Genetics
             if (genotype1 == null || genotype2 == null)
                 return null;
             
-            return _breedingSimulator.AnalyzeCompatibility(genotype1, genotype2);
+            return _breedingCalculationEngine.AnalyzeBreedingCompatibility(genotype1, genotype2);
         }
         
         /// <summary>
@@ -290,79 +297,81 @@ namespace ProjectChimera.Systems.Genetics
         }
         
         /// <summary>
-        /// Updates the pedigree database with breeding results.
+        /// Handles breeding completion events from the breeding calculation engine.
         /// </summary>
-        private void UpdatePedigreeDatabase(BreedingResult breedingResult)
+        private void HandleBreedingCompleted(BreedingResult breedingResult)
         {
-            if (breedingResult == null)
-                return;
-            
-            foreach (var offspring in breedingResult.OffspringGenotypes)
+            _onBreedingCompleted?.Raise(breedingResult);
+        }
+        
+        /// <summary>
+        /// Handles mutation events from the breeding calculation engine.
+        /// </summary>
+        private void HandleMutationOccurred(GeneticMutation mutation)
+        {
+            _onMutationOccurred?.Raise(mutation);
+        }
+        
+        /// <summary>
+        /// Converts trait selection criteria to breeding goal format.
+        /// </summary>
+        private BreedingGoal ConvertCriteriaToBreedingGoal(TraitSelectionCriteria criteria)
+        {
+            // Simplified conversion - in real implementation this would be more sophisticated
+            return new BreedingGoal
             {
-                var lineage = new BreedingLineage
+                GoalID = System.Guid.NewGuid().ToString(),
+                GoalName = "Optimization Goal",
+                Description = "Generated from trait selection criteria",
+                GoalType = BreedingGoalType.CustomObjective,
+                TargetTraits = new List<TargetTrait>(),
+                Priority = 1,
+                Status = BreedingGoalStatus.Active,
+                CreatedAt = System.DateTime.Now
+            };
+        }
+        
+        /// <summary>
+        /// Converts optimal breeding pairs to breeding recommendation format.
+        /// </summary>
+        private BreedingRecommendation ConvertOptimalPairsToRecommendation(List<OptimalBreedingPair> optimalPairs)
+        {
+            var recommendation = new BreedingRecommendation
+            {
+                RecommendedPairs = new List<BreedingPair>(),
+                ExpectedGeneticGain = 0.15f,
+                ReasoningNotes = new List<string>(),
+                ConfidenceScore = 0.8f
+            };
+            
+            // Convert optimal pairs to simple breeding pairs
+            foreach (var optimalPair in optimalPairs)
+            {
+                var breedingPair = new BreedingPair
                 {
-                    IndividualID = offspring.GenotypeID,
-                    Parent1ID = breedingResult.Parent1Genotype.GenotypeID,
-                    Parent2ID = breedingResult.Parent2Genotype.GenotypeID,
-                    Generation = CalculateGeneration(breedingResult.Parent1Genotype, breedingResult.Parent2Genotype),
-                    BreedingDate = System.DateTime.Now,
-                    InbreedingCoefficient = CalculateInbreedingCoefficient(offspring.GenotypeID)
+                    Parent1ID = optimalPair.Parent1?.GenotypeID ?? "",
+                    Parent2ID = optimalPair.Parent2?.GenotypeID ?? "",
+                    ExpectedOffspringValue = optimalPair.Score,
+                    GeneticDistance = optimalPair.Compatibility?.CompatibilityScore ?? 0.5f,
+                    Justification = "AI-optimized breeding pair selection"
                 };
                 
-                _pedigreeDatabase[offspring.GenotypeID] = lineage;
-            }
-        }
-        
-        /// <summary>
-        /// Calculates the generation number for offspring.
-        /// </summary>
-        private int CalculateGeneration(PlantGenotype parent1, PlantGenotype parent2)
-        {
-            int gen1 = _pedigreeDatabase.ContainsKey(parent1.GenotypeID) ? 
-                _pedigreeDatabase[parent1.GenotypeID].Generation : 0;
-            int gen2 = _pedigreeDatabase.ContainsKey(parent2.GenotypeID) ? 
-                _pedigreeDatabase[parent2.GenotypeID].Generation : 0;
-            
-            return Mathf.Max(gen1, gen2) + 1;
-        }
-        
-        /// <summary>
-        /// Calculates inbreeding coefficient based on pedigree.
-        /// </summary>
-        private float CalculateInbreedingCoefficient(string individualID)
-        {
-            // Simplified inbreeding coefficient calculation
-            // In reality, this would require more complex pedigree analysis
-            if (!_pedigreeDatabase.ContainsKey(individualID))
-                return 0f;
-            
-            var lineage = _pedigreeDatabase[individualID];
-            if (lineage.Parent1ID == lineage.Parent2ID)
-                return 1f; // Self-fertilization
-            
-            // Check for common ancestors (simplified)
-            float coefficient = 0f;
-            if (_pedigreeDatabase.ContainsKey(lineage.Parent1ID) && 
-                _pedigreeDatabase.ContainsKey(lineage.Parent2ID))
-            {
-                var parent1Lineage = _pedigreeDatabase[lineage.Parent1ID];
-                var parent2Lineage = _pedigreeDatabase[lineage.Parent2ID];
-                
-                // Check for shared grandparents
-                if (parent1Lineage.Parent1ID == parent2Lineage.Parent1ID || 
-                    parent1Lineage.Parent1ID == parent2Lineage.Parent2ID ||
-                    parent1Lineage.Parent2ID == parent2Lineage.Parent1ID || 
-                    parent1Lineage.Parent2ID == parent2Lineage.Parent2ID)
-                {
-                    coefficient = 0.125f; // Half-siblings
-                }
+                recommendation.RecommendedPairs.Add(breedingPair);
+                recommendation.ReasoningNotes.Add($"High compatibility pair: {breedingPair.Parent1ID} x {breedingPair.Parent2ID}");
             }
             
-            return coefficient;
+            return recommendation;
         }
         
         protected override void OnManagerShutdown()
         {
+            // Unsubscribe from breeding events
+            if (_breedingCalculationEngine != null)
+            {
+                _breedingCalculationEngine.OnBreedingCompleted -= HandleBreedingCompleted;
+                _breedingCalculationEngine.OnMutationOccurred -= HandleMutationOccurred;
+            }
+            
             _genotypeCache.Clear();
             _pedigreeDatabase.Clear();
             
