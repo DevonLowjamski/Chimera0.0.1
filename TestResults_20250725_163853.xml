@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Failed(Child)" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.1144433">
+  <test-suite type="TestSuite" id="1261" name="Chimera" fullname="Chimera" runstate="Runnable" testcasecount="205" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.114443" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1167" name="ProjectChimera.Testing.dll" fullname="/Users/devon/Documents/Cursor/Projects/Library/ScriptAssemblies/ProjectChimera.Testing.dll" runstate="Runnable" testcasecount="140" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.107166" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="56809" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1168" name="ProjectChimera" fullname="ProjectChimera" runstate="Runnable" testcasecount="140" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.105209" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1169" name="Testing" fullname="ProjectChimera.Testing" runstate="Runnable" testcasecount="140" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.103474" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1174" name="Performance" fullname="ProjectChimera.Testing.Performance" runstate="Runnable" testcasecount="14" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.099673" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1106" name="PlantStressTestingFramework" fullname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" classname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.097412" total="4" passed="0" failed="4" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <output><![CDATA[You are trying to create a MonoBehaviour using the 'new' keyword.  This is not allowed.  MonoBehaviours can only be added using AddComponent(). Alternatively, your script can inherit from ScriptableObject or no base class at all
+]]></output>
+              <test-case id="1107" name="GradualLoadStressTest" fullname="ProjectChimera.Testing.Performance.PlantStressTestingFramework.GradualLoadStressTest" methodname="GradualLoadStressTest" classname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" runstate="Runnable" seed="1317321367" result="Failed" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.035613" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Category" value="Stress Test" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Exception] KeyNotFoundException: The given key 'High' was not present in the dictionary.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[[AudioFocusHandler] Audio Focus Handler initialized with FMOD compatibility
+[Chimera][GameManager] AudioFocusHandler created to prevent FMOD errors
+[Chimera][GameManager] Settings Manager not assigned
+[Chimera][PerformanceOrchestrator] PerformanceOrchestrator: Loaded default configuration from Resources
+[Chimera][PerformanceOrchestrator] PC015: Initializing simplified performance monitoring
+[Chimera][PerformanceOrchestrator] PerformanceOrchestrator initialized for performance monitoring
+[TEST INFO] PC016-1a: Stress testing systems initialized
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+[Chimera][GameManager] Event Manager not assigned
+]]></output>
+              </test-case>
+              <test-case id="1109" name="MemoryStressTest" fullname="ProjectChimera.Testing.Performance.PlantStressTestingFramework.MemoryStressTest" methodname="MemoryStressTest" classname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" runstate="Runnable" seed="1964616235" result="Failed" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.014434" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Category" value="Stress Test" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Exception] KeyNotFoundException: The given key 'High' was not present in the dictionary.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[[TEST INFO] PC016-1a: Stress testing systems initialized
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+[Chimera][GameManager] Data Manager not assigned
+]]></output>
+              </test-case>
+              <test-case id="1108" name="SuddenLoadStressTest" fullname="ProjectChimera.Testing.Performance.PlantStressTestingFramework.SuddenLoadStressTest" methodname="SuddenLoadStressTest" classname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" runstate="Runnable" seed="1964818878" result="Failed" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.011510" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Category" value="Stress Test" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Exception] KeyNotFoundException: The given key 'High' was not present in the dictionary.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[[TEST INFO] PC016-1a: Stress testing systems initialized
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+[Chimera][GameManager] Time Manager not assigned
+]]></output>
+              </test-case>
+              <test-case id="1110" name="SustainedLoadStressTest" fullname="ProjectChimera.Testing.Performance.PlantStressTestingFramework.SustainedLoadStressTest" methodname="SustainedLoadStressTest" classname="ProjectChimera.Testing.Performance.PlantStressTestingFramework" runstate="Runnable" seed="518426940" result="Failed" start-time="2025-07-25 20:38:38Z" end-time="2025-07-25 20:38:38Z" duration="0.011974" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Category" value="Stress Test" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Exception] KeyNotFoundException: The given key 'High' was not present in the dictionary.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[[TEST INFO] PC016-1a: Stress testing systems initialized
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+KeyNotFoundException: The given key 'High' was not present in the dictionary.
+System.Collections.Generic.Dictionary`2[TKey,TValue].get_Item (TKey key) (at <3d924b715ad54b5eb484ff00169219c6>:0)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessLODGroup (ProjectChimera.Core.Optimization.LODLevel lodLevel, System.Int32 updateFrequency, ProjectChimera.Core.Optimization.PlantUpdateType updateType, System.Single& budgetRemaining) (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:331)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.ProcessFrameBasedUpdates () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:311)
+ProjectChimera.Core.Optimization.PlantUpdateOptimizer.Update () (at Assets/ProjectChimera/Core/Optimization/PlantUpdateOptimizer.cs:123)
+
+[Chimera][PerformanceOrchestrator] PerformanceOrchestrator shutdown complete
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
