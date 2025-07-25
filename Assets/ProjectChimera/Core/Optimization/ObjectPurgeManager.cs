@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Data.Environment;
-using ProjectChimera.Systems.SpeedTree;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -184,8 +182,8 @@ namespace ProjectChimera.Core.Optimization
         private void RegisterCommonObjectTypes()
         {
             // Register frequently used collection types
-            RegisterObjectType<List<SpeedTreePlantInstance>>(100);
-            RegisterObjectType<List<EnvironmentalConditions>>(50);
+            RegisterObjectType<List<GameObject>>(100);
+            RegisterObjectType<List<Dictionary<string, float>>>(50);
             RegisterObjectType<Dictionary<string, object>>(50);
             RegisterObjectType<List<GameObject>>(200);
             

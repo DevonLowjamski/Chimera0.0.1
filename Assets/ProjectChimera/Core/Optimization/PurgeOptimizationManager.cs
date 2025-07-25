@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Data.Genetics;
-using ProjectChimera.Data.Environment;
-using ProjectChimera.Systems.SpeedTree;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -125,15 +122,15 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get or create optimized plant instance list
         /// </summary>
-        public List<SpeedTreePlantInstance> GetOptimizedPlantList()
+        public List<GameObject> GetOptimizedPlantList()
         {
-            return _plantCollectionPurger?.GetPlantInstanceList() ?? new List<SpeedTreePlantInstance>();
+            return _plantCollectionPurger?.GetPlantInstanceList() ?? new List<GameObject>();
         }
 
         /// <summary>
         /// Return plant instance list to optimized pool
         /// </summary>
-        public void ReturnOptimizedPlantList(List<SpeedTreePlantInstance> list)
+        public void ReturnOptimizedPlantList(List<GameObject> list)
         {
             _plantCollectionPurger?.ReturnPlantInstanceList(list);
         }
@@ -157,8 +154,8 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Execute optimized plant batch operation
         /// </summary>
-        public void ExecuteOptimizedPlantBatch(IEnumerable<SpeedTreePlantInstance> plants, 
-            System.Action<List<SpeedTreePlantInstance>, Dictionary<string, object>> batchProcessor)
+        public void ExecuteOptimizedPlantBatch(IEnumerable<GameObject> plants, 
+            System.Action<List<GameObject>, Dictionary<string, object>> batchProcessor)
         {
             if (_plantCollectionPurger != null)
             {
@@ -167,7 +164,7 @@ namespace ProjectChimera.Core.Optimization
             else
             {
                 // Fallback to non-optimized operation
-                var plantList = new List<SpeedTreePlantInstance>(plants);
+                var plantList = new List<GameObject>(plants);
                 var cache = new Dictionary<string, object>();
                 batchProcessor(plantList, cache);
             }

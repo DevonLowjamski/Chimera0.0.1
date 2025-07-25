@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.SpeedTree;
-using ProjectChimera.Data.Environment;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -33,14 +31,14 @@ namespace ProjectChimera.Core.Optimization
         [SerializeField] private float _performanceLogInterval = 5f;
         
         // Plant update queues by priority
-        private readonly Queue<SpeedTreePlantInstance> _criticalPriorityQueue = new Queue<SpeedTreePlantInstance>();
-        private readonly Queue<SpeedTreePlantInstance> _highPriorityQueue = new Queue<SpeedTreePlantInstance>();
-        private readonly Queue<SpeedTreePlantInstance> _normalPriorityQueue = new Queue<SpeedTreePlantInstance>();
-        private readonly Queue<SpeedTreePlantInstance> _lowPriorityQueue = new Queue<SpeedTreePlantInstance>();
+        private readonly Queue<GameObject> _criticalPriorityQueue = new Queue<GameObject>();
+        private readonly Queue<GameObject> _highPriorityQueue = new Queue<GameObject>();
+        private readonly Queue<GameObject> _normalPriorityQueue = new Queue<GameObject>();
+        private readonly Queue<GameObject> _lowPriorityQueue = new Queue<GameObject>();
         
         // Active plant tracking
-        private readonly HashSet<SpeedTreePlantInstance> _registeredPlants = new HashSet<SpeedTreePlantInstance>();
-        private readonly Dictionary<SpeedTreePlantInstance, PlantUpdateMetrics> _plantMetrics = new Dictionary<SpeedTreePlantInstance, PlantUpdateMetrics>();
+        private readonly HashSet<GameObject> _registeredPlants = new HashSet<GameObject>();
+        private readonly Dictionary<GameObject, PlantUpdateMetrics> _plantMetrics = new Dictionary<GameObject, PlantUpdateMetrics>();
         
         // Batch processing
         private int _currentBatchSize;
@@ -122,7 +120,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Register a plant for scheduled updates
         /// </summary>
-        public void RegisterPlant(SpeedTreePlantInstance plant)
+        public void RegisterPlant(GameObject plant)
         {
             if (plant == null) return;
             
@@ -145,7 +143,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Unregister a plant from scheduled updates
         /// </summary>
-        public void UnregisterPlant(SpeedTreePlantInstance plant)
+        public void UnregisterPlant(GameObject plant)
         {
             if (plant == null) return;
             
@@ -163,7 +161,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Re-evaluate and queue a plant based on current priority
         /// </summary>
-        public void RequeuePlant(SpeedTreePlantInstance plant)
+        public void RequeuePlant(GameObject plant)
         {
             if (plant == null || !_registeredPlants.Contains(plant)) return;
             
@@ -174,7 +172,7 @@ namespace ProjectChimera.Core.Optimization
         
         #region Priority Management
         
-        private void QueuePlantByPriority(SpeedTreePlantInstance plant)
+        private void QueuePlantByPriority(GameObject plant)
         {
             if (!_enablePriorityQueuing)
             {
@@ -201,12 +199,12 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private UpdatePriority CalculatePlantPriority(SpeedTreePlantInstance plant)
+        private UpdatePriority CalculatePlantPriority(GameObject plant)
         {
-            // Critical: Plants with very low health
-            if (plant.Health < _criticalHealthThreshold)
+            // Critical: Plants that are inactive or null
+            if (plant == null || !plant.activeInHierarchy)
             {
-                return UpdatePriority.Critical;
+                return UpdatePriority.Low;
             }
             
             // High: Visible plants close to camera
@@ -229,7 +227,7 @@ namespace ProjectChimera.Core.Optimization
             return UpdatePriority.Normal;
         }
         
-        private void RemoveFromAllQueues(SpeedTreePlantInstance plant)
+        private void RemoveFromAllQueues(GameObject plant)
         {
             // This is inefficient but necessary - in a production system,
             // we'd use a more sophisticated data structure
@@ -239,9 +237,9 @@ namespace ProjectChimera.Core.Optimization
             RemoveFromQueue(_lowPriorityQueue, plant);
         }
         
-        private void RemoveFromQueue(Queue<SpeedTreePlantInstance> queue, SpeedTreePlantInstance plant)
+        private void RemoveFromQueue(Queue<GameObject> queue, GameObject plant)
         {
-            var tempList = new List<SpeedTreePlantInstance>();
+            var tempList = new List<GameObject>();
             
             while (queue.Count > 0)
             {
@@ -309,7 +307,7 @@ namespace ProjectChimera.Core.Optimization
             ProcessQueueWithBudget(_lowPriorityQueue, plantsToProcess, frameStartTime, ref remainingBudget);
         }
         
-        private int ProcessQueueWithBudget(Queue<SpeedTreePlantInstance> queue, int maxPlants, float frameStartTime, ref float remainingBudget)
+        private int ProcessQueueWithBudget(Queue<GameObject> queue, int maxPlants, float frameStartTime, ref float remainingBudget)
         {
             int processed = 0;
             
@@ -345,9 +343,9 @@ namespace ProjectChimera.Core.Optimization
             return maxPlants - processed;
         }
         
-        private void UpdatePlant(SpeedTreePlantInstance plant)
+        private void UpdatePlant(GameObject plant)
         {
-            // SpeedTreePlantInstance handles its own updates internally
+            // GameObject handles its own updates internally
             // We can trigger specific updates if needed using available methods
             
             try
@@ -356,10 +354,10 @@ namespace ProjectChimera.Core.Optimization
                 // through Unity's lifecycle methods and internal systems
                 // We just need to ensure the plant is active and processing
                 
-                if (plant.IsAlive && plant.gameObject.activeInHierarchy)
+                if (plant.activeInHierarchy && plant.gameObject.activeInHierarchy)
                 {
                     // Plant updates are managed internally
-                    // Could call UpdateEnvironmentalConditions if needed
+                    // Could call UpdateDictionary<string, float> if needed
                 }
             }
             catch (Exception ex)
@@ -420,7 +418,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private void UpdatePlantMetrics(SpeedTreePlantInstance plant, float updateDuration)
+        private void UpdatePlantMetrics(GameObject plant, float updateDuration)
         {
             if (_plantMetrics.TryGetValue(plant, out var metrics))
             {

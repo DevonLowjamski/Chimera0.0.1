@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Data.Genetics;
-using ProjectChimera.Systems.SpeedTree;
-using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -22,9 +19,9 @@ namespace ProjectChimera.Core.Optimization
         [SerializeField] private int _poolWarmupSize = 10;
 
         // Collection pools for plant update operations
-        private readonly Stack<List<SpeedTreePlantInstance>> _plantInstanceLists = new Stack<List<SpeedTreePlantInstance>>();
-        private readonly Stack<List<(CannabisGenotype, EnvironmentalConditions)>> _genotypeTuples = new Stack<List<(CannabisGenotype, EnvironmentalConditions)>>();
-        private readonly Stack<List<EnvironmentalConditions>> _environmentalConditionsLists = new Stack<List<EnvironmentalConditions>>();
+        private readonly Stack<List<GameObject>> _plantInstanceLists = new Stack<List<GameObject>>();
+        private readonly Stack<List<(Dictionary<string, object>, Dictionary<string, float>)>> _genotypeTuples = new Stack<List<(Dictionary<string, object>, Dictionary<string, float>)>>();
+        private readonly Stack<List<Dictionary<string, float>>> _environmentalConditionsLists = new Stack<List<Dictionary<string, float>>>();
         private readonly Stack<Dictionary<string, object>> _calculationCaches = new Stack<Dictionary<string, object>>();
         private readonly Stack<List<Vector3>> _positionLists = new Stack<List<Vector3>>();
 
@@ -71,9 +68,9 @@ namespace ProjectChimera.Core.Optimization
             // Pre-warm pools with commonly used collection sizes
             for (int i = 0; i < _poolWarmupSize; i++)
             {
-                _plantInstanceLists.Push(new List<SpeedTreePlantInstance>());
-                _genotypeTuples.Push(new List<(CannabisGenotype, EnvironmentalConditions)>());
-                _environmentalConditionsLists.Push(new List<EnvironmentalConditions>());
+                _plantInstanceLists.Push(new List<GameObject>());
+                _genotypeTuples.Push(new List<(Dictionary<string, object>, Dictionary<string, float>)>());
+                _environmentalConditionsLists.Push(new List<Dictionary<string, float>>());
                 _calculationCaches.Push(new Dictionary<string, object>());
                 _positionLists.Push(new List<Vector3>());
             }
@@ -84,7 +81,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get a pooled list for plant instances
         /// </summary>
-        public List<SpeedTreePlantInstance> GetPlantInstanceList()
+        public List<GameObject> GetPlantInstanceList()
         {
             _plantListGets++;
             
@@ -96,13 +93,13 @@ namespace ProjectChimera.Core.Optimization
             }
 
             // Create new list if pool is empty
-            return new List<SpeedTreePlantInstance>();
+            return new List<GameObject>();
         }
 
         /// <summary>
         /// Return a plant instance list to the pool
         /// </summary>
-        public void ReturnPlantInstanceList(List<SpeedTreePlantInstance> list)
+        public void ReturnPlantInstanceList(List<GameObject> list)
         {
             if (list == null) return;
 
@@ -120,7 +117,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get a pooled list for genotype/environment tuples
         /// </summary>
-        public List<(CannabisGenotype, EnvironmentalConditions)> GetGenotypeTupleList()
+        public List<(Dictionary<string, object>, Dictionary<string, float>)> GetGenotypeTupleList()
         {
             _genotypeListGets++;
             
@@ -131,13 +128,13 @@ namespace ProjectChimera.Core.Optimization
                 return list;
             }
 
-            return new List<(CannabisGenotype, EnvironmentalConditions)>();
+            return new List<(Dictionary<string, object>, Dictionary<string, float>)>();
         }
 
         /// <summary>
         /// Return a genotype tuple list to the pool
         /// </summary>
-        public void ReturnGenotypeTupleList(List<(CannabisGenotype, EnvironmentalConditions)> list)
+        public void ReturnGenotypeTupleList(List<(Dictionary<string, object>, Dictionary<string, float>)> list)
         {
             if (list == null) return;
 
@@ -153,7 +150,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get a pooled environmental conditions list
         /// </summary>
-        public List<EnvironmentalConditions> GetEnvironmentalConditionsList()
+        public List<Dictionary<string, float>> GetEnvironmentalConditionsList()
         {
             if (_environmentalConditionsLists.Count > 0)
             {
@@ -162,13 +159,13 @@ namespace ProjectChimera.Core.Optimization
                 return list;
             }
 
-            return new List<EnvironmentalConditions>();
+            return new List<Dictionary<string, float>>();
         }
 
         /// <summary>
         /// Return an environmental conditions list to the pool
         /// </summary>
-        public void ReturnEnvironmentalConditionsList(List<EnvironmentalConditions> list)
+        public void ReturnEnvironmentalConditionsList(List<Dictionary<string, float>> list)
         {
             if (list == null) return;
 
@@ -238,7 +235,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Optimized batch operation for plant updates using pooled collections
         /// </summary>
-        public void ExecuteOptimizedPlantBatch(IEnumerable<SpeedTreePlantInstance> plants, System.Action<List<SpeedTreePlantInstance>, Dictionary<string, object>> batchProcessor)
+        public void ExecuteOptimizedPlantBatch(IEnumerable<GameObject> plants, System.Action<List<GameObject>, Dictionary<string, object>> batchProcessor)
         {
             var plantList = GetPlantInstanceList();
             var calculationCache = GetCalculationCache();
@@ -265,8 +262,8 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Optimized genetic batch operation using pooled collections
         /// </summary>
-        public void ExecuteOptimizedGeneticBatch(IEnumerable<(CannabisGenotype, EnvironmentalConditions)> geneticData, 
-            System.Action<List<(CannabisGenotype, EnvironmentalConditions)>> batchProcessor)
+        public void ExecuteOptimizedGeneticBatch(IEnumerable<(Dictionary<string, object>, Dictionary<string, float>)> geneticData, 
+            System.Action<List<(Dictionary<string, object>, Dictionary<string, float>)>> batchProcessor)
         {
             var geneticList = GetGenotypeTupleList();
 

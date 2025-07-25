@@ -3,10 +3,7 @@
     "rootNamespace": "ProjectChimera.Core.Optimization",
     "references": [
         "ProjectChimera.Core",
-        "ProjectChimera.Data",
-        "ProjectChimera.Systems",
-        "ProjectChimera.Systems.SpeedTree",
-        "ProjectChimera.Systems.Cultivation"
+        "ProjectChimera.Data"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -255,7 +255,9 @@ namespace ProjectChimera.Testing
             for (int i = 0; i < count; i++)
             {
                 var plantGO = new GameObject($"TestPlant_{i}");
-                plantGO.AddComponent<ProjectChimera.Systems.SpeedTree.SpeedTreePlantInstance>();
+                // Add basic components that would be on a real plant
+                plantGO.AddComponent<MeshRenderer>();
+                plantGO.AddComponent<MeshFilter>();
                 plants[i] = plantGO;
             }
             

@@ -21,6 +21,7 @@ namespace ProjectChimera.Core
         [SerializeField] private DataManager _dataManager;
         [SerializeField] private EventManager _eventManager;
         [SerializeField] private SettingsManager _settingsManager;
+        
 
         [Header("Game State Events")]
         [SerializeField] private SimpleGameEventSO _onGameInitialized;
@@ -119,7 +120,7 @@ namespace ProjectChimera.Core
             yield return StartCoroutine(InitializeManager(_eventManager, "Event"));
             yield return StartCoroutine(InitializeManager(_dataManager, "Data"));
             yield return StartCoroutine(InitializeManager(_timeManager, "Time"));
-
+            
             // Register all managers
             RegisterManager(_settingsManager);
             RegisterManager(_eventManager);

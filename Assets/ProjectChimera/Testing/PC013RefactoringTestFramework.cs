@@ -7,7 +7,7 @@ using NUnit.Framework;
 using ProjectChimera.Core;
 using ProjectChimera.Core.DependencyInjection;
 using ProjectChimera.Core.Optimization;
-using ProjectChimera.Systems.SpeedTree;
+// using ProjectChimera.Systems.SpeedTree; // Removed due to circular dependencies
 
 namespace ProjectChimera.Testing
 {
@@ -343,7 +343,7 @@ namespace ProjectChimera.Testing
                 Assert.IsNotNull(processor, "PlantBatchProcessor component should be created");
                 
                 // Test batch processing with empty list (should not crash)
-                var emptyList = new List<SpeedTreePlantInstance>();
+                var emptyList = new List<GameObject>();
                 processor.ProcessPlantCollection(emptyList);
                 
                 results.BatchProcessorWorking = true;
@@ -560,12 +560,14 @@ namespace ProjectChimera.Testing
             {
                 
                 // Create test plant instances
-                var testPlants = new List<SpeedTreePlantInstance>();
+                var testPlants = new List<GameObject>();
                 for (int i = 0; i < _testPlantCount; i++)
                 {
                     var plantGO = new GameObject($"TestPlant_{i}");
-                    var plant = plantGO.AddComponent<SpeedTreePlantInstance>();
-                    testPlants.Add(plant);
+                    // Add basic components that would be on a real plant
+                    plantGO.AddComponent<MeshRenderer>();
+                    plantGO.AddComponent<MeshFilter>();
+                    testPlants.Add(plantGO);
                 }
                 
                 // Test batch processing performance

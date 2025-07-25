@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.SpeedTree;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -52,8 +51,8 @@ namespace ProjectChimera.Core.Optimization
         private Camera _mainCamera;
         
         // Plant management
-        private readonly Dictionary<SpeedTreePlantInstance, PlantLODData> _plantLODData = new Dictionary<SpeedTreePlantInstance, PlantLODData>();
-        private readonly Dictionary<LODLevel, List<SpeedTreePlantInstance>> _lodGroups = new Dictionary<LODLevel, List<SpeedTreePlantInstance>>();
+        private readonly Dictionary<GameObject, PlantLODData> _plantLODData = new Dictionary<GameObject, PlantLODData>();
+        private readonly Dictionary<LODLevel, List<GameObject>> _lodGroups = new Dictionary<LODLevel, List<GameObject>>();
         
         // Performance tracking
         private float _currentFrameRate = 60f;
@@ -163,7 +162,7 @@ namespace ProjectChimera.Core.Optimization
             // Initialize LOD group dictionaries
             foreach (LODLevel level in Enum.GetValues(typeof(LODLevel)))
             {
-                _lodGroups[level] = new List<SpeedTreePlantInstance>();
+                _lodGroups[level] = new List<GameObject>();
             }
         }
         
@@ -174,7 +173,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Register a plant for optimized updates
         /// </summary>
-        public void RegisterPlant(SpeedTreePlantInstance plant)
+        public void RegisterPlant(GameObject plant)
         {
             if (plant == null || _plantLODData.ContainsKey(plant)) return;
             
@@ -201,7 +200,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Unregister a plant from optimized updates
         /// </summary>
-        public void UnregisterPlant(SpeedTreePlantInstance plant)
+        public void UnregisterPlant(GameObject plant)
         {
             if (plant == null || !_plantLODData.ContainsKey(plant)) return;
             
@@ -251,7 +250,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private LODLevel CalculateLODLevel(SpeedTreePlantInstance plant, float distance, Plane[] frustumPlanes)
+        private LODLevel CalculateLODLevel(GameObject plant, float distance, Plane[] frustumPlanes)
         {
             // Frustum culling check
             if (_enableFrustumCulling)
@@ -286,7 +285,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private void UpdatePlantLODLevel(SpeedTreePlantInstance plant, PlantLODData lodData, LODLevel newLOD)
+        private void UpdatePlantLODLevel(GameObject plant, PlantLODData lodData, LODLevel newLOD)
         {
             // Remove from old LOD group
             _lodGroups[lodData.CurrentLOD].Remove(plant);
@@ -438,7 +437,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Optimize plant updates for the given collection
         /// </summary>
-        public void OptimizePlantUpdates(List<SpeedTreePlantInstance> plants)
+        public void OptimizePlantUpdates(List<GameObject> plants)
         {
             if (plants == null || plants.Count == 0)
             {
@@ -546,7 +545,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Update LOD data for all plants based on camera distance
         /// </summary>
-        private void UpdateLODData(List<SpeedTreePlantInstance> plants)
+        private void UpdateLODData(List<GameObject> plants)
         {
             if (_mainCamera == null) return;
             
@@ -597,7 +596,7 @@ namespace ProjectChimera.Core.Optimization
                 
                 if (!_lodGroups.ContainsKey(lodData.CurrentLOD))
                 {
-                    _lodGroups[lodData.CurrentLOD] = new List<SpeedTreePlantInstance>();
+                    _lodGroups[lodData.CurrentLOD] = new List<GameObject>();
                 }
                 
                 _lodGroups[lodData.CurrentLOD].Add(plant);
@@ -636,7 +635,7 @@ namespace ProjectChimera.Core.Optimization
     /// </summary>
     public class PlantLODData
     {
-        public SpeedTreePlantInstance Plant { get; set; }
+        public GameObject Plant { get; set; }
         public LODLevel CurrentLOD { get; set; }
         public int FramesSinceLastUpdate { get; set; }
         public float LastUpdateTime { get; set; }

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.SpeedTree;
-using ProjectChimera.Data.Environment;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -61,8 +59,8 @@ namespace ProjectChimera.Core.Optimization
         /// Execute an operation using pooled plant list and data dictionary
         /// </summary>
         public static void WithPooledPlantOperation(this PooledObjectManager manager,
-            IEnumerable<SpeedTreePlantInstance> plants,
-            Action<List<SpeedTreePlantInstance>, Dictionary<string, object>> operation)
+            IEnumerable<GameObject> plants,
+            Action<List<GameObject>, Dictionary<string, object>> operation)
         {
             if (manager == null) throw new ArgumentNullException(nameof(manager));
             
@@ -119,8 +117,8 @@ namespace ProjectChimera.Core.Optimization
         /// Execute an environmental conditions operation using pooled collections
         /// </summary>
         public static void WithPooledEnvironmentalOperation(this PooledObjectManager manager,
-            IEnumerable<EnvironmentalConditions> conditions,
-            Action<List<EnvironmentalConditions>, Dictionary<string, object>> operation)
+            IEnumerable<Dictionary<string, float>> conditions,
+            Action<List<Dictionary<string, float>>, Dictionary<string, object>> operation)
         {
             if (manager == null) throw new ArgumentNullException(nameof(manager));
             

@@ -130,7 +130,7 @@ namespace ProjectChimera.Testing.Units
             // Arrange
             var optimizer = new GameObject("TestPlantUpdateOptimizer").AddComponent<PlantUpdateOptimizer>();
             optimizer.Initialize();
-            var emptyList = new List<SpeedTreePlantInstance>();
+            var emptyList = new List<GameObject>();
             
             // Act & Assert - Should not throw
             Assert.DoesNotThrow(() => optimizer.OptimizePlantUpdates(emptyList));
@@ -203,7 +203,7 @@ namespace ProjectChimera.Testing.Units
             // Arrange
             var processor = new GameObject("TestPlantBatchProcessor").AddComponent<PlantBatchProcessor>();
             processor.Initialize();
-            var emptyCollection = new List<SpeedTreePlantInstance>();
+            var emptyCollection = new List<GameObject>();
             
             // Act & Assert - Should not throw
             Assert.DoesNotThrow(() => processor.ProcessPlantCollection(emptyCollection));

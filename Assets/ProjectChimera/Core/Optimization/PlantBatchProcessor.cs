@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.SpeedTree;
-using ProjectChimera.Data.Environment;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -91,7 +89,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Process a collection of plants in optimized batches
         /// </summary>
-        public void ProcessPlantCollection(IEnumerable<SpeedTreePlantInstance> plants, 
+        public void ProcessPlantCollection(IEnumerable<GameObject> plants, 
             PlantUpdateType updateType = PlantUpdateType.Full)
         {
             if (plants == null) return;
@@ -109,7 +107,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Process a specific batch of plants with performance tracking
         /// </summary>
-        public BatchProcessResult ProcessPlantBatch(List<SpeedTreePlantInstance> plantBatch, 
+        public BatchProcessResult ProcessPlantBatch(List<GameObject> plantBatch, 
             PlantUpdateType updateType = PlantUpdateType.Full)
         {
             if (plantBatch == null || plantBatch.Count == 0)
@@ -165,7 +163,7 @@ namespace ProjectChimera.Core.Optimization
         
         #region Memory-Optimized Processing
         
-        private void ProcessPlantsWithPooling(IEnumerable<SpeedTreePlantInstance> plants, PlantUpdateType updateType)
+        private void ProcessPlantsWithPooling(IEnumerable<GameObject> plants, PlantUpdateType updateType)
         {
             _poolManager.ExecuteBatchOperation(plants, (plantList, dataDict) =>
             {
@@ -179,13 +177,13 @@ namespace ProjectChimera.Core.Optimization
             });
         }
         
-        private List<List<SpeedTreePlantInstance>> CreateBatches(List<SpeedTreePlantInstance> plants, int batchSize)
+        private List<List<GameObject>> CreateBatches(List<GameObject> plants, int batchSize)
         {
-            var batches = new List<List<SpeedTreePlantInstance>>();
+            var batches = new List<List<GameObject>>();
             
             for (int i = 0; i < plants.Count; i += batchSize)
             {
-                var batch = _poolManager?.GetPlantList() ?? new List<SpeedTreePlantInstance>();
+                var batch = _poolManager?.GetPlantList() ?? new List<GameObject>();
                 
                 int endIndex = Mathf.Min(i + batchSize, plants.Count);
                 for (int j = i; j < endIndex; j++)
@@ -203,9 +201,9 @@ namespace ProjectChimera.Core.Optimization
         
         #region Standard Processing
         
-        private void ProcessPlantsStandard(IEnumerable<SpeedTreePlantInstance> plants, PlantUpdateType updateType)
+        private void ProcessPlantsStandard(IEnumerable<GameObject> plants, PlantUpdateType updateType)
         {
-            var plantList = new List<SpeedTreePlantInstance>(plants);
+            var plantList = new List<GameObject>(plants);
             var batches = CreateBatchesStandard(plantList, _optimalBatchSize);
             
             foreach (var batch in batches)
@@ -214,13 +212,13 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private List<List<SpeedTreePlantInstance>> CreateBatchesStandard(List<SpeedTreePlantInstance> plants, int batchSize)
+        private List<List<GameObject>> CreateBatchesStandard(List<GameObject> plants, int batchSize)
         {
-            var batches = new List<List<SpeedTreePlantInstance>>();
+            var batches = new List<List<GameObject>>();
             
             for (int i = 0; i < plants.Count; i += batchSize)
             {
-                var batch = new List<SpeedTreePlantInstance>();
+                var batch = new List<GameObject>();
                 
                 int endIndex = Mathf.Min(i + batchSize, plants.Count);
                 for (int j = i; j < endIndex; j++)
@@ -238,7 +236,7 @@ namespace ProjectChimera.Core.Optimization
         
         #region Specific Update Processors
         
-        private void ProcessGrowthBatch(List<SpeedTreePlantInstance> plants)
+        private void ProcessGrowthBatch(List<GameObject> plants)
         {
             if (!_enableGrowthUpdates) return;
             
@@ -254,7 +252,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private void ProcessEnvironmentalBatch(List<SpeedTreePlantInstance> plants)
+        private void ProcessEnvironmentalBatch(List<GameObject> plants)
         {
             if (!_enableEnvironmentalUpdates) return;
             
@@ -263,12 +261,12 @@ namespace ProjectChimera.Core.Optimization
                 if (plant != null && plant.gameObject.activeInHierarchy)
                 {
                     // Environmental processing handled internally
-                    // UpdateEnvironmentalConditions is available if needed
+                    // UpdateDictionary<string, float> is available if needed
                 }
             }
         }
         
-        private void ProcessVisualBatch(List<SpeedTreePlantInstance> plants)
+        private void ProcessVisualBatch(List<GameObject> plants)
         {
             if (!_enableVisualUpdates) return;
             
@@ -282,7 +280,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private void ProcessHealthBatch(List<SpeedTreePlantInstance> plants)
+        private void ProcessHealthBatch(List<GameObject> plants)
         {
             if (!_enableHealthUpdates) return;
             
@@ -296,7 +294,7 @@ namespace ProjectChimera.Core.Optimization
             }
         }
         
-        private void ProcessFullUpdateBatch(List<SpeedTreePlantInstance> plants)
+        private void ProcessFullUpdateBatch(List<GameObject> plants)
         {
             float deltaTime = Time.deltaTime;
             
@@ -304,7 +302,7 @@ namespace ProjectChimera.Core.Optimization
             {
                 if (plant != null && plant.gameObject.activeInHierarchy)
                 {
-                    // All updates are handled internally by SpeedTreePlantInstance
+                    // All updates are handled internally by GameObject
                     // The plant manages its own growth, environment, health, and visuals
                     // through Unity's Update lifecycle and internal methods
                 }
@@ -407,7 +405,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Process a collection of plants using batch optimization
         /// </summary>
-        public void ProcessPlantCollection(List<SpeedTreePlantInstance> plants)
+        public void ProcessPlantCollection(List<GameObject> plants)
         {
             if (plants == null || plants.Count == 0)
             {
@@ -433,7 +431,7 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Process a single batch of plants with specified update type
         /// </summary>
-        private void ProcessBatch(List<SpeedTreePlantInstance> batch, PlantUpdateType updateType)
+        private void ProcessBatch(List<GameObject> batch, PlantUpdateType updateType)
         {
             if (batch == null || batch.Count == 0) return;
             

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.SpeedTree;
-using ProjectChimera.Data.Environment;
 
 namespace ProjectChimera.Core.Optimization
 {
@@ -37,9 +35,9 @@ namespace ProjectChimera.Core.Optimization
         private readonly Dictionary<string, object> _unityPools = new Dictionary<string, object>();
         
         // Specialized pools for common types
-        private GenericObjectPool<List<SpeedTreePlantInstance>> _plantListPool;
+        private GenericObjectPool<List<GameObject>> _plantListPool;
         private GenericObjectPool<Dictionary<string, object>> _dataDictionaryPool;
-        private GenericObjectPool<List<EnvironmentalConditions>> _environmentalConditionsPool;
+        private GenericObjectPool<List<Dictionary<string, float>>> _environmentalConditionsPool;
         private GenericObjectPool<List<Vector3>> _vector3ListPool;
         private GenericObjectPool<List<float>> _floatListPool;
         private GenericObjectPool<List<string>> _stringListPool;
@@ -126,7 +124,7 @@ namespace ProjectChimera.Core.Optimization
             if (!_enableSpecializedPooling) return;
             
             // Plant data pools
-            _plantListPool = new GenericObjectPool<List<SpeedTreePlantInstance>>(
+            _plantListPool = new GenericObjectPool<List<GameObject>>(
                 _largePoolSize,
                 list => list?.Clear(),
                 null
@@ -140,7 +138,7 @@ namespace ProjectChimera.Core.Optimization
             );
             
             // Environmental data pools
-            _environmentalConditionsPool = new GenericObjectPool<List<EnvironmentalConditions>>(
+            _environmentalConditionsPool = new GenericObjectPool<List<Dictionary<string, float>>>(
                 _defaultPoolSize,
                 list => list?.Clear(),
                 null
@@ -280,15 +278,15 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get a pooled plant instance list
         /// </summary>
-        public List<SpeedTreePlantInstance> GetPlantList()
+        public List<GameObject> GetPlantList()
         {
-            return _plantListPool?.Get() ?? new List<SpeedTreePlantInstance>();
+            return _plantListPool?.Get() ?? new List<GameObject>();
         }
         
         /// <summary>
         /// Return a plant instance list to the pool
         /// </summary>
-        public void ReturnPlantList(List<SpeedTreePlantInstance> list)
+        public void ReturnPlantList(List<GameObject> list)
         {
             _plantListPool?.Return(list);
         }
@@ -312,15 +310,15 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Get a pooled environmental conditions list
         /// </summary>
-        public List<EnvironmentalConditions> GetEnvironmentalConditionsList()
+        public List<Dictionary<string, float>> GetEnvironmentalConditionsList()
         {
-            return _environmentalConditionsPool?.Get() ?? new List<EnvironmentalConditions>();
+            return _environmentalConditionsPool?.Get() ?? new List<Dictionary<string, float>>();
         }
         
         /// <summary>
         /// Return an environmental conditions list to the pool
         /// </summary>
-        public void ReturnEnvironmentalConditionsList(List<EnvironmentalConditions> list)
+        public void ReturnEnvironmentalConditionsList(List<Dictionary<string, float>> list)
         {
             _environmentalConditionsPool?.Return(list);
         }
@@ -380,8 +378,8 @@ namespace ProjectChimera.Core.Optimization
         /// <summary>
         /// Execute a batch operation using pooled plant list and data dictionary
         /// </summary>
-        public void ExecuteBatchOperation(IEnumerable<SpeedTreePlantInstance> plants, 
-            Action<List<SpeedTreePlantInstance>, Dictionary<string, object>> operation)
+        public void ExecuteBatchOperation(IEnumerable<GameObject> plants, 
+            Action<List<GameObject>, Dictionary<string, object>> operation)
         {
             var plantList = GetPlantList();
             var dataDict = GetDataDictionary();

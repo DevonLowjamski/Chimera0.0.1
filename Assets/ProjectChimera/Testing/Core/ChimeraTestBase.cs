@@ -54,6 +54,21 @@ namespace ProjectChimera.Testing.Core
             Debug.Log($"[TEST {result}] {testName}: {details}");
         }
         
+        protected void LogInfo(string message)
+        {
+            Debug.Log($"[TEST INFO] {message}");
+        }
+        
+        protected void LogWarning(string message)
+        {
+            Debug.LogWarning($"[TEST WARNING] {message}");
+        }
+        
+        protected void LogError(string message)
+        {
+            Debug.LogError($"[TEST ERROR] {message}");
+        }
+        
         protected IEnumerator WaitForCondition(System.Func<bool> condition, float timeoutSeconds = 5f)
         {
             float elapsed = 0f;
@@ -98,12 +113,15 @@ namespace ProjectChimera.Testing.Core
             return strain;
         }
         
-        protected virtual ProjectChimera.Systems.Cultivation.PlantInstance CreateTestPlantInstance()
+        protected virtual GameObject CreateTestPlantInstance()
         {
-            var plant = new ProjectChimera.Systems.Cultivation.PlantInstance();
+            var plantGO = new GameObject("TestPlant");
             var testStrain = CreateTestPlantStrain();
-            plant.InitializeFromStrain(testStrain);
-            return plant;
+            // Plant instances are now GameObjects with components
+            // Add basic components that would be on a real plant
+            plantGO.AddComponent<MeshRenderer>();
+            plantGO.AddComponent<MeshFilter>();
+            return plantGO;
         }
     }
 }

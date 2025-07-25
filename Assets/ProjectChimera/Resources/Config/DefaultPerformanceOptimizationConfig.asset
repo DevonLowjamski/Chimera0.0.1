@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 920d4fe7f85904acc97d2fb1c5991738, type: 3}
+  m_Name: DefaultPerformanceOptimizationConfig
+  TargetFrameRate: 60
+  MaxPlantCount: 1000
+  FrameTimeBudgetMS: 16.67
+  MinAcceptableFPS: 55
+  EnableDynamicLOD: 1
+  LODConfiguration:
+    LOD0Distance: 20
+    LOD1Distance: 40
+    LOD2Distance: 70
+    LOD3Distance: 100
+    EnableSmoothTransitions: 1
+    TransitionFadeTime: 0.5
+  EnableFrustumCulling: 1
+  EnableDistanceCulling: 1
+  EnableOcclusionCulling: 1
+  MaxVisibleDistance: 100
+  EnablePriorityUpdates: 1
+  MaxPlantsPerFrameUpdate: 50
+  PlantUpdateFrameBudget: 0.3
+  DistanceUpdateScaling:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -0.018
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 50
+      value: 0.5
+      inSlope: -0.018
+      outSlope: -0.008
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 100
+      value: 0.1
+      inSlope: -0.008
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  EnableGPUInstancing: 1
+  EnableDynamicBatching: 1
+  MaxBatchSize: 100
+  EnableObjectPooling: 1
+  EnableTextureStreaming: 1
+  MaxMemoryUsageMB: 1024
+  EnableGCManagement: 1
+  EnableDynamicQuality: 1
+  QualityLevels:
+  - Name: Ultra
+    LODDistanceMultiplier: 1
+    UpdateFrequencyMultiplier: 1
+    MaxVisiblePlants: 1000
+    EnableShadows: 1
+    EnableWind: 1
+    TextureQuality: 1
+  - Name: High
+    LODDistanceMultiplier: 0.8
+    UpdateFrequencyMultiplier: 0.8
+    MaxVisiblePlants: 800
+    EnableShadows: 1
+    EnableWind: 1
+    TextureQuality: 1
+  - Name: Medium
+    LODDistanceMultiplier: 0.6
+    UpdateFrequencyMultiplier: 0.6
+    MaxVisiblePlants: 600
+    EnableShadows: 1
+    EnableWind: 0
+    TextureQuality: 0.75
+  - Name: Low
+    LODDistanceMultiplier: 0.4
+    UpdateFrequencyMultiplier: 0.4
+    MaxVisiblePlants: 400
+    EnableShadows: 0
+    EnableWind: 0
+    TextureQuality: 0.5
+  EnableSpeedTreeWind: 1
+  EnableSpeedTreeShadows: 1
+  SpeedTreeLODTransitionSpeed: 1
+  EnablePerformanceMonitoring: 1
+  EnableDebugOverlays: 0
+  LogPerformanceWarnings: 1
+  MonitoringUpdateFrequency: 1
