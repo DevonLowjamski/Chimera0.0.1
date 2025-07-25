@@ -1,0 +1,227 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using System.Collections.Generic;
+
+/// <summary>
+/// Error Wave 28 Validation Test - Missing Properties and Methods Resolution
+/// 
+/// Tests that all CS1061 errors for missing properties and methods have been resolved.
+/// 
+/// Root Cause: Multiple classes were missing expected properties and methods:
+/// - CannabinoidProfile missing THCPercentage/CBDPercentage (wrong casing)
+/// - GeneticPerformanceMonitor missing RecordBatchUpdate/GetPerformanceData methods
+/// - TraitExpressionEngine missing CalculateExpressionBatch method
+/// - StressType enum missing Temperature/Light values
+/// - StressFactor missing Severity property
+/// 
+/// Solution: Verified that all required properties and methods are properly implemented
+/// and added compatibility properties where needed for consistent naming conventions.
+/// </summary>
+public class Wave28ValidationTest : MonoBehaviour
+{
+    [System.Serializable]
+    public class ValidationResults
+    {
+        public bool CannabinoidProfilePropertiesExist;
+        public bool GeneticPerformanceMonitorMethodsExist;
+        public bool TraitExpressionEngineMethodsExist;
+        public bool StressTypeEnumValuesExist;
+        public bool StressFactorPropertiesExist;
+        public bool EnvironmentalConditionsCompatible;
+        public bool AllValidationsPassed;
+    }
+
+    public ValidationResults Results = new ValidationResults();
+
+    [ContextMenu("Run Wave 28 Validation")]
+    public void RunValidation()
+    {
+        Debug.Log("=== Error Wave 28 Validation Test ===");
+        
+        ValidateCannabinoidProfileProperties();
+        ValidateGeneticPerformanceMonitorMethods();
+        ValidateTraitExpressionEngineMethods();
+        ValidateStressTypeEnumValues();
+        ValidateStressFactorProperties();
+        ValidateEnvironmentalConditionsCompatibility();
+        
+        Results.AllValidationsPassed = Results.CannabinoidProfilePropertiesExist &&
+                                      Results.GeneticPerformanceMonitorMethodsExist &&
+                                      Results.TraitExpressionEngineMethodsExist &&
+                                      Results.StressTypeEnumValuesExist &&
+                                      Results.StressFactorPropertiesExist &&
+                                      Results.EnvironmentalConditionsCompatible;
+        
+        if (Results.AllValidationsPassed)
+        {
+            Debug.Log("✅ All Error Wave 28 validations passed!");
+        }
+        else
+        {
+            Debug.LogError("❌ Some Error Wave 28 validations failed. Check individual results.");
+        }
+    }
+
+    private void ValidateCannabinoidProfileProperties()
+    {
+        try
+        {
+            var profile = new CannabinoidProfile();
+            
+            // Test THCPercentage property (compatibility property)
+            profile.THCPercentage = 20.0f;
+            float thcValue = profile.THCPercentage;
+            
+            // Test CBDPercentage property (compatibility property)
+            profile.CBDPercentage = 5.0f;
+            float cbdValue = profile.CBDPercentage;
+            
+            Results.CannabinoidProfilePropertiesExist = true;
+            Debug.Log("✅ CannabinoidProfile THCPercentage and CBDPercentage properties exist and work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.CannabinoidProfilePropertiesExist = false;
+            Debug.LogError($"❌ CannabinoidProfile properties validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateGeneticPerformanceMonitorMethods()
+    {
+        try
+        {
+            var monitor = new GeneticPerformanceMonitor();
+            
+            // Test RecordBatchUpdate method
+            var stats = new GeneticPerformanceStats
+            {
+                TotalCalculations = 100,
+                AverageCalculationTimeMs = 5.0,
+                CacheHitRatio = 0.8,
+                BatchCalculations = 10,
+                AverageBatchTimeMs = 15.0
+            };
+            monitor.RecordBatchUpdate(25, stats);
+            
+            // Test GetPerformanceData method
+            var performanceData = monitor.GetPerformanceData();
+            
+            Results.GeneticPerformanceMonitorMethodsExist = true;
+            Debug.Log("✅ GeneticPerformanceMonitor RecordBatchUpdate and GetPerformanceData methods exist and work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.GeneticPerformanceMonitorMethodsExist = false;
+            Debug.LogError($"❌ GeneticPerformanceMonitor methods validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateTraitExpressionEngineMethods()
+    {
+        try
+        {
+            var engine = new TraitExpressionEngine();
+            
+            // Test CalculateExpressionBatch method exists
+            var batchData = new List<(PlantGenotype, EnvironmentalConditions)>();
+            
+            // Create test data
+            var genotype = new PlantGenotype();
+            var environment = new EnvironmentalConditions();
+            batchData.Add((genotype, environment));
+            
+            // This should not throw a method not found exception
+            var results = engine.CalculateExpressionBatch(batchData);
+            
+            Results.TraitExpressionEngineMethodsExist = true;
+            Debug.Log("✅ TraitExpressionEngine CalculateExpressionBatch method exists and works correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.TraitExpressionEngineMethodsExist = false;
+            Debug.LogError($"❌ TraitExpressionEngine methods validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateStressTypeEnumValues()
+    {
+        try
+        {
+            // Test that StressType enum has required values
+            var temperatureStress = StressType.Temperature;
+            var lightStress = StressType.Light;
+            var waterStress = StressType.Water;
+            var nutrientStress = StressType.Nutrient;
+            var atmosphericStress = StressType.Atmospheric;
+            
+            Results.StressTypeEnumValuesExist = true;
+            Debug.Log("✅ StressType enum has all required values (Temperature, Light, Water, Nutrient, Atmospheric)");
+        }
+        catch (System.Exception ex)
+        {
+            Results.StressTypeEnumValuesExist = false;
+            Debug.LogError($"❌ StressType enum validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateStressFactorProperties()
+    {
+        try
+        {
+            var stressFactor = new StressFactor();
+            
+            // Test Severity property
+            stressFactor.Severity = 0.75f;
+            float severityValue = stressFactor.Severity;
+            
+            // Test StressType property
+            stressFactor.StressType = StressType.Temperature;
+            var stressType = stressFactor.StressType;
+            
+            Results.StressFactorPropertiesExist = true;
+            Debug.Log("✅ StressFactor Severity and StressType properties exist and work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.StressFactorPropertiesExist = false;
+            Debug.LogError($"❌ StressFactor properties validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateEnvironmentalConditionsCompatibility()
+    {
+        try
+        {
+            var conditions = new EnvironmentalConditions();
+            
+            // Test NutrientLevel property (added in Wave 26)
+            conditions.NutrientLevel = 0.8f;
+            float nutrientLevel = conditions.NutrientLevel;
+            
+            // Test other key properties
+            conditions.Temperature = 25.0f;
+            conditions.Humidity = 60.0f;
+            conditions.LightIntensity = 800.0f;
+            conditions.CO2Level = 1200.0f;
+            
+            Results.EnvironmentalConditionsCompatible = true;
+            Debug.Log("✅ EnvironmentalConditions has all required properties including NutrientLevel");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentalConditionsCompatible = false;
+            Debug.LogError($"❌ EnvironmentalConditions compatibility validation failed: {ex.Message}");
+        }
+    }
+
+    void Start()
+    {
+        // Auto-run validation on start in development builds
+        #if UNITY_EDITOR
+        Invoke(nameof(RunValidation), 1f);
+        #endif
+    }
+} 

@@ -1,0 +1,285 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ProjectChimera.Data.UI
+{
+    // Competitive/Leaderboard types
+    public enum LeaderboardType
+    {
+        Overall,
+        Weekly,
+        Monthly,
+        Seasonal,
+        Yield,
+        Quality,
+        Efficiency,
+        Innovation
+    }
+
+    [System.Serializable]
+    public class LeaderboardDisplayData
+    {
+        public int Rank;
+        public string PlayerName;
+        public float Score;
+        public string Achievement;
+        public DateTime LastUpdate;
+    }
+
+    [System.Serializable]
+    public class CompetitionEvent
+    {
+        public string Id;
+        public string Name;
+        public string Description;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public CompetitionStatus Status;
+        public List<string> Participants;
+        public Dictionary<string, float> Rewards;
+    }
+
+    public enum CompetitionStatus
+    {
+        Upcoming,
+        Active,
+        Completed,
+        Cancelled
+    }
+
+    [System.Serializable]
+    public class CompetitiveStatsSummary
+    {
+        public int CurrentRank;
+        public float TotalScore;
+        public int CompetitionsWon;
+        public int CompetitionsParticipated;
+        public float WinRate;
+        public List<PersonalRecord> Records;
+    }
+
+    [System.Serializable]
+    public class PersonalRecord
+    {
+        public RecordType Type;
+        public float Value;
+        public DateTime AchievedDate;
+        public string Description;
+    }
+
+    public enum RecordType
+    {
+        HighestYield,
+        BestQuality,
+        FastestGrowth,
+        MostEfficient,
+        LongestStreak,
+        HighestProfit
+    }
+
+    // UI Status for notifications - using UIStatus from ProjectChimera.UI.Components
+
+    // Progress bar component
+    [System.Serializable]
+
+    // Random Events types
+    public class RandomEventData
+    {
+        public string Id;
+        public string Title;
+        public string Description;
+        public RandomEventType Type;
+        public RandomEventSeverity Severity;
+        public DateTime OccurredAt;
+        public bool IsResolved;
+        public List<RandomEventChoice> Choices;
+    }
+
+    public enum RandomEventType
+    {
+        Environmental,
+        Economic,
+        Technical,
+        Social,
+        Regulatory,
+        Natural
+    }
+
+    public enum RandomEventSeverity
+    {
+        Minor,
+        Moderate,
+        Major,
+        Critical
+    }
+
+    [System.Serializable]
+    public class RandomEventChoice
+    {
+        public string Id;
+        public string Text;
+        public string Description;
+        public Dictionary<string, float> Consequences;
+        public float Cost;
+        public bool IsAvailable;
+    }
+
+    // Save/Load types
+    [System.Serializable]
+    public class SaveSlotData
+    {
+        public string SlotId;
+        public string SaveName;
+        public DateTime SaveTime;
+        public string PreviewImage;
+        public Dictionary<string, object> Metadata;
+        public long FileSize;
+        public bool IsValid;
+    }
+
+    // Plant breeding types
+    [System.Serializable]
+    public class PlantBreedingData
+    {
+        public string PlantId;
+        public string StrainName;
+        public List<string> ParentStrains;
+        public Dictionary<string, float> Traits;
+        public int Generation;
+        public float BreedingProgress;
+        public bool IsStable;
+    }
+
+    // Facility management types
+    [System.Serializable]
+    public class FacilityData
+    {
+        public string FacilityId;
+        public string Name;
+        public FacilityType Type;
+        public Vector3 Position;
+        public Vector3 Size;
+        public FacilityStatus Status;
+        public Dictionary<string, float> Resources;
+        public List<string> ConnectedSystems;
+    }
+
+    public enum FacilityType
+    {
+        GrowRoom,
+        ProcessingRoom,
+        StorageRoom,
+        Laboratory,
+        Office,
+        Utility
+    }
+
+    public enum FacilityStatus
+    {
+        Operational,
+        Maintenance,
+        Offline,
+        Construction,
+        Damaged
+    }
+
+    // Plant cultivation types
+    [System.Serializable]
+    public class PlantInstance
+    {
+        public string PlantId;
+        public string SpeciesName;
+        public string StrainName;
+        public int Age;
+        public float Health;
+        public float GrowthStage;
+        public Dictionary<string, float> Traits;
+        public Vector3 Position;
+        public bool IsHarvestable;
+    }
+
+    // Breeding result types
+    [System.Serializable]
+    public class BreedingResult
+    {
+        public string ResultId;
+        public string NewStrainName;
+        public PlantInstance ResultPlant;
+        public Dictionary<string, float> InheritedTraits;
+        public float SuccessRate;
+        public bool IsStable;
+        public List<string> Notes;
+    }
+
+    // Objectives and challenges types
+    [System.Serializable]
+    public class ObjectiveProgressData
+    {
+        public string ObjectiveId;
+        public string Title;
+        public string Description;
+        public float Progress;
+        public float Target;
+        public ObjectiveDifficulty Difficulty;
+        public DateTime StartTime;
+        public DateTime? CompletionTime;
+        public Dictionary<string, object> Rewards;
+    }
+
+    [System.Serializable]
+    public class ChallengeProgressData
+    {
+        public string ChallengeId;
+        public string Title;
+        public string Description;
+        public float Progress;
+        public float Target;
+        public ObjectiveDifficulty Difficulty;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public bool IsCompleted;
+        public Dictionary<string, object> Rewards;
+    }
+
+    public enum ObjectiveDifficulty
+    {
+        Easy,
+        Medium,
+        Hard,
+        Expert,
+        Legendary
+    }
+
+    [System.Serializable]
+    public class ActiveObjective
+    {
+        public string Id;
+        public string Title;
+        public string Description;
+        public ObjectiveDifficulty Difficulty;
+        public float Progress;
+        public float Target;
+        public bool IsCompleted;
+        public DateTime StartTime;
+        public Dictionary<string, object> Requirements;
+        public Dictionary<string, object> Rewards;
+    }
+
+    [System.Serializable]
+    public class ActiveChallenge
+    {
+        public string Id;
+        public string Title;
+        public string Description;
+        public ObjectiveDifficulty Difficulty;
+        public float Progress;
+        public float Target;
+        public bool IsCompleted;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public bool IsTimeExpired;
+        public Dictionary<string, object> Requirements;
+        public Dictionary<string, object> Rewards;
+    }
+}

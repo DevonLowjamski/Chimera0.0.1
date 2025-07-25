@@ -1,0 +1,34 @@
+using UnityEngine;
+using System;
+using ProjectChimera.Core;
+using ProjectChimera.Data;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Scientific Reputation Manager - Specialized reputation management for scientific gaming systems
+    /// </summary>
+    public class ScientificReputationManager : MonoBehaviour
+    {
+        private bool _isInitialized = false;
+        private ReputationConfigSO _config;
+        
+        public event Action<float> OnReputationChanged;
+        
+        public void Initialize(ReputationConfigSO config)
+        {
+            if (_isInitialized) return;
+            
+            _config = config;
+            _isInitialized = true;
+            
+            Debug.Log("ScientificReputationManager initialized");
+        }
+        
+        public void Update()
+        {
+            if (!_isInitialized) return;
+            // Update logic here
+        }
+    }
+}

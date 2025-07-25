@@ -1,0 +1,265 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult; // Use same alias as cultivation files
+using StressResponse = ProjectChimera.Systems.Genetics.StressResponse; // Use same alias as cultivation files
+using StressFactor = ProjectChimera.Systems.Genetics.StressFactor; // Use same alias as cultivation files
+
+/// <summary>
+/// Error Wave 30 Validation Test - Ambiguous Reference Resolution for Multiple Types
+/// 
+/// Tests that the CS0104 ambiguous reference errors for TraitExpressionResult, StressResponse, 
+/// and StressFactor have been resolved in PlantUpdateProcessor.cs and PlantManager.cs.
+/// 
+/// Root Cause: Multiple class definitions existed in different namespaces:
+/// - ProjectChimera.Data.Genetics.TraitExpressionResult vs ProjectChimera.Systems.Genetics.TraitExpressionResult
+/// - ProjectChimera.Data.Genetics.StressResponse vs ProjectChimera.Systems.Genetics.StressResponse
+/// - ProjectChimera.Data.Genetics.StressFactor vs ProjectChimera.Systems.Genetics.StressFactor
+/// 
+/// Solution: Added using aliases to explicitly specify which versions to use in cultivation files.
+/// PlantUpdateProcessor and PlantManager now use Systems.Genetics versions for operational compatibility.
+/// 
+/// Tests verify:
+/// - TraitExpressionResult can be created and used without ambiguity
+/// - StressResponse can be created and used without ambiguity
+/// - StressFactor can be created and used without ambiguity
+/// - PlantUpdateProcessor genetic calculations work correctly
+/// - PlantManager genetic performance tracking works correctly
+/// </summary>
+public class Wave30ValidationTest : MonoBehaviour
+{
+    [System.Serializable]
+    public class ValidationResults
+    {
+        public bool TraitExpressionResultResolved;
+        public bool StressResponseResolved;
+        public bool StressFactorResolved;
+        public bool PlantUpdateProcessorWorking;
+        public bool PlantManagerGeneticsWorking;
+        public bool AllTestsPassed;
+    }
+
+    public ValidationResults Results = new ValidationResults();
+
+    void Start()
+    {
+        Debug.Log("=== Error Wave 30 Validation Test - Ambiguous Reference Resolution ===");
+        
+        TestTraitExpressionResultResolution();
+        TestStressResponseResolution();
+        TestStressFactorResolution();
+        TestPlantUpdateProcessorIntegration();
+        TestPlantManagerGeneticsIntegration();
+        
+        Results.AllTestsPassed = 
+            Results.TraitExpressionResultResolved &&
+            Results.StressResponseResolved &&
+            Results.StressFactorResolved &&
+            Results.PlantUpdateProcessorWorking &&
+            Results.PlantManagerGeneticsWorking;
+
+        if (Results.AllTestsPassed)
+        {
+            Debug.Log("🎉 ERROR WAVE 30 VALIDATION PASSED! All ambiguous reference errors resolved.");
+        }
+        else
+        {
+            Debug.LogError("❌ Error Wave 30 validation failed. Some ambiguous references still exist.");
+        }
+    }
+
+    private void TestTraitExpressionResultResolution()
+    {
+        string testName = "TraitExpressionResult Resolution";
+        Debug.Log($"Testing {testName}...");
+
+        try
+        {
+            // Test that TraitExpressionResult can be created without ambiguity
+            var traitResult = new TraitExpressionResult();
+            
+            // Set some properties to verify it's the correct type
+            traitResult.HeightExpression = 1.5f;
+            traitResult.THCExpression = 0.25f;
+            traitResult.YieldExpression = 2.0f;
+            traitResult.OverallFitness = 0.85f;
+            
+            Debug.Log($"✓ TraitExpressionResult created successfully - Height: {traitResult.HeightExpression}, THC: {traitResult.THCExpression}, Yield: {traitResult.YieldExpression}, Fitness: {traitResult.OverallFitness}");
+            
+            Results.TraitExpressionResultResolved = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ TraitExpressionResult creation failed: {ex.Message}");
+            Results.TraitExpressionResultResolved = false;
+        }
+    }
+
+    private void TestStressResponseResolution()
+    {
+        string testName = "StressResponse Resolution";
+        Debug.Log($"Testing {testName}...");
+
+        try
+        {
+            // Test that StressResponse can be created without ambiguity
+            var stressResponse = new StressResponse();
+            
+            // Set some properties to verify it's the correct type
+            stressResponse.OverallStressLevel = 0.3f;
+            stressResponse.AdaptiveCapacity = 0.7f;
+            stressResponse.StressResistance = 0.8f;
+            
+            Debug.Log($"✓ StressResponse created successfully - Overall: {stressResponse.OverallStressLevel}, Adaptive: {stressResponse.AdaptiveCapacity}, Resistance: {stressResponse.StressResistance}");
+            
+            Results.StressResponseResolved = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ StressResponse creation failed: {ex.Message}");
+            Results.StressResponseResolved = false;
+        }
+    }
+
+    private void TestStressFactorResolution()
+    {
+        string testName = "StressFactor Resolution";
+        Debug.Log($"Testing {testName}...");
+
+        try
+        {
+            // Test that StressFactor can be created without ambiguity
+            var stressFactor = new StressFactor();
+            
+            // Set some properties to verify it's the correct type
+            stressFactor.StressType = StressType.Temperature;
+            stressFactor.Severity = 0.6f;
+            
+            Debug.Log($"✓ StressFactor created successfully - Type: {stressFactor.StressType}, Severity: {stressFactor.Severity}");
+            
+            Results.StressFactorResolved = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ StressFactor creation failed: {ex.Message}");
+            Results.StressFactorResolved = false;
+        }
+    }
+
+    private void TestPlantUpdateProcessorIntegration()
+    {
+        string testName = "PlantUpdateProcessor Integration";
+        Debug.Log($"Testing {testName}...");
+
+        try
+        {
+            // Test that PlantUpdateProcessor can be created and uses correct types
+            var processor = new PlantUpdateProcessor(true, true, true);
+            
+            // Test cache statistics (this should work if types are resolved correctly)
+            var cacheStats = processor.GetCacheStatistics();
+            Debug.Log($"✓ PlantUpdateProcessor cache stats - Size: {cacheStats.cacheSize}, Last Update: {cacheStats.lastUpdate}");
+            
+            // Test performance metrics (this should work if types are resolved correctly)
+            var perfStats = processor.GetPerformanceMetrics();
+            Debug.Log($"✓ PlantUpdateProcessor performance stats - Cache Size: {perfStats.CurrentCacheSize}, Calculations: {perfStats.TotalCalculations}");
+            
+            Results.PlantUpdateProcessorWorking = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ PlantUpdateProcessor integration failed: {ex.Message}");
+            Results.PlantUpdateProcessorWorking = false;
+        }
+    }
+
+    private void TestPlantManagerGeneticsIntegration()
+    {
+        string testName = "PlantManager Genetics Integration";
+        Debug.Log($"Testing {testName}...");
+
+        try
+        {
+            // Find or create PlantManager instance
+            var plantManager = FindObjectOfType<PlantManager>();
+            if (plantManager == null)
+            {
+                var managerGO = new GameObject("TestPlantManager");
+                plantManager = managerGO.AddComponent<PlantManager>();
+            }
+            
+            // Test genetic performance stats (this should work if types are resolved correctly)
+            var geneticStats = plantManager.GetGeneticPerformanceStats();
+            Debug.Log($"✓ PlantManager genetic stats - Cache Size: {geneticStats.CurrentCacheSize}, Hit Rate: {geneticStats.CacheHitRate}");
+            
+            // Test enhanced statistics (this should work if types are resolved correctly)
+            var enhancedStats = plantManager.GetEnhancedStatistics();
+            Debug.Log($"✓ PlantManager enhanced stats - Advanced Genetics: {enhancedStats.AdvancedGeneticsEnabled}");
+            
+            Results.PlantManagerGeneticsWorking = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ PlantManager genetics integration failed: {ex.Message}");
+            Results.PlantManagerGeneticsWorking = false;
+        }
+    }
+
+    /// <summary>
+    /// Comprehensive test that creates instances of all three types together
+    /// to verify no namespace conflicts exist
+    /// </summary>
+    private void TestCombinedTypeUsage()
+    {
+        Debug.Log("Testing combined type usage...");
+
+        try
+        {
+            // Create all three types together to test for conflicts
+            var traitExpression = new TraitExpressionResult
+            {
+                HeightExpression = 1.2f,
+                THCExpression = 0.18f,
+                YieldExpression = 1.8f,
+                OverallFitness = 0.9f
+            };
+
+            var stressResponse = new StressResponse
+            {
+                OverallStressLevel = 0.2f,
+                AdaptiveCapacity = 0.8f,
+                StressResistance = 0.75f
+            };
+
+            var stressFactor = new StressFactor
+            {
+                StressType = StressType.Light,
+                Severity = 0.4f
+            };
+
+            // Assign stress response to trait expression (tests type compatibility)
+            traitExpression.StressResponse = stressResponse;
+
+            Debug.Log("✅ Combined type usage successful - all types work together without conflicts");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"❌ Combined type usage failed: {ex.Message}");
+        }
+    }
+
+    private TraitExpressionResult CreateMockTraitExpressionResult()
+    {
+        var result = new TraitExpressionResult();
+        result.HeightExpression = 1.4f;
+        result.THCExpression = 0.22f;
+        result.YieldExpression = 1.9f;
+        result.OverallFitness = 0.88f;
+        result.StressResponse = new StressResponse
+        {
+            OverallStressLevel = 0.15f,
+            AdaptiveCapacity = 0.85f
+        };
+        return result;
+    }
+} 

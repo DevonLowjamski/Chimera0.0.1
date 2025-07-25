@@ -1,0 +1,285 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <!-- 
+    Project Chimera - Data Visualization UXML Layout
+    Comprehensive analytics dashboard with charts, graphs, and real-time data insights
+    -->
+    
+    <ui:VisualElement name="data-visualization-root" class="visualization-root">
+        
+        <!-- Header Section with Controls -->
+        <ui:VisualElement name="visualization-header" class="visualization-header">
+            <ui:VisualElement name="header-left" class="header-left">
+                <ui:Label text="Data Analytics Dashboard" name="panel-title" class="panel-title" />
+                <ui:Label text="Real-time Monitoring &amp; Performance Insights" name="panel-subtitle" class="panel-subtitle" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="header-controls" class="header-controls">
+                <ui:VisualElement name="time-range-controls" class="time-controls">
+                    <ui:Label text="Time Range:" class="control-label" />
+                    <ui:DropdownField name="date-range-filter" class="time-range-dropdown" />
+                    <ui:Button text="Live" name="live-update-button" class="live-btn" />
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="export-controls" class="export-controls">
+                    <ui:Button text="Export Data" name="export-data-button" class="export-btn" />
+                    <ui:Button text="Share Dashboard" name="share-button" class="share-btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Navigation Tabs -->
+        <ui:VisualElement name="tab-navigation" class="tab-navigation">
+            <ui:Button text="Overview" name="overview-tab" class="nav-tab tab-active" />
+            <ui:Button text="Performance" name="performance-tab" class="nav-tab" />
+            <ui:Button text="Trends" name="trends-tab" class="nav-tab" />
+            <ui:Button text="Compare" name="compare-tab" class="nav-tab" />
+            <ui:Button text="Reports" name="reports-tab" class="nav-tab" />
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="visualization-main" class="visualization-main">
+            
+            <!-- Overview Panel -->
+            <ui:VisualElement name="overview-panel" class="tab-panel">
+                <ui:VisualElement name="overview-content" class="overview-content">
+                    
+                    <!-- KPI Cards Section -->
+                    <ui:VisualElement name="kpi-section" class="dashboard-section">
+                        <ui:Label text="Key Performance Indicators" class="section-title" />
+                        <ui:VisualElement name="kpi-container" class="kpi-container" />
+                    </ui:VisualElement>
+                    
+                    <!-- Quick Charts Grid -->
+                    <ui:VisualElement name="charts-grid-section" class="dashboard-section">
+                        <ui:Label text="Real-time Metrics" class="section-title" />
+                        <ui:VisualElement name="quick-charts-container" class="charts-grid" />
+                    </ui:VisualElement>
+                    
+                    <!-- Alerts and Summary -->
+                    <ui:VisualElement name="overview-bottom" class="overview-bottom">
+                        <ui:VisualElement name="alerts-section" class="side-section">
+                            <ui:Label text="Active Alerts" class="section-title" />
+                            <ui:ScrollView name="alerts-scroll" class="alerts-scroll">
+                                <ui:VisualElement name="alerts-container" class="alerts-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="summary-section" class="side-section">
+                            <ui:Label text="System Summary" class="section-title" />
+                            <ui:VisualElement name="summary-stats-container" class="summary-stats" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Performance Panel -->
+            <ui:VisualElement name="performance-panel" class="tab-panel hidden">
+                <ui:VisualElement name="performance-content" class="performance-content">
+                    
+                    <!-- Performance Controls -->
+                    <ui:VisualElement name="performance-controls" class="panel-controls">
+                        <ui:VisualElement name="controls-left" class="controls-section">
+                            <ui:Label text="Metric:" class="control-label" />
+                            <ui:DropdownField name="performance-metric-selector" class="metric-dropdown" />
+                            <ui:Label text="Timeframe:" class="control-label" />
+                            <ui:DropdownField name="performance-time-range" class="time-dropdown" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-right" class="controls-section">
+                            <ui:Button text="Benchmark" name="benchmark-button" class="benchmark-btn" />
+                            <ui:Button text="Optimize" name="optimize-button" class="optimize-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Performance Layout -->
+                    <ui:VisualElement name="performance-layout" class="performance-layout">
+                        <ui:VisualElement name="performance-charts-section" class="charts-section">
+                            <ui:Label text="Performance Charts" class="section-title" />
+                            <ui:VisualElement name="performance-charts-container" class="charts-container" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="metrics-sidebar" class="metrics-sidebar">
+                            <ui:VisualElement name="metrics-grid-section" class="sidebar-section">
+                                <ui:Label text="Metrics Grid" class="section-title" />
+                                <ui:VisualElement name="metrics-grid-container" class="metrics-grid" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement name="performance-alerts-section" class="sidebar-section">
+                                <ui:Label text="Performance Alerts" class="section-title" />
+                                <ui:VisualElement name="performance-alerts-container" class="alerts-container" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Trends Panel -->
+            <ui:VisualElement name="trends-panel" class="tab-panel hidden">
+                <ui:VisualElement name="trends-content" class="trends-content">
+                    
+                    <!-- Trends Controls -->
+                    <ui:VisualElement name="trends-controls" class="panel-controls">
+                        <ui:VisualElement name="controls-left" class="controls-section">
+                            <ui:Label text="Analysis Type:" class="control-label" />
+                            <ui:DropdownField name="trend-analysis-type" class="analysis-dropdown" />
+                            <ui:Label text="Forecast Range:" class="control-label" />
+                            <ui:Slider low-value="1" high-value="30" value="7" name="forecast-range-slider" class="forecast-slider" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-right" class="controls-section">
+                            <ui:Button text="Run Analysis" name="run-analysis-button" class="analysis-btn" />
+                            <ui:Button text="Save Trend" name="save-trend-button" class="save-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Trends Layout -->
+                    <ui:VisualElement name="trends-layout" class="trends-layout">
+                        <ui:VisualElement name="trend-charts-section" class="charts-section">
+                            <ui:Label text="Trend Analysis" class="section-title" />
+                            <ui:VisualElement name="trend-charts-container" class="charts-container" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="forecast-section" class="forecast-section">
+                            <ui:Label text="Forecast &amp; Predictions" class="section-title" />
+                            <ui:VisualElement name="forecast-container" class="forecast-container" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="correlation-section" class="correlation-section">
+                            <ui:Label text="Correlation Matrix" class="section-title" />
+                            <ui:VisualElement name="correlation-matrix" class="correlation-matrix" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Compare Panel -->
+            <ui:VisualElement name="compare-panel" class="tab-panel hidden">
+                <ui:VisualElement name="compare-content" class="compare-content">
+                    
+                    <!-- Compare Controls -->
+                    <ui:VisualElement name="compare-controls" class="panel-controls">
+                        <ui:VisualElement name="controls-left" class="controls-section">
+                            <ui:Label text="Metric A:" class="control-label" />
+                            <ui:DropdownField name="compare-metric-a" class="metric-dropdown" />
+                            <ui:Label text="Metric B:" class="control-label" />
+                            <ui:DropdownField name="compare-metric-b" class="metric-dropdown" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-center" class="controls-section">
+                            <ui:Label text="Timeframe:" class="control-label" />
+                            <ui:DropdownField name="comparison-timeframe" class="time-dropdown" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-right" class="controls-section">
+                            <ui:Button text="Compare" name="compare-button" class="compare-btn" />
+                            <ui:Button text="Reset" name="reset-comparison-button" class="reset-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Compare Layout -->
+                    <ui:VisualElement name="compare-layout" class="compare-layout">
+                        <ui:VisualElement name="comparison-charts-section" class="charts-section">
+                            <ui:Label text="Comparative Analysis" class="section-title" />
+                            <ui:VisualElement name="comparison-charts-container" class="charts-container" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="benchmark-section" class="benchmark-section">
+                            <ui:Label text="Benchmark Comparison" class="section-title" />
+                            <ui:VisualElement name="benchmark-container" class="benchmark-container" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Reports Panel -->
+            <ui:VisualElement name="reports-panel" class="tab-panel hidden">
+                <ui:VisualElement name="reports-content" class="reports-content">
+                    
+                    <!-- Reports Controls -->
+                    <ui:VisualElement name="reports-controls" class="panel-controls">
+                        <ui:VisualElement name="controls-left" class="controls-section">
+                            <ui:Label text="Report Type:" class="control-label" />
+                            <ui:DropdownField name="report-type-dropdown" class="report-dropdown" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="controls-right" class="controls-section">
+                            <ui:Button text="Generate Report" name="generate-report-button" class="generate-btn" />
+                            <ui:Button text="Schedule Report" name="schedule-report-button" class="schedule-btn" />
+                            <ui:Button text="Export Data" name="export-data-button" class="export-btn" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Reports Layout -->
+                    <ui:VisualElement name="reports-layout" class="reports-layout">
+                        <ui:VisualElement name="report-templates-section" class="templates-section">
+                            <ui:Label text="Report Templates" class="section-title" />
+                            <ui:ScrollView name="templates-scroll" class="templates-scroll">
+                                <ui:VisualElement name="report-templates-container" class="templates-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="custom-report-section" class="builder-section">
+                            <ui:Label text="Custom Report Builder" class="section-title" />
+                            <ui:VisualElement name="custom-report-builder" class="report-builder" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="scheduled-reports-section" class="scheduled-section">
+                            <ui:Label text="Scheduled Reports" class="section-title" />
+                            <ui:ScrollView name="scheduled-scroll" class="scheduled-scroll">
+                                <ui:VisualElement name="scheduled-reports-container" class="scheduled-container" />
+                            </ui:ScrollView>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Chart Controls Panel -->
+        <ui:VisualElement name="chart-controls-panel" class="chart-controls">
+            <ui:VisualElement name="chart-config" class="chart-config">
+                <ui:Label text="Chart Options:" class="control-label" />
+                <ui:DropdownField name="chart-type-selector" class="chart-type-dropdown" />
+                
+                <ui:VisualElement name="chart-toggles" class="chart-toggles">
+                    <ui:Toggle name="show-grid-toggle" class="chart-toggle" text="Grid" />
+                    <ui:Toggle name="show-legend-toggle" class="chart-toggle" text="Legend" />
+                    <ui:Toggle name="enable-animations-toggle" class="chart-toggle" text="Animations" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="zoom-controls" class="zoom-controls">
+                <ui:Label text="Zoom:" class="control-label" />
+                <ui:Slider low-value="0.5" high-value="3" value="1" name="zoom-level-slider" class="zoom-slider" />
+                <ui:Button text="Reset" name="reset-zoom-button" class="reset-zoom-btn" />
+                <ui:Button text="⛶" name="fullscreen-button" class="fullscreen-btn" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="filter-controls" class="filter-controls">
+                <ui:Label text="Filters:" class="control-label" />
+                <ui:DropdownField name="facility-zone-filter" class="filter-dropdown" />
+                <ui:DropdownField name="data-source-filter" class="filter-dropdown" />
+                <ui:TextField placeholder-text="Custom filter..." name="custom-filter-field" class="filter-field" />
+                <ui:Button text="Apply" name="apply-filters-button" class="apply-btn" />
+                <ui:Button text="Clear" name="clear-filters-button" class="clear-btn" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Status Bar -->
+        <ui:VisualElement name="status-bar" class="status-bar">
+            <ui:VisualElement name="status-left" class="status-section">
+                <ui:Label text="Last Updated: 2 seconds ago" name="last-update-label" class="status-text" />
+                <ui:Label text="Data Points: 15,247" name="data-points-label" class="status-text" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="status-center" class="status-section">
+                <ui:Label text="Processing..." name="processing-label" class="status-text processing-indicator" />
+                <ui:ProgressBar value="0.75" name="processing-bar" class="processing-bar" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="status-right" class="status-section">
+                <ui:Label text="Network Quality: Excellent" name="network-status-label" class="status-text" />
+                <ui:Label text="99.8% Uptime" name="uptime-label" class="status-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

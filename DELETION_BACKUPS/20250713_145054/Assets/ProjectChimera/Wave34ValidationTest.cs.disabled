@@ -1,0 +1,152 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Environment;
+using System;
+
+/// <summary>
+/// Error Wave 34 Validation Test - Assembly Reference Resolution
+/// 
+/// Tests that the CS0234 errors for missing assembly references have been resolved 
+/// in PlantInstance.cs and PlantUpdateProcessor.cs.
+/// 
+/// Errors resolved:
+/// - CS0234: The type or namespace name 'Environment' does not exist in the namespace 'ProjectChimera.Systems'
+/// 
+/// Root cause:
+/// - PlantInstance.cs and PlantUpdateProcessor.cs were trying to reference ProjectChimera.Systems.Environment.EnvironmentalManager
+/// - But the ProjectChimera.Systems.Cultivation assembly did not have a reference to ProjectChimera.Systems.Environment assembly
+/// 
+/// Solution applied:
+/// - Added "ProjectChimera.Systems.Environment" to the references array in ProjectChimera.Systems.Cultivation.asmdef
+/// - This allows cultivation system files to properly reference the EnvironmentalManager class
+/// </summary>
+public class Wave34ValidationTest : MonoBehaviour
+{
+    [Header("Wave 34 Validation Results")]
+    public Wave34ValidationResults Results;
+    
+    [System.Serializable]
+    public class Wave34ValidationResults
+    {
+        [Header("Assembly Reference Tests")]
+        public bool EnvironmentAssemblyReferenceExists = false;
+        public bool EnvironmentalManagerTypeAccessible = false;
+        public bool NamespaceResolutionWorks = false;
+        
+        [Header("Type Resolution Tests")]
+        public bool CanCreateEnvironmentalManagerReference = false;
+        public bool CanUseEnvironmentalManagerMethods = false;
+        
+        [Header("Overall Results")]
+        public bool AllErrorsResolved = false;
+        public string ValidationSummary = "";
+    }
+    
+    void Start()
+    {
+        ValidateWave34Fixes();
+    }
+    
+    private void ValidateWave34Fixes()
+    {
+        Debug.Log("=== Error Wave 34 Validation Test ===");
+        
+        ValidateAssemblyReference();
+        ValidateEnvironmentalManagerAccess();
+        ValidateNamespaceResolution();
+        ValidateTypeResolution();
+        
+        // Overall validation
+        Results.AllErrorsResolved = Results.EnvironmentAssemblyReferenceExists &&
+                                   Results.EnvironmentalManagerTypeAccessible &&
+                                   Results.NamespaceResolutionWorks &&
+                                   Results.CanCreateEnvironmentalManagerReference &&
+                                   Results.CanUseEnvironmentalManagerMethods;
+        
+        Results.ValidationSummary = Results.AllErrorsResolved ? 
+            "✅ All Error Wave 34 assembly reference issues resolved successfully!" : 
+            "❌ Some Error Wave 34 assembly reference issues remain unresolved.";
+        
+        Debug.Log($"Wave 34 Validation Complete: {Results.ValidationSummary}");
+    }
+    
+    private void ValidateAssemblyReference()
+    {
+        try
+        {
+            // Test that we can access the ProjectChimera.Systems.Environment namespace
+            // This validates that the assembly reference was added correctly
+            var environmentManagerType = typeof(ProjectChimera.Systems.Environment.EnvironmentalManager);
+            Results.EnvironmentAssemblyReferenceExists = environmentManagerType != null;
+            
+            Debug.Log("✅ Environment assembly reference validated");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentAssemblyReferenceExists = false;
+            Debug.LogError($"❌ Environment assembly reference validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateEnvironmentalManagerAccess()
+    {
+        try
+        {
+            // Test CS0234: Access to EnvironmentalManager type
+            var managerType = typeof(EnvironmentalManager);
+            Results.EnvironmentalManagerTypeAccessible = managerType != null;
+            
+            Debug.Log("✅ EnvironmentalManager type is accessible from Cultivation assembly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentalManagerTypeAccessible = false;
+            Debug.LogError($"❌ EnvironmentalManager access validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateNamespaceResolution()
+    {
+        try
+        {
+            // Test that the namespace ProjectChimera.Systems.Environment resolves correctly
+            var namespaceTypes = System.Reflection.Assembly.GetAssembly(typeof(EnvironmentalManager))
+                .GetTypes()
+                .Where(t => t.Namespace == "ProjectChimera.Systems.Environment")
+                .ToArray();
+            
+            Results.NamespaceResolutionWorks = namespaceTypes.Length > 0;
+            Debug.Log($"✅ Namespace resolution works - Found {namespaceTypes.Length} types in ProjectChimera.Systems.Environment");
+        }
+        catch (System.Exception ex)
+        {
+            Results.NamespaceResolutionWorks = false;
+            Debug.LogError($"❌ Namespace resolution validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateTypeResolution()
+    {
+        try
+        {
+            // Test that we can create references to EnvironmentalManager
+            // This simulates what PlantInstance and PlantUpdateProcessor are doing
+            EnvironmentalManager manager = null; // Just testing type resolution, not instantiation
+            Results.CanCreateEnvironmentalManagerReference = true;
+            
+            // Test that we can access EnvironmentalManager methods (compile-time check)
+            // This validates that the using alias works correctly
+            var managerType = typeof(EnvironmentalManager);
+            var methods = managerType.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            Results.CanUseEnvironmentalManagerMethods = methods.Length > 0;
+            
+            Debug.Log($"✅ Type resolution works - EnvironmentalManager has {methods.Length} accessible methods");
+        }
+        catch (System.Exception ex)
+        {
+            Results.CanCreateEnvironmentalManagerReference = false;
+            Results.CanUseEnvironmentalManagerMethods = false;
+            Debug.LogError($"❌ Type resolution validation failed: {ex.Message}");
+        }
+    }
+} 

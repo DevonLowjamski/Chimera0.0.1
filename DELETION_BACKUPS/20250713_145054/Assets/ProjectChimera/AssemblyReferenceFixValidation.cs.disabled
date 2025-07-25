@@ -1,0 +1,100 @@
+using UnityEngine;
+using ProjectChimera.Events;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Assembly Reference Fix Validation Test
+    /// Tests that all Events namespace types work correctly without circular dependencies
+    /// </summary>
+    public class AssemblyReferenceFixValidation : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Assembly Reference Fix Validation ===");
+            
+            TestEventsNamespaceTypes();
+            TestPlantGrowthStageAccess();
+            TestPlantCareEventDataComplete();
+            
+            Debug.Log("✅ All assembly reference fixes validated successfully!");
+        }
+        
+        private void TestEventsNamespaceTypes()
+        {
+            Debug.Log("Testing Events namespace type definitions...");
+            
+            // Test InteractivePlant from Data.Cultivation namespace (no longer duplicated in Events)
+            var dataPlant = new ProjectChimera.Data.Cultivation.InteractivePlant
+            {
+                PlantInstanceID = 789,
+                PlantedTime = System.DateTime.Now
+            };
+            
+            // Test locally defined CareEffects in Events namespace
+            var eventsCareEffects = new ProjectChimera.Events.CareEffects
+            {
+                HydrationChange = 0.3f,
+                HealthImprovement = 0.2f,
+                StressReduction = 0.15f,
+                GrowthRateBoost = 0.1f
+            };
+            
+            Debug.Log($"✓ Events Types: Plant={dataPlant.PlantInstanceID}, CareEffects={eventsCareEffects.HealthImprovement}");
+        }
+        
+        private void TestPlantGrowthStageAccess()
+        {
+            Debug.Log("Testing PlantGrowthStage enum access...");
+            
+            // Test all growth stages are accessible
+            var stages = new PlantGrowthStage[]
+            {
+                PlantGrowthStage.Seed,
+                PlantGrowthStage.Germination,
+                PlantGrowthStage.Seedling,
+                PlantGrowthStage.Vegetative,
+                PlantGrowthStage.Flowering,
+                PlantGrowthStage.Mature,
+                PlantGrowthStage.Harvest,
+                PlantGrowthStage.Dormant
+            };
+            
+            Debug.Log($"✓ PlantGrowthStage: {stages.Length} stages accessible, including {stages[4]} and {stages[7]}");
+        }
+        
+        private void TestPlantCareEventDataComplete()
+        {
+            Debug.Log("Testing complete PlantCareEventData functionality...");
+            
+            // Test PlantCareEventData with all properties working
+            var careEventData = new ProjectChimera.Events.PlantCareEventData
+            {
+                PlantId = "plant-456",
+                CareAction = "Advanced Pruning",
+                EffectivenessScore = 0.92f,
+                Timestamp = Time.time,
+                // Extended properties for system integration
+                TaskType = CultivationTaskType.Pruning,
+                PlayerSkillLevel = 8.5f,
+                PlantId_Int = 456,
+                // Complex object properties using Data.Cultivation namespace types
+                PlantInstance = new ProjectChimera.Data.Cultivation.InteractivePlant
+                {
+                    PlantInstanceID = 456,
+                    PlantedTime = System.DateTime.Now
+                },
+                CareEffects = new ProjectChimera.Events.CareEffects
+                {
+                    HealthImprovement = 0.15f,
+                    GrowthRateBoost = 0.12f,
+                    StressReduction = 0.08f
+                }
+            };
+            
+            Debug.Log($"✓ PlantCareEventData: {careEventData.CareAction} on plant {careEventData.PlantInstance.PlantInstanceID}, skill={careEventData.PlayerSkillLevel}");
+        }
+    }
+}

@@ -1,0 +1,1028 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Advanced biological control manager for Project Chimera's Enhanced IPM Gaming System.
+    /// Manages beneficial organism deployment, ecosystem balance, predator-prey dynamics,
+    /// establishment success rates, and complex biological interactions. Features sophisticated
+    /// ecological modeling with food web dynamics, environmental dependencies, and sustainable
+    /// biological control strategies for long-term pest management success.
+    /// 
+    /// Key Features:
+    /// - Realistic predator-prey population dynamics
+    /// - Ecosystem balance monitoring and management
+    /// - Environmental dependency modeling for organism success
+    /// - Multi-species interaction and competition systems
+    /// - Establishment success prediction algorithms
+    /// - Seasonal activity and overwintering management
+    /// - Biological efficacy optimization
+    /// - Sustainable biocontrol strategy development
+    /// </summary>
+    public class IPMBiologicalManager : IPMEntityManagerBase<BeneficialOrganismData, BeneficialOrganismType>, IIPMBiologicalManager
+    {
+        [Header("Biological Control Configuration")]
+        [SerializeField] private float _ecosystemUpdateInterval = 10f;
+        [SerializeField] private float _populationUpdateInterval = 5f;
+        [SerializeField] private bool _enableEcosystemBalance = true;
+        [SerializeField] private bool _enableEnvironmentalDependency = true;
+        [SerializeField] private bool _enableMultiSpeciesInteractions = true;
+        
+        [Header("Population Dynamics")]
+        [SerializeField] private float _baseEstablishmentRate = 0.7f;
+        [SerializeField] private float _baseReproductionRate = 0.15f;
+        [SerializeField] private float _baseMortalityRate = 0.1f;
+        [SerializeField] private int _maxOrganismsPerSpecies = 2000;
+        [SerializeField] private float _predationEfficiencyFactor = 0.8f;
+        
+        [Header("Ecosystem Balance")]
+        [SerializeField] private float _optimalEcosystemBalance = 0.75f;
+        [SerializeField] private float _ecosystemImbalanceThreshold = 0.3f;
+        [SerializeField] private bool _enableAutomaticRebalancing = true;
+        [SerializeField] private float _balanceRecoveryRate = 0.05f;
+        
+        [Header("Environmental Dependencies")]
+        [SerializeField] private bool _enableTemperatureDependency = true;
+        [SerializeField] private bool _enableHumidityDependency = true;
+        [SerializeField] private bool _enableHostPlantDependency = true;
+        [SerializeField] private float _environmentalStressTolerance = 0.6f;
+        
+        // Biological Control Systems
+        private EcosystemBalanceCalculator _ecosystemCalculator;
+        private PredatorPreyDynamics _predatorPreySystem;
+        private EstablishmentPredictor _establishmentPredictor;
+        private EnvironmentalDependencyProcessor _environmentalProcessor;
+        private MultiSpeciesInteractionManager _interactionManager;
+        
+        // Population State Management
+        private Dictionary<string, OrganismPopulationState> _populationStates = new Dictionary<string, OrganismPopulationState>();
+        private Dictionary<BeneficialOrganismType, SpeciesProfile> _speciesProfiles = new Dictionary<BeneficialOrganismType, SpeciesProfile>();
+        private Dictionary<string, EcosystemNiche> _ecosystemNiches = new Dictionary<string, EcosystemNiche>();
+        
+        // Ecosystem Monitoring
+        private EcosystemMetrics _ecosystemMetrics = new EcosystemMetrics();
+        private Dictionary<string, FoodWebConnection> _foodWebConnections = new Dictionary<string, FoodWebConnection>();
+        private List<EcosystemAlert> _ecosystemAlerts = new List<EcosystemAlert>();
+        
+        // Performance Optimization
+        private float _lastEcosystemUpdate;
+        private float _lastPopulationUpdate;
+        private OrganismUpdateScheduler _updateScheduler;
+        
+        // Events
+        public event Action<BeneficialOrganismData> OnOrganismDeployed;
+        public event Action<BeneficialOrganismData> OnOrganismEstablished;
+        public event Action<BeneficialOrganismType, int> OnPopulationChanged;
+        public event Action<float> OnEcosystemBalanceChanged;
+        public event Action<EcosystemAlert> OnEcosystemAlert;
+        
+        #region Initialization
+        
+        protected override void InitializeEntityManagerSpecific()
+        {
+            InitializeSpeciesProfiles();
+            InitializeBiologicalSystems();
+            InitializeEcosystemModeling();
+            InitializeEnvironmentalDependencies();
+            InitializePerformanceOptimization();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[IPMBiologicalManager] Biological control system initialized with ecosystem modeling");
+            }
+        }
+        
+        private void InitializeSpeciesProfiles()
+        {
+            foreach (BeneficialOrganismType organismType in Enum.GetValues(typeof(BeneficialOrganismType)))
+            {
+                _speciesProfiles[organismType] = CreateSpeciesProfile(organismType);
+            }
+        }
+        
+        private void InitializeBiologicalSystems()
+        {
+            _ecosystemCalculator = new EcosystemBalanceCalculator(_optimalEcosystemBalance, _ecosystemImbalanceThreshold);
+            _predatorPreySystem = new PredatorPreyDynamics(_predationEfficiencyFactor);
+            _establishmentPredictor = new EstablishmentPredictor(_baseEstablishmentRate);
+            _interactionManager = new MultiSpeciesInteractionManager(_enableMultiSpeciesInteractions);
+        }
+        
+        private void InitializeEcosystemModeling()
+        {
+            if (_enableEcosystemBalance)
+            {
+                InitializeFoodWebConnections();
+                InitializeEcosystemNiches();
+            }
+        }
+        
+        private void InitializeEnvironmentalDependencies()
+        {
+            if (_enableEnvironmentalDependency)
+            {
+                _environmentalProcessor = new EnvironmentalDependencyProcessor(
+                    _enableTemperatureDependency,
+                    _enableHumidityDependency,
+                    _enableHostPlantDependency,
+                    _environmentalStressTolerance
+                );
+            }
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            _updateScheduler = new OrganismUpdateScheduler(_maxEntitiesPerUpdate);
+        }
+        
+        private void InitializeFoodWebConnections()
+        {
+            // Initialize predator-prey relationships
+            var connections = new List<(BeneficialOrganismType predator, PestType prey, float efficiency)>
+            {
+                (BeneficialOrganismType.Ladybugs, PestType.Aphids, 0.9f),
+                (BeneficialOrganismType.LacewingLarvae, PestType.Aphids, 0.8f),
+                (BeneficialOrganismType.PredatoryMites, PestType.SpiderMites, 0.85f),
+                (BeneficialOrganismType.Parasitoids, PestType.Whiteflies, 0.75f),
+                (BeneficialOrganismType.PredatoryBeetles, PestType.Thrips, 0.7f)
+            };
+            
+            foreach (var (predator, prey, efficiency) in connections)
+            {
+                var connectionId = $"{predator}_{prey}";
+                _foodWebConnections[connectionId] = new FoodWebConnection
+                {
+                    PredatorType = predator,
+                    PreyType = prey,
+                    PredationEfficiency = efficiency,
+                    ConnectionStrength = efficiency,
+                    IsActive = true
+                };
+            }
+        }
+        
+        private void InitializeEcosystemNiches()
+        {
+            foreach (BeneficialOrganismType organismType in Enum.GetValues(typeof(BeneficialOrganismType)))
+            {
+                _ecosystemNiches[organismType.ToString()] = new EcosystemNiche
+                {
+                    OrganismType = organismType,
+                    NicheSize = CalculateNicheSize(organismType),
+                    CompetitiveStrength = CalculateCompetitiveStrength(organismType),
+                    ResourceRequirements = GetResourceRequirements(organismType),
+                    EnvironmentalTolerances = GetEnvironmentalTolerances(organismType)
+                };
+            }
+        }
+        
+        #endregion
+        
+        #region IIPMBiologicalManager Implementation
+        
+        public void DeployOrganism(BeneficialOrganismData organismData)
+        {
+            var entityId = SpawnEntity(organismData, organismData.Type, organismData.ReleaseLocation);
+            
+            if (!string.IsNullOrEmpty(entityId))
+            {
+                // Initialize population state
+                _populationStates[entityId] = new OrganismPopulationState
+                {
+                    OrganismId = entityId,
+                    CurrentPopulation = organismData.PopulationSize,
+                    MaxPopulation = _maxOrganismsPerSpecies,
+                    ReproductionRate = _baseReproductionRate,
+                    MortalityRate = _baseMortalityRate,
+                    EstablishmentStatus = EstablishmentStatus.Establishing,
+                    LastUpdate = DateTime.Now,
+                    EnvironmentalStress = 0f,
+                    PredationPressure = 0f
+                };
+                
+                // Predict establishment success
+                var establishmentProbability = _establishmentPredictor.PredictEstablishment(organismData);
+                _populationStates[entityId].EstablishmentProbability = establishmentProbability;
+                
+                // Update ecosystem metrics
+                UpdateEcosystemMetricsFromDeployment(organismData);
+                
+                OnOrganismDeployed?.Invoke(organismData);
+                OnPopulationChanged?.Invoke(organismData.Type, organismData.PopulationSize);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMBiologicalManager] {organismData.Type} deployed: {organismData.PopulationSize} individuals (Est. Success: {establishmentProbability:P1})");
+                }
+            }
+        }
+        
+        public void UpdateOrganisms(float deltaTime)
+        {
+            if (Time.time - _lastPopulationUpdate >= _populationUpdateInterval)
+            {
+                UpdatePopulationDynamics(deltaTime);
+                _lastPopulationUpdate = Time.time;
+            }
+            
+            if (Time.time - _lastEcosystemUpdate >= _ecosystemUpdateInterval)
+            {
+                UpdateEcosystemBalance();
+                UpdateEnvironmentalDependencies();
+                ProcessMultiSpeciesInteractions();
+                _lastEcosystemUpdate = Time.time;
+            }
+        }
+        
+        public void RemoveOrganism(string organismId)
+        {
+            var organismData = GetEntity(organismId);
+            if (organismData != null)
+            {
+                // Update ecosystem before removal
+                UpdateEcosystemMetricsFromRemoval(organismData);
+                
+                // Cleanup state
+                _populationStates.Remove(organismId);
+                
+                OnPopulationChanged?.Invoke(organismData.Type, 0);
+                
+                // Destroy the entity
+                DestroyEntity(organismId);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMBiologicalManager] {organismData.Type} population removed: {organismId}");
+                }
+            }
+        }
+        
+        public List<BeneficialOrganismData> GetActiveOrganisms()
+        {
+            return _activeEntities.Values.ToList();
+        }
+        
+        public float CalculateEcosystemBalance()
+        {
+            if (!_enableEcosystemBalance)
+                return 0.75f; // Default balanced state
+            
+            return _ecosystemCalculator.CalculateBalance(_activeEntities.Values.ToList(), GetPestPopulations());
+        }
+        
+        public bool CanDeployOrganism(BeneficialOrganismType type)
+        {
+            // Check population limits
+            var currentPopulation = GetEntityCount(type);
+            if (currentPopulation >= _maxOrganismsPerSpecies)
+                return false;
+            
+            // Check ecosystem capacity
+            if (_enableEcosystemBalance && !HasEcosystemCapacity(type))
+                return false;
+            
+            // Check environmental suitability
+            if (_enableEnvironmentalDependency && !IsEnvironmentallySuitable(type))
+                return false;
+            
+            return true;
+        }
+        
+        #endregion
+        
+        #region Population Dynamics
+        
+        private void UpdatePopulationDynamics(float deltaTime)
+        {
+            var organismsToUpdate = _updateScheduler.GetOrganismsForUpdate(_populationStates.Keys.ToList());
+            
+            foreach (var organismId in organismsToUpdate)
+            {
+                if (_populationStates.TryGetValue(organismId, out var state))
+                {
+                    UpdateSinglePopulation(organismId, state, deltaTime);
+                }
+            }
+        }
+        
+        private void UpdateSinglePopulation(string organismId, OrganismPopulationState state, float deltaTime)
+        {
+            var organismData = GetEntity(organismId);
+            if (organismData == null) return;
+            
+            var timeSinceUpdate = DateTime.Now - state.LastUpdate;
+            if (timeSinceUpdate.TotalSeconds < _populationUpdateInterval) return;
+            
+            // Calculate population changes
+            var growthRate = CalculateGrowthRate(state, organismData);
+            var carryingCapacity = CalculateCarryingCapacity(state, organismData);
+            var predationImpact = CalculatePredationImpact(state, organismData);
+            var environmentalImpact = CalculateEnvironmentalImpact(state, organismData);
+            
+            // Apply logistic growth with predation and environmental factors
+            var newPopulation = CalculateLogisticGrowthWithFactors(
+                state.CurrentPopulation,
+                growthRate,
+                carryingCapacity,
+                predationImpact,
+                environmentalImpact,
+                (float)timeSinceUpdate.TotalSeconds
+            );
+            
+            // Update establishment status
+            UpdateEstablishmentStatus(state, organismData);
+            
+            // Apply population changes
+            var oldPopulation = state.CurrentPopulation;
+            state.CurrentPopulation = Mathf.RoundToInt(newPopulation);
+            state.LastUpdate = DateTime.Now;
+            
+            // Update organism data
+            organismData.PopulationSize = state.CurrentPopulation;
+            _populationStates[organismId] = state;
+            
+            // Fire events if significant change
+            if (Mathf.Abs(oldPopulation - state.CurrentPopulation) > 5)
+            {
+                OnPopulationChanged?.Invoke(organismData.Type, state.CurrentPopulation);
+            }
+            
+            // Check for population collapse
+            if (state.CurrentPopulation <= 0)
+            {
+                MarkOrganismForRemoval(organismId, "Population collapse");
+            }
+        }
+        
+        private float CalculateGrowthRate(OrganismPopulationState state, BeneficialOrganismData organism)
+        {
+            var baseRate = state.ReproductionRate;
+            var speciesProfile = _speciesProfiles.GetValueOrDefault(organism.Type);
+            
+            if (speciesProfile != null)
+            {
+                baseRate *= speciesProfile.ReproductionModifier;
+            }
+            
+            // Environmental factors
+            var environmentalFactor = _environmentalProcessor?.GetGrowthModifier(organism.Type) ?? 1f;
+            
+            // Food availability (based on prey populations)
+            var foodAvailability = CalculateFoodAvailability(organism);
+            
+            // Establishment bonus
+            var establishmentBonus = state.EstablishmentStatus == EstablishmentStatus.Established ? 1.2f : 1f;
+            
+            return baseRate * environmentalFactor * foodAvailability * establishmentBonus;
+        }
+        
+        private int CalculateCarryingCapacity(OrganismPopulationState state, BeneficialOrganismData organism)
+        {
+            var baseCapacity = _maxOrganismsPerSpecies;
+            var environmentalCapacity = _environmentalProcessor?.GetCapacityModifier(organism.Type) ?? 1f;
+            var nicheCapacity = CalculateNicheCapacity(organism.Type);
+            var competitionFactor = CalculateCompetitionFactor(organism.Type);
+            
+            return Mathf.RoundToInt(baseCapacity * environmentalCapacity * nicheCapacity * competitionFactor);
+        }
+        
+        private float CalculatePredationImpact(OrganismPopulationState state, BeneficialOrganismData organism)
+        {
+            // Beneficial organisms have few natural predators in controlled environments
+            return state.PredationPressure * 0.1f; // Minimal predation impact
+        }
+        
+        private float CalculateEnvironmentalImpact(OrganismPopulationState state, BeneficialOrganismData organism)
+        {
+            return 1f - state.EnvironmentalStress;
+        }
+        
+        private float CalculateLogisticGrowthWithFactors(float currentPop, float growthRate, float carryingCapacity, 
+            float predationImpact, float environmentalImpact, float deltaTime)
+        {
+            if (carryingCapacity <= 0) return currentPop;
+            
+            // Logistic growth
+            var growthFactor = growthRate * (1f - currentPop / carryingCapacity) * deltaTime;
+            var growth = currentPop * growthFactor;
+            
+            // Apply environmental and predation impacts
+            growth *= environmentalImpact;
+            var predationLoss = currentPop * predationImpact * deltaTime;
+            
+            return Mathf.Max(0f, currentPop + growth - predationLoss);
+        }
+        
+        private void UpdateEstablishmentStatus(OrganismPopulationState state, BeneficialOrganismData organism)
+        {
+            if (state.EstablishmentStatus == EstablishmentStatus.Established) return;
+            
+            var daysDeployed = (DateTime.Now - organism.ReleaseTime).TotalDays;
+            var populationStability = CalculatePopulationStability(state);
+            var environmentalSuitability = _environmentalProcessor?.GetEstablishmentSuitability(organism.Type) ?? 0.5f;
+            
+            // Establishment criteria
+            var establishmentScore = (populationStability + environmentalSuitability) / 2f;
+            
+            if (daysDeployed >= 7 && establishmentScore >= 0.7f)
+            {
+                state.EstablishmentStatus = EstablishmentStatus.Established;
+                organism.IsEstablished = true;
+                OnOrganismEstablished?.Invoke(organism);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMBiologicalManager] {organism.Type} successfully established after {daysDeployed:F1} days");
+                }
+            }
+            else if (daysDeployed >= 14 && establishmentScore < 0.3f)
+            {
+                state.EstablishmentStatus = EstablishmentStatus.Failed;
+                MarkOrganismForRemoval(state.OrganismId, "Establishment failure");
+            }
+        }
+        
+        private float CalculatePopulationStability(OrganismPopulationState state)
+        {
+            // Simplified stability calculation - would track population variance over time
+            var currentRatio = (float)state.CurrentPopulation / Math.Max(1, state.MaxPopulation);
+            return Mathf.Clamp01(currentRatio);
+        }
+        
+        private float CalculateFoodAvailability(BeneficialOrganismData organism)
+        {
+            var totalPrey = 0;
+            var targetPests = GetTargetPests(organism.Type);
+            
+            foreach (var pestType in targetPests)
+            {
+                totalPrey += GetPestPopulation(pestType);
+            }
+            
+            // Food availability based on prey density
+            return Mathf.Min(1f, totalPrey / 500f); // Optimal at 500+ prey
+        }
+        
+        private float CalculateNicheCapacity(BeneficialOrganismType organismType)
+        {
+            if (_ecosystemNiches.TryGetValue(organismType.ToString(), out var niche))
+            {
+                return niche.NicheSize;
+            }
+            return 1f;
+        }
+        
+        private float CalculateCompetitionFactor(BeneficialOrganismType organismType)
+        {
+            // Calculate competition from other species in similar niches
+            var competitionPressure = 0f;
+            var competitors = GetCompetitorSpecies(organismType);
+            
+            foreach (var competitor in competitors)
+            {
+                var competitorPopulation = GetEntityCount(competitor);
+                competitionPressure += competitorPopulation * 0.0001f; // Competition factor
+            }
+            
+            return Mathf.Max(0.1f, 1f - competitionPressure);
+        }
+        
+        #endregion
+        
+        #region Ecosystem Balance Management
+        
+        private void UpdateEcosystemBalance()
+        {
+            if (!_enableEcosystemBalance) return;
+            
+            var oldBalance = _ecosystemMetrics.OverallBalance;
+            var newBalance = CalculateEcosystemBalance();
+            
+            _ecosystemMetrics.OverallBalance = newBalance;
+            _ecosystemMetrics.LastUpdate = DateTime.Now;
+            
+            // Check for significant balance changes
+            if (Mathf.Abs(oldBalance - newBalance) > 0.1f)
+            {
+                OnEcosystemBalanceChanged?.Invoke(newBalance);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMBiologicalManager] Ecosystem balance changed: {newBalance:P1} (was {oldBalance:P1})");
+                }
+            }
+            
+            // Check for ecosystem alerts
+            CheckEcosystemAlerts(newBalance);
+            
+            // Automatic rebalancing if enabled
+            if (_enableAutomaticRebalancing && newBalance < _ecosystemImbalanceThreshold)
+            {
+                AttemptEcosystemRebalancing();
+            }
+        }
+        
+        private void CheckEcosystemAlerts(float balance)
+        {
+            if (balance < _ecosystemImbalanceThreshold)
+            {
+                var alert = new EcosystemAlert
+                {
+                    AlertType = EcosystemAlertType.Imbalance,
+                    Severity = AlertSeverity.High,
+                    Message = $"Ecosystem severely imbalanced: {balance:P1}",
+                    Timestamp = DateTime.Now,
+                    RecommendedActions = GetRebalancingRecommendations()
+                };
+                
+                _ecosystemAlerts.Add(alert);
+                OnEcosystemAlert?.Invoke(alert);
+            }
+            else if (balance < _optimalEcosystemBalance * 0.8f)
+            {
+                var alert = new EcosystemAlert
+                {
+                    AlertType = EcosystemAlertType.Warning,
+                    Severity = AlertSeverity.Medium,
+                    Message = $"Ecosystem balance declining: {balance:P1}",
+                    Timestamp = DateTime.Now,
+                    RecommendedActions = GetOptimizationRecommendations()
+                };
+                
+                _ecosystemAlerts.Add(alert);
+                OnEcosystemAlert?.Invoke(alert);
+            }
+        }
+        
+        private void AttemptEcosystemRebalancing()
+        {
+            // Identify species that need population adjustments
+            var rebalancingActions = AnalyzeRebalancingNeeds();
+            
+            foreach (var action in rebalancingActions)
+            {
+                ApplyRebalancingAction(action);
+            }
+            
+            if (_enableDebugLogging && rebalancingActions.Any())
+            {
+                Debug.Log($"[IPMBiologicalManager] Applied {rebalancingActions.Count} rebalancing actions");
+            }
+        }
+        
+        private List<RebalancingAction> AnalyzeRebalancingNeeds()
+        {
+            var actions = new List<RebalancingAction>();
+            
+            // Analyze each species population relative to optimal levels
+            foreach (var organismType in _speciesProfiles.Keys)
+            {
+                var currentPopulation = GetEntityCount(organismType);
+                var optimalPopulation = CalculateOptimalPopulation(organismType);
+                
+                if (currentPopulation < optimalPopulation * 0.5f)
+                {
+                    actions.Add(new RebalancingAction
+                    {
+                        ActionType = RebalancingActionType.Boost,
+                        OrganismType = organismType,
+                        TargetChange = optimalPopulation - currentPopulation,
+                        Priority = CalculateActionPriority(organismType, currentPopulation, optimalPopulation)
+                    });
+                }
+                else if (currentPopulation > optimalPopulation * 1.5f)
+                {
+                    actions.Add(new RebalancingAction
+                    {
+                        ActionType = RebalancingActionType.Reduce,
+                        OrganismType = organismType,
+                        TargetChange = currentPopulation - optimalPopulation,
+                        Priority = CalculateActionPriority(organismType, currentPopulation, optimalPopulation)
+                    });
+                }
+            }
+            
+            return actions.OrderByDescending(a => a.Priority).ToList();
+        }
+        
+        private void ApplyRebalancingAction(RebalancingAction action)
+        {
+            switch (action.ActionType)
+            {
+                case RebalancingActionType.Boost:
+                    BoostOrganismPopulation(action.OrganismType, action.TargetChange);
+                    break;
+                case RebalancingActionType.Reduce:
+                    ReduceOrganismPopulation(action.OrganismType, action.TargetChange);
+                    break;
+            }
+        }
+        
+        private void BoostOrganismPopulation(BeneficialOrganismType organismType, int targetIncrease)
+        {
+            // Apply reproduction boost to existing populations
+            var organisms = GetEntitiesByType(organismType);
+            foreach (var organism in organisms)
+            {
+                if (_populationStates.TryGetValue(organism.OrganismId, out var state))
+                {
+                    var boost = Mathf.RoundToInt(targetIncrease * _balanceRecoveryRate);
+                    state.CurrentPopulation = Mathf.Min(state.MaxPopulation, state.CurrentPopulation + boost);
+                    organism.PopulationSize = state.CurrentPopulation;
+                    _populationStates[organism.OrganismId] = state;
+                }
+            }
+        }
+        
+        private void ReduceOrganismPopulation(BeneficialOrganismType organismType, int targetDecrease)
+        {
+            // Apply natural mortality increase to existing populations
+            var organisms = GetEntitiesByType(organismType);
+            foreach (var organism in organisms)
+            {
+                if (_populationStates.TryGetValue(organism.OrganismId, out var state))
+                {
+                    var reduction = Mathf.RoundToInt(targetDecrease * _balanceRecoveryRate);
+                    state.CurrentPopulation = Mathf.Max(0, state.CurrentPopulation - reduction);
+                    organism.PopulationSize = state.CurrentPopulation;
+                    _populationStates[organism.OrganismId] = state;
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Environmental Dependencies
+        
+        private void UpdateEnvironmentalDependencies()
+        {
+            if (!_enableEnvironmentalDependency || _environmentalProcessor == null) return;
+            
+            foreach (var organismData in _activeEntities.Values)
+            {
+                if (_populationStates.TryGetValue(organismData.OrganismId, out var state))
+                {
+                    var environmentalStress = _environmentalProcessor.CalculateEnvironmentalStress(organismData.Type);
+                    state.EnvironmentalStress = environmentalStress;
+                    _populationStates[organismData.OrganismId] = state;
+                    
+                    // Update organism stress level
+                    organismData.EnvironmentalStress = environmentalStress;
+                }
+            }
+        }
+        
+        private bool HasEcosystemCapacity(BeneficialOrganismType type)
+        {
+            var currentBalance = CalculateEcosystemBalance();
+            var projectedImpact = EstimateDeploymentImpact(type);
+            
+            return (currentBalance + projectedImpact) <= 1f; // Don't exceed perfect balance
+        }
+        
+        private bool IsEnvironmentallySuitable(BeneficialOrganismType type)
+        {
+            if (_environmentalProcessor == null) return true;
+            
+            var suitability = _environmentalProcessor.GetEstablishmentSuitability(type);
+            return suitability >= 0.5f; // Minimum 50% suitability required
+        }
+        
+        private float EstimateDeploymentImpact(BeneficialOrganismType type)
+        {
+            // Estimate how deployment would affect ecosystem balance
+            var speciesProfile = _speciesProfiles.GetValueOrDefault(type);
+            if (speciesProfile == null) return 0.1f;
+            
+            return speciesProfile.EcosystemImpact;
+        }
+        
+        #endregion
+        
+        #region Multi-Species Interactions
+        
+        private void ProcessMultiSpeciesInteractions()
+        {
+            if (!_enableMultiSpeciesInteractions || _interactionManager == null) return;
+            
+            _interactionManager.ProcessInteractions(_activeEntities.Values.ToList(), _populationStates);
+        }
+        
+        #endregion
+        
+        #region Entity Manager Implementation
+        
+        protected override BeneficialOrganismData CreateEntityInstance()
+        {
+            return new BeneficialOrganismData();
+        }
+        
+        protected override void DestroyEntityInstance(BeneficialOrganismData entity)
+        {
+            // Cleanup entity-specific resources
+        }
+        
+        protected override void ConfigureEntity(BeneficialOrganismData entity, BeneficialOrganismData sourceData, 
+            BeneficialOrganismType entityType, Vector3 position)
+        {
+            entity.OrganismId = sourceData.OrganismId;
+            entity.Type = sourceData.Type;
+            entity.PopulationSize = sourceData.PopulationSize;
+            entity.ReleaseLocation = position;
+            entity.SearchRadius = sourceData.SearchRadius;
+            entity.TargetPests = sourceData.TargetPests ?? new List<PestType>();
+            entity.HuntingEfficiency = sourceData.HuntingEfficiency;
+            entity.SurvivalRate = sourceData.SurvivalRate;
+            entity.ReleaseTime = sourceData.ReleaseTime;
+            entity.IsEstablished = sourceData.IsEstablished;
+            entity.EnvironmentalStress = sourceData.EnvironmentalStress;
+            entity.PerformanceMetrics = sourceData.PerformanceMetrics ?? new Dictionary<string, float>();
+        }
+        
+        protected override void UpdateEntitySpecific(string entityId, BeneficialOrganismData entity, float deltaTime)
+        {
+            // Entity-specific updates are handled in UpdateOrganisms
+        }
+        
+        protected override BeneficialOrganismType GetEntityType(string entityId)
+        {
+            var entity = GetEntity(entityId);
+            return entity?.Type ?? BeneficialOrganismType.Ladybugs;
+        }
+        
+        protected override string GenerateEntityId()
+        {
+            return "Organism_" + Guid.NewGuid().ToString("N")[..8];
+        }
+        
+        protected override bool ShouldMarkForDestruction(string entityId)
+        {
+            if (_populationStates.TryGetValue(entityId, out var state))
+            {
+                return state.CurrentPopulation <= 0 || state.EstablishmentStatus == EstablishmentStatus.Failed;
+            }
+            return false;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private SpeciesProfile CreateSpeciesProfile(BeneficialOrganismType organismType)
+        {
+            return organismType switch
+            {
+                BeneficialOrganismType.Ladybugs => new SpeciesProfile
+                {
+                    OrganismType = organismType,
+                    ReproductionModifier = 1.2f,
+                    EcosystemImpact = 0.15f,
+                    OptimalTemperature = 22f,
+                    TemperatureTolerance = 8f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.3f,
+                    PrimaryPrey = new List<PestType> { PestType.Aphids },
+                    SecondaryPrey = new List<PestType> { PestType.Scale, PestType.Mealybugs }
+                },
+                BeneficialOrganismType.PredatoryMites => new SpeciesProfile
+                {
+                    OrganismType = organismType,
+                    ReproductionModifier = 1.5f,
+                    EcosystemImpact = 0.12f,
+                    OptimalTemperature = 25f,
+                    TemperatureTolerance = 6f,
+                    OptimalHumidity = 0.7f,
+                    HumidityTolerance = 0.25f,
+                    PrimaryPrey = new List<PestType> { PestType.SpiderMites },
+                    SecondaryPrey = new List<PestType> { PestType.Thrips }
+                },
+                BeneficialOrganismType.LacewingLarvae => new SpeciesProfile
+                {
+                    OrganismType = organismType,
+                    ReproductionModifier = 1.1f,
+                    EcosystemImpact = 0.18f,
+                    OptimalTemperature = 24f,
+                    TemperatureTolerance = 7f,
+                    OptimalHumidity = 0.55f,
+                    HumidityTolerance = 0.35f,
+                    PrimaryPrey = new List<PestType> { PestType.Aphids, PestType.Thrips },
+                    SecondaryPrey = new List<PestType> { PestType.Whiteflies }
+                },
+                _ => new SpeciesProfile
+                {
+                    OrganismType = organismType,
+                    ReproductionModifier = 1.0f,
+                    EcosystemImpact = 0.1f,
+                    OptimalTemperature = 23f,
+                    TemperatureTolerance = 7f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.3f,
+                    PrimaryPrey = new List<PestType> { PestType.Aphids },
+                    SecondaryPrey = new List<PestType>()
+                }
+            };
+        }
+        
+        private float CalculateNicheSize(BeneficialOrganismType organismType)
+        {
+            return organismType switch
+            {
+                BeneficialOrganismType.Ladybugs => 0.8f,
+                BeneficialOrganismType.PredatoryMites => 1.2f,
+                BeneficialOrganismType.LacewingLarvae => 0.9f,
+                BeneficialOrganismType.Parasitoids => 0.7f,
+                BeneficialOrganismType.PredatoryBeetles => 0.6f,
+                _ => 1.0f
+            };
+        }
+        
+        private float CalculateCompetitiveStrength(BeneficialOrganismType organismType)
+        {
+            return organismType switch
+            {
+                BeneficialOrganismType.PredatoryMites => 1.3f,
+                BeneficialOrganismType.Ladybugs => 1.1f,
+                BeneficialOrganismType.LacewingLarvae => 1.0f,
+                BeneficialOrganismType.PredatoryBeetles => 0.9f,
+                BeneficialOrganismType.Parasitoids => 0.8f,
+                _ => 1.0f
+            };
+        }
+        
+        private Dictionary<string, float> GetResourceRequirements(BeneficialOrganismType organismType)
+        {
+            return new Dictionary<string, float>
+            {
+                ["Food"] = UnityEngine.Random.Range(0.7f, 1.3f),
+                ["Shelter"] = UnityEngine.Random.Range(0.5f, 1.0f),
+                ["Water"] = UnityEngine.Random.Range(0.6f, 1.2f),
+                ["Territory"] = UnityEngine.Random.Range(0.4f, 0.9f)
+            };
+        }
+        
+        private Dictionary<string, float> GetEnvironmentalTolerances(BeneficialOrganismType organismType)
+        {
+            var profile = _speciesProfiles.GetValueOrDefault(organismType);
+            if (profile == null) return new Dictionary<string, float>();
+            
+            return new Dictionary<string, float>
+            {
+                ["Temperature"] = profile.TemperatureTolerance,
+                ["Humidity"] = profile.HumidityTolerance,
+                ["Light"] = 0.5f,
+                ["pH"] = 0.3f
+            };
+        }
+        
+        private List<PestType> GetTargetPests(BeneficialOrganismType organismType)
+        {
+            var profile = _speciesProfiles.GetValueOrDefault(organismType);
+            if (profile == null) return new List<PestType>();
+            
+            var targets = new List<PestType>(profile.PrimaryPrey);
+            targets.AddRange(profile.SecondaryPrey);
+            return targets;
+        }
+        
+        private List<BeneficialOrganismType> GetCompetitorSpecies(BeneficialOrganismType organismType)
+        {
+            // Species that compete for similar resources or prey
+            return organismType switch
+            {
+                BeneficialOrganismType.Ladybugs => new List<BeneficialOrganismType> { BeneficialOrganismType.LacewingLarvae },
+                BeneficialOrganismType.LacewingLarvae => new List<BeneficialOrganismType> { BeneficialOrganismType.Ladybugs },
+                BeneficialOrganismType.PredatoryMites => new List<BeneficialOrganismType> { BeneficialOrganismType.PredatoryBeetles },
+                _ => new List<BeneficialOrganismType>()
+            };
+        }
+        
+        private int GetPestPopulation(PestType pestType)
+        {
+            // This would integrate with the IPMPestManager
+            return UnityEngine.Random.Range(50, 500); // Placeholder
+        }
+        
+        private List<PestInvasionData> GetPestPopulations()
+        {
+            // This would integrate with the IPMPestManager
+            return new List<PestInvasionData>(); // Placeholder
+        }
+        
+        private int CalculateOptimalPopulation(BeneficialOrganismType organismType)
+        {
+            var speciesProfile = _speciesProfiles.GetValueOrDefault(organismType);
+            if (speciesProfile == null) return 100;
+            
+            // Calculate optimal population based on prey availability and ecosystem capacity
+            var preyPopulation = speciesProfile.PrimaryPrey.Sum(GetPestPopulation);
+            var optimalRatio = 0.1f; // 1 predator per 10 prey
+            
+            return Mathf.RoundToInt(preyPopulation * optimalRatio);
+        }
+        
+        private float CalculateActionPriority(BeneficialOrganismType organismType, int currentPop, int optimalPop)
+        {
+            var deviation = Mathf.Abs(currentPop - optimalPop) / (float)Math.Max(optimalPop, 1);
+            var impactWeight = _speciesProfiles.GetValueOrDefault(organismType)?.EcosystemImpact ?? 0.1f;
+            
+            return deviation * impactWeight;
+        }
+        
+        private void UpdateEcosystemMetricsFromDeployment(BeneficialOrganismData organism)
+        {
+            _ecosystemMetrics.TotalOrganisms++;
+            _ecosystemMetrics.SpeciesDiversity = CalculateSpeciesDiversity();
+            _ecosystemMetrics.PredatorPreyRatio = CalculatePredatorPreyRatio();
+        }
+        
+        private void UpdateEcosystemMetricsFromRemoval(BeneficialOrganismData organism)
+        {
+            _ecosystemMetrics.TotalOrganisms--;
+            _ecosystemMetrics.SpeciesDiversity = CalculateSpeciesDiversity();
+            _ecosystemMetrics.PredatorPreyRatio = CalculatePredatorPreyRatio();
+        }
+        
+        private float CalculateSpeciesDiversity()
+        {
+            var speciesCount = _activeEntities.Values
+                .GroupBy(o => o.Type)
+                .Count();
+            
+            var totalSpecies = Enum.GetValues(typeof(BeneficialOrganismType)).Length;
+            return (float)speciesCount / totalSpecies;
+        }
+        
+        private float CalculatePredatorPreyRatio()
+        {
+            var totalPredators = _activeEntities.Values.Sum(o => o.PopulationSize);
+            var totalPrey = GetPestPopulations().Sum(p => p.PopulationSize);
+            
+            if (totalPrey == 0) return 0f;
+            return (float)totalPredators / totalPrey;
+        }
+        
+        private List<string> GetRebalancingRecommendations()
+        {
+            return new List<string>
+            {
+                "Deploy additional predatory species",
+                "Reduce overabundant populations",
+                "Improve environmental conditions",
+                "Increase prey species availability"
+            };
+        }
+        
+        private List<string> GetOptimizationRecommendations()
+        {
+            return new List<string>
+            {
+                "Monitor population trends",
+                "Adjust environmental parameters",
+                "Consider supplemental releases",
+                "Evaluate establishment success"
+            };
+        }
+        
+        private void MarkOrganismForRemoval(string organismId, string reason)
+        {
+            // Mark for removal in next cleanup cycle
+            if (_populationStates.TryGetValue(organismId, out var state))
+            {
+                state.EstablishmentStatus = EstablishmentStatus.Failed;
+                _populationStates[organismId] = state;
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMBiologicalManager] Marking organism {organismId} for removal: {reason}");
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Cleanup
+        
+        protected override void CleanupSystemSpecific()
+        {
+            _populationStates.Clear();
+            _ecosystemNiches.Clear();
+            _foodWebConnections.Clear();
+            _ecosystemAlerts.Clear();
+            
+            _ecosystemCalculator?.Dispose();
+            _predatorPreySystem?.Dispose();
+            _establishmentPredictor?.Dispose();
+            _environmentalProcessor?.Dispose();
+            _interactionManager?.Dispose();
+        }
+        
+        #endregion
+        
+    }
+}

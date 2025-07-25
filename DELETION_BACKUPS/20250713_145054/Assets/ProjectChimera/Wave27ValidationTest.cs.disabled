@@ -1,0 +1,163 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult; // Use same alias as PlantInstance
+
+/// <summary>
+/// Error Wave 27 Validation Test - Ambiguous TraitExpressionResult Reference Resolution
+/// 
+/// Tests that the CS0104 ambiguous reference errors for TraitExpressionResult have been resolved.
+/// 
+/// Root Cause: Two TraitExpressionResult classes existed in different namespaces:
+/// - ProjectChimera.Data.Genetics.TraitExpressionResult
+/// - ProjectChimera.Systems.Genetics.TraitExpressionResult
+/// PlantInstance.cs imported both namespaces, causing compiler ambiguity.
+/// 
+/// Solution: Added using alias to explicitly specify which TraitExpressionResult to use.
+/// Since PlantInstance works with genetics system operations, it uses the Systems.Genetics version.
+/// 
+/// Expected Results:
+/// - Zero CS0104 ambiguous reference errors
+/// - PlantInstance can properly access TraitExpressionResult
+/// - Genetic trait expression system fully operational
+/// - No compilation conflicts between Data and Systems genetics types
+/// </summary>
+public class Wave27ValidationTest : MonoBehaviour
+{
+    [Header("Wave 27 Validation - Ambiguous Reference Resolution")]
+    [SerializeField] private bool _runTestsOnStart = true;
+    [SerializeField] private bool _enableDetailedLogging = true;
+    
+    private void Start()
+    {
+        if (_runTestsOnStart)
+        {
+            RunValidationTests();
+        }
+    }
+    
+    public void RunValidationTests()
+    {
+        Debug.Log("=== Error Wave 27 Validation Tests ===");
+        
+        TestTraitExpressionResultResolution();
+        TestPlantInstanceTraitExpressionAccess();
+        TestNamespaceDisambiguation();
+        TestGeneticsSystemIntegration();
+        
+        Debug.Log("=== Wave 27 Validation Complete ===");
+    }
+    
+    private void TestTraitExpressionResultResolution()
+    {
+        Debug.Log("Testing TraitExpressionResult type resolution...");
+        
+        try
+        {
+            // Test that TraitExpressionResult can be created without ambiguity
+            var traitResult = new TraitExpressionResult();
+            traitResult.HeightExpression = 1.5f;
+            traitResult.THCExpression = 0.8f;
+            traitResult.YieldExpression = 1.2f;
+            
+            Debug.Log($"✓ TraitExpressionResult created successfully - Height: {traitResult.HeightExpression}, THC: {traitResult.THCExpression}, Yield: {traitResult.YieldExpression}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ TraitExpressionResult creation failed: {ex.Message}");
+        }
+    }
+    
+    private void TestPlantInstanceTraitExpressionAccess()
+    {
+        Debug.Log("Testing PlantInstance trait expression access...");
+        
+        try
+        {
+            // Create a test plant instance
+            var plantGO = new GameObject("TestPlant");
+            var plantInstance = plantGO.AddComponent<PlantInstance>();
+            
+            // Test trait expression setting
+            var traitExpression = new TraitExpressionResult
+            {
+                HeightExpression = 1.8f,
+                THCExpression = 0.9f,
+                YieldExpression = 1.3f
+            };
+            
+            plantInstance.SetLastTraitExpression(traitExpression);
+            var retrievedExpression = plantInstance.LastTraitExpression;
+            
+            if (retrievedExpression != null)
+            {
+                Debug.Log($"✓ PlantInstance trait expression access working - Retrieved Height: {retrievedExpression.HeightExpression}");
+            }
+            else
+            {
+                Debug.LogError("✗ PlantInstance trait expression retrieval failed");
+            }
+            
+            // Cleanup
+            DestroyImmediate(plantGO);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ PlantInstance trait expression test failed: {ex.Message}");
+        }
+    }
+    
+    private void TestNamespaceDisambiguation()
+    {
+        Debug.Log("Testing namespace disambiguation...");
+        
+        try
+        {
+            // Test that we can explicitly reference both types if needed
+            var systemsResult = new ProjectChimera.Systems.Genetics.TraitExpressionResult();
+            systemsResult.HeightExpression = 1.0f;
+            
+            // Note: We can't easily test Data.Genetics.TraitExpressionResult here 
+            // without causing the same ambiguity, but the using alias resolves this
+            
+            Debug.Log("✓ Namespace disambiguation working - Systems.Genetics version accessible");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ Namespace disambiguation test failed: {ex.Message}");
+        }
+    }
+    
+    private void TestGeneticsSystemIntegration()
+    {
+        Debug.Log("Testing genetics system integration...");
+        
+        try
+        {
+            // Test that PlantInstance can work with genetic modifiers
+            var plantGO = new GameObject("TestPlantGenetics");
+            var plantInstance = plantGO.AddComponent<PlantInstance>();
+            
+            // Test genetic modifier methods
+            plantInstance.ApplyHeightGrowthModifier(1.2f, 0.1f);
+            plantInstance.ApplyPotencyModifier(0.9f);
+            plantInstance.ApplyYieldModifier(1.1f);
+            
+            Debug.Log("✓ Genetics system integration working - Genetic modifiers applied successfully");
+            
+            // Cleanup
+            DestroyImmediate(plantGO);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ Genetics system integration test failed: {ex.Message}");
+        }
+    }
+    
+    [ContextMenu("Run Wave 27 Validation Tests")]
+    public void RunTestsFromContextMenu()
+    {
+        RunValidationTests();
+    }
+} 

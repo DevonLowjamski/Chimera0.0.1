@@ -1,0 +1,993 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Supporting data structures and helper classes for the IPM Pest Management System.
+    /// Defines specialized classes for pest behavior, learning algorithms, environmental processing,
+    /// and population dynamics to support the advanced pest simulation system.
+    /// </summary>
+    
+    #region Pest Population Management
+    
+    [Serializable]
+    public class PestPopulationState
+    {
+        public string InvasionId;
+        public int CurrentPopulation;
+        public int MaxPopulation;
+        public float ReproductionRate;
+        public float MortalityRate;
+        public DateTime LastUpdate;
+        public PopulationGrowthPhase GrowthPhase;
+        public float GeneticDiversity = 1f;
+        public Dictionary<string, int> AgeGroups = new Dictionary<string, int>();
+        public float StressLevel;
+        public Vector3 CenterOfMass;
+        public float DispersalPressure;
+    }
+    
+    public enum PopulationGrowthPhase
+    {
+        Establishment,
+        Exponential,
+        Deceleration,
+        Equilibrium,
+        Decline,
+        Collapse
+    }
+    
+    [Serializable]
+    public class PestSpeciesProfile
+    {
+        public PestType PestType;
+        public float BaseReproductionRate;
+        public float BaseMortalityRate;
+        public Dictionary<string, float> EnvironmentalPreferences;
+        public Dictionary<string, float> SeasonalActivity;
+        public List<string> PreferredHosts;
+        public float DispersalRange;
+        public int GenerationTime; // Days
+        public float SocialBehaviorFactor;
+        public List<PestType> CompetitorSpecies;
+        public List<BeneficialOrganismType> NaturalEnemies;
+    }
+    
+    [Serializable]
+    public class ResistanceProfile
+    {
+        public PestType PestType;
+        public Dictionary<string, float> ChemicalResistance;
+        public Dictionary<string, float> BiologicalResistance;
+        public float MutationRate;
+        public DateTime LastUpdate;
+        public Dictionary<string, ResistanceGene> ResistanceGenes;
+        public float CrossResistanceFactor;
+    }
+    
+    [Serializable]
+    public class ResistanceGene
+    {
+        public string GeneId;
+        public string ResistanceType;
+        public float Expression;
+        public float Frequency;
+        public bool IsDominant;
+        public DateTime EmergenceTime;
+    }
+    
+    #endregion
+    
+    #region AI Learning and Adaptation
+    
+    /// <summary>
+    /// Advanced learning engine for pest AI behavior adaptation.
+    /// Implements machine learning-inspired algorithms for pest behavior evolution.
+    /// </summary>
+    public class PestLearningEngine
+    {
+        private readonly float _learningRate;
+        private readonly float _memoryDecayRate;
+        private Dictionary<string, LearningMemory> _learningMemories = new Dictionary<string, LearningMemory>();
+        
+        public PestLearningEngine(float learningRate, float memoryDecayRate)
+        {
+            _learningRate = learningRate;
+            _memoryDecayRate = memoryDecayRate;
+        }
+        
+        public void ProcessPlayerActions(PestAIBehavior behavior, List<PlayerAction> actions)
+        {
+            var memoryKey = behavior.PestType.ToString();
+            
+            if (!_learningMemories.TryGetValue(memoryKey, out var memory))
+            {
+                memory = new LearningMemory { PestType = behavior.PestType };
+                _learningMemories[memoryKey] = memory;
+            }
+            
+            foreach (var action in actions)
+            {
+                ProcessSingleAction(behavior, action, memory);
+            }
+            
+            ApplyLearning(behavior, memory);
+            DecayMemory(memory);
+        }
+        
+        private void ProcessSingleAction(PestAIBehavior behavior, PlayerAction action, LearningMemory memory)
+        {
+            var strategyKey = action.Strategy.ToString();
+            
+            // Track strategy effectiveness
+            if (!memory.StrategyExperiences.ContainsKey(strategyKey))
+            {
+                memory.StrategyExperiences[strategyKey] = new StrategyExperience();
+            }
+            
+            var experience = memory.StrategyExperiences[strategyKey];
+            experience.Encounters++;
+            experience.TotalEffectiveness += action.ActualEffectiveness;
+            experience.AverageEffectiveness = experience.TotalEffectiveness / experience.Encounters;
+            experience.LastEncounter = action.Timestamp;
+            
+            // Update threat assessment
+            UpdateThreatAssessment(behavior, action, experience);
+        }
+        
+        private void UpdateThreatAssessment(PestAIBehavior behavior, PlayerAction action, StrategyExperience experience)
+        {
+            var threatLevel = CalculateThreatLevel(action.ActualEffectiveness, experience.AverageEffectiveness);
+            
+            // Adapt behavior based on threat level
+            switch (action.Strategy)
+            {
+                case IPMStrategyType.Chemical:
+                    AdaptToChemicalThreat(behavior, threatLevel);
+                    break;
+                case IPMStrategyType.Biological:
+                    AdaptToBiologicalThreat(behavior, threatLevel);
+                    break;
+                case IPMStrategyType.Environmental:
+                    AdaptToEnvironmentalThreat(behavior, threatLevel);
+                    break;
+            }
+        }
+        
+        private float CalculateThreatLevel(float currentEffectiveness, float averageEffectiveness)
+        {
+            var relativeThreat = currentEffectiveness / Math.Max(averageEffectiveness, 0.1f);
+            return Mathf.Clamp01(relativeThreat);
+        }
+        
+        private void AdaptToChemicalThreat(PestAIBehavior behavior, float threatLevel)
+        {
+            // Increase chemical avoidance behavior
+            var currentResistance = behavior.ChemicalResistance.GetValueOrDefault("General", 0f);
+            var newResistance = Mathf.Min(1f, currentResistance + threatLevel * _learningRate);
+            behavior.ChemicalResistance["General"] = newResistance;
+            
+            // Increase intelligence to detect chemical applications
+            behavior.Intelligence = Mathf.Min(1f, behavior.Intelligence + threatLevel * _learningRate * 0.5f);
+        }
+        
+        private void AdaptToBiologicalThreat(PestAIBehavior behavior, float threatLevel)
+        {
+            // Increase predator avoidance
+            foreach (BeneficialOrganismType organism in Enum.GetValues(typeof(BeneficialOrganismType)))
+            {
+                var currentAvoidance = behavior.PredatorAvoidance.GetValueOrDefault(organism, 0f);
+                var newAvoidance = Mathf.Min(1f, currentAvoidance + threatLevel * _learningRate * 0.3f);
+                behavior.PredatorAvoidance[organism] = newAvoidance;
+            }
+            
+            // Increase aggressiveness as defense mechanism
+            behavior.Aggressiveness = Mathf.Min(1f, behavior.Aggressiveness + threatLevel * _learningRate * 0.2f);
+        }
+        
+        private void AdaptToEnvironmentalThreat(PestAIBehavior behavior, float threatLevel)
+        {
+            // Increase adaptability to environmental changes
+            behavior.Adaptability = Mathf.Min(1f, behavior.Adaptability + threatLevel * _learningRate);
+            
+            // Develop environmental awareness
+            foreach (DefenseStructureType structure in Enum.GetValues(typeof(DefenseStructureType)))
+            {
+                if (structure.ToString().Contains("Environmental") || structure.ToString().Contains("Controller"))
+                {
+                    var currentAvoidance = behavior.DefenseAvoidance.GetValueOrDefault(structure, 0f);
+                    var newAvoidance = Mathf.Min(1f, currentAvoidance + threatLevel * _learningRate * 0.4f);
+                    behavior.DefenseAvoidance[structure] = newAvoidance;
+                }
+            }
+        }
+        
+        private void ApplyLearning(PestAIBehavior behavior, LearningMemory memory)
+        {
+            // Apply global learning adjustments based on accumulated experience
+            var totalThreatLevel = CalculateOverallThreatLevel(memory);
+            
+            // Adapt learning rate based on threat level
+            behavior.LearningRate = Mathf.Min(0.5f, behavior.LearningRate + totalThreatLevel * 0.01f);
+            
+            // Update path preferences based on successful/failed encounters
+            UpdatePathPreferences(behavior, memory);
+        }
+        
+        private float CalculateOverallThreatLevel(LearningMemory memory)
+        {
+            if (!memory.StrategyExperiences.Any()) return 0f;
+            
+            return memory.StrategyExperiences.Values
+                .Select(exp => exp.AverageEffectiveness)
+                .DefaultIfEmpty(0f)
+                .Average();
+        }
+        
+        private void UpdatePathPreferences(PestAIBehavior behavior, LearningMemory memory)
+        {
+            // Modify preferred paths based on encounter success rates
+            // This would integrate with spatial memory of successful/unsuccessful areas
+            if (behavior.PreferredPaths.Count > 0)
+            {
+                // Add variation to paths to avoid predictable patterns
+                for (int i = 0; i < behavior.PreferredPaths.Count; i++)
+                {
+                    var currentPath = behavior.PreferredPaths[i];
+                    var variation = UnityEngine.Random.insideUnitSphere * 5f; // 5 unit variation
+                    behavior.PreferredPaths[i] = currentPath + variation;
+                }
+            }
+        }
+        
+        private void DecayMemory(LearningMemory memory)
+        {
+            var cutoffTime = DateTime.Now.AddDays(-7); // 7 day memory
+            
+            foreach (var experience in memory.StrategyExperiences.Values.ToList())
+            {
+                if (experience.LastEncounter < cutoffTime)
+                {
+                    // Decay old experiences
+                    experience.TotalEffectiveness *= (1f - _memoryDecayRate);
+                    experience.AverageEffectiveness = experience.TotalEffectiveness / Math.Max(experience.Encounters, 1);
+                }
+            }
+        }
+        
+        public void ProcessInvasionCompletion(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            // Process overall invasion success/failure for species-wide learning
+            var invasionSuccess = invasionData.PopulationSize > 0;
+            
+            if (invasionSuccess)
+            {
+                // Successful invasion - reinforce current behaviors
+                behavior.Intelligence = Mathf.Min(1f, behavior.Intelligence + 0.01f);
+                behavior.Adaptability = Mathf.Min(1f, behavior.Adaptability + 0.01f);
+            }
+            else
+            {
+                // Failed invasion - increase caution and adaptability
+                behavior.Aggressiveness = Mathf.Max(0f, behavior.Aggressiveness - 0.02f);
+                behavior.Adaptability = Mathf.Min(1f, behavior.Adaptability + 0.02f);
+            }
+        }
+    }
+    
+    [Serializable]
+    public class LearningMemory
+    {
+        public PestType PestType;
+        public Dictionary<string, StrategyExperience> StrategyExperiences = new Dictionary<string, StrategyExperience>();
+        public List<SpatialMemory> SpatialMemories = new List<SpatialMemory>();
+        public DateTime LastUpdate = DateTime.Now;
+    }
+    
+    [Serializable]
+    public class StrategyExperience
+    {
+        public int Encounters;
+        public float TotalEffectiveness;
+        public float AverageEffectiveness;
+        public DateTime LastEncounter;
+        public List<float> RecentEffectiveness = new List<float>();
+    }
+    
+    [Serializable]
+    public class SpatialMemory
+    {
+        public Vector3 Location;
+        public float DangerLevel;
+        public DateTime LastEncounter;
+        public string ThreatType;
+    }
+    
+    [Serializable]
+    public class PlayerAction
+    {
+        public IPMStrategyType Strategy;
+        public float PlannedEffectiveness;
+        public float ActualEffectiveness;
+        public DateTime Timestamp;
+        public string InvasionId;
+        public Vector3 ApplicationLocation;
+        public Dictionary<string, object> Context = new Dictionary<string, object>();
+    }
+    
+    #endregion
+    
+    #region Behavior Adaptation System
+    
+    /// <summary>
+    /// Manages adaptive behavior changes for pest AI systems.
+    /// </summary>
+    public class BehaviorAdaptationSystem
+    {
+        private readonly float _adaptationThreshold;
+        private readonly bool _enableCrossSpeciesLearning;
+        private Dictionary<PestType, AdaptationHistory> _adaptationHistories = new Dictionary<PestType, AdaptationHistory>();
+        
+        public BehaviorAdaptationSystem(float adaptationThreshold, bool enableCrossSpeciesLearning)
+        {
+            _adaptationThreshold = adaptationThreshold;
+            _enableCrossSpeciesLearning = enableCrossSpeciesLearning;
+        }
+        
+        public AdaptationResult AdaptBehavior(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            var result = new AdaptationResult { HasAdapted = false, UpdatedBehavior = behavior };
+            
+            if (!_adaptationHistories.TryGetValue(behavior.PestType, out var history))
+            {
+                history = new AdaptationHistory { PestType = behavior.PestType };
+                _adaptationHistories[behavior.PestType] = history;
+            }
+            
+            // Evaluate need for adaptation
+            var adaptationNeed = EvaluateAdaptationNeed(behavior, invasionData, history);
+            
+            if (adaptationNeed >= _adaptationThreshold)
+            {
+                result.UpdatedBehavior = CreateAdaptedBehavior(behavior, invasionData, history);
+                result.HasAdapted = true;
+                result.AdaptationStrength = adaptationNeed;
+                
+                // Record adaptation
+                RecordAdaptation(history, result);
+            }
+            
+            return result;
+        }
+        
+        private float EvaluateAdaptationNeed(PestAIBehavior behavior, PestInvasionData invasionData, AdaptationHistory history)
+        {
+            var adaptationFactors = new List<float>();
+            
+            // Population pressure
+            var populationPressure = invasionData.PopulationSize / 1000f; // Normalize to 0-1
+            adaptationFactors.Add(populationPressure);
+            
+            // Environmental stress
+            var environmentalStress = 1f - invasionData.EnvironmentalTolerance;
+            adaptationFactors.Add(environmentalStress);
+            
+            // Resistance pressure
+            var resistancePressure = CalculateResistancePressure(invasionData);
+            adaptationFactors.Add(resistancePressure);
+            
+            // Time since last adaptation
+            var timeFactor = CalculateTimeFactor(history);
+            adaptationFactors.Add(timeFactor);
+            
+            return adaptationFactors.Average() * GetSpeciesAdaptabilityFactor(behavior.PestType);
+        }
+        
+        private float CalculateResistancePressure(PestInvasionData invasionData)
+        {
+            // Higher resistance levels indicate more pressure to adapt
+            var chemicalResistance = (float)invasionData.ChemicalResistance / 5f; // Normalize ResistanceLevel enum
+            var biologicalResistance = (float)invasionData.BiologicalResistance / 5f;
+            
+            return (chemicalResistance + biologicalResistance) / 2f;
+        }
+        
+        private float CalculateTimeFactor(AdaptationHistory history)
+        {
+            if (history.LastAdaptation == default) return 1f;
+            
+            var timeSinceAdaptation = DateTime.Now - history.LastAdaptation;
+            var daysSince = (float)timeSinceAdaptation.TotalDays;
+            
+            // Adaptation need increases over time, plateaus at 30 days
+            return Mathf.Min(1f, daysSince / 30f);
+        }
+        
+        private float GetSpeciesAdaptabilityFactor(PestType pestType)
+        {
+            // Different species have different adaptability rates
+            return pestType switch
+            {
+                PestType.Aphids => 1.2f,        // Highly adaptable
+                PestType.SpiderMites => 1.1f,   // Very adaptable
+                PestType.Thrips => 1.0f,        // Moderately adaptable
+                PestType.Whiteflies => 0.9f,    // Less adaptable
+                PestType.Scale => 0.7f,         // Slow adapters
+                _ => 1.0f
+            };
+        }
+        
+        private PestAIBehavior CreateAdaptedBehavior(PestAIBehavior originalBehavior, PestInvasionData invasionData, AdaptationHistory history)
+        {
+            var adaptedBehavior = CloneBehavior(originalBehavior);
+            
+            // Apply specific adaptations based on invasion context
+            ApplyAggressivenessAdaptation(adaptedBehavior, invasionData);
+            ApplyIntelligenceAdaptation(adaptedBehavior, invasionData);
+            ApplyAdaptabilityAdaptation(adaptedBehavior, invasionData);
+            ApplyDefenseAdaptations(adaptedBehavior, invasionData);
+            
+            // Cross-species learning
+            if (_enableCrossSpeciesLearning)
+            {
+                ApplyCrossSpeciesLearning(adaptedBehavior, history);
+            }
+            
+            return adaptedBehavior;
+        }
+        
+        private void ApplyAggressivenessAdaptation(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            // Increase aggressiveness under population pressure
+            var populationFactor = invasionData.PopulationSize / 500f;
+            var aggressionBoost = Mathf.Min(0.1f, populationFactor * 0.05f);
+            behavior.Aggressiveness = Mathf.Min(1f, behavior.Aggressiveness + aggressionBoost);
+        }
+        
+        private void ApplyIntelligenceAdaptation(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            // Increase intelligence based on survival pressure
+            var survivalPressure = CalculateSurvivalPressure(invasionData);
+            var intelligenceBoost = survivalPressure * 0.03f;
+            behavior.Intelligence = Mathf.Min(1f, behavior.Intelligence + intelligenceBoost);
+        }
+        
+        private void ApplyAdaptabilityAdaptation(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            // Environmental stress increases adaptability
+            var environmentalStress = 1f - invasionData.EnvironmentalTolerance;
+            var adaptabilityBoost = environmentalStress * 0.02f;
+            behavior.Adaptability = Mathf.Min(1f, behavior.Adaptability + adaptabilityBoost);
+        }
+        
+        private void ApplyDefenseAdaptations(PestAIBehavior behavior, PestInvasionData invasionData)
+        {
+            // Improve defense avoidance based on resistance levels
+            var resistanceLevel = Math.Max((float)invasionData.ChemicalResistance, (float)invasionData.BiologicalResistance) / 5f;
+            
+            foreach (DefenseStructureType defense in Enum.GetValues(typeof(DefenseStructureType)))
+            {
+                var currentAvoidance = behavior.DefenseAvoidance.GetValueOrDefault(defense, 0f);
+                var avoidanceBoost = resistanceLevel * 0.01f;
+                behavior.DefenseAvoidance[defense] = Mathf.Min(1f, currentAvoidance + avoidanceBoost);
+            }
+        }
+        
+        private void ApplyCrossSpeciesLearning(PestAIBehavior behavior, AdaptationHistory history)
+        {
+            // Learn from adaptations of other species
+            foreach (var otherHistory in _adaptationHistories.Values)
+            {
+                if (otherHistory.PestType != behavior.PestType && otherHistory.RecentAdaptations.Any())
+                {
+                    var recentAdaptation = otherHistory.RecentAdaptations.Last();
+                    ApplyCrossSpeciesKnowledge(behavior, recentAdaptation);
+                }
+            }
+        }
+        
+        private void ApplyCrossSpeciesKnowledge(PestAIBehavior behavior, AdaptationRecord adaptation)
+        {
+            // Apply reduced learning from other species
+            var learningFactor = 0.1f; // Cross-species learning is less effective
+            
+            behavior.Intelligence = Mathf.Min(1f, behavior.Intelligence + adaptation.IntelligenceChange * learningFactor);
+            behavior.Adaptability = Mathf.Min(1f, behavior.Adaptability + adaptation.AdaptabilityChange * learningFactor);
+        }
+        
+        private float CalculateSurvivalPressure(PestInvasionData invasionData)
+        {
+            var resistancePressure = CalculateResistancePressure(invasionData);
+            var environmentalPressure = 1f - invasionData.EnvironmentalTolerance;
+            var aggressionPressure = invasionData.AggressionLevel;
+            
+            return (resistancePressure + environmentalPressure + aggressionPressure) / 3f;
+        }
+        
+        private PestAIBehavior CloneBehavior(PestAIBehavior original)
+        {
+            return new PestAIBehavior
+            {
+                PestType = original.PestType,
+                Aggressiveness = original.Aggressiveness,
+                Intelligence = original.Intelligence,
+                Adaptability = original.Adaptability,
+                DefenseAvoidance = new Dictionary<DefenseStructureType, float>(original.DefenseAvoidance),
+                PredatorAvoidance = new Dictionary<BeneficialOrganismType, float>(original.PredatorAvoidance),
+                ChemicalResistance = new Dictionary<string, float>(original.ChemicalResistance),
+                PreferredPaths = new List<Vector3>(original.PreferredPaths),
+                LearningRate = original.LearningRate,
+                PlayerCounters = new Dictionary<string, float>(original.PlayerCounters)
+            };
+        }
+        
+        private void RecordAdaptation(AdaptationHistory history, AdaptationResult result)
+        {
+            var record = new AdaptationRecord
+            {
+                Timestamp = DateTime.Now,
+                AdaptationStrength = result.AdaptationStrength,
+                AggressivenessChange = result.UpdatedBehavior.Aggressiveness - result.UpdatedBehavior.Aggressiveness,
+                IntelligenceChange = result.UpdatedBehavior.Intelligence - result.UpdatedBehavior.Intelligence,
+                AdaptabilityChange = result.UpdatedBehavior.Adaptability - result.UpdatedBehavior.Adaptability
+            };
+            
+            history.RecentAdaptations.Add(record);
+            history.LastAdaptation = DateTime.Now;
+            history.TotalAdaptations++;
+            
+            // Keep only recent adaptations
+            if (history.RecentAdaptations.Count > 10)
+            {
+                history.RecentAdaptations.RemoveAt(0);
+            }
+        }
+    }
+    
+    [Serializable]
+    public class AdaptationHistory
+    {
+        public PestType PestType;
+        public DateTime LastAdaptation;
+        public int TotalAdaptations;
+        public List<AdaptationRecord> RecentAdaptations = new List<AdaptationRecord>();
+    }
+    
+    [Serializable]
+    public class AdaptationRecord
+    {
+        public DateTime Timestamp;
+        public float AdaptationStrength;
+        public float AggressivenessChange;
+        public float IntelligenceChange;
+        public float AdaptabilityChange;
+    }
+    
+    [Serializable]
+    public class AdaptationResult
+    {
+        public bool HasAdapted;
+        public PestAIBehavior UpdatedBehavior;
+        public float AdaptationStrength;
+    }
+    
+    #endregion
+    
+    #region Environmental Processing
+    
+    /// <summary>
+    /// Processes environmental factors affecting pest behavior and population dynamics.
+    /// </summary>
+    public class EnvironmentalFactorProcessor
+    {
+        private Dictionary<PestType, EnvironmentalPreferences> _preferences = new Dictionary<PestType, EnvironmentalPreferences>();
+        
+        public EnvironmentalFactorProcessor()
+        {
+            InitializePreferences();
+        }
+        
+        public float GetGrowthModifier(PestType pestType)
+        {
+            if (!_preferences.TryGetValue(pestType, out var prefs))
+                return 1f;
+            
+            var currentConditions = GetCurrentEnvironmentalConditions();
+            return CalculateGrowthModifier(prefs, currentConditions);
+        }
+        
+        public float GetCapacityModifier(PestType pestType)
+        {
+            if (!_preferences.TryGetValue(pestType, out var prefs))
+                return 1f;
+            
+            var currentConditions = GetCurrentEnvironmentalConditions();
+            return CalculateCapacityModifier(prefs, currentConditions);
+        }
+        
+        public float GetMortalityModifier(PestType pestType)
+        {
+            if (!_preferences.TryGetValue(pestType, out var prefs))
+                return 1f;
+            
+            var currentConditions = GetCurrentEnvironmentalConditions();
+            return CalculateMortalityModifier(prefs, currentConditions);
+        }
+        
+        public float CalculateEnvironmentalStress(PestType pestType)
+        {
+            if (!_preferences.TryGetValue(pestType, out var prefs))
+                return 0.5f;
+            
+            var currentConditions = GetCurrentEnvironmentalConditions();
+            return CalculateStressLevel(prefs, currentConditions);
+        }
+        
+        public float GetControlModifier(PestType pestType, IPMStrategyType strategy)
+        {
+            var currentConditions = GetCurrentEnvironmentalConditions();
+            
+            return strategy switch
+            {
+                IPMStrategyType.Chemical => GetChemicalControlModifier(pestType, currentConditions),
+                IPMStrategyType.Biological => GetBiologicalControlModifier(pestType, currentConditions),
+                IPMStrategyType.Environmental => GetEnvironmentalControlModifier(pestType, currentConditions),
+                _ => 1f
+            };
+        }
+        
+        private void InitializePreferences()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _preferences[pestType] = CreateEnvironmentalPreferences(pestType);
+            }
+        }
+        
+        private EnvironmentalPreferences CreateEnvironmentalPreferences(PestType pestType)
+        {
+            return pestType switch
+            {
+                PestType.Aphids => new EnvironmentalPreferences
+                {
+                    OptimalTemperature = 22f,
+                    TemperatureTolerance = 8f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.3f,
+                    OptimalLight = 0.7f,
+                    LightTolerance = 0.4f
+                },
+                PestType.SpiderMites => new EnvironmentalPreferences
+                {
+                    OptimalTemperature = 27f,
+                    TemperatureTolerance = 6f,
+                    OptimalHumidity = 0.4f,
+                    HumidityTolerance = 0.2f,
+                    OptimalLight = 0.8f,
+                    LightTolerance = 0.3f
+                },
+                PestType.Thrips => new EnvironmentalPreferences
+                {
+                    OptimalTemperature = 25f,
+                    TemperatureTolerance = 7f,
+                    OptimalHumidity = 0.5f,
+                    HumidityTolerance = 0.25f,
+                    OptimalLight = 0.75f,
+                    LightTolerance = 0.35f
+                },
+                _ => new EnvironmentalPreferences
+                {
+                    OptimalTemperature = 24f,
+                    TemperatureTolerance = 7f,
+                    OptimalHumidity = 0.55f,
+                    HumidityTolerance = 0.3f,
+                    OptimalLight = 0.7f,
+                    LightTolerance = 0.4f
+                }
+            };
+        }
+        
+        private EnvironmentalConditions GetCurrentEnvironmentalConditions()
+        {
+            // In a real implementation, this would get conditions from EnvironmentalManager
+            return new EnvironmentalConditions
+            {
+                Temperature = UnityEngine.Random.Range(18f, 30f),
+                Humidity = UnityEngine.Random.Range(0.3f, 0.8f),
+                LightLevel = UnityEngine.Random.Range(0.4f, 1f),
+                CO2Level = UnityEngine.Random.Range(400f, 1200f),
+                AirFlow = UnityEngine.Random.Range(0.1f, 1f)
+            };
+        }
+        
+        private float CalculateGrowthModifier(EnvironmentalPreferences prefs, EnvironmentalConditions conditions)
+        {
+            var tempFactor = CalculatePreferenceFactor(conditions.Temperature, prefs.OptimalTemperature, prefs.TemperatureTolerance);
+            var humidityFactor = CalculatePreferenceFactor(conditions.Humidity, prefs.OptimalHumidity, prefs.HumidityTolerance);
+            var lightFactor = CalculatePreferenceFactor(conditions.LightLevel, prefs.OptimalLight, prefs.LightTolerance);
+            
+            return (tempFactor + humidityFactor + lightFactor) / 3f;
+        }
+        
+        private float CalculateCapacityModifier(EnvironmentalPreferences prefs, EnvironmentalConditions conditions)
+        {
+            var baseModifier = CalculateGrowthModifier(prefs, conditions);
+            
+            // Capacity is more sensitive to extreme conditions
+            return Mathf.Pow(baseModifier, 1.5f);
+        }
+        
+        private float CalculateMortalityModifier(EnvironmentalPreferences prefs, EnvironmentalConditions conditions)
+        {
+            var stressLevel = CalculateStressLevel(prefs, conditions);
+            
+            // Higher stress = higher mortality
+            return 1f + stressLevel * 2f;
+        }
+        
+        private float CalculateStressLevel(EnvironmentalPreferences prefs, EnvironmentalConditions conditions)
+        {
+            var tempStress = CalculateStressFactor(conditions.Temperature, prefs.OptimalTemperature, prefs.TemperatureTolerance);
+            var humidityStress = CalculateStressFactor(conditions.Humidity, prefs.OptimalHumidity, prefs.HumidityTolerance);
+            var lightStress = CalculateStressFactor(conditions.LightLevel, prefs.OptimalLight, prefs.LightTolerance);
+            
+            return (tempStress + humidityStress + lightStress) / 3f;
+        }
+        
+        private float CalculatePreferenceFactor(float actual, float optimal, float tolerance)
+        {
+            var deviation = Mathf.Abs(actual - optimal);
+            var normalizedDeviation = deviation / tolerance;
+            
+            return Mathf.Max(0.1f, 1f - normalizedDeviation);
+        }
+        
+        private float CalculateStressFactor(float actual, float optimal, float tolerance)
+        {
+            var deviation = Mathf.Abs(actual - optimal);
+            var normalizedDeviation = deviation / tolerance;
+            
+            return Mathf.Min(1f, normalizedDeviation);
+        }
+        
+        private float GetChemicalControlModifier(PestType pestType, EnvironmentalConditions conditions)
+        {
+            // Temperature and humidity affect chemical effectiveness
+            var tempEffect = Mathf.InverseLerp(15f, 35f, conditions.Temperature); // Better at moderate temps
+            var humidityEffect = 1f - Mathf.Abs(0.6f - conditions.Humidity); // Best at 60% humidity
+            
+            return (tempEffect + humidityEffect) / 2f;
+        }
+        
+        private float GetBiologicalControlModifier(PestType pestType, EnvironmentalConditions conditions)
+        {
+            // Biological controls are more sensitive to environmental conditions
+            var tempEffect = 1f - Mathf.Abs(conditions.Temperature - 23f) / 10f; // Optimal at 23°C
+            var humidityEffect = Mathf.InverseLerp(0.4f, 0.8f, conditions.Humidity); // Need higher humidity
+            
+            return Mathf.Max(0.3f, (tempEffect + humidityEffect) / 2f);
+        }
+        
+        private float GetEnvironmentalControlModifier(PestType pestType, EnvironmentalConditions conditions)
+        {
+            // Environmental controls are most effective when conditions are already stressful
+            var stressLevel = CalculateStressLevel(_preferences[pestType], conditions);
+            
+            return 0.5f + stressLevel * 0.5f; // More effective under stress
+        }
+    }
+    
+    [Serializable]
+    public class EnvironmentalPreferences
+    {
+        public float OptimalTemperature;
+        public float TemperatureTolerance;
+        public float OptimalHumidity;
+        public float HumidityTolerance;
+        public float OptimalLight;
+        public float LightTolerance;
+    }
+    
+    [Serializable]
+    public class EnvironmentalConditions
+    {
+        public float Temperature;
+        public float Humidity;
+        public float LightLevel;
+        public float CO2Level;
+        public float AirFlow;
+    }
+    
+    #endregion
+    
+    #region Seasonal and Stress Management
+    
+    /// <summary>
+    /// Manages seasonal behavior patterns for pest species.
+    /// </summary>
+    public class SeasonalBehaviorManager
+    {
+        private Dictionary<PestType, SeasonalProfile> _seasonalProfiles = new Dictionary<PestType, SeasonalProfile>();
+        
+        public SeasonalBehaviorManager()
+        {
+            InitializeSeasonalProfiles();
+        }
+        
+        public float GetSeasonalModifier(PestType pestType)
+        {
+            if (!_seasonalProfiles.TryGetValue(pestType, out var profile))
+                return 1f;
+            
+            var currentSeason = GetCurrentSeason();
+            return profile.SeasonalMultipliers.GetValueOrDefault(currentSeason, 1f);
+        }
+        
+        private void InitializeSeasonalProfiles()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _seasonalProfiles[pestType] = CreateSeasonalProfile(pestType);
+            }
+        }
+        
+        private SeasonalProfile CreateSeasonalProfile(PestType pestType)
+        {
+            return pestType switch
+            {
+                PestType.Aphids => new SeasonalProfile
+                {
+                    SeasonalMultipliers = new Dictionary<string, float>
+                    {
+                        ["Spring"] = 1.3f,
+                        ["Summer"] = 1.1f,
+                        ["Fall"] = 0.8f,
+                        ["Winter"] = 0.3f
+                    }
+                },
+                PestType.SpiderMites => new SeasonalProfile
+                {
+                    SeasonalMultipliers = new Dictionary<string, float>
+                    {
+                        ["Spring"] = 1.1f,
+                        ["Summer"] = 1.4f,
+                        ["Fall"] = 1.0f,
+                        ["Winter"] = 0.4f
+                    }
+                },
+                _ => new SeasonalProfile
+                {
+                    SeasonalMultipliers = new Dictionary<string, float>
+                    {
+                        ["Spring"] = 1.2f,
+                        ["Summer"] = 1.2f,
+                        ["Fall"] = 0.9f,
+                        ["Winter"] = 0.5f
+                    }
+                }
+            };
+        }
+        
+        private string GetCurrentSeason()
+        {
+            var month = DateTime.Now.Month;
+            return month switch
+            {
+                >= 3 and <= 5 => "Spring",
+                >= 6 and <= 8 => "Summer",
+                >= 9 and <= 11 => "Fall",
+                _ => "Winter"
+            };
+        }
+    }
+    
+    [Serializable]
+    public class SeasonalProfile
+    {
+        public Dictionary<string, float> SeasonalMultipliers;
+    }
+    
+    /// <summary>
+    /// Manages stress response systems for pest populations.
+    /// </summary>
+    public class StressResponseSystem
+    {
+        private Dictionary<string, StressState> _stressStates = new Dictionary<string, StressState>();
+        
+        public float GetStressModifier(string invasionId)
+        {
+            if (!_stressStates.TryGetValue(invasionId, out var stress))
+                return 1f;
+            
+            return 1f - stress.StressLevel * 0.5f; // Stress reduces growth
+        }
+        
+        public float CalculateStressLevel(string invasionId)
+        {
+            return _stressStates.GetValueOrDefault(invasionId)?.StressLevel ?? 0f;
+        }
+        
+        public void UpdateStressLevel(string invasionId, float environmentalStress)
+        {
+            if (!_stressStates.TryGetValue(invasionId, out var stress))
+            {
+                stress = new StressState { InvasionId = invasionId };
+                _stressStates[invasionId] = stress;
+            }
+            
+            // Update stress with decay
+            stress.StressLevel = Mathf.Lerp(stress.StressLevel, environmentalStress, 0.1f);
+            stress.LastUpdate = DateTime.Now;
+            
+            _stressStates[invasionId] = stress;
+        }
+    }
+    
+    [Serializable]
+    public class StressState
+    {
+        public string InvasionId;
+        public float StressLevel;
+        public DateTime LastUpdate;
+        public List<string> StressFactors = new List<string>();
+    }
+    
+    #endregion
+    
+    #region Performance Optimization
+    
+    /// <summary>
+    /// Schedules and optimizes pest simulation updates for performance.
+    /// </summary>
+    public class PestSimulationScheduler
+    {
+        private readonly int _maxUpdatesPerFrame;
+        private Queue<string> _updateQueue = new Queue<string>();
+        private Dictionary<string, DateTime> _lastUpdates = new Dictionary<string, DateTime>();
+        
+        public PestSimulationScheduler(int maxUpdatesPerFrame)
+        {
+            _maxUpdatesPerFrame = maxUpdatesPerFrame;
+        }
+        
+        public void ScheduleUpdate(string invasionId)
+        {
+            if (!_updateQueue.Contains(invasionId))
+            {
+                _updateQueue.Enqueue(invasionId);
+            }
+        }
+        
+        public List<string> GetUpdatesForFrame()
+        {
+            var updates = new List<string>();
+            var count = Math.Min(_maxUpdatesPerFrame, _updateQueue.Count);
+            
+            for (int i = 0; i < count; i++)
+            {
+                if (_updateQueue.Count > 0)
+                {
+                    var invasionId = _updateQueue.Dequeue();
+                    updates.Add(invasionId);
+                    _lastUpdates[invasionId] = DateTime.Now;
+                }
+            }
+            
+            return updates;
+        }
+        
+        public bool ShouldUpdate(string invasionId, float updateInterval)
+        {
+            if (!_lastUpdates.TryGetValue(invasionId, out var lastUpdate))
+                return true;
+            
+            return (DateTime.Now - lastUpdate).TotalSeconds >= updateInterval;
+        }
+    }
+    
+    #endregion
+}

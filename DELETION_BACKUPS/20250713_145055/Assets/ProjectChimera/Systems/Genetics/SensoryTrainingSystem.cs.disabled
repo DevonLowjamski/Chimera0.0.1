@@ -1,0 +1,752 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Advanced Sensory Training System for Project Chimera.
+    /// Provides immersive terpene identification and aromatic profiling games
+    /// that teach real cannabis science while building player expertise.
+    /// Features adaptive difficulty, scientific accuracy, and progressive skill building.
+    /// </summary>
+    public class SensoryTrainingSystem
+    {
+        private readonly GeneticsConfigSO _config;
+        private readonly Dictionary<string, SensoryTrainingSession> _activeSessions = new Dictionary<string, SensoryTrainingSession>();
+        private readonly Dictionary<string, TerpeneProfile> _terpeneDatabase = new Dictionary<string, TerpeneProfile>();
+        private readonly List<AromaticDescriptor> _aromaticDescriptors = new List<AromaticDescriptor>();
+        
+        // Advanced Terpene Science Integration
+        private TerpeneDatabase _terpeneDb;
+        private AromaticProfileGenerator _profileGenerator;
+        private SensoryDifficultyEngine _difficultyEngine;
+        private PerformanceAnalyzer _performanceAnalyzer;
+        
+        // Adaptive Learning
+        private PlayerSensoryProfile _playerProfiles = new PlayerSensoryProfile();
+        private SkillProgressionTracker _progressionTracker;
+        private PersonalizedChallengeGenerator _challengeGenerator;
+        
+        // Events
+        public event Action<SensoryTrainingSession> OnTrainingCompleted;
+        public event Action<string, string> OnTerpeneIdentified;
+        public event Action<string, int> OnStreakAchieved;
+        public event Action<string, string> OnNewTerpeneUnlocked;
+        
+        public SensoryTrainingSystem(GeneticsConfigSO config)
+        {
+            _config = config;
+            InitializeSystem();
+        }
+        
+        private void InitializeSystem()
+        {
+            // Initialize terpene science systems
+            _terpeneDb = new TerpeneDatabase(_config);
+            _profileGenerator = new AromaticProfileGenerator(_config);
+            _difficultyEngine = new SensoryDifficultyEngine(_config);
+            _performanceAnalyzer = new PerformanceAnalyzer(_config);
+            
+            // Initialize adaptive learning systems
+            _progressionTracker = new SkillProgressionTracker(_config);
+            _challengeGenerator = new PersonalizedChallengeGenerator(_config);
+            
+            // Load scientific terpene data
+            LoadTerpeneDatabase();
+            LoadAromaticDescriptors();
+            
+            Debug.Log("[SensoryTrainingSystem] Initialized with advanced terpene science integration");
+        }
+        
+        #region Session Management
+        
+        public SensoryTrainingSession CreateTrainingSession(string playerId, SensoryGameType gameType, DifficultyLevel difficulty)
+        {
+            var session = new SensoryTrainingSession
+            {
+                PlayerId = playerId,
+                GameType = gameType,
+                Difficulty = difficulty
+            };
+            
+            // Customize session based on game type and player skill
+            ConfigureSession(session, playerId);
+            
+            // Generate challenges for this session
+            GenerateSessionChallenges(session);
+            
+            _activeSessions[session.SessionId] = session;
+            return session;
+        }
+        
+        private void ConfigureSession(SensoryTrainingSession session, string playerId)
+        {
+            var playerProfile = _playerProfiles.GetPlayerProfile(playerId);
+            
+            switch (session.GameType)
+            {
+                case SensoryGameType.TerpeneIdentification:
+                    ConfigureTerpeneIdentification(session, playerProfile);
+                    break;
+                    
+                case SensoryGameType.AromaticBlending:
+                    ConfigureAromaticBlending(session, playerProfile);
+                    break;
+                    
+                case SensoryGameType.ConcentrationDetection:
+                    ConfigureConcentrationDetection(session, playerProfile);
+                    break;
+                    
+                case SensoryGameType.ProfileMatching:
+                    ConfigureProfileMatching(session, playerProfile);
+                    break;
+                    
+                case SensoryGameType.NoveltyDetection:
+                    ConfigureNoveltyDetection(session, playerProfile);
+                    break;
+                    
+                case SensoryGameType.QualityAssessment:
+                    ConfigureQualityAssessment(session, playerProfile);
+                    break;
+            }
+        }
+        
+        private void ConfigureTerpeneIdentification(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Select appropriate terpenes based on player skill
+            var availableTerpenes = _terpeneDb.GetTerpenesForSkillLevel(playerProfile.TerpeneKnowledgeLevel);
+            var targetTerpenes = _difficultyEngine.SelectTerpenes(availableTerpenes, session.Difficulty, session.NumberOfSamples);
+            
+            session.TargetTerpenes = targetTerpenes.Select(t => t.TerpeneName).ToList();
+            session.NumberOfSamples = Math.Min(session.NumberOfSamples, targetTerpenes.Count);
+            session.TimePerSample = _difficultyEngine.GetTimeLimit(session.Difficulty, session.GameType);
+            session.AllowHints = _difficultyEngine.AllowHints(session.Difficulty);
+            session.ShowScientificNames = playerProfile.PreferScientificNames;
+        }
+        
+        private void ConfigureAromaticBlending(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Set up complex aromatic blending challenges
+            session.NumberOfSamples = 3; // Fewer but more complex
+            session.TimePerSample = 90f; // More time for complex analysis
+            session.AllowHints = true; // Complex game, hints helpful
+            
+            // Select complementary and contrasting terpenes
+            var primaryTerpenes = _terpeneDb.GetPrimaryTerpenes();
+            var secondaryTerpenes = _terpeneDb.GetSecondaryTerpenes();
+            session.TargetTerpenes = _challengeGenerator.CreateBlendingCombinations(primaryTerpenes, secondaryTerpenes, session.Difficulty);
+        }
+        
+        private void ConfigureConcentrationDetection(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Focus on concentration differences
+            session.NumberOfSamples = 6;
+            session.TimePerSample = 30f;
+            session.AllowHints = false; // Pure sensory challenge
+            
+            // Use familiar terpenes but vary concentrations
+            var familiarTerpenes = playerProfile.ProficientTerpenes.Take(3).ToList();
+            session.TargetTerpenes = familiarTerpenes;
+        }
+        
+        private void ConfigureProfileMatching(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Match complex strain profiles
+            session.NumberOfSamples = 4;
+            session.TimePerSample = 120f; // Complex analysis
+            session.AllowHints = true;
+            
+            // Use realistic strain profiles
+            var strainProfiles = _terpeneDb.GetRealisticStrainProfiles(session.Difficulty);
+            session.TargetTerpenes = strainProfiles.SelectMany(p => p.DominantTerpenes).Distinct().ToList();
+        }
+        
+        private void ConfigureNoveltyDetection(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Detect unusual or rare combinations
+            session.NumberOfSamples = 5;
+            session.TimePerSample = 45f;
+            session.AllowHints = false;
+            
+            // Mix familiar with unfamiliar
+            var rareTerpenes = _terpeneDb.GetRareTerpenes();
+            var familiarTerpenes = playerProfile.ProficientTerpenes;
+            session.TargetTerpenes = _challengeGenerator.CreateNoveltyMix(familiarTerpenes, rareTerpenes, session.Difficulty);
+        }
+        
+        private void ConfigureQualityAssessment(SensoryTrainingSession session, PlayerProfile playerProfile)
+        {
+            // Assess overall aromatic quality and balance
+            session.NumberOfSamples = 3;
+            session.TimePerSample = 180f; // Extended analysis
+            session.AllowHints = true;
+            
+            // Use high-quality vs flawed profiles
+            session.TargetTerpenes = _terpeneDb.GetQualityComparisonTerpenes();
+        }
+        
+        #endregion
+        
+        #region Challenge Generation
+        
+        private void GenerateSessionChallenges(SensoryTrainingSession session)
+        {
+            session.Challenges.Clear();
+            
+            for (int i = 0; i < session.NumberOfSamples; i++)
+            {
+                var challenge = GenerateChallenge(session, i);
+                session.Challenges.Add(challenge);
+            }
+        }
+        
+        private SensoryChallenge GenerateChallenge(SensoryTrainingSession session, int challengeIndex)
+        {
+            var challenge = new SensoryChallenge();
+            
+            switch (session.GameType)
+            {
+                case SensoryGameType.TerpeneIdentification:
+                    GenerateTerpeneIdentificationChallenge(challenge, session, challengeIndex);
+                    break;
+                    
+                case SensoryGameType.AromaticBlending:
+                    GenerateAromaticBlendingChallenge(challenge, session, challengeIndex);
+                    break;
+                    
+                case SensoryGameType.ConcentrationDetection:
+                    GenerateConcentrationDetectionChallenge(challenge, session, challengeIndex);
+                    break;
+                    
+                case SensoryGameType.ProfileMatching:
+                    GenerateProfileMatchingChallenge(challenge, session, challengeIndex);
+                    break;
+                    
+                case SensoryGameType.NoveltyDetection:
+                    GenerateNoveltyDetectionChallenge(challenge, session, challengeIndex);
+                    break;
+                    
+                case SensoryGameType.QualityAssessment:
+                    GenerateQualityAssessmentChallenge(challenge, session, challengeIndex);
+                    break;
+            }
+            
+            return challenge;
+        }
+        
+        private void GenerateTerpeneIdentificationChallenge(SensoryChallenge challenge, SensoryTrainingSession session, int index)
+        {
+            // Select target terpene for this challenge
+            var targetTerpene = session.TargetTerpenes[index % session.TargetTerpenes.Count];
+            var terpeneData = _terpeneDb.GetTerpene(targetTerpene);
+            
+            // Create aromatic profile
+            var profile = _profileGenerator.CreateSingleTerpeneProfile(terpeneData, session.Difficulty);
+            challenge.TerpeneProfile = JsonUtility.ToJson(profile);
+            challenge.CorrectAnswer = session.ShowScientificNames ? terpeneData.ScientificName : terpeneData.CommonName;
+            
+            // Generate answer options (including correct answer)
+            challenge.AnswerOptions = GenerateAnswerOptions(terpeneData, session);
+            
+            // Add descriptive information
+            challenge.VisualDescription = terpeneData.VisualDescription;
+            challenge.AromaticDescriptors = terpeneData.AromaticDescriptors.ToList();
+            challenge.ScientificExplanation = GenerateScientificExplanation(terpeneData);
+        }
+        
+        private void GenerateAromaticBlendingChallenge(SensoryChallenge challenge, SensoryTrainingSession session, int index)
+        {
+            // Create complex blended profile
+            var primaryTerpene = session.TargetTerpenes[index * 2 % session.TargetTerpenes.Count];
+            var secondaryTerpene = session.TargetTerpenes[(index * 2 + 1) % session.TargetTerpenes.Count];
+            
+            var primaryData = _terpeneDb.GetTerpene(primaryTerpene);
+            var secondaryData = _terpeneDb.GetTerpene(secondaryTerpene);
+            
+            var blendedProfile = _profileGenerator.CreateBlendedProfile(primaryData, secondaryData, session.Difficulty);
+            challenge.TerpeneProfile = JsonUtility.ToJson(blendedProfile);
+            
+            // Correct answer is the blend description
+            challenge.CorrectAnswer = $"{primaryData.CommonName} + {secondaryData.CommonName}";
+            
+            // Generate options with different blends
+            challenge.AnswerOptions = GenerateBlendingOptions(primaryData, secondaryData, session);
+            
+            challenge.AromaticDescriptors = CombineDescriptors(primaryData.AromaticDescriptors, secondaryData.AromaticDescriptors);
+            challenge.ScientificExplanation = GenerateBlendingExplanation(primaryData, secondaryData);
+        }
+        
+        #endregion
+        
+        #region Response Processing
+        
+        public SensoryResponse ProcessResponse(string sessionId, string challengeId, string response)
+        {
+            var session = _activeSessions.GetValueOrDefault(sessionId);
+            if (session == null) return new SensoryResponse { IsCorrect = false };
+            
+            var challenge = session.Challenges.FirstOrDefault(c => c.ChallengeId == challengeId);
+            if (challenge == null) return new SensoryResponse { IsCorrect = false };
+            
+            // Record response
+            challenge.PlayerAnswer = response;
+            challenge.ResponseTime = DateTime.Now;
+            challenge.ResponseDuration = (float)(challenge.ResponseTime.Value - challenge.PresentationTime).TotalSeconds;
+            challenge.IsCorrect = EvaluateResponse(challenge, response);
+            
+            // Update session statistics
+            UpdateSessionStatistics(session, challenge);
+            
+            // Check for completion
+            if (IsSessionComplete(session))
+            {
+                CompleteSession(session);
+            }
+            
+            var sensoryResponse = new SensoryResponse
+            {
+                IsCorrect = challenge.IsCorrect,
+                TerpeneIdentified = challenge.CorrectAnswer,
+                ResponseTime = challenge.ResponseDuration
+            };
+            
+            if (challenge.IsCorrect)
+            {
+                OnTerpeneIdentified?.Invoke(session.PlayerId, challenge.CorrectAnswer);
+                CheckForStreak(session);
+            }
+            
+            return sensoryResponse;
+        }
+        
+        private bool EvaluateResponse(SensoryChallenge challenge, string response)
+        {
+            // Handle different response evaluation methods
+            switch (GetGameTypeFromChallenge(challenge))
+            {
+                case SensoryGameType.TerpeneIdentification:
+                    return EvaluateTerpeneIdentification(challenge, response);
+                    
+                case SensoryGameType.AromaticBlending:
+                    return EvaluateAromaticBlending(challenge, response);
+                    
+                default:
+                    return response.Equals(challenge.CorrectAnswer, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        
+        private bool EvaluateTerpeneIdentification(SensoryChallenge challenge, string response)
+        {
+            // Allow for both common and scientific names
+            var correctAnswers = new List<string> { challenge.CorrectAnswer };
+            
+            // Add alternative acceptable answers
+            var terpeneData = _terpeneDb.GetTerpeneByName(challenge.CorrectAnswer);
+            if (terpeneData != null)
+            {
+                correctAnswers.Add(terpeneData.CommonName);
+                correctAnswers.Add(terpeneData.ScientificName);
+                correctAnswers.AddRange(terpeneData.AlternativeNames);
+            }
+            
+            return correctAnswers.Any(answer => 
+                answer.Equals(response, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        private bool EvaluateAromaticBlending(SensoryChallenge challenge, string response)
+        {
+            // More flexible evaluation for blending
+            var correctParts = challenge.CorrectAnswer.Split('+').Select(p => p.Trim()).ToList();
+            var responseParts = response.Split('+', '&', ',').Select(p => p.Trim()).ToList();
+            
+            // Check if response contains the main components
+            var correctComponents = 0;
+            foreach (var part in correctParts)
+            {
+                if (responseParts.Any(rp => rp.Equals(part, StringComparison.OrdinalIgnoreCase)))
+                {
+                    correctComponents++;
+                }
+            }
+            
+            return correctComponents >= correctParts.Count * 0.7f; // 70% accuracy threshold
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private void LoadTerpeneDatabase()
+        {
+            // Load comprehensive terpene data
+            _terpeneDatabase["Myrcene"] = new TerpeneProfile
+            {
+                TerpeneName = "Myrcene",
+                ScientificName = "β-Myrcene",
+                CommonName = "Myrcene",
+                AlternativeNames = new[] { "Beta-Myrcene", "β-Myrcene" },
+                AromaticDescriptors = new[] { "Earthy", "Musky", "Herbal", "Clove-like", "Sedating" },
+                VisualDescription = "Colorless liquid with penetrating odor",
+                BoilingPoint = 166.7f,
+                Density = 0.801f,
+                SolubilityInWater = "Insoluble",
+                CommonSources = new[] { "Hops", "Lemongrass", "Thyme", "Cannabis" },
+                EffectsProfile = new[] { "Sedating", "Muscle Relaxant", "Sleep Aid" },
+                ConcentrationRange = new Vector2(0.1f, 2.0f), // Typical % in cannabis
+                RarityLevel = 1 // Very common
+            };
+            
+            // Limonene
+            _terpeneDatabase["Limonene"] = new TerpeneProfile
+            {
+                TerpeneName = "Limonene",
+                ScientificName = "D-Limonene",
+                CommonName = "Limonene",
+                AromaticDescriptors = new[] { "Citrus", "Fresh", "Lemon", "Orange", "Uplifting" },
+                VisualDescription = "Clear, colorless liquid",
+                BoilingPoint = 176f,
+                CommonSources = new[] { "Citrus fruits", "Pine needles", "Cannabis" },
+                EffectsProfile = new[] { "Uplifting", "Stress Relief", "Mood Enhancement" },
+                ConcentrationRange = new Vector2(0.05f, 1.5f),
+                RarityLevel = 2
+            };
+            
+            // Pinene
+            _terpeneDatabase["Pinene"] = new TerpeneProfile
+            {
+                TerpeneName = "Pinene",
+                ScientificName = "α-Pinene",
+                CommonName = "Pinene",
+                AromaticDescriptors = new[] { "Pine", "Fresh", "Sharp", "Herbal", "Alert" },
+                VisualDescription = "Colorless liquid with pine-like odor",
+                BoilingPoint = 155f,
+                CommonSources = new[] { "Pine trees", "Rosemary", "Basil", "Cannabis" },
+                EffectsProfile = new[] { "Alertness", "Memory Retention", "Respiratory Support" },
+                ConcentrationRange = new Vector2(0.02f, 1.0f),
+                RarityLevel = 2
+            };
+        }
+        
+        private void LoadAromaticDescriptors()
+        {
+            _aromaticDescriptors.AddRange(new[]
+            {
+                new AromaticDescriptor { Term = "Earthy", Category = "Base", Intensity = "Medium" },
+                new AromaticDescriptor { Term = "Citrus", Category = "Bright", Intensity = "High" },
+                new AromaticDescriptor { Term = "Pine", Category = "Fresh", Intensity = "Medium" },
+                new AromaticDescriptor { Term = "Floral", Category = "Delicate", Intensity = "Light" },
+                new AromaticDescriptor { Term = "Spicy", Category = "Warm", Intensity = "High" },
+                new AromaticDescriptor { Term = "Sweet", Category = "Pleasant", Intensity = "Medium" },
+                new AromaticDescriptor { Term = "Woody", Category = "Base", Intensity = "Medium" },
+                new AromaticDescriptor { Term = "Fruity", Category = "Bright", Intensity = "High" }
+            });
+        }
+        
+        private List<string> GenerateAnswerOptions(TerpeneProfile correctTerpene, SensoryTrainingSession session)
+        {
+            var options = new List<string> { correctTerpene.CommonName };
+            
+            // Add similar terpenes as distractors
+            var similarTerpenes = _terpeneDb.GetSimilarTerpenes(correctTerpene, 3);
+            options.AddRange(similarTerpenes.Select(t => t.CommonName));
+            
+            // Shuffle options
+            return options.OrderBy(x => UnityEngine.Random.value).ToList();
+        }
+        
+        private List<string> GenerateBlendingOptions(TerpeneProfile primary, TerpeneProfile secondary, SensoryTrainingSession session)
+        {
+            var options = new List<string>
+            {
+                $"{primary.CommonName} + {secondary.CommonName}",
+                $"{secondary.CommonName} + {primary.CommonName}"
+            };
+            
+            // Add incorrect combinations
+            var otherTerpenes = _terpeneDb.GetRandomTerpenes(4);
+            foreach (var other in otherTerpenes)
+            {
+                options.Add($"{primary.CommonName} + {other.CommonName}");
+            }
+            
+            return options.Take(4).OrderBy(x => UnityEngine.Random.value).ToList();
+        }
+        
+        private SensoryGameType GetGameTypeFromChallenge(SensoryChallenge challenge)
+        {
+            // Determine game type from challenge characteristics
+            return SensoryGameType.TerpeneIdentification; // Placeholder
+        }
+        
+        private void UpdateSessionStatistics(SensoryTrainingSession session, SensoryChallenge challenge)
+        {
+            var completedChallenges = session.Challenges.Count(c => c.ResponseTime.HasValue);
+            var correctChallenges = session.Challenges.Count(c => c.IsCorrect);
+            
+            session.OverallAccuracy = completedChallenges > 0 ? (float)correctChallenges / completedChallenges : 0f;
+            session.AverageResponseTime = session.Challenges
+                .Where(c => c.ResponseTime.HasValue)
+                .Average(c => c.ResponseDuration);
+            
+            // Update streak
+            if (challenge.IsCorrect)
+            {
+                session.CurrentStreak++;
+                session.LongestStreak = Math.Max(session.LongestStreak, session.CurrentStreak);
+            }
+            else
+            {
+                session.CurrentStreak = 0;
+            }
+        }
+        
+        private bool IsSessionComplete(SensoryTrainingSession session)
+        {
+            return session.Challenges.All(c => c.ResponseTime.HasValue);
+        }
+        
+        private void CompleteSession(SensoryTrainingSession session)
+        {
+            // Calculate final experience and progression
+            session.ExperienceGained = CalculateExperienceGained(session);
+            
+            // Update player profile
+            UpdatePlayerProfile(session);
+            
+            OnTrainingCompleted?.Invoke(session);
+            _activeSessions.Remove(session.SessionId);
+        }
+        
+        private int CalculateExperienceGained(SensoryTrainingSession session)
+        {
+            var baseExp = 50;
+            var accuracyBonus = (int)(session.OverallAccuracy * 100);
+            var streakBonus = session.LongestStreak * 10;
+            var difficultyMultiplier = ((int)session.Difficulty + 1) * 0.5f;
+            
+            return (int)((baseExp + accuracyBonus + streakBonus) * difficultyMultiplier);
+        }
+        
+        private void UpdatePlayerProfile(SensoryTrainingSession session)
+        {
+            var profile = _playerProfiles.GetPlayerProfile(session.PlayerId);
+            
+            // Update statistics
+            profile.TotalSessions++;
+            profile.TotalCorrectResponses += session.Challenges.Count(c => c.IsCorrect);
+            profile.TotalResponses += session.Challenges.Count;
+            profile.OverallAccuracy = (float)profile.TotalCorrectResponses / profile.TotalResponses;
+            
+            // Update terpene proficiencies
+            foreach (var challenge in session.Challenges.Where(c => c.IsCorrect))
+            {
+                var terpeneName = ExtractTerpeneName(challenge.CorrectAnswer);
+                if (!string.IsNullOrEmpty(terpeneName) && !profile.ProficientTerpenes.Contains(terpeneName))
+                {
+                    profile.ProficientTerpenes.Add(terpeneName);
+                    OnNewTerpeneUnlocked?.Invoke(session.PlayerId, terpeneName);
+                }
+            }
+        }
+        
+        private void CheckForStreak(SensoryTrainingSession session)
+        {
+            if (session.CurrentStreak > 0 && session.CurrentStreak % 5 == 0)
+            {
+                OnStreakAchieved?.Invoke(session.PlayerId, session.CurrentStreak);
+            }
+        }
+        
+        private string ExtractTerpeneName(string answer)
+        {
+            // Extract terpene name from complex answers
+            if (answer.Contains("+"))
+            {
+                return answer.Split('+')[0].Trim();
+            }
+            if (answer.Contains("-"))
+            {
+                return answer.Split('-')[0].Trim();
+            }
+            return answer;
+        }
+        
+        private List<string> CombineDescriptors(string[] descriptors1, string[] descriptors2)
+        {
+            return descriptors1.Union(descriptors2).ToList();
+        }
+        
+        private string GenerateScientificExplanation(TerpeneProfile terpene)
+        {
+            return $"{terpene.ScientificName} is a terpene commonly found in {string.Join(", ", terpene.CommonSources)}. " +
+                   $"It has a boiling point of {terpene.BoilingPoint}°C and is known for its {string.Join(", ", terpene.AromaticDescriptors)} aroma profile. " +
+                   $"This terpene is associated with {string.Join(", ", terpene.EffectsProfile)} effects.";
+        }
+        
+        private string GenerateBlendingExplanation(TerpeneProfile primary, TerpeneProfile secondary)
+        {
+            return $"This blend combines {primary.CommonName} ({string.Join(", ", primary.AromaticDescriptors)}) " +
+                   $"with {secondary.CommonName} ({string.Join(", ", secondary.AromaticDescriptors)}). " +
+                   $"The interaction creates a complex aromatic profile that demonstrates terpene synergy.";
+        }
+        
+        public string GetSessionPlayerId(string sessionId)
+        {
+            var session = _activeSessions.GetValueOrDefault(sessionId);
+            return session?.PlayerId ?? "";
+        }
+        
+        public void Update(float deltaTime)
+        {
+            // Update session timers, cleanup expired sessions
+            CleanupExpiredSessions();
+        }
+        
+        private void CleanupExpiredSessions()
+        {
+            var expiredSessions = _activeSessions.Values
+                .Where(s => (DateTime.Now - s.Challenges.FirstOrDefault()?.PresentationTime ?? DateTime.Now).TotalHours > 2)
+                .ToList();
+            
+            foreach (var session in expiredSessions)
+            {
+                _activeSessions.Remove(session.SessionId);
+            }
+        }
+        
+        public void ApplyConfiguration(GeneticsConfigSO config)
+        {
+            // Apply configuration changes
+            _terpeneDb?.ApplyConfiguration(config);
+            _profileGenerator?.ApplyConfiguration(config);
+        }
+        
+        #endregion
+    }
+    
+    #region Supporting Classes and Data Structures
+    
+    public class TerpeneProfile
+    {
+        public string TerpeneName;
+        public string ScientificName;
+        public string CommonName;
+        public string[] AlternativeNames;
+        public string[] AromaticDescriptors;
+        public string VisualDescription;
+        public float BoilingPoint;
+        public float Density;
+        public string SolubilityInWater;
+        public string[] CommonSources;
+        public string[] EffectsProfile;
+        public Vector2 ConcentrationRange;
+        public int RarityLevel; // 1-5, 1 = very common, 5 = very rare
+    }
+    
+    public class AromaticDescriptor
+    {
+        public string Term;
+        public string Category;
+        public string Intensity;
+    }
+    
+    public class StrainProfile
+    {
+        public string StrainName;
+        public List<string> DominantTerpenes;
+        public List<string> AromaticProfile;
+        public string QualityRating;
+    }
+    
+    public class PlayerProfile
+    {
+        public string PlayerId;
+        public int TotalSessions;
+        public int TotalResponses;
+        public int TotalCorrectResponses;
+        public float OverallAccuracy;
+        public List<string> ProficientTerpenes = new List<string>();
+        public List<string> EarnedBadges = new List<string>();
+        public int TerpeneKnowledgeLevel;
+        public bool PreferScientificNames;
+    }
+    
+    // Placeholder classes for advanced systems
+    public class TerpeneDatabase
+    {
+        public TerpeneDatabase(GeneticsConfigSO config) { }
+        public List<TerpeneProfile> GetTerpenesForSkillLevel(int level) => new List<TerpeneProfile>();
+        public TerpeneProfile GetTerpene(string name) => new TerpeneProfile();
+        public TerpeneProfile GetTerpeneByName(string name) => new TerpeneProfile();
+        public List<TerpeneProfile> GetSimilarTerpenes(TerpeneProfile terpene, int count) => new List<TerpeneProfile>();
+        public List<TerpeneProfile> GetRandomTerpenes(int count) => new List<TerpeneProfile>();
+        public List<TerpeneProfile> GetPrimaryTerpenes() => new List<TerpeneProfile>();
+        public List<TerpeneProfile> GetSecondaryTerpenes() => new List<TerpeneProfile>();
+        public List<TerpeneProfile> GetRareTerpenes() => new List<TerpeneProfile>();
+        public List<string> GetQualityComparisonTerpenes() => new List<string>();
+        public List<StrainProfile> GetRealisticStrainProfiles(DifficultyLevel difficulty) => new List<StrainProfile>();
+        public List<string> GetUnlocksForLevel(int level) => new List<string>();
+        public void ApplyConfiguration(GeneticsConfigSO config) { }
+    }
+    
+    public class AromaticProfileGenerator
+    {
+        public AromaticProfileGenerator(GeneticsConfigSO config) { }
+        public object CreateSingleTerpeneProfile(TerpeneProfile terpene, DifficultyLevel difficulty) => new object();
+        public object CreateBlendedProfile(TerpeneProfile primary, TerpeneProfile secondary, DifficultyLevel difficulty) => new object();
+        public void ApplyConfiguration(GeneticsConfigSO config) { }
+    }
+    
+    public class SensoryDifficultyEngine
+    {
+        public SensoryDifficultyEngine(GeneticsConfigSO config) { }
+        public List<TerpeneProfile> SelectTerpenes(List<TerpeneProfile> available, DifficultyLevel difficulty, int count) => new List<TerpeneProfile>();
+        public float GetTimeLimit(DifficultyLevel difficulty, SensoryGameType gameType) => 30f;
+        public bool AllowHints(DifficultyLevel difficulty) => difficulty <= DifficultyLevel.Intermediate;
+    }
+    
+    public class PerformanceAnalyzer
+    {
+        public PerformanceAnalyzer(GeneticsConfigSO config) { }
+    }
+    
+    public class SkillProgressionTracker
+    {
+        public SkillProgressionTracker(GeneticsConfigSO config) { }
+    }
+    
+    public class PersonalizedChallengeGenerator
+    {
+        public PersonalizedChallengeGenerator(GeneticsConfigSO config) { }
+        public List<string> CreateBlendingCombinations(List<TerpeneProfile> primary, List<TerpeneProfile> secondary, DifficultyLevel difficulty) => new List<string>();
+        public List<string> CreateNoveltyMix(List<string> familiar, List<TerpeneProfile> rare, DifficultyLevel difficulty) => new List<string>();
+    }
+    
+    public class PlayerSensoryProfile
+    {
+        private Dictionary<string, PlayerProfile> _profiles = new Dictionary<string, PlayerProfile>();
+        
+        public PlayerProfile GetPlayerProfile(string playerId)
+        {
+            if (!_profiles.TryGetValue(playerId, out var profile))
+            {
+                profile = new PlayerProfile { PlayerId = playerId };
+                _profiles[playerId] = profile;
+            }
+            return profile;
+        }
+    }
+    
+    public class SensoryResponse
+    {
+        public bool IsCorrect;
+        public string TerpeneIdentified;
+        public float ResponseTime;
+    }
+    
+    #endregion
+}

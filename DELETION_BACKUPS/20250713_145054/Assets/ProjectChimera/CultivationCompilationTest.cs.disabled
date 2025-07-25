@@ -1,0 +1,116 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Events;
+using System.Collections.Generic;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Comprehensive compilation test for all fixed cultivation systems
+    /// Tests all the major type conflicts and conversions that were resolved
+    /// </summary>
+    public class CultivationCompilationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Cultivation Systems Compilation Test ===");
+            
+            TestPlayerAgencySystem();
+            TestInteractivePlantCareSystem();
+            TestEarnedAutomationSystem();
+            TestConsequenceManager();
+            TestCareEffectParticleSystem();
+            
+            Debug.Log("✓ All cultivation systems compile successfully!");
+        }
+        
+        private void TestPlayerAgencySystem()
+        {
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            Debug.Log("✓ PlayerAgencyGamingSystem compiles");
+            
+            // Test local PlayerChoice class (vs Events.PlayerChoice)
+            var choice = new PlayerChoice
+            {
+                ChoiceType = PlayerChoiceType.CultivationMethod,
+                ChoiceDescription = "Test choice",
+                ImpactLevel = 0.8f,
+                ChoiceParameters = new Dictionary<string, object>(),
+                ChoiceTimestamp = Time.time
+            };
+            Debug.Log($"✓ Local PlayerChoice works: {choice.ChoiceType}");
+            
+            // Test local ConsequenceType enum (vs Events.ConsequenceType)
+            var consequenceType = ConsequenceType.YieldChange;
+            Debug.Log($"✓ Local ConsequenceType enum works: {consequenceType}");
+            
+            // Test Events namespace types via aliases
+            var eventsPlayerChoice = new ProjectChimera.Events.PlayerChoice();
+            var eventsConsequenceType = ProjectChimera.Events.ConsequenceType.Immediate;
+            Debug.Log($"✓ Events namespace types accessible: {eventsConsequenceType}");
+            
+            // Test Data namespace types via aliases
+            var cultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach.OrganicTraditional;
+            var facilityApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach.MinimalistEfficient;
+            Debug.Log($"✓ Data namespace types work: {cultivationApproach}, {facilityApproach}");
+        }
+        
+        private void TestInteractivePlantCareSystem()
+        {
+            var careSystem = GetComponent<InteractivePlantCareSystem>();
+            Debug.Log("✓ InteractivePlantCareSystem compiles");
+        }
+        
+        private void TestEarnedAutomationSystem()
+        {
+            var automationSystem = GetComponent<EarnedAutomationProgressionSystem>();
+            Debug.Log("✓ EarnedAutomationProgressionSystem compiles");
+            
+            // Test TaskType conversion fixes
+            var dataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType.Watering;
+            var dataTaskType = (ProjectChimera.Data.Cultivation.TaskType)dataCultivationTaskType;
+            Debug.Log($"✓ TaskType conversion works: {dataCultivationTaskType} -> {dataTaskType}");
+            
+            // Test automation event data structures
+            var unlockEventData = new ProjectChimera.Core.Events.AutomationUnlockEventData
+            {
+                TaskType = dataTaskType.ToString(),
+                SystemType = "AutoWatering",
+                Timestamp = (float)System.DateTime.Now.Ticks
+            };
+            Debug.Log($"✓ AutomationUnlockEventData works with correct types: {unlockEventData.TaskType}, {unlockEventData.SystemType}");
+        }
+        
+        private void TestConsequenceManager()
+        {
+            var consequenceManager = GetComponent<ConsequenceManager>();
+            Debug.Log("✓ ConsequenceManager compiles");
+            
+            // Test ConsequenceEvent with local ConsequenceType
+            var consequenceEvent = new ConsequenceEvent
+            {
+                ConsequenceId = "test",
+                ConsequenceName = "Test Consequence",
+                Description = "Test description",
+                Type = ConsequenceType.EfficiencyChange, // Uses local enum
+                Severity = 0.5f,
+                ConsequenceData = null,
+                Timestamp = System.DateTime.Now
+            };
+            Debug.Log($"✓ ConsequenceEvent uses local ConsequenceType: {consequenceEvent.Type}");
+        }
+        
+        private void TestCareEffectParticleSystem()
+        {
+            var particleSystem = GetComponent<CareEffectParticleSystem>();
+            Debug.Log("✓ CareEffectParticleSystem compiles");
+            
+            if (particleSystem != null)
+            {
+                particleSystem.PlayMilestoneEffect(Vector3.zero);
+                Debug.Log("✓ PlayMilestoneEffect method works");
+            }
+        }
+    }
+}

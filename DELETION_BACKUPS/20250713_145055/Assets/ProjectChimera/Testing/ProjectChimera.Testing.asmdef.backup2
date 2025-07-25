@@ -1,0 +1,27 @@
+{
+    "name": "ProjectChimera.Testing",
+    "rootNamespace": "ProjectChimera.Testing",
+    "references": [
+        "GUID:365498379ff0240e68a20a8f327e0755",
+        "GUID:6cca6c5303192494bbddc11201b0e867",
+        "GUID:2fab2900087b74620a6ae7f53d1409fd",
+        "GUID:ab19632e6af1424cb93a8f1cdb979172",
+        "GUID:50dda257fa5de44f3845d5ce0d1f0074",
+        "GUID:8793bbaecc2ee47a19a0166a8565f767",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+} 

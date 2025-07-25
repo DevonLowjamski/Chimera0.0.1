@@ -1,0 +1,2642 @@
+{
+  "timestamp": "2025-07-13T14:50:55.063715",
+  "total_operations": 404,
+  "operations": [
+    {
+      "file": "Assets/ProjectChimera/Wave22ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave22ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.897428"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave22ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.898758"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave6ErrorFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave6ErrorFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.900115"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave6ErrorFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.900795"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationCheck.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalCompilationCheck.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.901949"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationCheck.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.902665"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave48ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave48ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.903495"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave48ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.903965"
+    },
+    {
+      "file": "Assets/ProjectChimera/CareActionFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CareActionFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.904528"
+    },
+    {
+      "file": "Assets/ProjectChimera/CareActionFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.904887"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticsCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/GeneticsCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.905380"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticsCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.905583"
+    },
+    {
+      "file": "Assets/ProjectChimera/SimpleCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/SimpleCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.906039"
+    },
+    {
+      "file": "Assets/ProjectChimera/SimpleCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.906326"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanProgressionTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CleanProgressionTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.906750"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanProgressionTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.906809"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave40ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave40ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.907350"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave40ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.908649"
+    },
+    {
+      "file": "Assets/ProjectChimera/ResearchCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ResearchCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.909089"
+    },
+    {
+      "file": "Assets/ProjectChimera/ResearchCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.909193"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave37ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave37ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.909779"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave37ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.909841"
+    },
+    {
+      "file": "Assets/ProjectChimera/CurrentErrorTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CurrentErrorTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.910268"
+    },
+    {
+      "file": "Assets/ProjectChimera/CurrentErrorTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.910328"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave19ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave19ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.910751"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave19ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.910810"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalErrorFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalErrorFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.912740"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalErrorFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.912833"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave30ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave30ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.913229"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave30ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.913463"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave47ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave47ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.913836"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave47ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.913895"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave16ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave16ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.914255"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave16ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.914448"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave38ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave38ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.914937"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave38ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.915122"
+    },
+    {
+      "file": "Assets/ProjectChimera/ChimeraLoggerFixVerification.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ChimeraLoggerFixVerification.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.915551"
+    },
+    {
+      "file": "Assets/ProjectChimera/ChimeraLoggerFixVerification.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.915633"
+    },
+    {
+      "file": "Assets/ProjectChimera/MilestoneSystemValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/MilestoneSystemValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.916084"
+    },
+    {
+      "file": "Assets/ProjectChimera/MilestoneSystemValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.916153"
+    },
+    {
+      "file": "Assets/ProjectChimera/AdvancedTournamentValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/AdvancedTournamentValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.916614"
+    },
+    {
+      "file": "Assets/ProjectChimera/AdvancedTournamentValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.916697"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalErrorResolutionTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalErrorResolutionTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.917196"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalErrorResolutionTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.917277"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave25ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave25ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.917802"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave25ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.918002"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave20ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave20ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.918485"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave20ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.918564"
+    },
+    {
+      "file": "Assets/ProjectChimera/AdvancedIntegrationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/AdvancedIntegrationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.919276"
+    },
+    {
+      "file": "Assets/ProjectChimera/AdvancedIntegrationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.919362"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CleanCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.919967"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.920609"
+    },
+    {
+      "file": "Assets/ProjectChimera/AromaticGamingValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/AromaticGamingValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.924846"
+    },
+    {
+      "file": "Assets/ProjectChimera/AromaticGamingValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.925030"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave28ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave28ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.925722"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave28ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.925934"
+    },
+    {
+      "file": "Assets/ProjectChimera/EventCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/EventCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.926421"
+    },
+    {
+      "file": "Assets/ProjectChimera/EventCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.926504"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalPlantCareEventDataValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalPlantCareEventDataValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.926978"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalPlantCareEventDataValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.927056"
+    },
+    {
+      "file": "Assets/ProjectChimera/EventDataPropertiesValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/EventDataPropertiesValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.928468"
+    },
+    {
+      "file": "Assets/ProjectChimera/EventDataPropertiesValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.928563"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticResearchValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/GeneticResearchValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.929138"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticResearchValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.929330"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalGamingSystemsValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalGamingSystemsValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.929815"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalGamingSystemsValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.929938"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave35ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave35ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.930694"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave35ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.930781"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave42ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave42ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.931404"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave42ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.931478"
+    },
+    {
+      "file": "Assets/ProjectChimera/PlayerAgencyCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/PlayerAgencyCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.932002"
+    },
+    {
+      "file": "Assets/ProjectChimera/PlayerAgencyCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.932086"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticsAnalyticsValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/GeneticsAnalyticsValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.932611"
+    },
+    {
+      "file": "Assets/ProjectChimera/GeneticsAnalyticsValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.932675"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveProgressionValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ComprehensiveProgressionValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.933150"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveProgressionValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.933228"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave45ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave45ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.933619"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave45ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.933685"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave32ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave32ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.933998"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave32ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.934065"
+    },
+    {
+      "file": "Assets/ProjectChimera/ScientificCompetitionValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ScientificCompetitionValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.934550"
+    },
+    {
+      "file": "Assets/ProjectChimera/ScientificCompetitionValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.934648"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalTypeResolutionTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalTypeResolutionTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.935114"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalTypeResolutionTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.935180"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave3FixValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave3FixValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.935494"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave3FixValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.935578"
+    },
+    {
+      "file": "Assets/ProjectChimera/PlayerAgencyFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/PlayerAgencyFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.936182"
+    },
+    {
+      "file": "Assets/ProjectChimera/PlayerAgencyFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.936257"
+    },
+    {
+      "file": "Assets/ProjectChimera/EnvironmentalConditionsTypeTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/EnvironmentalConditionsTypeTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.936696"
+    },
+    {
+      "file": "Assets/ProjectChimera/EnvironmentalConditionsTypeTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.936794"
+    },
+    {
+      "file": "Assets/ProjectChimera/LatestErrorFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/LatestErrorFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.938170"
+    },
+    {
+      "file": "Assets/ProjectChimera/LatestErrorFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.938347"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveWave6ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ComprehensiveWave6ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.938837"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveWave6ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.938912"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanGeneticsTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CleanGeneticsTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.939214"
+    },
+    {
+      "file": "Assets/ProjectChimera/CleanGeneticsTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.939279"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave27ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave27ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.939883"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave27ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.939968"
+    },
+    {
+      "file": "Assets/ProjectChimera/ProgressionCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ProgressionCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.940284"
+    },
+    {
+      "file": "Assets/ProjectChimera/ProgressionCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.940355"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationFixValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationFixValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.940776"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationFixValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.940858"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave26ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave26ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.941407"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave26ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.941479"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.941835"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.941919"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompetitiveSystemValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompetitiveSystemValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.942435"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompetitiveSystemValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.942611"
+    },
+    {
+      "file": "Assets/ProjectChimera/ProjectChimeraValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ProjectChimeraValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.943182"
+    },
+    {
+      "file": "Assets/ProjectChimera/ProjectChimeraValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.943260"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalWorkingCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalWorkingCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.943771"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalWorkingCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.945308"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationResolutionSummary.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationResolutionSummary.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.945667"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationResolutionSummary.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.945739"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationVerification.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalCompilationVerification.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.946243"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationVerification.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.946322"
+    },
+    {
+      "file": "Assets/ProjectChimera/CultivationCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CultivationCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.947566"
+    },
+    {
+      "file": "Assets/ProjectChimera/CultivationCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.947654"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave44ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave44ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.948528"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave44ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.948732"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.949124"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.950512"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave33ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave33ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.951035"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave33ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.951126"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave34ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave34ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.951516"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave34ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.951588"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationErrorFixVerification.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationErrorFixVerification.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.951973"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationErrorFixVerification.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.952055"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave43ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave43ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.952847"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave43ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.952961"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalAmbiguityResolutionTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalAmbiguityResolutionTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.953386"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalAmbiguityResolutionTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.953624"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationErrorFixSummary.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationErrorFixSummary.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.954112"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationErrorFixSummary.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.954197"
+    },
+    {
+      "file": "Assets/ProjectChimera/NamespaceFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/NamespaceFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.954747"
+    },
+    {
+      "file": "Assets/ProjectChimera/NamespaceFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.954829"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave29ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave29ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.955471"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave29ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.955555"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave21ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave21ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.956044"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave21ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.956118"
+    },
+    {
+      "file": "Assets/ProjectChimera/AssemblyReferenceFixValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/AssemblyReferenceFixValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.956762"
+    },
+    {
+      "file": "Assets/ProjectChimera/AssemblyReferenceFixValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.956833"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveErrorFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ComprehensiveErrorFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.957404"
+    },
+    {
+      "file": "Assets/ProjectChimera/ComprehensiveErrorFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.957501"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.958383"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.958465"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave24ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave24ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.958954"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave24ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.959018"
+    },
+    {
+      "file": "Assets/ProjectChimera/ScientificGamingDataValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/ScientificGamingDataValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.959379"
+    },
+    {
+      "file": "Assets/ProjectChimera/ScientificGamingDataValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.959565"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave17ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave17ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.959964"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave17ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.960041"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave39ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave39ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.960780"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave39ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.960861"
+    },
+    {
+      "file": "Assets/ProjectChimera/BreedingChallengeValidation.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/BreedingChallengeValidation.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.961467"
+    },
+    {
+      "file": "Assets/ProjectChimera/BreedingChallengeValidation.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.961534"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalCompilationValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.962007"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalCompilationValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.962076"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave31ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave31ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.962554"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave31ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.962622"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompetitionCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompetitionCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.963020"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompetitionCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.963087"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave7ComprehensiveErrorResolution.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave7ComprehensiveErrorResolution.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.963526"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave7ComprehensiveErrorResolution.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.963590"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave46ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave46ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.964032"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave46ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.964091"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave41ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave41ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.964862"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave41ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.964929"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave36ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave36ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.965408"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave36ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.965467"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave18ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave18ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.965858"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave18ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.965914"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationStatusVerification.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/CompilationStatusVerification.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.966508"
+    },
+    {
+      "file": "Assets/ProjectChimera/CompilationStatusVerification.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.966583"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalWave6ErrorResolution.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/FinalWave6ErrorResolution.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.966998"
+    },
+    {
+      "file": "Assets/ProjectChimera/FinalWave6ErrorResolution.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.967057"
+    },
+    {
+      "file": "Assets/ProjectChimera/DuplicateFixTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/DuplicateFixTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.967609"
+    },
+    {
+      "file": "Assets/ProjectChimera/DuplicateFixTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.967681"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave23ValidationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Wave23ValidationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.968140"
+    },
+    {
+      "file": "Assets/ProjectChimera/Wave23ValidationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.968201"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticTestingFramework.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/GeneticTestingFramework.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.968900"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticTestingFramework.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.969306"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/AssemblyDiagnostic.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/AssemblyDiagnostic.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.969681"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/AssemblyDiagnostic.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.969897"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticInheritanceValidator.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/GeneticInheritanceValidator.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.970478"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticInheritanceValidator.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.973182"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/SimpleEnvironmentalGamingCompilationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/SimpleEnvironmentalGamingCompilationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.973678"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/SimpleEnvironmentalGamingCompilationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.973882"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/NewFeaturesTestRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/NewFeaturesTestRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.974324"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/NewFeaturesTestRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.974385"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestDataSO.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/TestDataSO.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.974782"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestDataSO.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.974842"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/SimpleTestRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/SimpleTestRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.975215"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/SimpleTestRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.975273"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestHarnessRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/TestHarnessRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.975851"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestHarnessRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.975910"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticValidationTestRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/GeneticValidationTestRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.976337"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticValidationTestRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.976406"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/AutomatedTestRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/AutomatedTestRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.976939"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/AutomatedTestRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.977004"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestingSummaryGenerator.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/TestingSummaryGenerator.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.977478"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestingSummaryGenerator.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.977552"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/CultivationAchievementIntegrationTest.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/CultivationAchievementIntegrationTest.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.977972"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/CultivationAchievementIntegrationTest.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.978037"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestEventChannels.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/TestEventChannels.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.978429"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/TestEventChannels.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.978485"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticTestScene.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Testing/GeneticTestScene.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.978826"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/GeneticTestScene.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.978893"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Cultivation/PlantHealthIndicatorSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Cultivation/PlantHealthIndicatorSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.979777"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Cultivation/PlantHealthIndicatorSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.979850"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionGamingSystemStubs.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Construction/ConstructionGamingSystemStubs.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.980602"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionGamingSystemStubs.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.980780"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/EnhancedConstructionGamingManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Construction/EnhancedConstructionGamingManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.981446"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/EnhancedConstructionGamingManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.981524"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/CollaborativeConstructionSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Construction/CollaborativeConstructionSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.982040"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/CollaborativeConstructionSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.982358"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionManager_Complex.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Construction/ConstructionManager_Complex.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.984682"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionManager_Complex.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.984752"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionChallengeEngine.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Construction/ConstructionChallengeEngine.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.985324"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Construction/ConstructionChallengeEngine.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.985387"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMAnalyticsDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMAnalyticsDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.986076"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMAnalyticsDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.986352"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMPestManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMPestManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.987297"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMPestManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.988300"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMSystemBase.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMSystemBase.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.988761"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMSystemBase.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.988947"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBiologicalDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMBiologicalDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.989463"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBiologicalDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.989666"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBattleSystemBase.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMBattleSystemBase.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.990189"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBattleSystemBase.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.990267"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStubs.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMStubs.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.990807"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStubs.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.990880"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMEnvironmentalManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMEnvironmentalManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.991531"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMEnvironmentalManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.991613"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStrategyDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMStrategyDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.992098"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStrategyDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.992168"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStrategyManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMStrategyManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.992777"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMStrategyManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.992852"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMGamingManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMGamingManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.993374"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMGamingManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.993443"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBiologicalManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMBiologicalManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.994072"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMBiologicalManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.994157"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMSupportingSystems.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMSupportingSystems.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.994919"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMSupportingSystems.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.994981"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMEntityManagerBase.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMEntityManagerBase.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.995668"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMEntityManagerBase.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.995868"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMAnalyticsManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMAnalyticsManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.996838"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMAnalyticsManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.996912"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMManagerImplementations.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMManagerImplementations.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.997463"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMManagerImplementations.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.997549"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMPestDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/IPM/IPMPestDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.998061"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/IPM/IPMPestDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.998141"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ComprehensiveProgressionManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Progression/ComprehensiveProgressionManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:54.999253"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ComprehensiveProgressionManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:54.999790"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionEventProcessor.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145054/Assets/ProjectChimera/Systems/Progression/ProgressionEventProcessor.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.001988"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionEventProcessor.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.002079"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionSupportManagers.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/ProgressionSupportManagers.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.002861"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionSupportManagers.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.002935"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementSystemManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/AchievementSystemManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.003802"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementSystemManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.003880"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/CompetitiveManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/CompetitiveManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.004433"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/CompetitiveManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.004764"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/IntelligentRewardDistributor.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/IntelligentRewardDistributor.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.005563"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/IntelligentRewardDistributor.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.005762"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.006490"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.006573"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementAnalyticsEngine.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/AchievementAnalyticsEngine.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.007303"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementAnalyticsEngine.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.007381"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/HiddenAchievementDetector.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/HiddenAchievementDetector.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.007941"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/HiddenAchievementDetector.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.008027"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/SocialRecognitionEngine.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/SocialRecognitionEngine.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.008692"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/SocialRecognitionEngine.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.008791"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionIntegrator.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/ProgressionIntegrator.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.009472"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionIntegrator.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.009665"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/CompetitiveMatchmakingSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/CompetitiveMatchmakingSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.011429"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/CompetitiveMatchmakingSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.011597"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/UnifiedExperienceManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/UnifiedExperienceManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.011994"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/UnifiedExperienceManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.012053"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/EnhancedScientificGamingManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/EnhancedScientificGamingManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.012515"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/EnhancedScientificGamingManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.012577"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/TournamentEventManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/TournamentEventManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.014502"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/TournamentEventManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.014689"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/BreedingChallengeManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/BreedingChallengeManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.015035"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/BreedingChallengeManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.015149"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/CommunityCollaborationSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/CommunityCollaborationSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.015592"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/CommunityCollaborationSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.015673"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificAchievementTracker.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/ScientificAchievementTracker.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.016068"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificAchievementTracker.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.016156"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/GeneticsGamingSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.016673"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.016751"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificSkillTreeManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/ScientificSkillTreeManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.017092"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificSkillTreeManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.017155"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificProgressionSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/ScientificProgressionSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.017748"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificProgressionSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.017824"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificCompetitionManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/ScientificCompetitionManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.018444"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificCompetitionManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.018516"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/SensoryTrainingSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/SensoryTrainingSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.019050"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/SensoryTrainingSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.019120"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AromaticGamingSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/AromaticGamingSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.019562"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AromaticGamingSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.019763"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/GeneticsGamingManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.020332"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.020400"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AchievementRecognitionSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/AchievementRecognitionSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.020912"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AchievementRecognitionSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.020980"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificReputationManager.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/ScientificReputationManager.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.021376"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/ScientificReputationManager.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.021438"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/TerpeneAnalysisGamingSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/TerpeneAnalysisGamingSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.022566"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/TerpeneAnalysisGamingSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.022638"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/GeneticsGamingDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.023275"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticsGamingDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.023348"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticDiscoveryEngine.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/GeneticDiscoveryEngine.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.023657"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/GeneticDiscoveryEngine.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.023720"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AromaticCreationStudio.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/AromaticCreationStudio.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.024012"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/AromaticCreationStudio.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.024099"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/BreedingChallengeSystem.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Genetics/BreedingChallengeSystem.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.024608"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Genetics/BreedingChallengeSystem.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.024678"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Effects/VisualFeedbackDataStructures.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Effects/VisualFeedbackDataStructures.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.025496"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Effects/VisualFeedbackDataStructures.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.025568"
+    },
+    {
+      "file": "Assets/ProjectChimera/Scripts/UI/MainGameUIController.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Scripts/UI/MainGameUIController.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.026333"
+    },
+    {
+      "file": "Assets/ProjectChimera/Scripts/UI/MainGameUIController.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.026407"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UITestRunner.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/UITestRunner.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.027009"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UITestRunner.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.027074"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UIValidationSuite.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/UIValidationSuite.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.027500"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UIValidationSuite.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.027590"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UIPerformanceProfiler.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/UIPerformanceProfiler.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.028057"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UIPerformanceProfiler.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.028125"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UISystemComponentTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/UISystemComponentTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.028569"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UISystemComponentTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.028658"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/PlantPanelTestSuite.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/PlantPanelTestSuite.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.029036"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/PlantPanelTestSuite.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.029111"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UITestFramework.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/UI/UITestFramework.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.029430"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/UI/UITestFramework.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.029530"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Core/ChimeraTestBase.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Core/ChimeraTestBase.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.030259"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Core/ChimeraTestBase.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.030336"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/AssemblyIntegrationTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Integration/AssemblyIntegrationTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.030695"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/AssemblyIntegrationTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.030909"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/IPMIntegrationTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Integration/IPMIntegrationTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.031485"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/IPMIntegrationTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.031563"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/UIIntegrationTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Integration/UIIntegrationTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.032052"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Integration/UIIntegrationTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.032121"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Performance/PerformanceTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Performance/PerformanceTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.032609"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Performance/PerformanceTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.032807"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Performance/CultivationPerformanceTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Performance/CultivationPerformanceTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.033239"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Performance/CultivationPerformanceTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.033308"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/EnvironmentalGamingSystemTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/EnvironmentalGamingSystemTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.034120"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/EnvironmentalGamingSystemTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.034194"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/ManagerImplementationTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/ManagerImplementationTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.034627"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/ManagerImplementationTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.034702"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/NewFeaturesTestSuite.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/NewFeaturesTestSuite.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.035223"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/NewFeaturesTestSuite.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.035300"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/EconomicGamingSystemTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/EconomicGamingSystemTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.035751"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/EconomicGamingSystemTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.035821"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Data/DataStructureTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Data/DataStructureTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.036174"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Data/DataStructureTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.036261"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Economy/MarketManagerTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/Economy/MarketManagerTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.036992"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Economy/MarketManagerTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.037056"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Economy/TradingManagerTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/Economy/TradingManagerTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.038361"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Economy/TradingManagerTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.038427"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Cultivation/CultivationSystemValidator.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/Cultivation/CultivationSystemValidator.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.038859"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Cultivation/CultivationSystemValidator.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.038923"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/AI/AIAdvisorManagerTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/AI/AIAdvisorManagerTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.039316"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/AI/AIAdvisorManagerTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.039382"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Construction/ConstructionGamingSystemTests.cs.disabled",
+      "type": "disabled_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/Construction/ConstructionGamingSystemTests.cs.disabled",
+      "timestamp": "2025-07-13T14:50:55.039957"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/Construction/ConstructionGamingSystemTests.cs.disabled.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.040044"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/BreedingUI.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/UI/BreedingUI.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.040876"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup",
+      "timestamp": "2025-07-13T14:50:55.041282"
+    },
+    {
+      "file": "Assets/ProjectChimera/Data/UI/UIDataStructures.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Data/UI/UIDataStructures.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.041932"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/SpeedTree/CannabisGeneticsEngine.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/SpeedTree/CannabisGeneticsEngine.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.043307"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Cultivation/PlantManager.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Cultivation/PlantManager.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.043857"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/Systems/ProjectChimera.Testing.Systems.asmdef.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/Systems/ProjectChimera.Testing.Systems.asmdef.backup",
+      "timestamp": "2025-07-13T14:50:55.044332"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/Core/GameUIManager.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/UI/Core/GameUIManager.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.045132"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/Dashboard/FacilityDashboardController.cs.backup",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/UI/Dashboard/FacilityDashboardController.cs.backup",
+      "timestamp": "2025-07-13T14:50:55.046045"
+    },
+    {
+      "file": "Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup2",
+      "type": "backup_file",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup2",
+      "timestamp": "2025-07-13T14:50:55.047534"
+    },
+    {
+      "file": "Assets/ProjectChimera/Core/SaveManager.cs",
+      "type": "adr_target",
+      "category": "save_managers",
+      "reason": "ADR-001: Superseded by Systems/Save/SaveManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Core/SaveManager.cs",
+      "timestamp": "2025-07-13T14:50:55.048160"
+    },
+    {
+      "file": "Assets/ProjectChimera/Core/SaveManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.048421"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionManager.cs",
+      "type": "adr_target",
+      "category": "progression_managers",
+      "reason": "ADR-002: Superseded by ComprehensiveProgressionManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/ProgressionManager.cs",
+      "timestamp": "2025-07-13T14:50:55.048876"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/ProgressionManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.048947"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/CleanProgressionManager.cs",
+      "type": "adr_target",
+      "category": "progression_managers",
+      "reason": "ADR-002: Superseded by ComprehensiveProgressionManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/CleanProgressionManager.cs",
+      "timestamp": "2025-07-13T14:50:55.049413"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/CleanProgressionManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.049476"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs",
+      "type": "adr_target",
+      "category": "progression_managers",
+      "reason": "ADR-002: Superseded by ComprehensiveProgressionManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs",
+      "timestamp": "2025-07-13T14:50:55.049946"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.050026"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/Core/GameUIManager.cs",
+      "type": "adr_target",
+      "category": "ui_managers",
+      "reason": "ADR-005: Superseded by UIManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/UI/Core/GameUIManager.cs",
+      "timestamp": "2025-07-13T14:50:55.050813"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/Core/GameUIManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.051082"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/AdvancedUIManager.cs",
+      "type": "adr_target",
+      "category": "ui_managers",
+      "reason": "ADR-005: Superseded by UIManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/UI/AdvancedUIManager.cs",
+      "timestamp": "2025-07-13T14:50:55.051747"
+    },
+    {
+      "file": "Assets/ProjectChimera/UI/AdvancedUIManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.051913"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementManager.cs",
+      "type": "adr_target",
+      "category": "achievement_managers",
+      "reason": "ADR-004: Superseded by LegacyAchievementManager.cs",
+      "status": "deleted",
+      "backup": "/Users/devon/Documents/Cursor/Projects/DELETION_BACKUPS/20250713_145055/Assets/ProjectChimera/Systems/Progression/AchievementManager.cs",
+      "timestamp": "2025-07-13T14:50:55.052367"
+    },
+    {
+      "file": "Assets/ProjectChimera/Systems/Progression/AchievementManager.cs.meta",
+      "type": "meta_file",
+      "status": "deleted",
+      "timestamp": "2025-07-13T14:50:55.052429"
+    },
+    {
+      "directory": "Assets/ProjectChimera/UI/Facility",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.053582"
+    },
+    {
+      "directory": "Assets/ProjectChimera/UI/Construction",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.053695"
+    },
+    {
+      "directory": "Assets/ProjectChimera/UI/Progression",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.053869"
+    },
+    {
+      "directory": "Assets/ProjectChimera/UI/Genetics",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.053933"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Core/Data/Genetics",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.054582"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Prefabs/Plants",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.055073"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Prefabs/Facilities",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.055150"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Testing/Systems/Construction",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.055567"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Testing/Validation",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.055674"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Audio",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.055826"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Visuals/Plants",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.056454"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Visuals/Infrastructure",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.056584"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Visuals/Effects",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.056672"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Visuals/Equipment",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.056749"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Visuals/Facilities",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.056833"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Systems/DataCollection",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.057838"
+    },
+    {
+      "directory": "Assets/ProjectChimera/Editor/Tutorial",
+      "type": "empty_directory",
+      "status": "removed",
+      "timestamp": "2025-07-13T14:50:55.063667"
+    }
+  ]
+}

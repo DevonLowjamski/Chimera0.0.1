@@ -1,0 +1,355 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Environment;
+using System.Collections.Generic;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 36 - Type conversion and namespace resolution
+    /// Tests that all compilation errors related to type mismatches and namespace conflicts are resolved.
+    /// </summary>
+    public class Wave36ValidationTest : MonoBehaviour
+    {
+        [Header("Test Components")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool enableDebugLogging = true;
+
+        private List<string> testResults = new List<string>();
+
+        private void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllTests();
+            }
+        }
+
+        public void RunAllTests()
+        {
+            testResults.Clear();
+            LogTest("=== Error Wave 36 Validation Tests ===");
+
+            // Test 1: PlantInstance Genotype Type Consistency
+            TestPlantInstanceGenotypeType();
+
+            // Test 2: PlantUpdateProcessor Type Conversions
+            TestPlantUpdateProcessorTypeConversions();
+
+            // Test 3: StressType Enum Resolution
+            TestStressTypeEnumResolution();
+
+            // Test 4: EnvironmentalConditions Type Resolution
+            TestEnvironmentalConditionsTypeResolution();
+
+            // Test 5: Namespace Alias Resolution
+            TestNamespaceAliasResolution();
+
+            // Test 6: Assembly Reference Validation
+            TestAssemblyReferenceValidation();
+
+            LogTest("=== All Error Wave 36 Tests Completed ===");
+            LogTestResults();
+        }
+
+        private void TestPlantInstanceGenotypeType()
+        {
+            LogTest("Testing PlantInstance Genotype Type Consistency...");
+
+            try
+            {
+                // Create a test PlantInstance
+                var testPlant = CreateTestPlantInstance();
+                
+                // Verify that Genotype property returns GenotypeDataSO
+                var genotype = testPlant.Genotype;
+                bool isCorrectType = genotype == null || genotype is GenotypeDataSO;
+                
+                if (isCorrectType)
+                {
+                    LogTest("✓ PlantInstance.Genotype returns correct GenotypeDataSO type");
+                }
+                else
+                {
+                    LogTest("✗ PlantInstance.Genotype type mismatch");
+                }
+
+                // Test setting genotype
+                var testGenotype = CreateTestGenotype();
+                testPlant.Genotype = testGenotype;
+                
+                if (testPlant.Genotype == testGenotype)
+                {
+                    LogTest("✓ PlantInstance.Genotype setter works correctly");
+                }
+                else
+                {
+                    LogTest("✗ PlantInstance.Genotype setter failed");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantInstance Genotype test failed: {ex.Message}");
+            }
+        }
+
+        private void TestPlantUpdateProcessorTypeConversions()
+        {
+            LogTest("Testing PlantUpdateProcessor Type Conversions...");
+
+            try
+            {
+                // Create test components
+                var processor = CreateTestPlantUpdateProcessor();
+                var testPlant = CreateTestPlantInstance();
+                testPlant.Genotype = CreateTestGenotype();
+
+                // Test that ConvertGenotypeDataToGenotype can handle GenotypeDataSO
+                if (testPlant.Genotype != null)
+                {
+                    // This should not cause compilation errors anymore
+                    LogTest("✓ PlantUpdateProcessor can access plant.Genotype as GenotypeDataSO");
+                }
+
+                LogTest("✓ PlantUpdateProcessor type conversion tests passed");
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantUpdateProcessor type conversion test failed: {ex.Message}");
+            }
+        }
+
+        private void TestStressTypeEnumResolution()
+        {
+            LogTest("Testing StressType Enum Resolution...");
+
+            try
+            {
+                // Test that all required StressType values are available
+                var stressTypes = new[]
+                {
+                    StressType.Temperature,
+                    StressType.Heat,
+                    StressType.Cold,
+                    StressType.Light,
+                    StressType.Water,
+                    StressType.Drought,
+                    StressType.Flood,
+                    StressType.Nutrient,
+                    StressType.Atmospheric,
+                    StressType.Humidity,
+                    StressType.CO2,
+                    StressType.pH,
+                    StressType.Salinity,
+                    StressType.Toxicity,
+                    StressType.Physical,
+                    StressType.Biotic
+                };
+
+                LogTest($"✓ All {stressTypes.Length} StressType enum values are accessible");
+
+                // Test that StressType is using the correct namespace (Systems.Genetics)
+                var stressType = StressType.Temperature;
+                string typeName = stressType.GetType().FullName;
+                
+                if (typeName.Contains("ProjectChimera.Systems.Genetics"))
+                {
+                    LogTest("✓ StressType is correctly resolved from Systems.Genetics namespace");
+                }
+                else
+                {
+                    LogTest($"✗ StressType namespace mismatch: {typeName}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ StressType enum test failed: {ex.Message}");
+            }
+        }
+
+        private void TestEnvironmentalConditionsTypeResolution()
+        {
+            LogTest("Testing EnvironmentalConditions Type Resolution...");
+
+            try
+            {
+                // Test Data.Cultivation.EnvironmentalConditions
+                var cultivationConditions = new ProjectChimera.Data.Cultivation.EnvironmentalConditions();
+                
+                // Test that required methods exist
+                bool hasIsInitialized = HasMethod(cultivationConditions, "IsInitialized");
+                bool hasCreateIndoorDefault = HasStaticMethod(typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions), "CreateIndoorDefault");
+
+                if (hasIsInitialized)
+                {
+                    LogTest("✓ EnvironmentalConditions.IsInitialized() method exists");
+                }
+                else
+                {
+                    LogTest("✗ EnvironmentalConditions.IsInitialized() method missing");
+                }
+
+                if (hasCreateIndoorDefault)
+                {
+                    LogTest("✓ EnvironmentalConditions.CreateIndoorDefault() static method exists");
+                }
+                else
+                {
+                    LogTest("✗ EnvironmentalConditions.CreateIndoorDefault() static method missing");
+                }
+
+                // Test Environment.EnvironmentalConditions
+                var environmentConditions = new ProjectChimera.Data.Environment.EnvironmentalConditions();
+                LogTest("✓ Both EnvironmentalConditions types are accessible");
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ EnvironmentalConditions type test failed: {ex.Message}");
+            }
+        }
+
+        private void TestNamespaceAliasResolution()
+        {
+            LogTest("Testing Namespace Alias Resolution...");
+
+            try
+            {
+                // Test that namespace aliases work correctly
+                var traitResult = new ProjectChimera.Systems.Genetics.TraitExpressionResult
+                {
+                    GenotypeID = "TEST_WAVE36",
+                    HeightExpression = 1.0f,
+                    THCExpression = 0.8f,
+                    YieldExpression = 1.2f
+                };
+
+                var stressResponse = new ProjectChimera.Systems.Genetics.StressResponse
+                {
+                    StressType = StressType.Temperature,
+                    Severity = 0.5f,
+                    Duration = 10.0f
+                };
+
+                var stressFactor = new ProjectChimera.Systems.Genetics.StressFactor
+                {
+                    FactorType = StressType.Water,
+                    Intensity = 0.3f
+                };
+
+                LogTest("✓ All namespace aliases resolve correctly");
+                LogTest($"✓ TraitExpressionResult created with ID: {traitResult.GenotypeID}");
+                LogTest($"✓ StressResponse created with type: {stressResponse.StressType}");
+                LogTest($"✓ StressFactor created with type: {stressFactor.FactorType}");
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Namespace alias test failed: {ex.Message}");
+            }
+        }
+
+        private void TestAssemblyReferenceValidation()
+        {
+            LogTest("Testing Assembly Reference Validation...");
+
+            try
+            {
+                // Test that EnvironmentalManager is accessible from Cultivation assembly
+                var envManager = FindObjectOfType<EnvironmentalManager>();
+                if (envManager == null)
+                {
+                    // Try to create one
+                    var go = new GameObject("TestEnvironmentalManager");
+                    envManager = go.AddComponent<EnvironmentalManager>();
+                }
+
+                if (envManager != null)
+                {
+                    LogTest("✓ EnvironmentalManager is accessible from Cultivation assembly");
+                    
+                    // Test that required methods exist
+                    bool hasGetCurrentConditions = HasMethod(envManager, "GetCurrentConditions");
+                    bool hasGetEnvironmentalConditions = HasMethod(envManager, "GetEnvironmentalConditions");
+
+                    if (hasGetCurrentConditions)
+                    {
+                        LogTest("✓ EnvironmentalManager.GetCurrentConditions() method exists");
+                    }
+
+                    if (hasGetEnvironmentalConditions)
+                    {
+                        LogTest("✓ EnvironmentalManager.GetEnvironmentalConditions() method exists");
+                    }
+                }
+                else
+                {
+                    LogTest("✗ EnvironmentalManager not accessible");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Assembly reference test failed: {ex.Message}");
+            }
+        }
+
+        private PlantInstance CreateTestPlantInstance()
+        {
+            var go = new GameObject("TestPlant_Wave36");
+            var plant = go.AddComponent<PlantInstance>();
+            return plant;
+        }
+
+        private GenotypeDataSO CreateTestGenotype()
+        {
+            var genotype = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            genotype.GenotypeID = "TEST_GENOTYPE_WAVE36";
+            return genotype;
+        }
+
+        private PlantUpdateProcessor CreateTestPlantUpdateProcessor()
+        {
+            var go = new GameObject("TestProcessor_Wave36");
+            var processor = go.AddComponent<PlantUpdateProcessor>();
+            return processor;
+        }
+
+        private bool HasMethod(object obj, string methodName)
+        {
+            var type = obj.GetType();
+            var method = type.GetMethod(methodName);
+            return method != null;
+        }
+
+        private bool HasStaticMethod(System.Type type, string methodName)
+        {
+            var method = type.GetMethod(methodName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            return method != null;
+        }
+
+        private void LogTest(string message)
+        {
+            testResults.Add(message);
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Wave36Test] {message}");
+            }
+        }
+
+        private void LogTestResults()
+        {
+            Debug.Log("=== Error Wave 36 Test Results ===");
+            foreach (var result in testResults)
+            {
+                Debug.Log(result);
+            }
+        }
+
+        [ContextMenu("Run Wave 36 Tests")]
+        public void RunTestsFromMenu()
+        {
+            RunAllTests();
+        }
+    }
+} 

@@ -1,0 +1,103 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Events;
+// Comprehensive type aliases for testing
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using EventsCultivationTaskType = ProjectChimera.Events.CultivationTaskType;
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+using EventsCareQuality = ProjectChimera.Events.CareQuality;
+using SystemsCareQuality = ProjectChimera.Systems.Cultivation.CareQuality;
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using SystemsPlayerChoice = ProjectChimera.Systems.Cultivation.PlayerChoice;
+using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice;
+using SystemsPlayerChoiceType = ProjectChimera.Systems.Cultivation.PlayerChoiceType;
+using EventsPlayerChoiceType = ProjectChimera.Events.PlayerChoiceType;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test for Wave 6 error fixes
+    /// </summary>
+    public class Wave6ErrorFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 6 Error Fix Test ===");
+            
+            TestTypeConversions();
+            TestEnumAdditions();
+            TestPropertyAdditions();
+            TestMethodAdditions();
+            
+            Debug.Log("Wave 6 error fix test completed!");
+        }
+        
+        private void TestTypeConversions()
+        {
+            Debug.Log("Testing type conversions...");
+            
+            // Test that DataCultivationTaskType to EventsCultivationTaskType conversion works
+            var dataTaskType = DataCultivationTaskType.Watering;
+            var eventsTaskType = (EventsCultivationTaskType)dataTaskType;
+            
+            Debug.Log($"✓ Type conversion works: {dataTaskType} → {eventsTaskType}");
+            
+            // Test PlayerChoice conversions
+            var dataPlayerChoice = DataPlayerChoice.OptimalCare;
+            var systemsPlayerChoice = (SystemsPlayerChoice)dataPlayerChoice;
+            var eventsPlayerChoice = (EventsPlayerChoice)dataPlayerChoice;
+            
+            Debug.Log($"✓ PlayerChoice conversions: {dataPlayerChoice} → Systems: {systemsPlayerChoice}, Events: {eventsPlayerChoice}");
+        }
+        
+        private void TestEnumAdditions()
+        {
+            Debug.Log("Testing enum additions...");
+            
+            // Test CareQuality variants with qualified names
+            var dataCareQuality = DataCareQuality.Adequate;
+            var eventsCareQuality = EventsCareQuality.Excellent;
+            var systemsCareQuality = SystemsCareQuality.Poor;
+            
+            Debug.Log($"✓ CareQuality variants: Data={dataCareQuality}, Events={eventsCareQuality}, Systems={systemsCareQuality}");
+            
+            // Test PlayerChoiceType variants
+            var systemsChoiceType = SystemsPlayerChoiceType.CultivationMethod;
+            var eventsChoiceType = EventsPlayerChoiceType.CareAction;
+            
+            Debug.Log($"✓ PlayerChoiceType variants: Systems={systemsChoiceType}, Events={eventsChoiceType}");
+        }
+        
+        private void TestPropertyAdditions()
+        {
+            Debug.Log("Testing property additions...");
+            
+            // Test InteractivePlant properties
+            var plant = new InteractivePlant
+            {
+                PlantedTime = System.DateTime.Now,
+                CurrentLightSatisfaction = 75f
+            };
+            
+            Debug.Log($"✓ InteractivePlant properties: PlantedTime={plant.PlantedTime}, LightSatisfaction={plant.CurrentLightSatisfaction}");
+        }
+        
+        private void TestMethodAdditions()
+        {
+            Debug.Log("Testing method additions...");
+            
+            var timeSystem = GetComponent<TimeAccelerationGamingSystem>();
+            var skillSystem = GetComponent<TreeSkillProgressionSystem>();
+            
+            if (timeSystem != null && skillSystem != null)
+            {
+                Debug.Log("✓ Systems with new methods accessible");
+            }
+            else
+            {
+                Debug.Log("✓ Systems compile (components not attached)");
+            }
+        }
+    }
+}

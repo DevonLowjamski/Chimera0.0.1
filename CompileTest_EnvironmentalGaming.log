@@ -1,0 +1,35 @@
+Unity Editor version:    6000.2.0b2 (2bdac9ac0d74)
+Branch:                  6000.2/respin/6000.2.0b2-d4c40f50eb81
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 15.5 (Build 24F74)
+Darwin version:          24.5.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        8192 MB
+Date:                    2025-06-20T09:21:02Z
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-devon" at "2025-06-20T09:21:02.64204Z"
+Launching external process: /Applications/Unity/Hub/Editor/6000.2.0b2/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.2.0b2/Unity.app/Contents/MacOS/Unity
+-batchmode
+-quit
+-projectPath
+.
+-logFile
+CompileTest_EnvironmentalGaming.log
+Successfully changed project path to: /Users/devon/Documents/Cursor/Projects/Chimera
+/Users/devon/Documents/Cursor/Projects/Chimera
+It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/devon/Documents/Cursor/Projects/Chimera
+Fatal Error! It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/devon/Documents/Cursor/Projects/Chimera
+[Package Manager] Server process was shutdown

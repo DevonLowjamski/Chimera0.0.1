@@ -1,0 +1,87 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Construction;
+using ProjectChimera.Systems.Construction;
+using ProjectChimera.Data.Environment;
+using ProjectChimera.Systems.Environment;
+// Aliases to resolve ambiguous references
+using ConstructionProjectType = ProjectChimera.Data.Construction.ProjectType;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test for current compilation error fixes
+    /// </summary>
+    public class CurrentErrorTest : MonoBehaviour
+    {
+        [Header("Test Results")]
+        [SerializeField] private bool _compilationSuccessful = false;
+        
+        void Start()
+        {
+            TestCurrentFixes();
+        }
+        
+        public void TestCurrentFixes()
+        {
+            Debug.Log("=== Current Error Fix Test ===");
+            
+            try
+            {
+                // Test 1: ChallengeParameters conversion (should use Systems version)
+                var systemsParams = new ProjectChimera.Systems.Construction.ChallengeParameters
+                {
+                    ProjectType = ConstructionProjectType.GrowRoom,
+                    SiteSize = new Vector3(10f, 3f, 8f),
+                    BudgetLimit = 50000f,
+                    RequiredFeatures = new System.Collections.Generic.List<string>()
+                };
+                
+                // Test 2: ParticipantInfo with correct role property
+                var participantInfo = new ProjectChimera.Data.Construction.ParticipantInfo
+                {
+                    PlayerId = "test",
+                    PlayerName = "Test",
+                    Role = ParticipantRole.Lead
+                };
+                
+                // Test 3: ConstructionGamingMetrics with correct property names
+                var metrics = new ProjectChimera.Data.Construction.ConstructionGamingMetrics
+                {
+                    ActiveChallenges = 5,
+                    TotalChallengesCompleted = 20,  // Correct property name
+                    TotalPlayers = 100
+                };
+                
+                // Test 4: EnvironmentalZoneType to string conversion
+                var zoneType = EnvironmentalZoneType.VegetativeChamber.ToString();
+                
+                // Test 5: Environment Systems namespace
+                var envManager = gameObject.GetComponent<EnvironmentalManager>();
+                if (envManager == null)
+                {
+                    envManager = gameObject.AddComponent<EnvironmentalManager>();
+                }
+                
+                // Test 6: IChimeraManager interface (without Priority property)
+                IChimeraManager chimeraManager = envManager;
+                string managerName = chimeraManager.ManagerName;
+                bool isInitialized = chimeraManager.IsInitialized;
+                
+                _compilationSuccessful = true;
+                Debug.Log("✅ All current error fixes successful!");
+            }
+            catch (System.Exception e)
+            {
+                _compilationSuccessful = false;
+                Debug.LogError($"❌ Current error fix test failed: {e.Message}");
+            }
+        }
+        
+        [ContextMenu("Test Current Error Fixes")]
+        public void RunTest()
+        {
+            TestCurrentFixes();
+        }
+    }
+}

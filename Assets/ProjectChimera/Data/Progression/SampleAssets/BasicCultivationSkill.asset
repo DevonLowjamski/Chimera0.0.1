@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: BasicCultivationSkill
+  _skillName: Basic Plant Care
+  _skillCategory: 0
+  _skillDomain: 0
+  _skillDescription: Learn the fundamentals of plant care including watering, feeding, and basic environmental management. This is the foundation for all cultivation activities.
+  _skillIcon: {fileID: 0}
+  _skillTier: 1
+  _maxSkillLevel: 5
+  _prerequisiteSkills: []
+  _unlockedSkills: []
+  _isCapstoneSkill: 0
+  _learningRequirements:
+    MinimumPlayerLevel: 1
+    MinimumPrerequisiteLevel: 1
+    FacilityRequirements: []
+    EquipmentRequirements: []
+    CertificationRequirements: []
+    MinimumExperience: 0
+  _levelUpCosts:
+  - Level: 1
+    SkillPointCost: 1
+    MoneyCost: 0
+    TimeCost: 8
+    ResourceCosts: []
+  - Level: 2
+    SkillPointCost: 1
+    MoneyCost: 100
+    TimeCost: 12
+    ResourceCosts: []
+  - Level: 3
+    SkillPointCost: 2
+    MoneyCost: 250
+    TimeCost: 16
+    ResourceCosts: []
+  - Level: 4
+    SkillPointCost: 2
+    MoneyCost: 500
+    TimeCost: 20
+    ResourceCosts: []
+  - Level: 5
+    SkillPointCost: 3
+    MoneyCost: 1000
+    TimeCost: 24
+    ResourceCosts: []
+  _experienceRequirementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.5
+      outSlope: 1.5
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _availableLearningMethods:
+  - MethodName: Hands-On Practice
+    LearningType: 0
+    EfficiencyMultiplier: 1.2
+    TimeMultiplier: 1
+    CostMultiplier: 1
+    RequiredResources: []
+    MethodDescription: Learn by doing through direct plant care experience
+  - MethodName: Online Tutorial
+    LearningType: 6
+    EfficiencyMultiplier: 0.8
+    TimeMultiplier: 0.7
+    CostMultiplier: 0.5
+    RequiredResources: []
+    MethodDescription: Study cultivation basics through online courses
+  _skillEffects:
+  - EffectType: 0
+    BaseValue: 5
+    ValuePerLevel: 3
+    IsPercentage: 1
+    EffectScope: 0
+    EffectDescription: Increases plant yield through better care practices
+  - EffectType: 2
+    BaseValue: 2
+    ValuePerLevel: 2
+    IsPercentage: 1
+    EffectScope: 0
+    EffectDescription: Plants grow faster due to improved care techniques
+  _skillBonuses:
+  - BonusName: Green Thumb
+    BonusType: 0
+    UnlockLevel: 3
+    BonusValue: 10
+    IsPercentage: 1
+    BonusDescription: 10% bonus to plant health and growth
+  - BonusName: Resource Efficiency
+    BonusType: 3
+    UnlockLevel: 5
+    BonusValue: 15
+    IsPercentage: 1
+    BonusDescription: 15% reduction in water and nutrient consumption
+  _unlockableFeatures:
+  - FeatureName: Plant Health Monitor
+    FeatureType: 3
+    UnlockLevel: 2
+    IsOneTimeUnlock: 1
+    FeatureDescription: Unlock advanced plant health monitoring tools
+  - FeatureName: Basic Automation
+    FeatureType: 4
+    UnlockLevel: 4
+    IsOneTimeUnlock: 1
+    FeatureDescription: Access to basic watering and feeding automation
+  _hasPassiveEffect: 1
+  _practicalApplications:
+  - ApplicationName: Daily Plant Care
+    ApplicationDomain: 0
+    EfficiencyBonus: 0.1
+    QualityBonus: 0.05
+    ApplicationDescription: Apply basic care principles in daily cultivation routine
+  _equipmentUnlocks: []
+  _processUnlocks:
+  - ProcessName: Systematic Watering
+    ProcessType: 0
+    UnlockLevel: 2
+    ProcessEfficiency: 1.2
+    ProcessDescription: Structured approach to plant watering schedules
+  _researchUnlocks: []
+  _masteryBonuses:
+  - MasteryName: Cultivation Fundamentals Master
+    MasteryLevel: 5
+    MasteryBonusValue: 0.25
+    MasteryType: 0
+    MasteryDescription: Mastery of basic cultivation provides permanent 25% efficiency bonus
+  _specializationPaths: []
+  _allowsSpecialization: 0
+  _specializationUnlockLevel: 5
+  _canTeachOthers: 1
+  _teachingUnlockLevel: 4
+  _teachingEfficiency: 1.1
+  _mentorshipBenefits:
+  - BenefitName: Knowledge Sharing
+    MentorshipType: 0
+    BenefitMultiplier: 1.2
+    BenefitDescription: Share fundamental cultivation knowledge with others

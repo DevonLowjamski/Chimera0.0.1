@@ -1,0 +1,68 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using System.Collections.Generic;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test for PlayerAgency and type resolution fixes
+    /// </summary>
+    public class PlayerAgencyFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== PlayerAgency Fix Test ===");
+            
+            TestPlayerChoiceTypes();
+            TestSystemIntegration();
+            TestMethodCalls();
+            
+            Debug.Log("PlayerAgency fix test completed!");
+        }
+        
+        private void TestPlayerChoiceTypes()
+        {
+            Debug.Log("Testing PlayerChoice types...");
+            
+            // Test local PlayerChoice class (with all required properties)
+            var choice = new PlayerChoice
+            {
+                ChoiceType = PlayerChoiceType.CultivationMethod,
+                ChoiceDescription = "Test choice",
+                ImpactLevel = 0.8f,
+                ChoiceParameters = new Dictionary<string, object>(),
+                ChoiceTimestamp = Time.time
+            };
+            
+            Debug.Log($"✓ Local PlayerChoice works: {choice.ChoiceType}, Impact: {choice.ImpactLevel}");
+        }
+        
+        private void TestSystemIntegration()
+        {
+            Debug.Log("Testing system integration...");
+            
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            var enhancedManager = GetComponent<EnhancedCultivationGamingManager>();
+            var careSystem = GetComponent<InteractivePlantCareSystem>();
+            
+            Debug.Log("✓ All major systems compile and are accessible");
+        }
+        
+        private void TestMethodCalls()
+        {
+            Debug.Log("Testing method calls...");
+            
+            var particleSystem = GetComponent<CareEffectParticleSystem>();
+            if (particleSystem != null)
+            {
+                // Test PlayMilestoneEffect method exists
+                particleSystem.PlayMilestoneEffect(Vector3.zero);
+                Debug.Log("✓ PlayMilestoneEffect method callable");
+            }
+            else
+            {
+                Debug.Log("✓ CareEffectParticleSystem compiles (component not attached)");
+            }
+        }
+    }
+}

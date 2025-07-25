@@ -1,0 +1,1289 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Data.AI;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Supporting data structures and helper classes for the IPM Analytics and Performance Monitoring System.
+    /// Defines specialized classes for data collection, analytics processing, performance monitoring,
+    /// reporting, and machine learning to support comprehensive business intelligence and system optimization.
+    /// </summary>
+    
+    /// <summary>
+    /// Types of analytics data that can be collected and processed
+    /// </summary>
+    public enum AnalyticsType
+    {
+        Performance,
+        BattleOutcome,
+        ResourceUsage,
+        PlayerBehavior,
+        SystemHealth,
+        ErrorTracking,
+        UserEngagement,
+        PestBehavior,
+        EnvironmentalImpact,
+        Trend,
+        Statistical,
+        Predictive,
+        Correlation
+    }
+    
+    /// <summary>
+    /// Resource utilization tracking for IPM systems
+    /// </summary>
+    [Serializable]
+    public class ResourceUtilization
+    {
+        public string ResourceId;
+        public string ResourceType;
+        public float TotalCapacity;
+        public float CurrentUsage;
+        public float UtilizationPercentage;
+        public DateTime LastUpdated;
+        public List<UsageEvent> UsageHistory = new List<UsageEvent>();
+        public float AverageUsage;
+        public float PeakUsage;
+        public int UsageCount;
+    }
+    
+    [Serializable]
+    public class UsageEvent
+    {
+        public DateTime Timestamp;
+        public float Amount;
+        public string Source;
+        public string EventType;
+    }
+    
+    /// <summary>
+    /// Base analytics data for IPM systems
+    /// </summary>
+    [Serializable]
+    public class AnalyticsData
+    {
+        public string DataId;
+        public string AnalyticsId;
+        public AnalyticsType Type;
+        public DateTime Timestamp;
+        public Dictionary<string, object> Properties = new Dictionary<string, object>();
+        public Dictionary<string, object> Data = new Dictionary<string, object>();
+        public float Value;
+        public Dictionary<string, object> Values = new Dictionary<string, object>();
+        public string Source;
+        public string Category;
+        public int Priority;
+    }
+    
+    #region Analytics Data Management
+    
+    [Serializable]
+    public class AnalyticsDataset
+    {
+        public AnalyticsType AnalyticsType;
+        public List<DataPoint> DataPoints;
+        public DatasetMetadata Metadata;
+        public DateTime LastUpdated;
+        public DatasetStatistics Statistics;
+        public CompressionSettings CompressionSettings;
+        public bool IsCompressed;
+        public long TotalSize;
+        public float CompressionRatio;
+    }
+    
+    [Serializable]
+    public class DataPoint
+    {
+        public DateTime Timestamp;
+        public string Source;
+        public object Value;
+        public Dictionary<string, object> Metadata;
+        public ProjectChimera.Data.AI.DataQuality Quality;
+        public bool IsValidated;
+        public float Confidence;
+        public string Units;
+        public DataPointType DataType;
+    }
+    
+    public enum DataPointType
+    {
+        Numeric,
+        Boolean,
+        Text,
+        Complex,
+        Timestamp,
+        Coordinate,
+        JSON
+    }
+    
+    [Serializable]
+    public class DataQuality
+    {
+        public float Accuracy;
+        public float Completeness;
+        public float Consistency;
+        public float Timeliness;
+        public float Validity;
+        public List<string> QualityIssues;
+        public QualityScore OverallScore;
+    }
+    
+    public enum QualityScore
+    {
+        Excellent,
+        Good,
+        Fair,
+        Poor,
+        Unacceptable
+    }
+    
+    [Serializable]
+    public class DatasetMetadata
+    {
+        public string Name;
+        public string Description;
+        public DateTime CreationTime;
+        public string Owner;
+        public List<string> Tags;
+        public Dictionary<string, string> Properties;
+        public DataSchema Schema;
+        public AccessPermissions Permissions;
+        public RetentionPolicy RetentionPolicy;
+    }
+    
+    [Serializable]
+    public class DataSchema
+    {
+        public List<FieldDefinition> Fields;
+        public Dictionary<string, string> Constraints;
+        public List<string> RequiredFields;
+        public Dictionary<string, object> DefaultValues;
+        public ValidationRules ValidationRules;
+    }
+    
+    [Serializable]
+    public class FieldDefinition
+    {
+        public string Name;
+        public DataFieldType Type;
+        public bool IsRequired;
+        public object DefaultValue;
+        public string Description;
+        public List<string> AllowedValues;
+        public RangeConstraint RangeConstraint;
+    }
+    
+    public enum DataFieldType
+    {
+        Integer,
+        Float,
+        String,
+        Boolean,
+        DateTime,
+        Array,
+        Object
+    }
+    
+    [Serializable]
+    public class RangeConstraint
+    {
+        public object MinValue;
+        public object MaxValue;
+        public bool IsMinInclusive;
+        public bool IsMaxInclusive;
+    }
+    
+    [Serializable]
+    public class AccessPermissions
+    {
+        public List<string> ReadPermissions;
+        public List<string> WritePermissions;
+        public List<string> AdminPermissions;
+        public bool IsPublic;
+        public List<string> RestrictedOperations;
+    }
+    
+    [Serializable]
+    public class RetentionPolicy
+    {
+        public int RetentionDays;
+        public bool AutoDelete;
+        public ArchiveSettings ArchiveSettings;
+        public CompressionSettings CompressionSettings;
+        public BackupSettings BackupSettings;
+    }
+    
+    [Serializable]
+    public class ArchiveSettings
+    {
+        public bool EnableArchiving;
+        public int ArchiveAfterDays;
+        public string ArchiveLocation;
+        public CompressionLevel CompressionLevel;
+    }
+    
+    public enum CompressionLevel
+    {
+        None,
+        Low,
+        Medium,
+        High,
+        Maximum
+    }
+    
+    [Serializable]
+    public class CompressionSettings
+    {
+        public CompressionLevel Level;
+        public string Algorithm;
+        public Dictionary<string, object> Parameters;
+        public float TargetCompressionRatio;
+    }
+    
+    [Serializable]
+    public class BackupSettings
+    {
+        public bool EnableBackup;
+        public int BackupFrequencyHours;
+        public int BackupsToKeep;
+        public string BackupLocation;
+        public bool EncryptBackups;
+    }
+    
+    #endregion
+    
+    #region Time Series and Statistics
+    
+    [Serializable]
+    public class TimeSeries
+    {
+        public string Source;
+        public List<TimeSeriesPoint> DataPoints;
+        public TimeSeriesStatistics Statistics;
+        public TimeSeriesMetadata Metadata;
+        public List<TimeSeriesAnnotation> Annotations;
+        public Dictionary<string, object> Properties;
+    }
+    
+    [Serializable]
+    public class TimeSeriesPoint
+    {
+        public DateTime Timestamp;
+        public double Value;
+        public Dictionary<string, object> Tags;
+        public float Quality;
+        public bool IsInterpolated;
+        public string Notes;
+    }
+    
+    [Serializable]
+    public class TimeSeriesStatistics
+    {
+        public double Mean;
+        public double Median;
+        public double StandardDeviation;
+        public double Variance;
+        public double Min;
+        public double Max;
+        public double Range;
+        public double Skewness;
+        public double Kurtosis;
+        public int Count;
+        public List<double> Quartiles;
+        public double InterquartileRange;
+        public List<Outlier> Outliers;
+        public TrendDirection Trend;
+        public float TrendStrength;
+        public Seasonality Seasonality;
+        public AutoCorrelation AutoCorrelation;
+    }
+    
+    public enum TrendDirection
+    {
+        Increasing,
+        Decreasing,
+        Stable,
+        Cyclical,
+        Unknown
+    }
+    
+    [Serializable]
+    public class Seasonality
+    {
+        public bool HasSeasonality;
+        public float SeasonalStrength;
+        public List<SeasonalComponent> Components;
+        public int Period;
+        public float Confidence;
+    }
+    
+    [Serializable]
+    public class SeasonalComponent
+    {
+        public string Name;
+        public int Period;
+        public float Amplitude;
+        public float Phase;
+        public float Strength;
+    }
+    
+    [Serializable]
+    public class AutoCorrelation
+    {
+        public List<float> Coefficients;
+        public List<int> Lags;
+        public float MaxCorrelation;
+        public int OptimalLag;
+        public bool IsSignificant;
+    }
+    
+    [Serializable]
+    public class Outlier
+    {
+        public DateTime Timestamp;
+        public double Value;
+        public double ZScore;
+        public OutlierType Type;
+        public float Severity;
+        public string Reason;
+        public bool IsConfirmed;
+    }
+    
+    public enum OutlierType
+    {
+        Statistical,
+        Contextual,
+        Collective,
+        Point,
+        Seasonal
+    }
+    
+    [Serializable]
+    public class TimeSeriesAnnotation
+    {
+        public DateTime StartTime;
+        public DateTime? EndTime;
+        public string Title;
+        public string Description;
+        public AnnotationType Type;
+        public Dictionary<string, object> Properties;
+        public string Color;
+        public bool IsVisible;
+    }
+    
+    public enum AnnotationType
+    {
+        Event,
+        Alert,
+        Maintenance,
+        Deployment,
+        Anomaly,
+        Threshold,
+        Note
+    }
+    
+    [Serializable]
+    public class TimeSeriesMetadata
+    {
+        public string Name;
+        public string Description;
+        public string Units;
+        public DataFrequency Frequency;
+        public DateTime StartTime;
+        public DateTime? EndTime;
+        public List<string> Tags;
+        public Dictionary<string, string> Attributes;
+    }
+    
+    public enum DataFrequency
+    {
+        RealTime,
+        Second,
+        Minute,
+        Hour,
+        Day,
+        Week,
+        Month,
+        Year,
+        Irregular
+    }
+    
+    #endregion
+    
+    #region Analytics Requests and Results
+    
+    [Serializable]
+    public class AnalyticsRequest
+    {
+        public string RequestId;
+        public AnalyticsType AnalyticsType;
+        public TimeRange TimeRange;
+        public List<string> DataSources;
+        public Dictionary<string, object> Parameters;
+        public AnalyticsOptions Options;
+        public string RequestedBy;
+        public DateTime RequestTime;
+        public Priority Priority;
+    }
+    
+    public enum Priority
+    {
+        Low,
+        Normal,
+        High,
+        Critical,
+        Emergency
+    }
+    
+    [Serializable]
+    public class AnalyticsOptions
+    {
+        public bool IncludeConfidenceIntervals;
+        public bool IncludeTrendAnalysis;
+        public bool IncludeAnomalies;
+        public bool IncludeForecasting;
+        public float ConfidenceLevel;
+        public int ForecastHorizon;
+        public bool EnableRealTimeUpdates;
+        public Dictionary<string, object> CustomOptions;
+    }
+    
+    [Serializable]
+    public class AnalyticsResult
+    {
+        public string RequestId;
+        public AnalyticsType AnalyticsType;
+        public bool Success;
+        public string Message;
+        public Dictionary<string, object> Results;
+        public AnalyticsMetadata Metadata;
+        public DateTime ProcessingStartTime;
+        public DateTime ProcessingEndTime;
+        public TimeSpan ProcessingDuration;
+        public List<string> Warnings;
+        public List<string> Errors;
+        public float Confidence;
+        public DataQuality DataQuality;
+    }
+    
+    [Serializable]
+    public class AnalyticsMetadata
+    {
+        public string AnalyticsEngine;
+        public string Version;
+        public Dictionary<string, object> Parameters;
+        public List<string> DataSources;
+        public int DataPointsProcessed;
+        public List<string> Methods;
+        public float ProcessingEfficiency;
+        public ResourceUsage ResourceUsage;
+    }
+    
+    [Serializable]
+    public class ResourceUsage
+    {
+        public float CPUUsagePercent;
+        public long MemoryUsageMB;
+        public float DiskIOUsageMB;
+        public float NetworkIOUsageMB;
+        public TimeSpan ProcessingTime;
+        public int ThreadsUsed;
+    }
+    
+    #endregion
+    
+    #region Trend Analysis
+    
+    [Serializable]
+    public class TrendAnalysisResult
+    {
+        public string Source;
+        public TrendDirection Direction;
+        public float Strength;
+        public float Confidence;
+        public DateTime AnalysisTime;
+        public TimeRange AnalysisRange;
+        public TrendStatistics Statistics;
+        public List<TrendSegment> Segments;
+        public List<TrendChangePoint> ChangePoints;
+        public TrendForecast Forecast;
+        public List<string> Insights;
+        public TrendQuality Quality;
+    }
+    
+    [Serializable]
+    public class TrendStatistics
+    {
+        public double Slope;
+        public double Intercept;
+        public double RSquared;
+        public double PValue;
+        public double StandardError;
+        public ConfidenceInterval ConfidenceInterval;
+        public bool IsStatisticallySignificant;
+        public float SignificanceLevel;
+    }
+    
+    [Serializable]
+    public class ConfidenceInterval
+    {
+        public double LowerBound;
+        public double UpperBound;
+        public float ConfidenceLevel;
+    }
+    
+    [Serializable]
+    public class TrendSegment
+    {
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public TrendDirection Direction;
+        public float Strength;
+        public double Slope;
+        public string Description;
+        public List<string> Factors;
+    }
+    
+    [Serializable]
+    public class TrendChangePoint
+    {
+        public DateTime Timestamp;
+        public ChangePointType Type;
+        public float Significance;
+        public string Reason;
+        public double ValueBefore;
+        public double ValueAfter;
+        public float Confidence;
+    }
+    
+    public enum ChangePointType
+    {
+        LevelShift,
+        TrendChange,
+        VarianceChange,
+        Seasonal,
+        Structural
+    }
+    
+    [Serializable]
+    public class TrendForecast
+    {
+        public List<ForecastPoint> Points;
+        public TimeRange ForecastRange;
+        public float Confidence;
+        public string Method;
+        public Dictionary<string, object> Parameters;
+        public List<string> Assumptions;
+        public ForecastQuality Quality;
+    }
+    
+    [Serializable]
+    public class ForecastPoint
+    {
+        public DateTime Timestamp;
+        public double PredictedValue;
+        public double LowerBound;
+        public double UpperBound;
+        public float Confidence;
+        public Dictionary<string, object> Metadata;
+    }
+    
+    [Serializable]
+    public class ForecastQuality
+    {
+        public float Accuracy;
+        public float Precision;
+        public float Reliability;
+        public List<string> QualityIndicators;
+        public Dictionary<string, float> ErrorMetrics;
+    }
+    
+    [Serializable]
+    public class TrendQuality
+    {
+        public float DataQuality;
+        public float ModelFit;
+        public float Stability;
+        public int DataPointsUsed;
+        public List<string> QualityIssues;
+        public bool IsReliable;
+    }
+    
+    #endregion
+    
+    #region Alerts and Monitoring
+    
+    [Serializable]
+    public class AnalyticsAlert
+    {
+        public string AlertId;
+        public AlertType AlertType;
+        public AlertSeverity Severity;
+        public string Source;
+        public DateTime Timestamp;
+        public string Message;
+        public string Description;
+        public DataPoint DataPoint;
+        public AlertCondition Condition;
+        public bool IsActive;
+        public DateTime? ResolvedTime;
+        public string ResolvedBy;
+        public List<AlertAction> Actions;
+        public Dictionary<string, object> Metadata;
+        public AlertContext Context;
+    }
+    
+    public enum AlertType
+    {
+        Threshold,
+        Anomaly,
+        Trend,
+        Performance,
+        Quality,
+        System,
+        Custom
+    }
+    
+    public enum AlertSeverity
+    {
+        Info,
+        Warning,
+        Error,
+        Critical,
+        Emergency
+    }
+    
+    [Serializable]
+    public class AlertCondition
+    {
+        public string ConditionId;
+        public string Name;
+        public string Description;
+        public string SourcePattern;
+        public AlertConditionType ConditionType;
+        public ComparisonOperator Operator;
+        public double ThresholdValue;
+        public TimeSpan TimeWindow;
+        public int MinOccurrences;
+        public AlertType AlertType;
+        public AlertSeverity Severity;
+        public string AlertMessage;
+        public bool IsEnabled;
+        public DateTime CreatedTime;
+        public string CreatedBy;
+        public List<string> NotificationChannels;
+        public Dictionary<string, object> Parameters;
+    }
+    
+    public enum AlertConditionType
+    {
+        Threshold,
+        RateOfChange,
+        Anomaly,
+        Pattern,
+        Correlation,
+        Statistical,
+        Custom
+    }
+    
+    public enum ComparisonOperator
+    {
+        GreaterThan,
+        LessThan,
+        GreaterThanOrEqual,
+        LessThanOrEqual,
+        Equal,
+        NotEqual,
+        Contains,
+        NotContains
+    }
+    
+    [Serializable]
+    public class AlertAction
+    {
+        public string ActionId;
+        public AlertActionType ActionType;
+        public string Description;
+        public Dictionary<string, object> Parameters;
+        public bool IsExecuted;
+        public DateTime? ExecutionTime;
+        public string ExecutionResult;
+        public bool IsSuccessful;
+    }
+    
+    public enum AlertActionType
+    {
+        Email,
+        SMS,
+        Webhook,
+        ScriptExecution,
+        APICall,
+        Notification,
+        LogEntry,
+        Custom
+    }
+    
+    [Serializable]
+    public class AlertContext
+    {
+        public Dictionary<string, object> EnvironmentalFactors;
+        public List<string> RelatedSystems;
+        public List<string> RecentEvents;
+        public Dictionary<string, double> RelevantMetrics;
+        public string BusinessContext;
+        public float Impact;
+        public List<string> AffectedUsers;
+    }
+    
+    #endregion
+    
+    #region Performance Monitoring
+    
+    [Serializable]
+    public class PerformanceMetric
+    {
+        public string MetricId;
+        public string Name;
+        public string Description;
+        public MetricType Type;
+        public string Units;
+        public double CurrentValue;
+        public double PreviousValue;
+        public double MinValue;
+        public double MaxValue;
+        public double AverageValue;
+        public List<double> RecentValues;
+        public TrendDirection Trend;
+        public DateTime LastUpdated;
+        public PerformanceThresholds Thresholds;
+        public MetricStatus Status;
+        public List<string> Tags;
+        public Dictionary<string, object> Metadata;
+        public string PlayerId = "";
+        public Dictionary<string, float> Metrics = new Dictionary<string, float>();
+        public void LastUpdate() { LastUpdated = DateTime.Now; }
+    }
+    
+    public enum MetricType
+    {
+        Counter,
+        Gauge,
+        Histogram,
+        Timer,
+        Rate,
+        Percentage,
+        Custom
+    }
+    
+    [Serializable]
+    public class PerformanceThresholds
+    {
+        public double WarningThreshold;
+        public double CriticalThreshold;
+        public double MinAcceptableValue;
+        public double MaxAcceptableValue;
+        public double TargetValue;
+        public double OptimalRange;
+    }
+    
+    public enum MetricStatus
+    {
+        Optimal,
+        Good,
+        Warning,
+        Critical,
+        Unknown,
+        Disabled
+    }
+    
+    [Serializable]
+    public class SystemHealthStatus
+    {
+        public HealthLevel OverallHealth;
+        public float HealthScore;
+        public DateTime LastCheck;
+        public Dictionary<string, ComponentHealth> ComponentHealth;
+        public List<HealthIssue> Issues;
+        public List<string> Recommendations;
+        public Dictionary<string, object> SystemMetrics;
+        public HealthTrend HealthTrend;
+    }
+    
+    public enum HealthLevel
+    {
+        Excellent,
+        Good,
+        Fair,
+        Poor,
+        Critical,
+        Unknown
+    }
+    
+    [Serializable]
+    public class ComponentHealth
+    {
+        public string ComponentName;
+        public HealthLevel HealthLevel;
+        public float HealthScore;
+        public DateTime LastCheck;
+        public List<string> Issues;
+        public Dictionary<string, double> Metrics;
+        public bool IsOperational;
+        public string Status;
+    }
+    
+    [Serializable]
+    public class HealthIssue
+    {
+        public string IssueId;
+        public string Component;
+        public IssueSeverity Severity;
+        public string Description;
+        public DateTime DetectedTime;
+        public bool IsResolved;
+        public DateTime? ResolvedTime;
+        public List<string> PossibleCauses;
+        public List<string> RecommendedActions;
+        public Dictionary<string, object> Context;
+    }
+    
+    public enum IssueSeverity
+    {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+    
+    [Serializable]
+    public class HealthTrend
+    {
+        public TrendDirection Direction;
+        public float TrendStrength;
+        public TimeSpan TrendDuration;
+        public List<HealthDataPoint> HistoricalData;
+        public string TrendDescription;
+    }
+    
+    [Serializable]
+    public class HealthDataPoint
+    {
+        public DateTime Timestamp;
+        public float HealthScore;
+        public HealthLevel HealthLevel;
+        public List<string> ActiveIssues;
+    }
+    
+    #endregion
+    
+    #region Reporting
+    
+    [Serializable]
+    public class AnalyticsReport
+    {
+        public string ReportId;
+        public string Title;
+        public string Description;
+        public ReportType ReportType;
+        public DateTime GenerationTime;
+        public TimeRange TimeRange;
+        public string GeneratedBy;
+        public List<ReportSection> Sections;
+        public List<PerformanceInsight> Insights;
+        public List<string> Recommendations;
+        public ReportSummary Summary;
+        public Dictionary<string, object> Metadata;
+        public bool IsError;
+        public string ErrorMessage;
+        public ReportSettings Settings;
+        public List<Visualization> Visualizations;
+    }
+    
+    public enum ReportType
+    {
+        Performance,
+        Summary,
+        Detailed,
+        Trend,
+        Anomaly,
+        Health,
+        Custom,
+        Executive
+    }
+    
+    [Serializable]
+    public class ReportSection
+    {
+        public string Title;
+        public string Description;
+        public object Content;
+        public ReportSectionType SectionType;
+        public List<Visualization> Charts;
+        public List<string> KeyFindings;
+        public Dictionary<string, object> Data;
+        public int Order;
+        public bool IsVisible;
+    }
+    
+    public enum ReportSectionType
+    {
+        Overview,
+        Performance,
+        Trends,
+        Anomalies,
+        Resources,
+        Health,
+        Recommendations,
+        Data,
+        Charts,
+        Custom
+    }
+    
+    [Serializable]
+    public class ReportSummary
+    {
+        public List<string> KeyFindings;
+        public List<string> MainInsights;
+        public List<string> ActionItems;
+        public Dictionary<string, object> KeyMetrics;
+        public float OverallScore;
+        public string ExecutiveSummary;
+        public List<string> Highlights;
+        public List<string> ConcernAreas;
+    }
+    
+    [Serializable]
+    public class PerformanceInsight
+    {
+        public string InsightId;
+        public string Title;
+        public string Description;
+        public InsightType Type;
+        public InsightSeverity Severity;
+        public float Confidence;
+        public List<string> SupportingData;
+        public List<string> Recommendations;
+        public string Impact;
+        public DateTime GeneratedTime;
+        public Dictionary<string, object> Context;
+        public bool IsActionable;
+        public List<string> Tags;
+    }
+    
+    public enum InsightType
+    {
+        Performance,
+        Trend,
+        Anomaly,
+        Optimization,
+        Resource,
+        Quality,
+        Predictive,
+        Comparative
+    }
+    
+    public enum InsightSeverity
+    {
+        Info,
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+    
+    [Serializable]
+    public class Visualization
+    {
+        public string VisualizationId;
+        public string Title;
+        public VisualizationType Type;
+        public object Data;
+        public VisualizationSettings Settings;
+        public Dictionary<string, object> Configuration;
+        public bool IsInteractive;
+        public List<string> DataSources;
+        public TimeRange TimeRange;
+    }
+    
+    public enum VisualizationType
+    {
+        LineChart,
+        BarChart,
+        PieChart,
+        ScatterPlot,
+        Heatmap,
+        Histogram,
+        BoxPlot,
+        Gauge,
+        Table,
+        Custom
+    }
+    
+    [Serializable]
+    public class VisualizationSettings
+    {
+        public Dictionary<string, string> Colors;
+        public string Theme;
+        public bool ShowLegend;
+        public bool ShowGrid;
+        public Dictionary<string, object> AxisSettings;
+        public Dictionary<string, object> SeriesSettings;
+        public bool EnableZoom;
+        public bool EnablePan;
+        public Dictionary<string, object> CustomSettings;
+    }
+    
+    [Serializable]
+    public class ReportSettings
+    {
+        public string Template;
+        public string Format;
+        public bool IncludeCharts;
+        public bool IncludeRawData;
+        public bool IncludeInsights;
+        public CompressionLevel CompressionLevel;
+        public List<string> Recipients;
+        public Dictionary<string, object> CustomSettings;
+    }
+    
+    [Serializable]
+    public class ReportRequest
+    {
+        public string RequestId;
+        public ReportType ReportType;
+        public string Title;
+        public string Description;
+        public TimeRange TimeRange;
+        public List<string> DataSources;
+        public ReportSettings Settings;
+        public string RequestedBy;
+        public DateTime RequestTime;
+        public Priority Priority;
+        public Dictionary<string, object> Parameters;
+    }
+    
+    [Serializable]
+    public class ReportFilter
+    {
+        public List<ReportType> ReportTypes;
+        public TimeRange TimeRange;
+        public List<string> GeneratedBy;
+        public List<string> Tags;
+        public Dictionary<string, object> Criteria;
+        
+        public bool MatchesReport(AnalyticsReport report)
+        {
+            if (ReportTypes != null && !ReportTypes.Contains(report.ReportType))
+                return false;
+            
+            if (TimeRange != null && !TimeRange.Contains(report.GenerationTime))
+                return false;
+            
+            if (GeneratedBy != null && !GeneratedBy.Contains(report.GeneratedBy))
+                return false;
+            
+            return true;
+        }
+    }
+    
+    public enum ReportFrequency
+    {
+        RealTime,
+        Hourly,
+        Daily,
+        Weekly,
+        Monthly,
+        Quarterly,
+        Yearly,
+        OnDemand,
+        Custom
+    }
+    
+    #endregion
+    
+    #region Analytics Metrics and KPIs
+    
+    [Serializable]
+    public class AnalyticsMetrics
+    {
+        public int TotalDataPoints;
+        public DateTime LastDataUpdate;
+        public Dictionary<string, SourceMetrics> SourceMetrics;
+        public float SystemPerformance;
+        public float DataQualityScore;
+        public int ActiveAlerts;
+        public float AnalyticsAccuracy;
+        public ResourceUtilization ResourceUtilization;
+        public DateTime LastMetricsUpdate;
+        public Dictionary<string, float> CustomMetrics;
+    }
+    
+    [Serializable]
+    public class SourceMetrics
+    {
+        public int DataPointCount;
+        public DateTime LastUpdate;
+        public float DataRate;
+        public int DataPointsSinceLastRate;
+        public DateTime LastRateCalculation;
+        public float DataQuality;
+        public int ErrorCount;
+        public bool IsActive;
+        public Dictionary<string, object> CustomMetrics;
+    }
+    
+    [Serializable]
+    public class DatasetStatistics
+    {
+        public int TotalDataPoints;
+        public DateTime FirstDataPoint;
+        public DateTime LastDataPoint;
+        public float AverageDataRate;
+        public float DataQualityScore;
+        public long TotalSize;
+        public float CompressionRatio;
+        public Dictionary<string, int> DataTypeDistribution;
+        public Dictionary<string, float> ValueDistribution;
+        public float Completeness;
+        public int NullValues;
+        public int DuplicateValues;
+        public List<string> DataQualityIssues;
+    }
+    
+    [Serializable]
+    public class ValidationRules
+    {
+        public List<ValidationRule> Rules;
+        public bool StrictMode;
+        public ValidationAction OnFailure;
+        public bool LogFailures;
+        public float MinAcceptableQuality;
+    }
+    
+    [Serializable]
+    public class ValidationRule
+    {
+        public string RuleId;
+        public string Name;
+        public string Description;
+        public RuleType Type;
+        public Dictionary<string, object> Parameters;
+        public bool IsEnabled;
+        public ValidationSeverity Severity;
+        public string ErrorMessage;
+    }
+    
+    public enum RuleType
+    {
+        Range,
+        Pattern,
+        Format,
+        Consistency,
+        Completeness,
+        Uniqueness,
+        Custom
+    }
+    
+    public enum ValidationSeverity
+    {
+        Info,
+        Warning,
+        Error,
+        Critical
+    }
+    
+    public enum ValidationAction
+    {
+        Accept,
+        Reject,
+        Repair,
+        Flag,
+        Quarantine
+    }
+    
+    #endregion
+    
+    #region Supporting Types
+    
+    [Serializable]
+    public class TimeRange
+    {
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public TimeSpan Duration => EndTime - StartTime;
+        
+        public bool Contains(DateTime timestamp)
+        {
+            return timestamp >= StartTime && timestamp <= EndTime;
+        }
+        
+        public static TimeRange Last24Hours => new TimeRange
+        {
+            StartTime = DateTime.Now.AddHours(-24),
+            EndTime = DateTime.Now
+        };
+        
+        public static TimeRange LastWeek => new TimeRange
+        {
+            StartTime = DateTime.Now.AddDays(-7),
+            EndTime = DateTime.Now
+        };
+        
+        public static TimeRange LastMonth => new TimeRange
+        {
+            StartTime = DateTime.Now.AddMonths(-1),
+            EndTime = DateTime.Now
+        };
+    }
+    
+    [Serializable]
+    public class AnalyticsUpdateScheduler
+    {
+        public float AnalyticsUpdateInterval;
+        public float ReportGenerationInterval;
+        public float HealthCheckInterval;
+        public DateTime LastAnalyticsUpdate;
+        public DateTime LastReportGeneration;
+        public DateTime LastHealthCheck;
+        public List<ScheduledAnalyticsTask> ScheduledTasks;
+        public bool IsActive;
+        
+        public void Initialize(float analyticsInterval, float reportInterval, float healthInterval)
+        {
+            AnalyticsUpdateInterval = analyticsInterval;
+            ReportGenerationInterval = reportInterval;
+            HealthCheckInterval = healthInterval;
+            ScheduledTasks = new List<ScheduledAnalyticsTask>();
+            IsActive = true;
+        }
+    }
+    
+    [Serializable]
+    public class ScheduledAnalyticsTask
+    {
+        public string TaskId;
+        public DateTime ScheduledTime;
+        public AnalyticsTaskType TaskType;
+        public Dictionary<string, object> Parameters;
+        public bool IsCompleted;
+        public DateTime? CompletionTime;
+        public string Result;
+    }
+    
+    public enum AnalyticsTaskType
+    {
+        DataCollection,
+        Analytics,
+        ReportGeneration,
+        HealthCheck,
+        ModelUpdate,
+        DataCleanup,
+        Backup,
+        Custom
+    }
+    
+    #endregion
+}

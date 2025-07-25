@@ -1,0 +1,1217 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Core.Logging;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+using ProjectChimera.Systems.Gaming;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Aromatic Gaming System - Transforms terpene analysis and aromatic mastery into engaging sensory gameplay
+    /// Implements sensory training challenges, creative blending mechanics, and aromatic discovery systems
+    /// Core component of Enhanced Scientific Gaming System v2.0
+    /// </summary>
+    public class AromaticGamingSystem : MonoBehaviour
+    {
+        [Header("Aromatic Gaming Configuration")]
+        [SerializeField] private AromaticGamingConfigSO _aromaticConfig;
+        [SerializeField] private TerpeneLibrarySO _terpeneLibrary;
+        [SerializeField] private AromaticProfileDatabaseSO _profileDatabase;
+        
+        [Header("Sensory Training Systems")]
+        [SerializeField] private SensoryTrainingSystem _sensoryTrainingSystem;
+        [SerializeField] private AromaticIdentificationEngine _identificationEngine;
+        [SerializeField] private SensoryMemoryTracker _memoryTracker;
+        [SerializeField] private SensoryProgressionManager _progressionManager;
+        
+        [Header("Creative Blending Systems")]
+        [SerializeField] private AromaticCreationStudio _creationStudio;
+        [SerializeField] private TerpeneBlendingEngine _blendingEngine;
+        [SerializeField] private AromaticCompositionAnalyzer _compositionAnalyzer;
+        [SerializeField] private FlavorProfileGenerator _flavorProfileGenerator;
+        
+        [Header("Analysis and Discovery")]
+        [SerializeField] private TerpeneAnalysisGamingSystem _analysisSystem;
+        [SerializeField] private AromaticInnovationDetector _innovationDetector;
+        [SerializeField] private SynergyDiscoveryEngine _synergyEngine;
+        [SerializeField] private AromaticQualityAssessment _qualityAssessment;
+        
+        [Header("Gaming Settings")]
+        [Range(0.1f, 2.0f)] public float SensorySkillProgressionRate = 1.0f;
+        [Range(0.1f, 3.0f)] public float CreativityRewardMultiplier = 1.5f;
+        [Range(0.1f, 1.0f)] public float SensoryChallengeDifficulty = 0.7f;
+        [Range(1.0f, 10.0f)] public float InnovationThreshold = 4.0f;
+        [Range(0.1f, 2.0f)] public float BlendingPrecisionRequired = 0.8f;
+        
+        // System State
+        private bool _isInitialized = false;
+        private Dictionary<string, SensoryChallenge> _activeSensoryChallenges = new Dictionary<string, SensoryChallenge>();
+        private Dictionary<string, BlendingProject> _activeBlendingProjects = new Dictionary<string, BlendingProject>();
+        private List<AromaticDiscovery> _sessionDiscoveries = new List<AromaticDiscovery>();
+        private AromaticGamingState _currentGamingState;
+        
+        // Sensory Performance Metrics
+        private int _sensoryTestsCompleted = 0;
+        private int _terpeneIdentificationsCorrect = 0;
+        private int _blendingProjectsCompleted = 0;
+        private int _aromaticInnovationsCreated = 0;
+        private float _totalSensoryExperience = 0f;
+        private Dictionary<TerpeneCategory, float> _categoryMasteryLevels = new Dictionary<TerpeneCategory, float>();
+        
+        // Events
+        private GameEventChannelSO _onSensorySkillImproved;
+        private GameEventChannelSO _onAromaticMasteryAchieved;
+        private GameEventChannelSO _onTerpeneIdentified;
+        private GameEventChannelSO _onBlendingProjectCompleted;
+        private GameEventChannelSO _onAromaticInnovationCreated;
+        private GameEventChannelSO _onSynergyDiscovered;
+        private GameEventChannelSO _onSensoryMilestoneReached;
+        
+        #region Initialization
+        
+        public void Initialize(AromaticGamingConfigSO config)
+        {
+            if (_isInitialized)
+            {
+                ChimeraLogger.LogWarning("AromaticGamingSystem already initialized", this);
+                return;
+            }
+            
+            _aromaticConfig = config ?? _aromaticConfig;
+            
+            if (_aromaticConfig == null)
+            {
+                ChimeraLogger.LogError("AromaticGamingConfigSO is required for initialization", this);
+                return;
+            }
+            
+            InitializeAromaticSystems();
+            InitializeSensoryTraining();
+            InitializeCreativeBlending();
+            InitializeAnalysisAndDiscovery();
+            InitializeAromaticGamingState();
+            SetupEventChannels();
+            
+            _isInitialized = true;
+            ChimeraLogger.Log("AromaticGamingSystem initialized successfully", this);
+        }
+        
+        private void InitializeAromaticSystems()
+        {
+            // Initialize core aromatic gaming systems
+            _activeSensoryChallenges.Clear();
+            _activeBlendingProjects.Clear();
+            _sessionDiscoveries.Clear();
+            
+            // Initialize category mastery tracking
+            foreach (TerpeneCategory category in System.Enum.GetValues(typeof(TerpeneCategory)))
+            {
+                _categoryMasteryLevels[category] = 0f;
+            }
+        }
+        
+        private void InitializeSensoryTraining()
+        {
+            // Initialize sensory training components
+            if (_sensoryTrainingSystem == null)
+            {
+                _sensoryTrainingSystem = new SensoryTrainingSystem();
+            }
+            
+            if (_identificationEngine == null)
+            {
+                _identificationEngine = new AromaticIdentificationEngine();
+            }
+            
+            if (_memoryTracker == null)
+            {
+                _memoryTracker = new SensoryMemoryTracker();
+            }
+            
+            if (_progressionManager == null)
+            {
+                _progressionManager = new SensoryProgressionManager();
+            }
+        }
+        
+        private void InitializeCreativeBlending()
+        {
+            // Initialize creative blending components
+            if (_creationStudio == null)
+            {
+                _creationStudio = new AromaticCreationStudio();
+            }
+            
+            if (_blendingEngine == null)
+            {
+                _blendingEngine = new TerpeneBlendingEngine();
+            }
+            
+            if (_compositionAnalyzer == null)
+            {
+                _compositionAnalyzer = new AromaticCompositionAnalyzer();
+            }
+            
+            if (_flavorProfileGenerator == null)
+            {
+                _flavorProfileGenerator = new FlavorProfileGenerator();
+            }
+        }
+        
+        private void InitializeAnalysisAndDiscovery()
+        {
+            // Initialize analysis and discovery components
+            if (_analysisSystem == null)
+            {
+                _analysisSystem = new TerpeneAnalysisGamingSystem();
+            }
+            
+            if (_innovationDetector == null)
+            {
+                _innovationDetector = new AromaticInnovationDetector();
+            }
+            
+            if (_synergyEngine == null)
+            {
+                _synergyEngine = new SynergyDiscoveryEngine();
+            }
+            
+            if (_qualityAssessment == null)
+            {
+                _qualityAssessment = new AromaticQualityAssessment();
+            }
+        }
+        
+        private void InitializeAromaticGamingState()
+        {
+            _currentGamingState = new AromaticGamingState
+            {
+                CurrentSensoryLevel = SensorySkillLevel.Beginner,
+                CurrentBlendingLevel = BlendingSkillLevel.Basic,
+                TotalSensoryExperience = 0f,
+                TotalBlendingExperience = 0f,
+                IdentificationAccuracy = 0f,
+                BlendingPrecision = 0f,
+                UnlockedTerpeneCategories = new List<TerpeneCategory> { TerpeneCategory.Monoterpenes },
+                MasteredTerpenes = new List<string>(),
+                CreatedAromaticProfiles = 0,
+                DiscoveredSynergies = 0
+            };
+        }
+        
+        private void SetupEventChannels()
+        {
+            // Event channels would be assigned in inspector or loaded from configuration
+            if (_onSensorySkillImproved != null)
+                _onSensorySkillImproved.OnEventRaisedWithData.AddListener OnSensorySkillImprovedEvent;
+                
+            if (_onAromaticMasteryAchieved != null)
+                _onAromaticMasteryAchieved.OnEventRaisedWithData.AddListener OnAromaticMasteryAchievedEvent;
+                
+            if (_onTerpeneIdentified != null)
+                _onTerpeneIdentified.OnEventRaisedWithData.AddListener OnTerpeneIdentifiedEvent;
+        }
+        
+        #endregion
+        
+        #region Public API - Sensory Training
+        
+        /// <summary>
+        /// Start sensory training challenge with specified parameters
+        /// </summary>
+        public SensoryTrainingResult StartSensoryTraining(SensoryTrainingType trainingType, SensoryDifficulty difficulty)
+        {
+            if (!_isInitialized || !IsEligibleForTraining(trainingType))
+                return SensoryTrainingResult.Failed;
+            
+            var challenge = CreateSensoryChallenge(trainingType, difficulty);
+            if (challenge == null)
+                return SensoryTrainingResult.Failed;
+            
+            _activeSensoryChallenges[challenge.ChallengeID] = challenge;
+            
+            // Initialize sensory training interface
+            InitializeSensoryTrainingInterface(challenge);
+            
+            ChimeraLogger.Log($"Sensory training started: {trainingType} - {difficulty}", this);
+            return SensoryTrainingResult.Started;
+        }
+        
+        /// <summary>
+        /// Submit terpene identification attempt
+        /// </summary>
+        public TerpeneIdentificationResult SubmitTerpeneIdentification(string challengeID, TerpeneIdentificationAttempt attempt)
+        {
+            if (!_activeSensoryChallenges.TryGetValue(challengeID, out SensoryChallenge challenge))
+                return TerpeneIdentificationResult.InvalidChallenge;
+            
+            var result = EvaluateIdentificationAttempt(challenge, attempt);
+            
+            // Update challenge progress
+            UpdateSensoryChallengeProgress(challenge, result);
+            
+            // Track identification accuracy
+            if (result.IsCorrect)
+            {
+                _terpeneIdentificationsCorrect++;
+                UpdateSensorySkillProgress(attempt.TerpeneCategory, result.ConfidenceLevel);
+            }
+            
+            // Check for challenge completion
+            if (IsChallengeChallengeComplete(challenge))
+            {
+                CompleteSensoryChallenge(challenge);
+            }
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// Get available sensory training challenges
+        /// </summary>
+        public List<SensoryTrainingInfo> GetAvailableSensoryTraining()
+        {
+            var availableTraining = new List<SensoryTrainingInfo>();
+            
+            foreach (var category in _currentGamingState.UnlockedTerpeneCategories)
+            {
+                var trainingInfo = GetSensoryTrainingInfo(category);
+                if (trainingInfo != null)
+                {
+                    availableTraining.Add(trainingInfo);
+                }
+            }
+            
+            return availableTraining;
+        }
+        
+        /// <summary>
+        /// Get sensory skill progress for specific terpene category
+        /// </summary>
+        public SensorySkillProgress GetSensoryProgress(TerpeneCategory category)
+        {
+            var masteryLevel = _categoryMasteryLevels.TryGetValue(category, out float level) ? level : 0f;
+            
+            return new SensorySkillProgress
+            {
+                Category = category,
+                MasteryLevel = masteryLevel,
+                SkillLevel = CalculateSensorySkillLevel(masteryLevel),
+                TerpenesIdentified = GetIdentifiedTerpenesCount(category),
+                TotalTerpenesInCategory = GetTotalTerpenesInCategory(category),
+                AccuracyRate = CalculateAccuracyRate(category)
+            };
+        }
+        
+        #endregion
+        
+        #region Public API - Creative Blending
+        
+        /// <summary>
+        /// Start aromatic blending project with specified objectives
+        /// </summary>
+        public BlendingProjectResult StartBlendingProject(BlendingProjectSpec projectSpec)
+        {
+            if (!_isInitialized || !IsEligibleForBlending(projectSpec.RequiredSkillLevel))
+                return BlendingProjectResult.Failed;
+            
+            var project = CreateBlendingProject(projectSpec);
+            if (project == null)
+                return BlendingProjectResult.Failed;
+            
+            _activeBlendingProjects[project.ProjectID] = project;
+            
+            // Initialize blending studio interface
+            InitializeBlendingStudioInterface(project);
+            
+            ChimeraLogger.Log($"Blending project started: {project.ProjectName}", this);
+            return BlendingProjectResult.Started;
+        }
+        
+        /// <summary>
+        /// Create aromatic blend with specified terpene composition
+        /// </summary>
+        public AromaticBlendResult CreateAromaticBlend(string projectID, TerpeneComposition composition)
+        {
+            if (!_activeBlendingProjects.TryGetValue(projectID, out BlendingProject project))
+                return AromaticBlendResult.InvalidProject;
+            
+            var blendResult = EvaluateAromaticBlend(project, composition);
+            
+            // Analyze blend for innovations and synergies
+            AnalyzeBlendForInnovations(composition, blendResult);
+            
+            // Update blending project progress
+            UpdateBlendingProjectProgress(project, blendResult);
+            
+            // Check for project completion
+            if (IsBlendingProjectComplete(project))
+            {
+                CompleteBlendingProject(project);
+            }
+            
+            return blendResult;
+        }
+        
+        /// <summary>
+        /// Analyze existing aromatic profile for quality and innovation
+        /// </summary>
+        public AromaticAnalysisResult AnalyzeAromaticProfile(AromaticProfile profile)
+        {
+            if (!_isInitialized || profile == null)
+                return AromaticAnalysisResult.Invalid;
+            
+            var analysisResult = PerformAromaticAnalysis(profile);
+            
+            // Check for novel aromatic combinations
+            var novelCombinations = DetectNovelCombinations(profile);
+            if (novelCombinations.Count > 0)
+            {
+                ProcessNovelCombinationDiscovery(novelCombinations, profile);
+                analysisResult.NovelCombinations = novelCombinations;
+            }
+            
+            // Check for synergistic effects
+            var synergies = _synergyEngine?.DiscoverSynergies(profile);
+            if (synergies?.Count > 0)
+            {
+                ProcessSynergyDiscovery(synergies, profile);
+                analysisResult.DiscoveredSynergies = synergies;
+            }
+            
+            return analysisResult;
+        }
+        
+        /// <summary>
+        /// Get creative blending opportunities based on current skill level
+        /// </summary>
+        public List<BlendingOpportunity> GetBlendingOpportunities()
+        {
+            var opportunities = new List<BlendingOpportunity>();
+            
+            // Generate opportunities based on skill level and unlocked content
+            var skillLevel = _currentGamingState.CurrentBlendingLevel;
+            var unlockedCategories = _currentGamingState.UnlockedTerpeneCategories;
+            
+            opportunities.AddRange(GenerateSkillBasedOpportunities(skillLevel));
+            opportunities.AddRange(GenerateCategoryBasedOpportunities(unlockedCategories));
+            opportunities.AddRange(GenerateInnovationOpportunities());
+            
+            return opportunities;
+        }
+        
+        #endregion
+        
+        #region Sensory Challenge Processing
+        
+        private SensoryChallenge CreateSensoryChallenge(SensoryTrainingType trainingType, SensoryDifficulty difficulty)
+        {
+            var challenge = new SensoryChallenge
+            {
+                ChallengeID = System.Guid.NewGuid().ToString(),
+                TrainingType = trainingType,
+                Difficulty = difficulty,
+                TerpeneCategory = SelectTrainingCategory(trainingType),
+                TargetTerpenes = SelectTargetTerpenes(trainingType, difficulty),
+                MaxAttempts = CalculateMaxAttempts(difficulty),
+                TimeLimit = CalculateTimeLimit(trainingType, difficulty),
+                StartTime = Time.time,
+                IsActive = true
+            };
+            
+            return challenge;
+        }
+        
+        private TerpeneIdentificationResult EvaluateIdentificationAttempt(SensoryChallenge challenge, TerpeneIdentificationAttempt attempt)
+        {
+            var result = new TerpeneIdentificationResult
+            {
+                AttemptID = System.Guid.NewGuid().ToString(),
+                ChallengeID = challenge.ChallengeID,
+                SubmittedTerpene = attempt.IdentifiedTerpene,
+                CorrectTerpene = challenge.TargetTerpenes[attempt.AttemptIndex],
+                AttemptTime = Time.time
+            };
+            
+            // Check if identification is correct
+            result.IsCorrect = result.SubmittedTerpene == result.CorrectTerpene;
+            
+            // Calculate confidence and precision scores
+            result.ConfidenceLevel = attempt.ConfidenceLevel;
+            result.PrecisionScore = CalculatePrecisionScore(attempt, challenge);
+            result.ResponseTime = attempt.ResponseTime;
+            
+            // Calculate overall score
+            result.Score = CalculateIdentificationScore(result);
+            
+            // Provide feedback
+            result.Feedback = GenerateIdentificationFeedback(result, challenge);
+            
+            return result;
+        }
+        
+        private void CompleteSensoryChallenge(SensoryChallenge challenge)
+        {
+            challenge.IsCompleted = true;
+            challenge.IsActive = false;
+            challenge.CompletionTime = Time.time;
+            
+            _sensoryTestsCompleted++;
+            
+            // Calculate experience gained
+            var experienceGained = CalculateSensoryExperience(challenge);
+            _totalSensoryExperience += experienceGained;
+            _currentGamingState.TotalSensoryExperience += experienceGained;
+            
+            // Update sensory skill level
+            CheckSensorySkillLevelProgression();
+            
+            // Check for category mastery
+            CheckCategoryMastery(challenge.TerpeneCategory);
+            
+            // Trigger completion event
+            _onSensorySkillImproved?.RaiseEvent(new SensorySkillEventData
+            {
+                Challenge = challenge,
+                ExperienceGained = experienceGained,
+                NewSkillLevel = _currentGamingState.CurrentSensoryLevel
+            });
+            
+            // Clean up
+            _activeSensoryChallenges.Remove(challenge.ChallengeID);
+        }
+        
+        #endregion
+        
+        #region Blending Project Processing
+        
+        private BlendingProject CreateBlendingProject(BlendingProjectSpec projectSpec)
+        {
+            var project = new BlendingProject
+            {
+                ProjectID = System.Guid.NewGuid().ToString(),
+                ProjectName = projectSpec.ProjectName,
+                ProjectType = projectSpec.ProjectType,
+                Objectives = projectSpec.Objectives,
+                RequiredSkillLevel = projectSpec.RequiredSkillLevel,
+                DifficultyLevel = projectSpec.DifficultyLevel,
+                TimelineHours = projectSpec.TimelineHours,
+                StartTime = Time.time,
+                IsActive = true
+            };
+            
+            return project;
+        }
+        
+        private AromaticBlendResult EvaluateAromaticBlend(BlendingProject project, TerpeneComposition composition)
+        {
+            var result = new AromaticBlendResult
+            {
+                BlendID = System.Guid.NewGuid().ToString(),
+                ProjectID = project.ProjectID,
+                Composition = composition,
+                BlendTime = Time.time
+            };
+            
+            // Evaluate blend against project objectives
+            result.ObjectiveScore = CalculateObjectiveScore(project.Objectives, composition);
+            
+            // Analyze aromatic quality
+            result.AromaticQuality = _qualityAssessment?.AssessQuality(composition) ?? 0f;
+            
+            // Calculate innovation value
+            result.InnovationValue = CalculateBlendInnovationValue(composition);
+            
+            // Assess blend stability
+            result.BlendStability = CalculateBlendStability(composition);
+            
+            // Generate flavor profile prediction
+            result.FlavorProfile = _flavorProfileGenerator?.GenerateProfile(composition);
+            
+            // Calculate overall score
+            result.OverallScore = CalculateOverallBlendScore(result);
+            
+            // Determine success
+            result.IsSuccessful = result.OverallScore >= GetBlendSuccessThreshold(project);
+            
+            return result;
+        }
+        
+        private void CompleteBlendingProject(BlendingProject project)
+        {
+            project.IsCompleted = true;
+            project.IsActive = false;
+            project.CompletionTime = Time.time;
+            
+            _blendingProjectsCompleted++;
+            _currentGamingState.CreatedAromaticProfiles++;
+            
+            // Calculate blending experience gained
+            var experienceGained = CalculateBlendingExperience(project);
+            _currentGamingState.TotalBlendingExperience += experienceGained;
+            
+            // Update blending skill level
+            CheckBlendingSkillLevelProgression();
+            
+            // Check for blending mastery achievements
+            CheckBlendingMasteryAchievements(project);
+            
+            // Trigger completion event
+            _onBlendingProjectCompleted?.RaiseEvent(new BlendingProjectEventData
+            {
+                Project = project,
+                ExperienceGained = experienceGained,
+                NewSkillLevel = _currentGamingState.CurrentBlendingLevel
+            });
+            
+            // Clean up
+            _activeBlendingProjects.Remove(project.ProjectID);
+        }
+        
+        #endregion
+        
+        #region Discovery and Innovation Processing
+        
+        private AromaticAnalysisResult PerformAromaticAnalysis(AromaticProfile profile)
+        {
+            var result = new AromaticAnalysisResult
+            {
+                AnalysisID = System.Guid.NewGuid().ToString(),
+                Profile = profile,
+                AnalysisTime = Time.time
+            };
+            
+            // Analyze aromatic complexity
+            result.AromaticComplexity = CalculateAromaticComplexity(profile);
+            
+            // Analyze balance and harmony
+            result.BalanceScore = CalculateAromaticBalance(profile);
+            
+            // Analyze uniqueness
+            result.UniquenessScore = CalculateAromaticUniqueness(profile);
+            
+            // Predict sensory experience
+            result.SensoryExperiencePrediction = PredictSensoryExperience(profile);
+            
+            return result;
+        }
+        
+        private void ProcessNovelCombinationDiscovery(List<NovelAromaticCombination> combinations, AromaticProfile profile)
+        {
+            foreach (var combination in combinations)
+            {
+                var discovery = new AromaticDiscovery
+                {
+                    DiscoveryID = System.Guid.NewGuid().ToString(),
+                    DiscoveryType = AromaticDiscoveryType.NovelCombination,
+                    NovelCombination = combination,
+                    SourceProfile = profile,
+                    DiscoveryTime = Time.time,
+                    DiscoveryValue = CalculateCombinationValue(combination)
+                };
+                
+                _sessionDiscoveries.Add(discovery);
+                
+                // Register discovery
+                RegisterAromaticDiscovery(discovery);
+            }
+        }
+        
+        private void ProcessSynergyDiscovery(List<TerpeneSynergy> synergies, AromaticProfile profile)
+        {
+            foreach (var synergy in synergies)
+            {
+                var discovery = new AromaticDiscovery
+                {
+                    DiscoveryID = System.Guid.NewGuid().ToString(),
+                    DiscoveryType = AromaticDiscoveryType.SynergyEffect,
+                    DiscoveredSynergy = synergy,
+                    SourceProfile = profile,
+                    DiscoveryTime = Time.time,
+                    DiscoveryValue = CalculateSynergyValue(synergy)
+                };
+                
+                _sessionDiscoveries.Add(discovery);
+                _currentGamingState.DiscoveredSynergies++;
+                
+                // Trigger synergy discovery event
+                _onSynergyDiscovered?.RaiseEvent(new SynergyDiscoveryEventData
+                {
+                    Synergy = synergy,
+                    Discovery = discovery,
+                    Profile = profile
+                });
+            }
+        }
+        
+        private void AnalyzeBlendForInnovations(TerpeneComposition composition, AromaticBlendResult blendResult)
+        {
+            var innovationLevel = CalculateBlendInnovationLevel(composition, blendResult);
+            
+            if (innovationLevel >= InnovationThreshold)
+            {
+                ProcessAromaticInnovation(composition, innovationLevel);
+            }
+        }
+        
+        private void ProcessAromaticInnovation(TerpeneComposition composition, float innovationLevel)
+        {
+            var innovation = new AromaticInnovation
+            {
+                InnovationID = System.Guid.NewGuid().ToString(),
+                InnovationType = DetermineAromaticInnovationType(innovationLevel),
+                Composition = composition,
+                InnovationLevel = innovationLevel,
+                InnovationTime = Time.time,
+                InnovationValue = CalculateAromaticInnovationValue(composition, innovationLevel)
+            };
+            
+            _aromaticInnovationsCreated++;
+            
+            // Register innovation
+            _innovationDetector?.RegisterInnovation(innovation);
+            
+            // Trigger innovation event
+            _onAromaticInnovationCreated?.RaiseEvent(new AromaticInnovationEventData
+            {
+                Innovation = innovation,
+                Composition = composition,
+                InnovationLevel = innovationLevel
+            });
+            
+            ChimeraLogger.Log($"Aromatic innovation created: {innovation.InnovationType} (Level: {innovationLevel:F2})", this);
+        }
+        
+        #endregion
+        
+        #region Skill Progression and Unlocks
+        
+        private void CheckSensorySkillLevelProgression()
+        {
+            var newSkillLevel = CalculateSensorySkillLevel(_currentGamingState.TotalSensoryExperience);
+            
+            if (newSkillLevel != _currentGamingState.CurrentSensoryLevel)
+            {
+                var previousLevel = _currentGamingState.CurrentSensoryLevel;
+                _currentGamingState.CurrentSensoryLevel = newSkillLevel;
+                
+                ChimeraLogger.Log($"Sensory skill level increased: {previousLevel} → {newSkillLevel}", this);
+                
+                // Check for new unlocks
+                CheckSensorySkillLevelUnlocks(newSkillLevel);
+            }
+        }
+        
+        private void CheckBlendingSkillLevelProgression()
+        {
+            var newSkillLevel = CalculateBlendingSkillLevel(_currentGamingState.TotalBlendingExperience);
+            
+            if (newSkillLevel != _currentGamingState.CurrentBlendingLevel)
+            {
+                var previousLevel = _currentGamingState.CurrentBlendingLevel;
+                _currentGamingState.CurrentBlendingLevel = newSkillLevel;
+                
+                ChimeraLogger.Log($"Blending skill level increased: {previousLevel} → {newSkillLevel}", this);
+                
+                // Check for new unlocks
+                CheckBlendingSkillLevelUnlocks(newSkillLevel);
+            }
+        }
+        
+        private void CheckCategoryMastery(TerpeneCategory category)
+        {
+            var masteryLevel = _categoryMasteryLevels[category];
+            var masteryThreshold = GetCategoryMasteryThreshold(category);
+            
+            if (masteryLevel >= masteryThreshold && !IsCategoryMastered(category))
+            {
+                AchieveCategoryMastery(category);
+            }
+        }
+        
+        private void AchieveCategoryMastery(TerpeneCategory category)
+        {
+            ChimeraLogger.Log($"Terpene category mastery achieved: {category}", this);
+            
+            // Unlock advanced features for this category
+            UnlockAdvancedCategoryFeatures(category);
+            
+            // Check for overall aromatic mastery
+            CheckOverallAromaticMastery();
+            
+            // Trigger mastery event
+            _onAromaticMasteryAchieved?.RaiseEvent(new AromaticMasteryEventData
+            {
+                Category = category,
+                MasteryLevel = _categoryMasteryLevels[category],
+                AchievementTime = Time.time
+            });
+        }
+        
+        private void CheckSensorySkillLevelUnlocks(SensorySkillLevel newSkillLevel)
+        {
+            switch (newSkillLevel)
+            {
+                case SensorySkillLevel.Novice:
+                    UnlockSesquiterpenes();
+                    break;
+                case SensorySkillLevel.Intermediate:
+                    UnlockAdvancedSensoryTraining();
+                    break;
+                case SensorySkillLevel.Advanced:
+                    UnlockProfessionalSensoryTools();
+                    break;
+                case SensorySkillLevel.Expert:
+                    UnlockMasterSensoryTechniques();
+                    break;
+                case SensorySkillLevel.Master:
+                    UnlockSensoryCertificationPrograms();
+                    break;
+            }
+        }
+        
+        private void CheckBlendingSkillLevelUnlocks(BlendingSkillLevel newSkillLevel)
+        {
+            switch (newSkillLevel)
+            {
+                case BlendingSkillLevel.Apprentice:
+                    UnlockBasicBlendingTools();
+                    break;
+                case BlendingSkillLevel.Journeyman:
+                    UnlockAdvancedBlendingTechniques();
+                    break;
+                case BlendingSkillLevel.Expert:
+                    UnlockProfessionalBlendingStudio();
+                    break;
+                case BlendingSkillLevel.Master:
+                    UnlockInnovativeBlendingMethods();
+                    break;
+                case BlendingSkillLevel.GrandMaster:
+                    UnlockMasterBlenderRecognition();
+                    break;
+            }
+        }
+        
+        #endregion
+        
+        #region Calculation Methods
+        
+        private float CalculatePrecisionScore(TerpeneIdentificationAttempt attempt, SensoryChallenge challenge)
+        {
+            // Calculate precision based on identification accuracy and confidence
+            var baseScore = attempt.ConfidenceLevel;
+            var timePenalty = CalculateTimePenalty(attempt.ResponseTime, challenge.TimeLimit);
+            return baseScore * (1.0f - timePenalty);
+        }
+        
+        private float CalculateIdentificationScore(TerpeneIdentificationResult result)
+        {
+            if (!result.IsCorrect) return 0f;
+            
+            return (result.ConfidenceLevel * 0.6f) + (result.PrecisionScore * 0.4f);
+        }
+        
+        private float CalculateSensoryExperience(SensoryChallenge challenge)
+        {
+            var baseExperience = GetBaseSensoryExperience(challenge.TrainingType);
+            var difficultyMultiplier = GetDifficultyMultiplier(challenge.Difficulty);
+            var performanceMultiplier = CalculatePerformanceMultiplier(challenge);
+            
+            return baseExperience * difficultyMultiplier * performanceMultiplier * SensorySkillProgressionRate;
+        }
+        
+        private float CalculateBlendingExperience(BlendingProject project)
+        {
+            var baseExperience = GetBaseBlendingExperience(project.ProjectType);
+            var difficultyMultiplier = project.DifficultyLevel;
+            var complexityMultiplier = CalculateProjectComplexity(project);
+            
+            return baseExperience * difficultyMultiplier * complexityMultiplier;
+        }
+        
+        private float CalculateObjectiveScore(List<BlendingObjective> objectives, TerpeneComposition composition)
+        {
+            float totalScore = 0f;
+            float totalWeight = 0f;
+            
+            foreach (var objective in objectives)
+            {
+                var objectiveScore = EvaluateBlendingObjective(objective, composition);
+                totalScore += objectiveScore * objective.Weight;
+                totalWeight += objective.Weight;
+            }
+            
+            return totalWeight > 0 ? totalScore / totalWeight : 0f;
+        }
+        
+        private float CalculateBlendInnovationValue(TerpeneComposition composition)
+        {
+            // Calculate innovation value based on composition uniqueness and complexity
+            var uniqueness = CalculateCompositionUniqueness(composition);
+            var complexity = CalculateCompositionComplexity(composition);
+            var balance = CalculateCompositionBalance(composition);
+            
+            return (uniqueness * 0.4f) + (complexity * 0.3f) + (balance * 0.3f);
+        }
+        
+        private float CalculateOverallBlendScore(AromaticBlendResult result)
+        {
+            return (result.ObjectiveScore * 0.3f) + 
+                   (result.AromaticQuality * 0.25f) + 
+                   (result.InnovationValue * 0.25f) + 
+                   (result.BlendStability * 0.2f);
+        }
+        
+        private SensorySkillLevel CalculateSensorySkillLevel(float totalExperience)
+        {
+            if (totalExperience >= 2000f) return SensorySkillLevel.Master;
+            if (totalExperience >= 1000f) return SensorySkillLevel.Expert;
+            if (totalExperience >= 500f) return SensorySkillLevel.Advanced;
+            if (totalExperience >= 200f) return SensorySkillLevel.Intermediate;
+            if (totalExperience >= 50f) return SensorySkillLevel.Novice;
+            return SensorySkillLevel.Beginner;
+        }
+        
+        private BlendingSkillLevel CalculateBlendingSkillLevel(float totalExperience)
+        {
+            if (totalExperience >= 3000f) return BlendingSkillLevel.GrandMaster;
+            if (totalExperience >= 1500f) return BlendingSkillLevel.Master;
+            if (totalExperience >= 750f) return BlendingSkillLevel.Expert;
+            if (totalExperience >= 300f) return BlendingSkillLevel.Journeyman;
+            if (totalExperience >= 100f) return BlendingSkillLevel.Apprentice;
+            return BlendingSkillLevel.Basic;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private bool IsEligibleForTraining(SensoryTrainingType trainingType)
+        {
+            var requiredLevel = GetRequiredSensoryLevel(trainingType);
+            return _currentGamingState.CurrentSensoryLevel >= requiredLevel;
+        }
+        
+        private bool IsEligibleForBlending(BlendingSkillLevel requiredLevel)
+        {
+            return _currentGamingState.CurrentBlendingLevel >= requiredLevel;
+        }
+        
+        private TerpeneCategory SelectTrainingCategory(SensoryTrainingType trainingType)
+        {
+            // Select appropriate category based on training type and unlocked categories
+            return _currentGamingState.UnlockedTerpeneCategories.FirstOrDefault();
+        }
+        
+        private List<string> SelectTargetTerpenes(SensoryTrainingType trainingType, SensoryDifficulty difficulty)
+        {
+            // Select target terpenes based on training parameters
+            return new List<string> { "Limonene", "Pinene", "Myrcene" };
+        }
+        
+        private int CalculateMaxAttempts(SensoryDifficulty difficulty)
+        {
+            return difficulty switch
+            {
+                SensoryDifficulty.Easy => 5,
+                SensoryDifficulty.Medium => 3,
+                SensoryDifficulty.Hard => 2,
+                SensoryDifficulty.Expert => 1,
+                _ => 3
+            };
+        }
+        
+        private float CalculateTimeLimit(SensoryTrainingType trainingType, SensoryDifficulty difficulty)
+        {
+            var baseTime = trainingType switch
+            {
+                SensoryTrainingType.Identification => 30f,
+                SensoryTrainingType.Comparison => 60f,
+                SensoryTrainingType.BlindTesting => 45f,
+                SensoryTrainingType.MemoryChallenge => 90f,
+                _ => 30f
+            };
+            
+            var difficultyMultiplier = difficulty switch
+            {
+                SensoryDifficulty.Easy => 1.5f,
+                SensoryDifficulty.Medium => 1.0f,
+                SensoryDifficulty.Hard => 0.75f,
+                SensoryDifficulty.Expert => 0.5f,
+                _ => 1.0f
+            };
+            
+            return baseTime * difficultyMultiplier;
+        }
+        
+        private float GetBaseSensoryExperience(SensoryTrainingType trainingType)
+        {
+            return trainingType switch
+            {
+                SensoryTrainingType.Identification => 20f,
+                SensoryTrainingType.Comparison => 30f,
+                SensoryTrainingType.BlindTesting => 40f,
+                SensoryTrainingType.MemoryChallenge => 50f,
+                _ => 15f
+            };
+        }
+        
+        private float GetBaseBlendingExperience(BlendingProjectType projectType)
+        {
+            return projectType switch
+            {
+                BlendingProjectType.SimpleBlend => 50f,
+                BlendingProjectType.ComplexBlend => 100f,
+                BlendingProjectType.InnovativeBlend => 150f,
+                BlendingProjectType.MasterworkBlend => 250f,
+                _ => 40f
+            };
+        }
+        
+        private void RegisterAromaticDiscovery(AromaticDiscovery discovery)
+        {
+            _profileDatabase?.RegisterDiscovery(discovery);
+        }
+        
+        private void InitializeSensoryTrainingInterface(SensoryChallenge challenge)
+        {
+            _sensoryTrainingSystem?.InitializeChallenge(challenge);
+        }
+        
+        private void InitializeBlendingStudioInterface(BlendingProject project)
+        {
+            _creationStudio?.InitializeProject(project);
+        }
+        
+        private void UpdateSensoryChallengeProgress(SensoryChallenge challenge, TerpeneIdentificationResult result)
+        {
+            challenge.AttemptsUsed++;
+            if (result.IsCorrect)
+            {
+                challenge.CorrectIdentifications++;
+            }
+            challenge.BestScore = Mathf.Max(challenge.BestScore, result.Score);
+        }
+        
+        private void UpdateBlendingProjectProgress(BlendingProject project, AromaticBlendResult result)
+        {
+            project.BlendsCreated++;
+            project.BestScore = Mathf.Max(project.BestScore, result.OverallScore);
+        }
+        
+        private bool IsChallengeChallengeComplete(SensoryChallenge challenge)
+        {
+            return challenge.AttemptsUsed >= challenge.MaxAttempts || 
+                   (Time.time - challenge.StartTime) >= challenge.TimeLimit;
+        }
+        
+        private bool IsBlendingProjectComplete(BlendingProject project)
+        {
+            return project.BestScore >= GetBlendSuccessThreshold(project) ||
+                   (Time.time - project.StartTime) >= (project.TimelineHours * 3600f);
+        }
+        
+        private float GetBlendSuccessThreshold(BlendingProject project)
+        {
+            return project.DifficultyLevel switch
+            {
+                1.0f => 0.6f,
+                1.5f => 0.7f,
+                2.0f => 0.8f,
+                2.5f => 0.9f,
+                _ => 0.7f
+            };
+        }
+        
+        #endregion
+        
+        #region Public Properties
+        
+        /// <summary>
+        /// Get current aromatic gaming state
+        /// </summary>
+        public AromaticGamingState GetCurrentGamingState()
+        {
+            return _currentGamingState;
+        }
+        
+        /// <summary>
+        /// Get aromatic gaming performance metrics
+        /// </summary>
+        public AromaticGamingMetrics GetGamingMetrics()
+        {
+            return new AromaticGamingMetrics
+            {
+                SensoryTestsCompleted = _sensoryTestsCompleted,
+                TerpeneIdentificationsCorrect = _terpeneIdentificationsCorrect,
+                BlendingProjectsCompleted = _blendingProjectsCompleted,
+                AromaticInnovationsCreated = _aromaticInnovationsCreated,
+                TotalSensoryExperience = _totalSensoryExperience,
+                CurrentSensoryLevel = _currentGamingState.CurrentSensoryLevel,
+                CurrentBlendingLevel = _currentGamingState.CurrentBlendingLevel,
+                IdentificationAccuracy = CalculateOverallIdentificationAccuracy(),
+                BlendingPrecision = CalculateOverallBlendingPrecision()
+            };
+        }
+        
+        #endregion
+        
+        #region System Updates
+        
+        public void Update(float deltaTime)
+        {
+            UpdateSystem(deltaTime);
+        }
+        
+        public void UpdateSystem(float deltaTime)
+        {
+            if (!_isInitialized) return;
+            
+            // Update active sensory challenges
+            UpdateActiveSensoryChallenges(deltaTime);
+            
+            // Update active blending projects
+            UpdateActiveBlendingProjects(deltaTime);
+            
+            // Update sensory training systems
+            _sensoryTrainingSystem?.UpdateSystem(deltaTime);
+            
+            // Update creation studio
+            _creationStudio?.UpdateSystem(deltaTime);
+        }
+        
+        private void UpdateActiveSensoryChallenges(float deltaTime)
+        {
+            var challengesToRemove = new List<string>();
+            
+            foreach (var challenge in _activeSensoryChallenges.Values)
+            {
+                if (challenge.TimeLimit > 0 && (Time.time - challenge.StartTime) > challenge.TimeLimit)
+                {
+                    challenge.IsActive = false;
+                    challenge.IsTimedOut = true;
+                    challengesToRemove.Add(challenge.ChallengeID);
+                }
+            }
+            
+            foreach (var challengeID in challengesToRemove)
+            {
+                _activeSensoryChallenges.Remove(challengeID);
+            }
+        }
+        
+        private void UpdateActiveBlendingProjects(float deltaTime)
+        {
+            foreach (var project in _activeBlendingProjects.Values)
+            {
+                if (project.IsActive)
+                {
+                    var elapsed = Time.time - project.StartTime;
+                    project.ProgressPercentage = Mathf.Clamp01(elapsed / (project.TimelineHours * 3600f));
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Event Handlers
+        
+        private void OnSensorySkillImprovedEvent(object eventData)
+        {
+            if (eventData is SensorySkillEventData skillData)
+            {
+                ProcessSensorySkillImprovement(skillData);
+            }
+        }
+        
+        private void OnAromaticMasteryAchievedEvent(object eventData)
+        {
+            if (eventData is AromaticMasteryEventData masteryData)
+            {
+                ProcessAromaticMasteryAchievement(masteryData);
+            }
+        }
+        
+        private void OnTerpeneIdentifiedEvent(object eventData)
+        {
+            if (eventData is TerpeneIdentificationEventData identificationData)
+            {
+                ProcessTerpeneIdentification(identificationData);
+            }
+        }
+        
+        private void ProcessSensorySkillImprovement(SensorySkillEventData skillData)
+        {
+            ChimeraLogger.Log($"Sensory skill improvement processed: {skillData.NewSkillLevel}", this);
+        }
+        
+        private void ProcessAromaticMasteryAchievement(AromaticMasteryEventData masteryData)
+        {
+            ChimeraLogger.Log($"Aromatic mastery achievement processed: {masteryData.Category}", this);
+        }
+        
+        private void ProcessTerpeneIdentification(TerpeneIdentificationEventData identificationData)
+        {
+            ChimeraLogger.Log($"Terpene identification processed: {identificationData.IdentifiedTerpene}", this);
+        }
+        
+        #endregion
+        
+        #region Unity Lifecycle
+        
+        private void OnDestroy()
+        {
+            if (_onSensorySkillImproved != null)
+                _onSensorySkillImproved.OnEventRaisedWithData.RemoveListener OnSensorySkillImprovedEvent;
+                
+            if (_onAromaticMasteryAchieved != null)
+                _onAromaticMasteryAchieved.OnEventRaisedWithData.RemoveListener OnAromaticMasteryAchievedEvent;
+                
+            if (_onTerpeneIdentified != null)
+                _onTerpeneIdentified.OnEventRaisedWithData.RemoveListener OnTerpeneIdentifiedEvent;
+        }
+        
+        #endregion
+    }
+    
+    #region Data Structures
+    
+    [System.Serializable]
+    public class AromaticGamingState
+    {
+        public SensorySkillLevel CurrentSensoryLevel;
+        public BlendingSkillLevel CurrentBlendingLevel;
+        public float TotalSensoryExperience;
+        public float TotalBlendingExperience;
+        public float IdentificationAccuracy;
+        public float BlendingPrecision;
+        public List<TerpeneCategory> UnlockedTerpeneCategories;
+        public List<string> MasteredTerpenes;
+        public int CreatedAromaticProfiles;
+        public int DiscoveredSynergies;
+    }
+    
+    [System.Serializable]
+    public class AromaticGamingMetrics
+    {
+        public int SensoryTestsCompleted;
+        public int TerpeneIdentificationsCorrect;
+        public int BlendingProjectsCompleted;
+        public int AromaticInnovationsCreated;
+        public float TotalSensoryExperience;
+        public SensorySkillLevel CurrentSensoryLevel;
+        public BlendingSkillLevel CurrentBlendingLevel;
+        public float IdentificationAccuracy;
+        public float BlendingPrecision;
+    }
+    
+    // Placeholder classes removed - use actual implementations from individual files
+    
+    #endregion
+}

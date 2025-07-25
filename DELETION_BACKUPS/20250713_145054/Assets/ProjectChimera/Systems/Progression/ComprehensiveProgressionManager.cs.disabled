@@ -1,0 +1,1335 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Economy;
+using ProjectChimera.Data.Construction;
+using ProjectChimera.Data.Genetics;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Comprehensive progression manager orchestrating all progression systems including
+    /// skill trees, research, achievements, unlocks, experience, leveling, and campaign progression.
+    /// Integrates with all major game systems to provide meaningful advancement.
+    /// </summary>
+    public class ComprehensiveProgressionManager : ChimeraManager
+    {
+        [Header("Progression Configuration")]
+        [SerializeField] private SkillTreeLibrarySO _skillTreeLibrary;
+        [SerializeField] private ResearchDatabaseSO _researchDatabase;
+        [SerializeField] private AchievementLibrarySO _achievementLibrary;
+        [SerializeField] private ExperienceConfigSO _experienceConfig;
+        [SerializeField] private CampaignProgressionSO _campaignProgression;
+        [SerializeField] private CampaignConfigSO _campaignConfig;
+        [SerializeField] private UnlockSystemSO _unlockSystem;
+        [SerializeField] private UnlockConfigSO _unlockConfig;
+        
+        [Header("Progression Settings")]
+        [SerializeField] private bool _enableSkillProgression = true;
+        [SerializeField] private bool _enableResearchProgression = true;
+        [SerializeField] private bool _enableAchievements = true;
+        [SerializeField] private bool _enableExperienceGain = true;
+        [SerializeField] private float _progressionMultiplier = 1f;
+        [SerializeField] private float _experienceMultiplier = 1f;
+        
+        [Header("Integration Settings")]
+        [SerializeField] private bool _enableProgressionEffects = true;
+        [SerializeField] private bool _enableProgressionAudio = true;
+        [SerializeField] private bool _enableProgressionNotifications = true;
+        
+        // Core Progression Systems
+        private SkillTreeManager _skillTreeManager;
+        private ResearchManager _researchManager;
+        private AchievementManager _achievementManager;
+        private ExperienceManager _experienceManager;
+        private CampaignManager _campaignManager;
+        private UnlockManager _unlockManager;
+        private ProgressionAnalytics _progressionAnalytics;
+        
+        // Player Progression State
+        private PlayerProgressionData _playerProgression;
+        private Dictionary<string, float> _skillExperience = new Dictionary<string, float>();
+        private Dictionary<string, int> _skillLevels = new Dictionary<string, int>();
+        private HashSet<string> _unlockedContent = new HashSet<string>();
+        private HashSet<string> _completedAchievements = new HashSet<string>();
+        private Dictionary<string, ResearchProgress> _activeResearch = new Dictionary<string, ResearchProgress>();
+        
+        // Integration system managers - commenting out during namespace transition
+        // These will be replaced with data-driven approach or proper Data layer references
+        // private PlantManager _plantManager; // TODO: Replace with data-driven cultivation tracking
+        // private GeneticsManager _geneticsManager; // TODO: Replace with data-driven genetics tracking  
+        // private FacilityManager _facilityManager; // TODO: Replace with data-driven facility tracking
+        // private MarketManager _marketManager; // TODO: Replace with data-driven economy tracking
+        
+        // Progression Events and Notifications
+        private Queue<ProgressionEvent> _pendingEvents = new Queue<ProgressionEvent>();
+        private List<ProgressionNotification> _activeNotifications = new List<ProgressionNotification>();
+        private ProgressionEventProcessor _eventProcessor;
+        
+        // Performance and Analytics
+        private ProgressionMetrics _progressionMetrics;
+        private float _lastMetricsUpdate = 0f;
+        private List<ProgressionSession> _sessionHistory = new List<ProgressionSession>();
+        
+        // Events
+        public System.Action<string, int> OnSkillLevelUp;
+        public System.Action<string> OnResearchCompleted;
+        public System.Action<string> OnAchievementUnlocked;
+        public System.Action<string> OnContentUnlocked;
+        public System.Action<float> OnExperienceGained;
+        public System.Action<CampaignMilestone> OnCampaignMilestoneReached;
+        public System.Action<ProgressionMetrics> OnProgressionMetricsUpdated;
+        
+        // Properties
+        public PlayerProgressionData PlayerProgression => _playerProgression;
+        public ProgressionMetrics Metrics => _progressionMetrics;
+        public bool ProgressionEnabled => _enableSkillProgression || _enableResearchProgression;
+        
+        protected override void OnManagerInitialize()
+        {
+            InitializeProgressionSystems();
+            InitializePlayerProgression();
+            // ConnectToGameSystems(); // Commented out during namespace transition
+            InitializeProgressionAnalytics();
+            StartProgressionLoop();
+            LogInfo("Comprehensive Progression Manager initialized");
+        }
+        
+        private void Update()
+        {
+            UpdateProgressionSystems();
+            ProcessPendingEvents();
+            UpdateActiveNotifications();
+            UpdateProgressionMetrics();
+            UpdateProgressionAnalytics();
+        }
+        
+        #region Initialization
+        
+        private void InitializeProgressionSystems()
+        {
+            // Initialize ChimeraManager-based progression managers as components
+            _skillTreeManager = gameObject.AddComponent<SkillTreeManager>();
+            _researchManager = gameObject.AddComponent<ResearchManager>();
+            
+            // Initialize regular class-based progression managers with constructors
+            _achievementManager = new AchievementManager(_achievementLibrary);
+            _experienceManager = new ExperienceManager(_experienceConfig);
+            _campaignManager = new CampaignManager(_campaignConfig);
+            _unlockManager = new UnlockManager(_unlockConfig);
+            
+            // Initialize event processor
+            _eventProcessor = new ProgressionEventProcessor(this);
+            
+            // Initialize progression analytics
+            _progressionAnalytics = new ProgressionAnalytics();
+            
+            LogInfo("Progression subsystems initialized");
+        }
+        
+        private void InitializePlayerProgression()
+        {
+            // Load or create player progression data
+            _playerProgression = LoadPlayerProgression() ?? CreateNewPlayerProgression();
+            
+            // Initialize skill levels and experience
+            InitializeSkillProgression();
+            
+            // Initialize research progress
+            InitializeResearchProgression();
+            
+            // Initialize achievements
+            InitializeAchievementProgression();
+            
+            // Initialize unlocks
+            InitializeUnlockProgression();
+            
+            // Initialize campaign progress
+            InitializeCampaignProgression();
+            
+            LogInfo($"Player progression initialized - Level {_playerProgression.OverallLevel}, {_completedAchievements.Count} achievements");
+        }
+        
+        private PlayerProgressionData CreateNewPlayerProgression()
+        {
+            return new PlayerProgressionData
+            {
+                PlayerId = System.Guid.NewGuid().ToString(),
+                CreationDate = DateTime.Now,
+                LastPlayDate = DateTime.Now,
+                OverallLevel = 1,
+                TotalExperience = 0f,
+                PlayTimeHours = 0f,
+                ProgressionVersion = "1.0"
+            };
+        }
+        
+        private void InitializeSkillProgression()
+        {
+            if (_skillTreeLibrary != null)
+            {
+                foreach (var skillTree in _skillTreeLibrary.GetAllSkillTrees())
+                {
+                    foreach (var skill in skillTree.Skills)
+                    {
+                        if (!_skillLevels.ContainsKey(skill.SkillId))
+                        {
+                            _skillLevels[skill.SkillId] = 1;
+                            _skillExperience[skill.SkillId] = 0f;
+                        }
+                    }
+                }
+            }
+        }
+        
+        private void InitializeResearchProgression()
+        {
+            if (_researchDatabase != null)
+            {
+                var availableResearch = _researchDatabase.GetAvailableResearch();
+                LogInfo($"Initialized {availableResearch.Count} research projects");
+            }
+        }
+        
+        private void InitializeAchievementProgression()
+        {
+            if (_achievementLibrary != null)
+            {
+                var allAchievements = _achievementLibrary.GetAllAchievements();
+                LogInfo($"Tracking {allAchievements.Count} achievements");
+            }
+        }
+        
+        private void InitializeUnlockProgression()
+        {
+            if (_unlockSystem != null)
+            {
+                var defaultUnlocks = _unlockSystem.GetDefaultUnlocks();
+                foreach (var unlock in defaultUnlocks)
+                {
+                    _unlockedContent.Add(unlock);
+                }
+                LogInfo($"Initialized with {defaultUnlocks.Count} default unlocks");
+            }
+        }
+        
+        private void InitializeCampaignProgression()
+        {
+            if (_campaignProgression != null)
+            {
+                _campaignManager.InitializeWithData(_playerProgression.CampaignData);
+            }
+        }
+        
+        private void ConnectToGameSystems()
+        {
+            if (GameManager.Instance != null)
+            {
+                // _plantManager = GameManager.Instance.GetManager<PlantManager>();
+                // _environmentalManager = GameManager.Instance.GetManager<EnvironmentalManager>();
+                // _facilityConstructor = GameManager.Instance.GetManager<InteractiveFacilityConstructor>();
+                // _marketManager = GameManager.Instance.GetManager<MarketManager>();
+                // _effectsManager = GameManager.Instance.GetManager<AdvancedEffectsManager>(); // Commented out to prevent circular dependency
+                // _feedbackSystem = GameManager.Instance.GetManager<VisualFeedbackSystem>(); // Commented out to prevent circular dependency
+            }
+            
+            ConnectGameSystemEvents();
+        }
+        
+        private void ConnectGameSystemEvents()
+        {
+            // Plant system events
+            if (_plantManager != null)
+            {
+                // _plantManager.OnPlantAdded += HandlePlantAdded;
+                // _plantManager.OnPlantHarvested += HandlePlantHarvested;
+                // _plantManager.OnPlantStageChanged += HandlePlantStageChanged;
+            }
+            
+            // Environmental system events
+            if (_environmentalManager != null)
+            {
+                // _environmentalManager.OnConditionsOptimized += HandleEnvironmentalOptimization;
+            }
+            
+            // Construction system events
+            if (_facilityConstructor != null)
+            {
+                // _facilityConstructor.OnProjectCompleted += HandleConstructionCompleted;
+                // _facilityConstructor.OnMilestoneReached += HandleConstructionMilestone;
+            }
+            
+            // Economic system events
+            if (_marketManager != null)
+            {
+                // _marketManager.OnSaleCompleted += HandleSaleCompleted;
+                // _marketManager.OnProfitGenerated += HandleProfitGenerated;
+            }
+        }
+        
+        private void InitializeProgressionAnalytics()
+        {
+            _progressionMetrics = new ProgressionMetrics
+            {
+                SessionStartTime = DateTime.Now,
+                CurrentSkillLevels = _skillLevels.Count,
+                CompletedAchievements = _achievementLibrary?.GetAllAchievements().Count ?? 0,
+                ActiveResearchProjects = 0,
+                CompletedResearchProjects = _researchDatabase?.GetAllResearchProjects().Count ?? 0,
+                UnlockedContent = _unlockedContent.Count,
+                TotalExperience = _playerProgression?.TotalExperience ?? 0f,
+                OverallLevel = _playerProgression?.OverallLevel ?? 1,
+                LastUpdate = DateTime.Now
+            };
+            
+            InvokeRepeating(nameof(UpdateDetailedMetrics), 1f, 10f);
+        }
+        
+        private void StartProgressionLoop()
+        {
+            StartCoroutine(ProgressionUpdateLoop());
+        }
+        
+        private IEnumerator ProgressionUpdateLoop()
+        {
+            while (true)
+            {
+                // Process research progress
+                if (_enableResearchProgression)
+                {
+                    UpdateResearchProgress();
+                }
+                
+                // Check for achievement progress
+                if (_enableAchievements)
+                {
+                    CheckAchievementProgress();
+                }
+                
+                // Update campaign progress
+                UpdateCampaignProgress();
+                
+                // Save progression data periodically
+                if (Time.time % 60f < 1f) // Every minute
+                {
+                    SavePlayerProgression();
+                }
+                
+                yield return new WaitForSeconds(1f);
+            }
+        }
+        
+        #endregion
+        
+        #region Experience and Skill Progression
+        
+        public void GainExperience(string skillId, float amount, string source = "")
+        {
+            if (!_enableExperienceGain || amount <= 0f) return;
+            
+            float adjustedAmount = amount * _experienceMultiplier * _progressionMultiplier;
+            
+            // Add experience to specific skill
+            if (_skillExperience.ContainsKey(skillId))
+            {
+                _skillExperience[skillId] += adjustedAmount;
+                
+                // Add to total experience
+                _playerProgression.TotalExperience += adjustedAmount;
+                
+                // Check for skill level up
+                CheckSkillLevelUp(skillId);
+                
+                // Trigger experience gained event
+                OnExperienceGained?.Invoke(adjustedAmount);
+                
+                // Create progression event
+                QueueProgressionEvent(new ProgressionEvent
+                {
+                    EventType = ProgressionEventType.Experience_Gained,
+                    SkillId = skillId,
+                    Amount = adjustedAmount,
+                    Source = source,
+                    Timestamp = DateTime.Now
+                });
+                
+                LogInfo($"Gained {adjustedAmount:F1} experience in {skillId} from {source}");
+            }
+        }
+        
+        private void CheckSkillLevelUp(string skillId)
+        {
+            if (!_skillLevels.ContainsKey(skillId) || !_skillExperience.ContainsKey(skillId)) return;
+            
+            int currentLevel = _skillLevels[skillId];
+            float currentExp = _skillExperience[skillId];
+            float requiredExp = _experienceManager.GetExperienceRequiredForLevel(skillId, currentLevel + 1);
+            
+            if (currentExp >= requiredExp)
+            {
+                // Level up!
+                _skillLevels[skillId]++;
+                int newLevel = _skillLevels[skillId];
+                
+                // Carry over excess experience
+                _skillExperience[skillId] = currentExp - requiredExp;
+                
+                // Trigger skill level up event
+                OnSkillLevelUp?.Invoke(skillId, newLevel);
+                
+                // Check for new unlocks
+                CheckUnlocksForSkillLevel(skillId, newLevel);
+                
+                // Show progression effects
+                ShowSkillLevelUpEffects(skillId, newLevel);
+                
+                // Create progression event
+                QueueProgressionEvent(new ProgressionEvent
+                {
+                    EventType = ProgressionEventType.SkillLevelUp,
+                    SkillId = skillId,
+                    Level = newLevel,
+                    Timestamp = DateTime.Now
+                });
+                
+                LogInfo($"Skill level up! {skillId} is now level {newLevel}");
+                
+                // Check for additional level ups (in case of large experience gains)
+                CheckSkillLevelUp(skillId);
+            }
+        }
+        
+        private void CheckUnlocksForSkillLevel(string skillId, int level)
+        {
+            var unlocks = _unlockManager.GetUnlocksForSkillLevel(skillId, level);
+            foreach (var unlock in unlocks)
+            {
+                UnlockContent(unlock, $"Skill: {skillId} Level {level}");
+            }
+        }
+        
+        private void ShowSkillLevelUpEffects(string skillId, int level)
+        {
+            if (_enableProgressionEffects)
+            {
+                // _effectsManager.PlayEffect(EffectType.PlantGrowth, Vector3.zero, null, 3f); // Commented out to prevent circular dependency
+            }
+            
+            if (_enableProgressionNotifications)
+            {
+                // _feedbackSystem.ShowVisualConfirmation(Vector3.zero, ConfirmationType.Achievement, 
+                //     $"{skillId} Level {level}!"); // Commented out to prevent circular dependency
+            }
+        }
+        
+        #endregion
+        
+        #region Research Progression
+        
+        public void StartResearch(string researchId)
+        {
+            if (!_enableResearchProgression) return;
+            
+            var research = _researchDatabase?.GetResearch(researchId);
+            if (research == null)
+            {
+                LogWarning($"Research project not found: {researchId}");
+                return;
+            }
+            
+            // Check prerequisites
+            if (!AreResearchPrerequisitesMet(research))
+            {
+                LogWarning($"Prerequisites not met for research: {researchId}");
+                return;
+            }
+            
+            // Check if already active or completed
+            if (_activeResearch.ContainsKey(researchId) || IsResearchCompleted(researchId))
+            {
+                return;
+            }
+            
+            // Start research
+            var progress = new ResearchProgress
+            {
+                ResearchId = researchId,
+                StartTime = DateTime.Now,
+                Progress = 0f,
+                IsActive = true
+            };
+            
+            _activeResearch[researchId] = progress;
+            
+            LogInfo($"Started research: {research.ResearchName}");
+        }
+        
+        private void UpdateResearchProgress()
+        {
+            var completedResearch = new List<string>();
+            
+            foreach (var kvp in _activeResearch.ToList())
+            {
+                var progress = kvp.Value;
+                if (!progress.IsActive) continue;
+                
+                var research = _researchDatabase.GetResearch(progress.ResearchId);
+                if (research == null) continue;
+                
+                // Calculate progress based on time and research factors
+                float deltaTime = Time.deltaTime;
+                float progressRate = CalculateResearchProgressRate(research);
+                float progressGain = (progressRate * deltaTime) / research.ResearchDuration;
+                
+                progress.Progress += progressGain;
+                
+                // Check for completion
+                if (progress.Progress >= 1f)
+                {
+                    progress.Progress = 1f;
+                    progress.IsActive = false;
+                    progress.CompletionTime = DateTime.Now;
+                    
+                    completedResearch.Add(progress.ResearchId);
+                }
+            }
+            
+            // Process completed research
+            foreach (var researchId in completedResearch)
+            {
+                CompleteResearch(researchId);
+            }
+        }
+        
+        private float CalculateResearchProgressRate(ResearchProjectSO research)
+        {
+            float baseRate = 1f;
+            
+            // Factor in relevant skill levels
+            foreach (var requirement in research.SkillRequirements)
+            {
+                if (_skillLevels.TryGetValue(requirement.SkillId, out int skillLevel))
+                {
+                    float skillBonus = (skillLevel - requirement.MinLevel) * 0.1f;
+                    baseRate += Mathf.Max(0f, skillBonus);
+                }
+            }
+            
+            // Factor in facility upgrades
+            baseRate *= GetResearchFacilityMultiplier();
+            
+            return baseRate;
+        }
+        
+        private float GetResearchFacilityMultiplier()
+        {
+            // This would check for research facility upgrades
+            return 1f;
+        }
+        
+        private void CompleteResearch(string researchId)
+        {
+            var research = _researchDatabase.GetResearch(researchId);
+            if (research == null) return;
+            
+            // Add to completed research
+            _playerProgression.CompletedResearch.Add(researchId);
+            
+            // Apply research benefits
+            ApplyResearchBenefits(research);
+            
+            // Trigger completion event
+            OnResearchCompleted?.Invoke(researchId);
+            
+            // Show completion effects
+            ShowResearchCompletionEffects(research);
+            
+            // Create progression event
+            QueueProgressionEvent(new ProgressionEvent
+            {
+                EventType = ProgressionEventType.ResearchCompleted,
+                ResearchId = researchId,
+                Timestamp = DateTime.Now
+            });
+            
+            LogInfo($"Research completed: {research.ResearchName}");
+        }
+        
+        private void ApplyResearchBenefits(ResearchProjectSO research)
+        {
+            // Unlock new content
+            foreach (var unlock in research.ContentUnlocks)
+            {
+                UnlockContent(unlock, $"Research: {research.ResearchName}");
+            }
+            
+            // Apply passive bonuses
+            foreach (var bonus in research.PassiveBonuses)
+            {
+                ApplyPassiveBonus(bonus);
+            }
+        }
+        
+        private void ApplyPassiveBonus(PassiveBonus bonus)
+        {
+            // This would apply permanent bonuses to various game systems
+            LogInfo($"Applied passive bonus: {bonus.BonusType} +{bonus.Value}");
+        }
+        
+        private void ShowResearchCompletionEffects(ResearchProjectSO research)
+        {
+            if (_enableProgressionEffects)
+            {
+                // _effectsManager.PlayEffect(EffectType.Environmental, Vector3.zero, null, 4f); // Commented out to prevent circular dependency
+            }
+            
+            if (_enableProgressionNotifications)
+            {
+                // _feedbackSystem.ShowVisualConfirmation(Vector3.zero, ConfirmationType.Achievement, 
+                //     $"Research Complete: {research.ResearchName}"); // Commented out to prevent circular dependency
+            }
+        }
+        
+        private bool AreResearchPrerequisitesMet(ResearchProjectSO research)
+        {
+            // Check skill requirements
+            foreach (var requirement in research.SkillRequirements)
+            {
+                if (!_skillLevels.TryGetValue(requirement.SkillId, out int skillLevel) || 
+                    skillLevel < requirement.MinLevel)
+                {
+                    return false;
+                }
+            }
+            
+            // Check research prerequisites
+            foreach (var prerequisite in research.Prerequisites)
+            {
+                if (!IsResearchCompleted(prerequisite))
+                {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        private bool IsResearchCompleted(string researchId)
+        {
+            return _playerProgression.CompletedResearch.Contains(researchId);
+        }
+        
+        #endregion
+        
+        #region Achievement System
+        
+        public void CheckAchievementProgress()
+        {
+            if (!_enableAchievements || _achievementLibrary == null) return;
+            
+            var allAchievements = _achievementLibrary.GetAllAchievements();
+            
+            foreach (var achievement in allAchievements)
+            {
+                if (_completedAchievements.Contains(achievement.AchievementId)) continue;
+                
+                if (IsAchievementCompleted(achievement))
+                {
+                    UnlockAchievement(achievement);
+                }
+            }
+        }
+        
+        private bool IsAchievementCompleted(AchievementDefinition achievement)
+        {
+            foreach (var requirement in achievement.Requirements.Requirements)
+            {
+                if (!IsAchievementRequirementMet(requirement))
+                {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        private bool IsAchievementRequirementMet(AchievementRequirement requirement)
+        {
+            switch (requirement.Type)
+            {
+                case AchievementRequirementType.SkillLevel:
+                    return _skillLevels.TryGetValue(requirement.TargetId, out int level) && level >= requirement.RequiredValue;
+                
+                case AchievementRequirementType.ResearchCompleted:
+                    return IsResearchCompleted(requirement.TargetId);
+                
+                case AchievementRequirementType.PlantsHarvested:
+                    return _playerProgression.StatTracker.PlantsHarvested >= requirement.RequiredValue;
+                
+                case AchievementRequirementType.FacilitiesBuilt:
+                    return _playerProgression.StatTracker.FacilitiesBuilt >= requirement.RequiredValue;
+                
+                case AchievementRequirementType.TotalProfit:
+                    return _playerProgression.StatTracker.TotalProfit >= requirement.RequiredValue;
+                
+                case AchievementRequirementType.PlayTime:
+                    return _playerProgression.PlayTimeHours >= requirement.RequiredValue;
+                
+                default:
+                    return false;
+            }
+        }
+        
+        private void UnlockAchievement(AchievementDefinition achievement)
+        {
+            _completedAchievements.Add(achievement.AchievementId);
+            _playerProgression.CompletedAchievements.Add(achievement.AchievementId);
+            
+            // Apply achievement rewards
+            ApplyAchievementRewards(achievement);
+            
+            // Trigger achievement event
+            OnAchievementUnlocked?.Invoke(achievement.AchievementId);
+            
+            // Show achievement effects
+            ShowAchievementUnlockEffects(achievement);
+            
+            // Create progression event
+            QueueProgressionEvent(new ProgressionEvent
+            {
+                EventType = ProgressionEventType.Achievement_Unlocked,
+                AchievementId = achievement.AchievementId,
+                Timestamp = DateTime.Now
+            });
+            
+            LogInfo($"Achievement unlocked: {achievement.AchievementName}");
+        }
+        
+        private void ApplyAchievementRewards(AchievementDefinition achievement)
+        {
+            // Grant rewards based on reward type
+            foreach (var reward in achievement.Rewards)
+            {
+                switch (reward.RewardType)
+                {
+                    case AchievementRewardType.Experience_Bonus:
+                        GainExperience("", achievement.ExperienceReward, $"Achievement: {achievement.AchievementName}");
+                        break;
+                    case AchievementRewardType.Skill_Points:
+                        // Grant skill points (would integrate with skill point system)
+                        break;
+                    case AchievementRewardType.Unlock_Skill:
+                        if (reward.UnlockedSkill != null)
+                        {
+                            UnlockContent(reward.UnlockedSkill.SkillId, $"Achievement: {achievement.AchievementName}");
+                        }
+                        break;
+                    case AchievementRewardType.Unlock_Research:
+                        if (reward.UnlockedResearch != null)
+                        {
+                            UnlockContent(reward.UnlockedResearch.ProjectId, $"Achievement: {achievement.AchievementName}");
+                        }
+                        break;
+                    case AchievementRewardType.Unlock_Equipment:
+                        if (reward.UnlockedEquipment != null)
+                        {
+                            UnlockContent(reward.UnlockedEquipment.EquipmentId, $"Achievement: {achievement.AchievementName}");
+                        }
+                        break;
+                    case AchievementRewardType.Unlock_Feature:
+                        if (!string.IsNullOrEmpty(reward.UnlockedFeature))
+                        {
+                            UnlockContent(reward.UnlockedFeature, $"Achievement: {achievement.AchievementName}");
+                        }
+                        break;
+                }
+            }
+        }
+        
+        private void ShowAchievementUnlockEffects(AchievementDefinition achievement)
+        {
+            if (_enableProgressionEffects)
+            {
+                // _effectsManager.PlayEffect(EffectType.Environmental, Vector3.zero, null, 5f); // Commented out to prevent circular dependency
+            }
+            
+            if (_enableProgressionNotifications)
+            {
+                // _feedbackSystem.TriggerScreenFlash(Color.gold, 0.5f, 0.3f); // Commented out to prevent circular dependency
+                // _feedbackSystem.ShowVisualConfirmation(Vector3.zero, ConfirmationType.Achievement, 
+                //     $"Achievement: {achievement.AchievementName}"); // Commented out to prevent circular dependency
+            }
+        }
+        
+        #endregion
+        
+        #region Content Unlock System
+        
+        public void UnlockContent(string contentId, string source = "")
+        {
+            if (_unlockedContent.Contains(contentId)) return;
+            
+            _unlockedContent.Add(contentId);
+            _playerProgression.UnlockedContent.Add(contentId);
+            
+            // Trigger unlock event
+            OnContentUnlocked?.Invoke(contentId);
+            
+            // Show unlock notification
+            ShowContentUnlockNotification(contentId, source);
+            
+            // Create progression event
+            QueueProgressionEvent(new ProgressionEvent
+            {
+                EventType = ProgressionEventType.Content_Unlocked,
+                ContentId = contentId,
+                Source = source,
+                Timestamp = DateTime.Now
+            });
+            
+            LogInfo($"Content unlocked: {contentId} from {source}");
+        }
+        
+        private void ShowContentUnlockNotification(string contentId, string source)
+        {
+            if (_enableProgressionNotifications)
+            {
+                string message = string.IsNullOrEmpty(source) ? $"Unlocked: {contentId}" : $"Unlocked: {contentId} ({source})";
+                // _feedbackSystem.ShowVisualConfirmation(Vector3.zero, ConfirmationType.Success, message); // Commented out to prevent circular dependency
+            }
+        }
+        
+        public bool IsContentUnlocked(string contentId)
+        {
+            return _unlockedContent.Contains(contentId);
+        }
+        
+        public void CheckContentUnlocks()
+        {
+            if (_unlockSystem == null) return;
+            
+            // Check all unlock rules to see if any new content should be unlocked
+            var allUnlockables = _unlockSystem.GetAllUnlockables();
+            foreach (var unlockable in allUnlockables)
+            {
+                if (!IsContentUnlocked(unlockable.ContentId) && AreUnlockRequirementsMet(unlockable))
+                {
+                    UnlockContent(unlockable.ContentId, "Progression Requirements Met");
+                }
+            }
+        }
+        
+        private bool AreUnlockRequirementsMet(UnlockableContent unlockable)
+        {
+            foreach (var requirement in unlockable.Requirements)
+            {
+                if (!IsUnlockRequirementMet(requirement))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        private bool IsUnlockRequirementMet(UnlockRequirement requirement)
+        {
+            switch (requirement.RequirementType)
+            {
+                case UnlockRequirementType.PlayerLevel:
+                    return _playerProgression.PlayerLevel >= requirement.RequiredValue;
+                    
+                case UnlockRequirementType.SkillLevel:
+                    return GetSkillLevel(requirement.TargetId) >= requirement.RequiredValue;
+                    
+                case UnlockRequirementType.ResearchCompleted:
+                    return IsResearchCompleted(requirement.TargetId);
+                    
+                case UnlockRequirementType.AchievementCompleted:
+                    return _completedAchievements.Contains(requirement.TargetId);
+                    
+                case UnlockRequirementType.TimeInGame:
+                    return _playerProgression.PlayTimeHours >= requirement.RequiredValue;
+                    
+                case UnlockRequirementType.ContentUnlocked:
+                    return IsContentUnlocked(requirement.TargetId);
+                    
+                default:
+                    return false;
+            }
+        }
+        
+        #endregion
+        
+        #region Campaign Progression
+        
+        private void UpdateCampaignProgress()
+        {
+            // Update campaign manager with current player progression
+            _campaignManager.UpdateProgress();
+            
+            // Check for milestone completion
+            var completedMilestones = _campaignManager.GetCompletedMilestones();
+            foreach (var milestone in completedMilestones)
+            {
+                if (!_playerProgression.CompletedMilestones.Contains(milestone.MilestoneId))
+                {
+                    CompleteCampaignMilestone(milestone);
+                }
+            }
+        }
+        
+        private void CompleteCampaignMilestone(CampaignMilestone milestone)
+        {
+            _playerProgression.CompletedMilestones.Add(milestone.MilestoneId);
+            
+            // Apply milestone rewards
+            ApplyMilestoneRewards(milestone);
+            
+            // Trigger milestone event
+            OnCampaignMilestoneReached?.Invoke(milestone);
+            
+            // Show milestone effects
+            ShowMilestoneCompletionEffects(milestone);
+            
+            LogInfo($"Campaign milestone reached: {milestone.MilestoneName}");
+        }
+        
+        private void ApplyMilestoneRewards(CampaignMilestone milestone)
+        {
+            // Grant rewards similar to achievements
+            foreach (var reward in milestone.Rewards)
+            {
+                switch (reward.RewardType)
+                {
+                    case MilestoneRewardType.Permanent_Bonus:
+                        // Apply permanent bonus
+                        break;
+                    case MilestoneRewardType.Unlock_Feature:
+                        UnlockContent(reward.UnlockedFeature, $"Milestone: {milestone.MilestoneName}");
+                        break;
+                    case MilestoneRewardType.Unlock_Skill:
+                        if (reward.UnlockedSkillNode != null)
+                        {
+                            UnlockContent(reward.UnlockedSkillNode.SkillId, $"Milestone: {milestone.MilestoneName}");
+                        }
+                        break;
+                    case MilestoneRewardType.Title_Recognition:
+                        // Award title recognition
+                        break;
+                    case MilestoneRewardType.Special_Access:
+                        // Grant special access
+                        break;
+                    case MilestoneRewardType.Multiplier_Bonus:
+                        // Apply multiplier bonus
+                        break;
+                    case MilestoneRewardType.Unique_Opportunity:
+                        // Unlock unique opportunity
+                        break;
+                    case MilestoneRewardType.Legacy_Achievement:
+                        // Grant legacy achievement
+                        break;
+                }
+            }
+        }
+        
+        private void ShowMilestoneCompletionEffects(CampaignMilestone milestone)
+        {
+            if (_enableProgressionEffects)
+            {
+                // _effectsManager.PlayEffect(EffectType.Environmental, Vector3.zero, null, 6f); // Commented out to prevent circular dependency
+            }
+            
+            if (_enableProgressionNotifications)
+            {
+                // _feedbackSystem.TriggerScreenShake(0.3f, 0.5f); // Commented out to prevent circular dependency
+                // _feedbackSystem.ShowVisualConfirmation(Vector3.zero, ConfirmationType.Achievement, 
+                //     $"Milestone: {milestone.MilestoneName}"); // Commented out to prevent circular dependency
+            }
+        }
+        
+        #endregion
+        
+        #region Event Processing
+        
+        private void QueueProgressionEvent(ProgressionEvent progressionEvent)
+        {
+            _pendingEvents.Enqueue(progressionEvent);
+        }
+        
+        private void ProcessPendingEvents()
+        {
+            while (_pendingEvents.Count > 0)
+            {
+                var progressionEvent = _pendingEvents.Dequeue();
+                _eventProcessor.ProcessEvent(progressionEvent);
+                
+                // Update analytics
+                _progressionAnalytics.RecordEvent(progressionEvent);
+            }
+        }
+        
+        private void UpdateActiveNotifications()
+        {
+            for (int i = _activeNotifications.Count - 1; i >= 0; i--)
+            {
+                var notification = _activeNotifications[i];
+                
+                // Fix DateTime calculation - check if notification has expired
+                var elapsedTime = (System.DateTime.Now - notification.StartTime).TotalSeconds;
+                if (elapsedTime >= notification.Duration)
+                {
+                    _activeNotifications.RemoveAt(i);
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Game System Event Handlers
+        
+        private void HandlePlantAdded(PlantInstance plant)
+        {
+            if (plant == null) return;
+            
+            // Award experience for plant management
+            GainExperience("PlantManagement", 10f, "Plant Added");
+            
+            // Check for cultivation achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandlePlantHarvested(PlantInstance plant)
+        {
+            if (plant == null) return;
+            
+            // Award experience based on plant quality and yield
+            float baseExperience = 50f;
+            float qualityBonus = plant.CurrentHealth * 25f; // Bonus based on plant health
+            
+            GainExperience("PlantManagement", baseExperience + qualityBonus, "Plant Harvested");
+            GainExperience("Cultivation", baseExperience * 0.5f, "Plant Harvested");
+            
+            // Check for harvest-related achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandlePlantStageChanged(PlantInstance plant)
+        {
+            if (plant == null) return;
+            
+            // Award small experience for successful growth stage progression
+            GainExperience("PlantManagement", 5f, "Growth Stage Progression");
+            
+            // Check for growth-related achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandleEnvironmentalOptimization()
+        {
+            // Award experience for environmental optimization
+            GainExperience("EnvironmentalControl", 25f, "Environmental Optimization");
+            
+            // Check for environmental achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandleConstructionCompleted(object projectObj)
+        {
+            // Award experience based on project completion
+            float baseExperience = 100f;
+            float complexityBonus = 50f; // Fixed bonus since we can't access project details
+            
+            GainExperience("FacilityManagement", baseExperience + complexityBonus, "Construction Completed");
+            
+            // Update player stats
+            _playerProgression.FacilitiesBuilt++;
+            
+            // Check for construction achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandleConstructionMilestone(string milestone)
+        {
+            if (string.IsNullOrEmpty(milestone)) return;
+            
+            // Award experience for construction milestones
+            GainExperience("FacilityManagement", 75f, $"Construction Milestone: {milestone}");
+            
+            // Check for construction achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandleSaleCompleted(MarketTransaction transaction)
+        {
+            if (transaction == null) return;
+            
+            // Award experience based on sale value
+            float experienceAmount = Mathf.Min(transaction.TotalValue * 0.1f, 100f); // Cap at 100 exp
+            
+            GainExperience("BusinessManagement", experienceAmount, "Sale Completed");
+            
+            // Check for business achievements
+            CheckAchievementProgress();
+        }
+        
+        private void HandleProfitGenerated(float profit)
+        {
+            if (profit <= 0f) return;
+            
+            // Award experience based on profit amount
+            float experienceAmount = Mathf.Min(profit * 0.05f, 50f); // Cap at 50 exp
+            
+            GainExperience("BusinessManagement", experienceAmount, "Profit Generated");
+            
+            // Update player stats
+            _playerProgression.TotalProfit += profit;
+            
+            // Check for profit-related achievements
+            CheckAchievementProgress();
+        }
+        
+        #endregion
+        
+        #region System Updates and Metrics
+        
+        private void UpdateProgressionSystems()
+        {
+            // Fix protected member access - call Update() directly on managers
+            if (_skillTreeManager != null)
+            {
+                // _skillTreeManager.Update(); // Commented out - protected member access
+            }
+            if (_researchManager != null)
+            {
+                // _researchManager.Update(); // Commented out - protected member access
+            }
+            if (_achievementManager != null)
+            {
+                // _achievementManager.Update(); // Commented out - protected member access
+            }
+            if (_experienceManager != null)
+            {
+                // _experienceManager.Update(); // Commented out - protected member access
+            }
+            if (_campaignManager != null)
+            {
+                _campaignManager.Update();
+            }
+            if (_unlockManager != null)
+            {
+                // _unlockManager.Update(); // Commented out - protected member access
+            }
+        }
+        
+        private void UpdateProgressionMetrics()
+        {
+            if (Time.time - _lastMetricsUpdate >= 1f)
+            {
+                _progressionMetrics.CurrentSkillLevels = _skillLevels.Values.Sum();
+                _progressionMetrics.CompletedAchievements = _completedAchievements.Count;
+                _progressionMetrics.ActiveResearchProjects = _activeResearch.Count(r => r.Value.IsActive);
+                _progressionMetrics.CompletedResearchProjects = _playerProgression.CompletedResearch.Count;
+                _progressionMetrics.UnlockedContent = _unlockedContent.Count;
+                _progressionMetrics.TotalExperience = _playerProgression.TotalExperience;
+                _progressionMetrics.OverallLevel = _playerProgression.OverallLevel;
+                _progressionMetrics.LastUpdate = DateTime.Now;
+                
+                _lastMetricsUpdate = Time.time;
+            }
+        }
+        
+        private void UpdateDetailedMetrics()
+        {
+            _progressionMetrics.SessionDuration = (DateTime.Now - _progressionMetrics.SessionStartTime).TotalMinutes;
+            _playerProgression.PlayTimeHours += Time.deltaTime / 3600f;
+            _playerProgression.LastPlayDate = DateTime.Now;
+            
+            OnProgressionMetricsUpdated?.Invoke(_progressionMetrics);
+        }
+        
+        private void UpdateProgressionAnalytics()
+        {
+            if (_progressionAnalytics != null)
+            {
+                // Update analytics data
+                _progressionAnalytics.Update();
+            }
+        }
+        
+        #endregion
+        
+        #region Data Persistence
+        
+        private PlayerProgressionData LoadPlayerProgression()
+        {
+            // This would integrate with the save system
+            // For now, return null to create new progression
+            return null;
+        }
+        
+        private void SavePlayerProgression()
+        {
+            if (_playerProgression == null) return;
+            
+            // Update progression data
+            _playerProgression.SkillLevels = new Dictionary<string, int>(_skillLevels);
+            _playerProgression.SkillExperience = new Dictionary<string, float>(_skillExperience);
+            
+            // This would integrate with the save system
+            LogInfo("Player progression saved");
+        }
+        
+        #endregion
+        
+        #region Public Interface
+        
+        public int GetSkillLevel(string skillId)
+        {
+            return _skillLevels.TryGetValue(skillId, out int level) ? level : 1;
+        }
+        
+        public float GetSkillExperience(string skillId)
+        {
+            return _skillExperience.TryGetValue(skillId, out float exp) ? exp : 0f;
+        }
+        
+        public float GetSkillProgress(string skillId)
+        {
+            int currentLevel = GetSkillLevel(skillId);
+            float currentExp = GetSkillExperience(skillId);
+            float requiredExp = _experienceManager.GetExperienceRequiredForLevel(skillId, currentLevel + 1);
+            
+            return requiredExp > 0f ? currentExp / requiredExp : 0f;
+        }
+        
+        public List<string> GetAvailableResearch()
+        {
+            return _researchDatabase?.GetAvailableResearch()
+                .Where(r => AreResearchPrerequisitesMet(r) && !IsResearchCompleted(r.ProjectId)) // Use ProjectId instead of ResearchId
+                .Select(r => r.ProjectId) // Use ProjectId instead of ResearchId
+                .ToList() ?? new List<string>();
+        }
+        
+        public ResearchProgress GetResearchProgress(string researchId)
+        {
+            return _activeResearch.TryGetValue(researchId, out var progress) ? progress : null;
+        }
+        
+        public List<AchievementDefinition> GetAvailableAchievements()
+        {
+            return _achievementLibrary?.GetAllAchievements()
+                .Where(a => !_completedAchievements.Contains(a.AchievementId))
+                .ToList() ?? new List<AchievementDefinition>();
+        }
+        
+        public ProgressionSystemReport GetSystemReport()
+        {
+            return new ProgressionSystemReport
+            {
+                Metrics = _progressionMetrics,
+                PlayerProgression = _playerProgression,
+                SkillLevels = new Dictionary<string, int>(_skillLevels),
+                UnlockedContent = new HashSet<string>(_unlockedContent),
+                CompletedAchievements = new HashSet<string>(_completedAchievements)
+            };
+        }
+        
+        public void SetProgressionMultiplier(float multiplier)
+        {
+            _progressionMultiplier = Mathf.Max(0.1f, multiplier);
+        }
+        
+        public void SetExperienceMultiplier(float multiplier)
+        {
+            _experienceMultiplier = Mathf.Max(0.1f, multiplier);
+        }
+        
+        #endregion
+        
+        protected override void OnManagerShutdown()
+        {
+            // Save progression before shutdown
+            SavePlayerProgression();
+            
+            // Stop all coroutines
+            StopAllCoroutines();
+            CancelInvoke();
+            
+            // Disconnect events
+            DisconnectGameSystemEvents();
+            
+            // Cleanup subsystems - only call Cleanup on managers that have it
+            // _skillTreeManager?.Cleanup(); // Commented out - SkillTreeManager doesn't have Cleanup method
+            // _researchManager?.Cleanup(); // Commented out - ResearchManager doesn't have Cleanup method
+            // _achievementManager?.Cleanup(); // Commented out - AchievementManager doesn't have Cleanup method
+            // _experienceManager?.Cleanup(); // Commented out - ExperienceManager doesn't have Cleanup method
+            _campaignManager?.Cleanup(); // CampaignManager has Cleanup method
+            // _unlockManager?.Cleanup(); // Commented out - UnlockManager doesn't have Cleanup method
+            _progressionAnalytics?.Cleanup(); // ProgressionAnalytics now has Cleanup method
+            
+            LogInfo("Comprehensive Progression Manager shutdown complete");
+        }
+        
+        private void DisconnectGameSystemEvents()
+        {
+            if (_plantManager != null)
+            {
+                // _plantManager.OnPlantAdded -= HandlePlantAdded;
+                // _plantManager.OnPlantHarvested -= HandlePlantHarvested;
+                // _plantManager.OnPlantStageChanged -= HandlePlantStageChanged;
+            }
+            
+            if (_environmentalManager != null)
+            {
+                // _environmentalManager.OnConditionsOptimized -= HandleEnvironmentalOptimization;
+            }
+            
+            if (_facilityConstructor != null)
+            {
+                // _facilityConstructor.OnProjectCompleted -= HandleConstructionCompleted;
+                // _facilityConstructor.OnMilestoneReached -= HandleConstructionMilestone;
+            }
+            
+            if (_marketManager != null)
+            {
+                // _marketManager.OnSaleCompleted -= HandleSaleCompleted;
+                // _marketManager.OnProfitGenerated -= HandleProfitGenerated;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Plant instance data structure for progression integration.
+    /// </summary>
+    [Serializable]
+    public class PlantInstance
+    {
+        public string PlantId;
+        public string StrainId;
+        public DateTime PlantedDate;
+        public string CurrentStage;
+        public Dictionary<string, float> Stats;
+        public float HealthPercentage;
+        public bool IsHarvestable;
+    }
+    
+    /// <summary>
+    /// Market transaction data structure for economic progression.
+    /// </summary>
+    [Serializable]
+    public class MarketTransaction
+    {
+        public string TransactionId;
+        public DateTime TransactionDate;
+        public string ProductId;
+        public float Quantity;
+        public float Price;
+        public float TotalValue;
+        public string TransactionType;
+        public Dictionary<string, object> MetaData;
+    }
+}

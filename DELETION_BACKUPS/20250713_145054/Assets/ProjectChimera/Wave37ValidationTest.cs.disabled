@@ -1,0 +1,245 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Environment;
+using System.Collections.Generic;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 37 - StressType enum and EnvironmentalConditions type compatibility
+    /// Tests that all compilation errors related to StressType enum values and type conversions are resolved.
+    /// </summary>
+    public class Wave37ValidationTest : MonoBehaviour
+    {
+        [Header("Test Components")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool enableDebugLogging = true;
+
+        [Header("Test Results")]
+        [SerializeField] private bool stressTypeEnumTest = false;
+        [SerializeField] private bool environmentalConditionsTest = false;
+        [SerializeField] private bool typeConversionTest = false;
+        [SerializeField] private bool methodAccessibilityTest = false;
+
+        private void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllValidationTests();
+            }
+        }
+
+        /// <summary>
+        /// Run all validation tests for Error Wave 37.
+        /// </summary>
+        public void RunAllValidationTests()
+        {
+            LogInfo("=== Starting Error Wave 37 Validation Tests ===");
+
+            TestStressTypeEnumValues();
+            TestEnvironmentalConditionsCompatibility();
+            TestTypeConversions();
+            TestMethodAccessibility();
+
+            LogInfo("=== Error Wave 37 Validation Tests Complete ===");
+            LogValidationSummary();
+        }
+
+        /// <summary>
+        /// Test that all required StressType enum values exist in Systems.Genetics namespace.
+        /// </summary>
+        private void TestStressTypeEnumValues()
+        {
+            LogInfo("Testing StressType enum values...");
+            
+            try
+            {
+                // Test that all required StressType enum values exist
+                var stressTypes = new ProjectChimera.Systems.Genetics.StressType[]
+                {
+                    ProjectChimera.Systems.Genetics.StressType.Temperature,
+                    ProjectChimera.Systems.Genetics.StressType.Heat,
+                    ProjectChimera.Systems.Genetics.StressType.Cold,
+                    ProjectChimera.Systems.Genetics.StressType.Light,
+                    ProjectChimera.Systems.Genetics.StressType.Water,
+                    ProjectChimera.Systems.Genetics.StressType.Drought,
+                    ProjectChimera.Systems.Genetics.StressType.Flood,
+                    ProjectChimera.Systems.Genetics.StressType.Nutrient,
+                    ProjectChimera.Systems.Genetics.StressType.Atmospheric,
+                    ProjectChimera.Systems.Genetics.StressType.Humidity,
+                    ProjectChimera.Systems.Genetics.StressType.CO2,
+                    ProjectChimera.Systems.Genetics.StressType.pH,
+                    ProjectChimera.Systems.Genetics.StressType.Salinity,
+                    ProjectChimera.Systems.Genetics.StressType.Toxicity,
+                    ProjectChimera.Systems.Genetics.StressType.Physical,
+                    ProjectChimera.Systems.Genetics.StressType.Biotic
+                };
+
+                LogInfo($"✓ All {stressTypes.Length} StressType enum values accessible");
+                stressTypeEnumTest = true;
+            }
+            catch (System.Exception e)
+            {
+                LogError($"✗ StressType enum test failed: {e.Message}");
+                stressTypeEnumTest = false;
+            }
+        }
+
+        /// <summary>
+        /// Test EnvironmentalConditions compatibility between different namespaces.
+        /// </summary>
+        private void TestEnvironmentalConditionsCompatibility()
+        {
+            LogInfo("Testing EnvironmentalConditions compatibility...");
+            
+            try
+            {
+                // Test Data.Cultivation.EnvironmentalConditions
+                var cultivationConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                bool isInitialized = cultivationConditions.IsInitialized();
+                
+                // Test Systems.Cultivation.EnvironmentalConditions
+                var systemsConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                bool systemsIsInitialized = systemsConditions.IsInitialized();
+
+                LogInfo($"✓ Data.Cultivation.EnvironmentalConditions: IsInitialized = {isInitialized}");
+                LogInfo($"✓ Systems.Cultivation.EnvironmentalConditions: IsInitialized = {systemsIsInitialized}");
+                environmentalConditionsTest = true;
+            }
+            catch (System.Exception e)
+            {
+                LogError($"✗ EnvironmentalConditions compatibility test failed: {e.Message}");
+                environmentalConditionsTest = false;
+            }
+        }
+
+        /// <summary>
+        /// Test type conversions between different EnvironmentalConditions types.
+        /// </summary>
+        private void TestTypeConversions()
+        {
+            LogInfo("Testing type conversions...");
+            
+            try
+            {
+                // Test EnvironmentalManager conversion methods
+                var environmentalManager = FindObjectOfType<EnvironmentalManager>();
+                if (environmentalManager != null)
+                {
+                    var conditions = environmentalManager.GetCultivationConditions();
+                    var positionConditions = environmentalManager.GetCultivationConditions(Vector3.zero);
+                    
+                    LogInfo($"✓ EnvironmentalManager.GetCultivationConditions() returned valid conditions");
+                    LogInfo($"✓ EnvironmentalManager.GetCultivationConditions(Vector3) returned valid conditions");
+                }
+                else
+                {
+                    LogInfo("⚠ EnvironmentalManager not found in scene, skipping manager tests");
+                }
+
+                // Test PlantInstance environmental conditions
+                var testPlant = CreateTestPlantInstance();
+                if (testPlant != null)
+                {
+                    var plantConditions = testPlant.GetCurrentEnvironmentalConditions();
+                    LogInfo($"✓ PlantInstance.GetCurrentEnvironmentalConditions() returned valid conditions");
+                }
+
+                typeConversionTest = true;
+            }
+            catch (System.Exception e)
+            {
+                LogError($"✗ Type conversion test failed: {e.Message}");
+                typeConversionTest = false;
+            }
+        }
+
+        /// <summary>
+        /// Test method accessibility for all required methods.
+        /// </summary>
+        private void TestMethodAccessibility()
+        {
+            LogInfo("Testing method accessibility...");
+            
+            try
+            {
+                // Test StressFactor and StressResponse accessibility
+                var stressFactor = new ProjectChimera.Systems.Genetics.StressFactor();
+                var stressResponse = new ProjectChimera.Systems.Genetics.StressResponse();
+
+                // Test PlantUpdateProcessor creation
+                var plantUpdateProcessor = new PlantUpdateProcessor(true, true, true);
+                
+                LogInfo("✓ All required classes and methods are accessible");
+                methodAccessibilityTest = true;
+            }
+            catch (System.Exception e)
+            {
+                LogError($"✗ Method accessibility test failed: {e.Message}");
+                methodAccessibilityTest = false;
+            }
+        }
+
+        /// <summary>
+        /// Create a test PlantInstance for testing purposes.
+        /// </summary>
+        private PlantInstance CreateTestPlantInstance()
+        {
+            try
+            {
+                var testObject = new GameObject("TestPlant");
+                var plantInstance = testObject.AddComponent<PlantInstance>();
+                
+                // Initialize with minimal data
+                plantInstance.InitializeFromStrain(null);
+                
+                return plantInstance;
+            }
+            catch (System.Exception e)
+            {
+                LogError($"Failed to create test PlantInstance: {e.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Log validation summary with all test results.
+        /// </summary>
+        private void LogValidationSummary()
+        {
+            LogInfo("=== Error Wave 37 Validation Summary ===");
+            LogInfo($"StressType Enum Test: {(stressTypeEnumTest ? "PASS" : "FAIL")}");
+            LogInfo($"EnvironmentalConditions Test: {(environmentalConditionsTest ? "PASS" : "FAIL")}");
+            LogInfo($"Type Conversion Test: {(typeConversionTest ? "PASS" : "FAIL")}");
+            LogInfo($"Method Accessibility Test: {(methodAccessibilityTest ? "PASS" : "FAIL")}");
+
+            bool allTestsPassed = stressTypeEnumTest && environmentalConditionsTest && 
+                                typeConversionTest && methodAccessibilityTest;
+
+            if (allTestsPassed)
+            {
+                LogInfo("🎉 ALL TESTS PASSED - Error Wave 37 compilation issues resolved!");
+            }
+            else
+            {
+                LogError("❌ Some tests failed - Error Wave 37 issues may still exist");
+            }
+        }
+
+        private void LogInfo(string message)
+        {
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Wave37Validation] {message}");
+            }
+        }
+
+        private void LogError(string message)
+        {
+            Debug.LogError($"[Wave37Validation] {message}");
+        }
+    }
+} 

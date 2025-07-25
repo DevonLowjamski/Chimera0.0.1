@@ -1,0 +1,310 @@
+using UnityEngine;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+
+/// <summary>
+/// Error Wave 25 Validation Test - Missing Type Resolution
+/// 
+/// Tests that the CS0246 errors for missing types in GeneticPerformanceOptimization.cs have been resolved.
+/// 
+/// Root Cause: GeneticPerformanceOptimization.cs was missing using statements for:
+/// - ProjectChimera.Data.Genetics (for AlleleSO, PlantStrainSO types)
+/// - ProjectChimera.Data.Cultivation (for EnvironmentalConditions type)
+/// Additionally, the file contained duplicate class definitions that conflicted with existing types.
+/// 
+/// Solution: 
+/// 1. Added missing using statements for Data.Genetics and Data.Cultivation namespaces
+/// 2. Removed duplicate class definitions (AlleleCouple, PlantGenotype, GeneticMutation)
+/// 3. Classes now properly use types from the Data assemblies
+/// </summary>
+public class Wave25ValidationTest : MonoBehaviour
+{
+    [Header("Wave 25 - Missing Type Resolution Test")]
+    [SerializeField] private bool _runTestOnStart = true;
+    [SerializeField] private bool _testPassed = false;
+    
+    private void Start()
+    {
+        if (_runTestOnStart)
+        {
+            RunValidationTest();
+        }
+    }
+    
+    public void RunValidationTest()
+    {
+        Debug.Log("=== Error Wave 25 Validation Test - Missing Type Resolution ===");
+        
+        bool allTestsPassed = true;
+        
+        // Test 1: Verify AlleleSO type accessibility
+        allTestsPassed &= TestAlleleSO();
+        
+        // Test 2: Verify PlantStrainSO type accessibility
+        allTestsPassed &= TestPlantStrainSO();
+        
+        // Test 3: Verify EnvironmentalConditions type accessibility
+        allTestsPassed &= TestEnvironmentalConditions();
+        
+        // Test 4: Verify GeneticPerformanceOptimization classes functionality
+        allTestsPassed &= TestPerformanceOptimizationClasses();
+        
+        // Test 5: Verify no duplicate type conflicts
+        allTestsPassed &= TestNoDuplicateTypes();
+        
+        // Test 6: Verify integrated functionality
+        allTestsPassed &= TestIntegratedFunctionality();
+        
+        _testPassed = allTestsPassed;
+        
+        if (allTestsPassed)
+        {
+            Debug.Log("<color=green>✓ Wave 25 Validation Test PASSED - Missing types resolved successfully!</color>");
+        }
+        else
+        {
+            Debug.LogError("<color=red>✗ Wave 25 Validation Test FAILED - Some tests did not pass</color>");
+        }
+    }
+    
+    private bool TestAlleleSO()
+    {
+        try
+        {
+            Debug.Log("Testing AlleleSO type accessibility...");
+            
+            // Test that we can reference AlleleSO type without compilation errors
+            System.Type alleleSoType = typeof(AlleleSO);
+            Debug.Log($"✓ AlleleSO type found: {alleleSoType.FullName}");
+            
+            // Test that AlleleSO is from the correct namespace
+            if (alleleSoType.Namespace == "ProjectChimera.Data.Genetics")
+            {
+                Debug.Log("✓ AlleleSO is from correct namespace: ProjectChimera.Data.Genetics");
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"✗ AlleleSO is from wrong namespace: {alleleSoType.Namespace}");
+                return false;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ AlleleSO test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestPlantStrainSO()
+    {
+        try
+        {
+            Debug.Log("Testing PlantStrainSO type accessibility...");
+            
+            // Test that we can reference PlantStrainSO type without compilation errors
+            System.Type plantStrainSoType = typeof(PlantStrainSO);
+            Debug.Log($"✓ PlantStrainSO type found: {plantStrainSoType.FullName}");
+            
+            // Test that PlantStrainSO is from the correct namespace
+            if (plantStrainSoType.Namespace == "ProjectChimera.Data.Genetics")
+            {
+                Debug.Log("✓ PlantStrainSO is from correct namespace: ProjectChimera.Data.Genetics");
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"✗ PlantStrainSO is from wrong namespace: {plantStrainSoType.Namespace}");
+                return false;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ PlantStrainSO test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestEnvironmentalConditions()
+    {
+        try
+        {
+            Debug.Log("Testing EnvironmentalConditions type accessibility...");
+            
+            // Test that we can reference EnvironmentalConditions type without compilation errors
+            System.Type envConditionsType = typeof(EnvironmentalConditions);
+            Debug.Log($"✓ EnvironmentalConditions type found: {envConditionsType.FullName}");
+            
+            // Test that EnvironmentalConditions is from the correct namespace
+            if (envConditionsType.Namespace == "ProjectChimera.Data.Cultivation")
+            {
+                Debug.Log("✓ EnvironmentalConditions is from correct namespace: ProjectChimera.Data.Cultivation");
+                
+                // Test that we can create an instance
+                var envConditions = new EnvironmentalConditions
+                {
+                    Temperature = 25.0f,
+                    Humidity = 60.0f,
+                    LightIntensity = 800.0f,
+                    CO2Level = 1200.0f,
+                    AirFlow = 2.0f
+                };
+                
+                Debug.Log($"✓ EnvironmentalConditions instance created: Temp={envConditions.Temperature}°C");
+                return true;
+            }
+            else
+            {
+                Debug.LogError($"✗ EnvironmentalConditions is from wrong namespace: {envConditionsType.Namespace}");
+                return false;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ EnvironmentalConditions test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestPerformanceOptimizationClasses()
+    {
+        try
+        {
+            Debug.Log("Testing GeneticPerformanceOptimization classes...");
+            
+            // Test GeneticCalculationCache
+            var cache = new GeneticCalculationCache(maxCacheSize: 100, ttlSeconds: 60f);
+            Debug.Log("✓ GeneticCalculationCache created successfully");
+            
+            // Test ThreadSafeObjectPool
+            var pool = new ThreadSafeObjectPool<TraitExpressionResult>(() => new TraitExpressionResult(), 50);
+            var pooledItem = pool.Get();
+            pool.Return(pooledItem);
+            Debug.Log("✓ ThreadSafeObjectPool working correctly");
+            
+            // Test BatchProcessor
+            var batchProcessor = new BatchProcessor(batchSizeThreshold: 25);
+            Debug.Log("✓ BatchProcessor created successfully");
+            
+            // Test PerformanceMetrics
+            var metrics = new PerformanceMetrics();
+            metrics.RecordCalculationTime(1000);
+            var stats = metrics.GetStats();
+            Debug.Log($"✓ PerformanceMetrics working: {stats.TotalCalculations} calculations recorded");
+            
+            // Test GeneticPerformanceMonitor
+            var monitor = new GeneticPerformanceMonitor();
+            Debug.Log("✓ GeneticPerformanceMonitor created successfully");
+            
+            // Cleanup
+            cache.Dispose();
+            pool.Dispose();
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ Performance optimization classes test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestNoDuplicateTypes()
+    {
+        try
+        {
+            Debug.Log("Testing for duplicate type conflicts...");
+            
+            // Test that AlleleCouple comes from Data.Genetics namespace only
+            var alleleCoupleType = typeof(AlleleCouple);
+            if (alleleCoupleType.Namespace != "ProjectChimera.Data.Genetics")
+            {
+                Debug.LogError($"✗ AlleleCouple namespace conflict: {alleleCoupleType.Namespace}");
+                return false;
+            }
+            
+            // Test that PlantGenotype comes from Data.Genetics namespace only
+            var plantGenotypeType = typeof(PlantGenotype);
+            if (plantGenotypeType.Namespace != "ProjectChimera.Data.Genetics")
+            {
+                Debug.LogError($"✗ PlantGenotype namespace conflict: {plantGenotypeType.Namespace}");
+                return false;
+            }
+            
+            // Test that GeneticMutation comes from Data.Genetics namespace only
+            var geneticMutationType = typeof(GeneticMutation);
+            if (geneticMutationType.Namespace != "ProjectChimera.Data.Genetics")
+            {
+                Debug.LogError($"✗ GeneticMutation namespace conflict: {geneticMutationType.Namespace}");
+                return false;
+            }
+            
+            Debug.Log("✓ No duplicate type conflicts detected - all types from correct namespaces");
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ Duplicate type test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestIntegratedFunctionality()
+    {
+        try
+        {
+            Debug.Log("Testing integrated functionality...");
+            
+            // Test that we can create a PlantGenotype with proper types
+            var genotype = new PlantGenotype
+            {
+                GenotypeID = "TEST_GENOTYPE_WAVE25",
+                Generation = 1,
+                IsFounder = true,
+                CreationDate = System.DateTime.Now,
+                Genotype = new System.Collections.Generic.Dictionary<string, AlleleCouple>(),
+                Mutations = new System.Collections.Generic.List<GeneticMutation>(),
+                OverallFitness = 0.9f
+            };
+            
+            // Test that we can use EnvironmentalConditions with genetics classes
+            var environment = new EnvironmentalConditions
+            {
+                Temperature = 24.0f,
+                Humidity = 65.0f,
+                LightIntensity = 750.0f,
+                CO2Level = 1100.0f,
+                AirFlow = 2.2f
+            };
+            
+            // Test BatchProcessor with proper types
+            var batchProcessor = new BatchProcessor(20);
+            batchProcessor.AddCalculation(genotype, environment);
+            
+            Debug.Log($"✓ Integrated functionality working: Genotype {genotype.GenotypeID} with environment temp {environment.Temperature}°C");
+            Debug.Log($"✓ BatchProcessor can accept proper types: {batchProcessor.PendingCount} pending calculations");
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ Integrated functionality test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    [ContextMenu("Run Wave 25 Validation Test")]
+    public void RunTestFromMenu()
+    {
+        RunValidationTest();
+    }
+    
+    private void OnValidate()
+    {
+        if (Application.isPlaying && _runTestOnStart)
+        {
+            // Update test status in inspector during play mode
+        }
+    }
+} 

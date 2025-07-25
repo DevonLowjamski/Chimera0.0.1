@@ -1,0 +1,489 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Specialized base class for IPM battle and combat systems.
+    /// Provides battle state management, phase transitions, and tactical coordination.
+    /// </summary>
+    public abstract class IPMBattleSystemBase : IPMSystemBase, IIPMBattleManager
+    {
+        [Header("Battle System Configuration")]
+        [SerializeField] protected float _battleUpdateInterval = 0.1f;
+        [SerializeField] protected int _maxConcurrentBattles = 5;
+        [SerializeField] protected bool _enableBattleLogging = true;
+        
+        // Battle State Management
+        protected Dictionary<string, IPMBattleData> _activeBattles = new Dictionary<string, IPMBattleData>();
+        protected Dictionary<string, IPMBattlePhase> _battlePhases = new Dictionary<string, IPMBattlePhase>();
+        protected Dictionary<string, DateTime> _battleStartTimes = new Dictionary<string, DateTime>();
+        protected Queue<string> _battleCompletionQueue = new Queue<string>();
+        
+        // Battle Performance Tracking
+        protected Dictionary<string, BattlePerformanceData> _battlePerformance = new Dictionary<string, BattlePerformanceData>();
+        protected float _lastBattleUpdateTime;
+        
+        // Events
+        public event Action<IPMBattleData> OnBattleStarted;
+        public event Action<IPMBattleData> OnBattleEnded;
+        public event Action<IPMBattlePhase> OnBattlePhaseChanged;
+        
+        #region IIPMBattleManager Implementation
+        
+        public virtual bool StartBattle(IPMBattleConfiguration config)
+        {
+            try
+            {
+                if (!CanStartBattle())
+                {
+                    if (_enableBattleLogging)
+                    {
+                        Debug.LogWarning($"[{_systemId}] Cannot start battle - maximum concurrent battles reached or system not ready");
+                    }
+                    return false;
+                }
+                
+                var battleData = CreateBattleData(config);
+                if (ValidateBattleConfiguration(battleData))
+                {
+                    _activeBattles[battleData.BattleId] = battleData;
+                    _battlePhases[battleData.BattleId] = IPMBattlePhase.Preparation;
+                    _battleStartTimes[battleData.BattleId] = DateTime.Now;
+                    _battlePerformance[battleData.BattleId] = new BattlePerformanceData();
+                    
+                    OnBattleStartedInternal(battleData);
+                    OnBattleStarted?.Invoke(battleData);
+                    
+                    if (_enableBattleLogging)
+                    {
+                        Debug.Log($"[{_systemId}] Battle started: {battleData.BattleId} - {battleData.BattleName}");
+                    }
+                    
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Failed to start battle: {ex.Message}", ex);
+            }
+            
+            return false;
+        }
+        
+        public virtual bool EndBattle(string battleId, IPMBattleOutcome result)
+        {
+            try
+            {
+                if (!_activeBattles.TryGetValue(battleId, out var battleData))
+                {
+                    if (_enableBattleLogging)
+                    {
+                        Debug.LogWarning($"[{_systemId}] Cannot end battle - battle not found: {battleId}");
+                    }
+                    return false;
+                }
+                
+                battleData.Result = new IPMBattleResult
+                {
+                    BattleId = battleId,
+                    Outcome = result,
+                    Victory = (result == IPMBattleOutcome.Victory),
+                    BattleDuration = DateTime.Now - _battleStartTimes[battleId]
+                };
+                battleData.Duration = DateTime.Now - _battleStartTimes[battleId];
+                
+                OnBattleEndedInternal(battleData);
+                OnBattleEnded?.Invoke(battleData);
+                
+                // Cleanup battle data
+                _activeBattles.Remove(battleId);
+                _battlePhases.Remove(battleId);
+                _battleStartTimes.Remove(battleId);
+                _battlePerformance.Remove(battleId);
+                
+                if (_enableBattleLogging)
+                {
+                    Debug.Log($"[{_systemId}] Battle ended: {battleId} - Result: {result}");
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Failed to end battle {battleId}: {ex.Message}", ex);
+                return false;
+            }
+        }
+        
+        public virtual IPMBattleData GetBattleData(string battleId)
+        {
+            return _activeBattles.GetValueOrDefault(battleId);
+        }
+        
+        public virtual List<IPMBattleData> GetActiveBattles()
+        {
+            return _activeBattles.Values.ToList();
+        }
+        
+        public virtual bool CanStartBattle()
+        {
+            return _isActive && 
+                   _activeBattles.Count < _maxConcurrentBattles &&
+                   (_ipmConfig?.CanStartBattle(_activeBattles.Count) ?? false);
+        }
+        
+        public virtual void UpdateBattle(string battleId, float deltaTime)
+        {
+            try
+            {
+                if (_activeBattles.TryGetValue(battleId, out var battleData))
+                {
+                    using var _ = StartPerformanceOperation($"UpdateBattle_{battleId}");
+                    
+                    UpdateBattleProgress(battleData, deltaTime);
+                    CheckPhaseTransitions(battleData);
+                    UpdateBattlePerformance(battleId, deltaTime);
+                    
+                    // Update battle data
+                    _activeBattles[battleId] = battleData;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Failed to update battle {battleId}: {ex.Message}", ex);
+            }
+        }
+        
+        #endregion
+        
+        #region Battle Management
+        
+        protected virtual IPMBattleData CreateBattleData(IPMBattleConfiguration config)
+        {
+            return new IPMBattleData
+            {
+                BattleId = Guid.NewGuid().ToString(),
+                BattleName = $"IPM Battle {DateTime.Now:yyyy-MM-dd HH:mm}",
+                PrimaryThreat = GetPrimaryThreat(config),
+                SecondaryThreats = GetSecondaryThreats(config),
+                Difficulty = config.Difficulty,
+                CurrentPhase = IPMBattlePhase.Preparation,
+                BattleProgress = 0f,
+                StartTime = DateTime.Now,
+                Duration = TimeSpan.Zero,
+                FacilityLocation = GetBattleLocation(),
+                ParticipantIds = GetParticipantIds(config),
+                PlayerScores = new Dictionary<string, float>(),
+                Result = null, // Will be updated during battle
+                IsMultiplayer = config.AllowMultiplayer && config.MaxPlayers > 1,
+                FacilityId = GetFacilityId()
+            };
+        }
+        
+        protected virtual bool ValidateBattleConfiguration(IPMBattleData battleData)
+        {
+            if (string.IsNullOrEmpty(battleData.BattleId))
+            {
+                Debug.LogError($"[{_systemId}] Invalid battle configuration - missing BattleId");
+                return false;
+            }
+            
+            if (battleData.ParticipantIds == null || !battleData.ParticipantIds.Any())
+            {
+                Debug.LogError($"[{_systemId}] Invalid battle configuration - no participants");
+                return false;
+            }
+            
+            return ValidateBattleConfigurationSpecific(battleData);
+        }
+        
+        protected virtual void UpdateBattleProgress(IPMBattleData battleData, float deltaTime)
+        {
+            // Update battle progress based on elapsed time and objectives
+            var elapsedTime = DateTime.Now - battleData.StartTime;
+            var maxDuration = TimeSpan.FromSeconds(_ipmConfig?.BattleDuration ?? 300f);
+            
+            battleData.BattleProgress = Math.Min(1f, (float)(elapsedTime.TotalSeconds / maxDuration.TotalSeconds));
+            battleData.Duration = elapsedTime;
+            
+            // Update battle-specific progress
+            UpdateBattleProgressSpecific(battleData, deltaTime);
+        }
+        
+        protected virtual void CheckPhaseTransitions(IPMBattleData battleData)
+        {
+            var currentPhase = _battlePhases.GetValueOrDefault(battleData.BattleId, IPMBattlePhase.Preparation);
+            var newPhase = CalculateNewPhase(battleData, currentPhase);
+            
+            if (newPhase != currentPhase)
+            {
+                TransitionBattlePhase(battleData.BattleId, currentPhase, newPhase);
+            }
+        }
+        
+        protected virtual IPMBattlePhase CalculateNewPhase(IPMBattleData battleData, IPMBattlePhase currentPhase)
+        {
+            // Default phase progression based on battle progress
+            return battleData.BattleProgress switch
+            {
+                < 0.1f => IPMBattlePhase.Preparation,
+                < 0.3f => IPMBattlePhase.EarlyInvasion,
+                < 0.7f => IPMBattlePhase.MainAssault,
+                < 0.9f => IPMBattlePhase.FinalWave,
+                _ => currentPhase == IPMBattlePhase.FinalWave ? 
+                     (battleData.Result?.Outcome == IPMBattleOutcome.Victory ? IPMBattlePhase.Victory : IPMBattlePhase.Defeat) : 
+                     IPMBattlePhase.Cleanup
+            };
+        }
+        
+        protected virtual void TransitionBattlePhase(string battleId, IPMBattlePhase fromPhase, IPMBattlePhase toPhase)
+        {
+            _battlePhases[battleId] = toPhase;
+            
+            if (_activeBattles.TryGetValue(battleId, out var battleData))
+            {
+                battleData.CurrentPhase = toPhase;
+                _activeBattles[battleId] = battleData;
+            }
+            
+            OnBattlePhaseTransition(battleId, fromPhase, toPhase);
+            OnBattlePhaseChanged?.Invoke(toPhase);
+            
+            if (_enableBattleLogging)
+            {
+                Debug.Log($"[{_systemId}] Battle {battleId} phase transition: {fromPhase} -> {toPhase}");
+            }
+        }
+        
+        protected virtual void UpdateBattlePerformance(string battleId, float deltaTime)
+        {
+            if (_battlePerformance.TryGetValue(battleId, out var performance))
+            {
+                performance.UpdateCount++;
+                performance.TotalUpdateTime += deltaTime;
+                performance.LastUpdateTime = DateTime.Now;
+                performance.AverageUpdateTime = performance.TotalUpdateTime / performance.UpdateCount;
+                
+                _battlePerformance[battleId] = performance;
+            }
+        }
+        
+        #endregion
+        
+        #region System-Specific Updates
+        
+        protected override void UpdateSystemSpecific(float deltaTime)
+        {
+            if (Time.time - _lastBattleUpdateTime >= _battleUpdateInterval)
+            {
+                UpdateActiveBattles(deltaTime);
+                ProcessBattleCompletions();
+                _lastBattleUpdateTime = Time.time;
+            }
+        }
+        
+        protected virtual void UpdateActiveBattles(float deltaTime)
+        {
+            var battlesToUpdate = _activeBattles.Keys.ToList();
+            
+            foreach (var battleId in battlesToUpdate)
+            {
+                UpdateBattle(battleId, deltaTime);
+                
+                // Check for battle completion
+                if (ShouldCompleteBattle(battleId))
+                {
+                    _battleCompletionQueue.Enqueue(battleId);
+                }
+            }
+        }
+        
+        protected virtual void ProcessBattleCompletions()
+        {
+            while (_battleCompletionQueue.Count > 0)
+            {
+                var battleId = _battleCompletionQueue.Dequeue();
+                if (_activeBattles.TryGetValue(battleId, out var battleData))
+                {
+                    var result = DetermineBattleResult(battleData);
+                    EndBattle(battleId, result);
+                }
+            }
+        }
+        
+        protected virtual bool ShouldCompleteBattle(string battleId)
+        {
+            if (!_activeBattles.TryGetValue(battleId, out var battleData))
+                return true; // Battle doesn't exist, should be removed
+            
+            // Check for time limit
+            var maxDuration = TimeSpan.FromSeconds(_ipmConfig?.BattleDuration ?? 300f);
+            if (battleData.Duration >= maxDuration)
+                return true;
+            
+            // Check for victory/defeat conditions
+            var currentPhase = _battlePhases.GetValueOrDefault(battleId);
+            if (currentPhase == IPMBattlePhase.Victory || currentPhase == IPMBattlePhase.Defeat)
+                return true;
+            
+            return ShouldCompleteBattleSpecific(battleData);
+        }
+        
+        protected virtual IPMBattleOutcome DetermineBattleResult(IPMBattleData battleData)
+        {
+            var currentPhase = _battlePhases.GetValueOrDefault(battleData.BattleId);
+            
+            return currentPhase switch
+            {
+                IPMBattlePhase.Victory => IPMBattleOutcome.Victory,
+                IPMBattlePhase.Defeat => IPMBattleOutcome.Defeat,
+                _ => battleData.BattleProgress >= 1f ? IPMBattleOutcome.Timeout : IPMBattleOutcome.Defeat
+            };
+        }
+        
+        #endregion
+        
+        #region Abstract/Virtual Methods for Specialization
+        
+        /// <summary>
+        /// System-specific battle configuration validation. Override for custom validation.
+        /// </summary>
+        protected virtual bool ValidateBattleConfigurationSpecific(IPMBattleData battleData) => true;
+        
+        /// <summary>
+        /// System-specific battle progress updates. Override for custom progress tracking.
+        /// </summary>
+        protected virtual void UpdateBattleProgressSpecific(IPMBattleData battleData, float deltaTime) { }
+        
+        /// <summary>
+        /// System-specific battle completion checks. Override for custom completion logic.
+        /// </summary>
+        protected virtual bool ShouldCompleteBattleSpecific(IPMBattleData battleData) => false;
+        
+        /// <summary>
+        /// Called when a battle starts. Override for custom initialization.
+        /// </summary>
+        protected virtual void OnBattleStartedInternal(IPMBattleData battleData) { }
+        
+        /// <summary>
+        /// Called when a battle ends. Override for custom cleanup.
+        /// </summary>
+        protected virtual void OnBattleEndedInternal(IPMBattleData battleData) { }
+        
+        /// <summary>
+        /// Called during battle phase transitions. Override for custom phase handling.
+        /// </summary>
+        protected virtual void OnBattlePhaseTransition(string battleId, IPMBattlePhase fromPhase, IPMBattlePhase toPhase) { }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        protected virtual PestType GetPrimaryThreat(IPMBattleConfiguration config)
+        {
+            return config.EnabledPests?.FirstOrDefault() ?? PestType.Aphids;
+        }
+        
+        protected virtual List<PestType> GetSecondaryThreats(IPMBattleConfiguration config)
+        {
+            return config.EnabledPests?.Skip(1).ToList() ?? new List<PestType>();
+        }
+        
+        protected virtual Vector3 GetBattleLocation()
+        {
+            // Default implementation - override for facility-specific locations
+            return Vector3.zero;
+        }
+        
+        protected virtual List<string> GetParticipantIds(IPMBattleConfiguration config)
+        {
+            // Default implementation - override for multiplayer support
+            return new List<string> { "Player1" };
+        }
+        
+        protected virtual string GetFacilityId()
+        {
+            // Default implementation - override for facility integration
+            return "DefaultFacility";
+        }
+        
+        protected override Dictionary<string, float> GetSubSystemPerformance()
+        {
+            var baseMetrics = base.GetSubSystemPerformance();
+            
+            baseMetrics["ActiveBattles"] = _activeBattles.Count;
+            baseMetrics["BattleUpdateInterval"] = _battleUpdateInterval;
+            baseMetrics["AverageBattleDuration"] = CalculateAverageBattleDuration();
+            baseMetrics["BattleCompletionRate"] = CalculateBattleCompletionRate();
+            
+            return baseMetrics;
+        }
+        
+        private float CalculateAverageBattleDuration()
+        {
+            if (!_battlePerformance.Any()) return 0f;
+            
+            return (float)_battlePerformance.Values
+                .Where(p => p.UpdateCount > 0)
+                .Select(p => p.TotalUpdateTime)
+                .DefaultIfEmpty(0f)
+                .Average();
+        }
+        
+        private float CalculateBattleCompletionRate()
+        {
+            // This would require tracking completed battles over time
+            // For now, return a placeholder based on active battles
+            return _activeBattles.Count > 0 ? 1f : 0f;
+        }
+        
+        #endregion
+        
+        #region Cleanup
+        
+        protected override void CleanupSystemSpecific()
+        {
+            // End all active battles
+            var battleIds = _activeBattles.Keys.ToList();
+            foreach (var battleId in battleIds)
+            {
+                EndBattle(battleId, IPMBattleOutcome.Abandoned);
+            }
+            
+            _activeBattles.Clear();
+            _battlePhases.Clear();
+            _battleStartTimes.Clear();
+            _battlePerformance.Clear();
+            _battleCompletionQueue.Clear();
+        }
+        
+        #endregion
+        
+        #region Performance Data Structure
+        
+        [Serializable]
+        protected struct BattlePerformanceData
+        {
+            public int UpdateCount;
+            public float TotalUpdateTime;
+            public float AverageUpdateTime;
+            public DateTime LastUpdateTime;
+            
+            public BattlePerformanceData(int updateCount = 0)
+            {
+                UpdateCount = updateCount;
+                TotalUpdateTime = 0f;
+                AverageUpdateTime = 0f;
+                LastUpdateTime = DateTime.Now;
+            }
+        }
+        
+        #endregion
+    }
+}

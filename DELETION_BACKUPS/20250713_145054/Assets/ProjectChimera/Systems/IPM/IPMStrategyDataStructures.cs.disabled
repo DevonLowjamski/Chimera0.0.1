@@ -1,0 +1,754 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Supporting data structures and helper classes for the IPM Strategy Optimization System.
+    /// Defines specialized classes for AI decision making, strategy optimization, machine learning models,
+    /// and performance analytics to support advanced strategic planning and intelligent automation.
+    /// </summary>
+    
+    #region Strategy Management
+    
+    [Serializable]
+    public class StrategyState
+    {
+        public string StrategyId;
+        public StrategyData StrategyData;
+        public bool IsActive;
+        public float CurrentEffectiveness;
+        public float ResourcesAllocated;
+        public float ResourcesUsed;
+        public DateTime ActivationTime;
+        public DateTime? DeactivationTime;
+        public float EstimatedDuration;
+        public float ActualDuration;
+        public bool IsCompleted;
+        public StrategyStatus Status;
+        public List<StrategyMilestone> Milestones = new List<StrategyMilestone>();
+        public Dictionary<string, object> Parameters = new Dictionary<string, object>();
+        public StrategyOutcome Outcome;
+    }
+    
+    public enum StrategyStatus
+    {
+        Planned,
+        Activating,
+        Active,
+        Optimizing,
+        Completing,
+        Completed,
+        Failed,
+        Cancelled
+    }
+    
+    [Serializable]
+    public class StrategyProfile
+    {
+        public StrategyType StrategyType;
+        public float BaseEffectiveness;
+        public ResourceRequirements ResourceRequirements;
+        public float TimeToImplement;
+        public RiskLevel RiskLevel;
+        public ComplexityLevel Complexity;
+        public float EnvironmentalDependency;
+        public List<StrategyType> CompatibleStrategies;
+        public List<StrategyType> ConflictingStrategies;
+        public Dictionary<string, float> ParameterRanges;
+        public List<string> Prerequisites;
+        public EffectivenessFactors EffectivenessFactors;
+    }
+    
+    [Serializable]
+    public class ResourceRequirements
+    {
+        public float MaterialCost;
+        public float LaborHours;
+        public float EnergyCost;
+        public float EquipmentCost;
+        public List<string> RequiredEquipment;
+        public List<string> RequiredSkills;
+        public float MaintenanceCost;
+        public float OngoingCosts;
+    }
+    
+    public enum RiskLevel
+    {
+        VeryLow,
+        Low,
+        Medium,
+        High,
+        VeryHigh
+    }
+    
+    public enum ComplexityLevel
+    {
+        Simple,
+        Moderate,
+        Complex,
+        VeryComplex,
+        Expert
+    }
+    
+    [Serializable]
+    public class EffectivenessFactors
+    {
+        public Dictionary<EnvironmentalFactor, float> EnvironmentalModifiers;
+        public Dictionary<string, float> SeasonalModifiers;
+        public Dictionary<PestType, float> PestSpecificModifiers;
+        public float ExperienceModifier;
+        public float EquipmentQualityModifier;
+        public float TimingModifier;
+    }
+    
+    public enum EnvironmentalFactor
+    {
+        Temperature,
+        Humidity,
+        LightIntensity,
+        AirFlow,
+        CO2Level,
+        pH,
+        Nutrients
+    }
+    
+    #endregion
+    
+    #region Strategy Recommendation
+    
+    [Serializable]
+    public class StrategyRecommendation
+    {
+        public StrategyData StrategyData;
+        public float RecommendationScore;
+        public float ConfidenceLevel;
+        public string Reasoning;
+        public List<string> Advantages;
+        public List<string> Disadvantages;
+        public List<string> Prerequisites;
+        public EstimatedOutcome EstimatedOutcome;
+        public RiskAssessment RiskAssessment;
+        public List<AlternativeStrategy> Alternatives;
+        public RecommendationSource Source;
+    }
+    
+    public enum RecommendationSource
+    {
+        AIAnalysis,
+        PatternMatching,
+        ExpertSystem,
+        MachineLearning,
+        HistoricalData,
+        UserPreference,
+        Hybrid
+    }
+    
+    [Serializable]
+    public class EstimatedOutcome
+    {
+        public float ExpectedEffectiveness;
+        public float EffectivenessRange;
+        public float ExpectedCost;
+        public float CostRange;
+        public float ExpectedDuration;
+        public float DurationRange;
+        public float SuccessProbability;
+        public List<string> PotentialBenefits;
+        public List<string> PotentialRisks;
+    }
+    
+    [Serializable]
+    public class RiskAssessment
+    {
+        public RiskLevel OverallRisk;
+        public Dictionary<string, RiskFactor> RiskFactors;
+        public List<string> MitigationStrategies;
+        public float RiskTolerance;
+        public List<string> ContingencyPlans;
+    }
+    
+    [Serializable]
+    public class RiskFactor
+    {
+        public string Name;
+        public RiskLevel Level;
+        public float Probability;
+        public float Impact;
+        public string Description;
+        public List<string> Indicators;
+        public List<string> MitigationOptions;
+    }
+    
+    [Serializable]
+    public class AlternativeStrategy
+    {
+        public StrategyType StrategyType;
+        public float Score;
+        public string ComparisonReason;
+        public Dictionary<string, float> ComparisonMetrics;
+    }
+    
+    [Serializable]
+    public class SituationAnalysis
+    {
+        public float ProblemSeverity;
+        public ResourceAvailability ResourceAvailability;
+        public EnvironmentalAnalysis EnvironmentalFactors;
+        public TimeConstraints TimeConstraints;
+        public List<RiskFactor> RiskFactors;
+        public HistoricalAnalysis PreviousSuccesses;
+        public List<PatternMatch> PatternMatches;
+        public float UrgencyLevel;
+        public float ComplexityAssessment;
+    }
+    
+    [Serializable]
+    public class ResourceAvailability
+    {
+        public float AvailableBudget;
+        public float LaborAvailability;
+        public Dictionary<string, float> EquipmentAvailability;
+        public Dictionary<string, float> MaterialAvailability;
+        public float TimeAvailability;
+        public List<string> Constraints;
+    }
+    
+    [Serializable]
+    public class EnvironmentalAnalysis
+    {
+        public Dictionary<EnvironmentalFactor, float> CurrentConditions;
+        public Dictionary<EnvironmentalFactor, float> OptimalConditions;
+        public Dictionary<EnvironmentalFactor, float> DeviationSeverity;
+        public WeatherForecast WeatherPrediction;
+        public List<string> EnvironmentalChallenges;
+    }
+    
+    [Serializable]
+    public class WeatherForecast
+    {
+        public List<DailyWeather> Forecast;
+        public float ConfidenceLevel;
+        public List<string> SignificantEvents;
+    }
+    
+    [Serializable]
+    public class DailyWeather
+    {
+        public DateTime Date;
+        public float Temperature;
+        public float Humidity;
+        public float Precipitation;
+        public float WindSpeed;
+        public string Conditions;
+    }
+    
+    [Serializable]
+    public class TimeConstraints
+    {
+        public DateTime Deadline;
+        public float AvailableTimeHours;
+        public List<string> ScheduleConflicts;
+        public Dictionary<string, DateTime> Milestones;
+        public bool IsUrgent;
+        public float FlexibilityFactor;
+    }
+    
+    [Serializable]
+    public class HistoricalAnalysis
+    {
+        public List<HistoricalStrategy> SimilarCases;
+        public float AverageSuccessRate;
+        public Dictionary<StrategyType, float> StrategyPerformance;
+        public List<string> LessonsLearned;
+        public List<string> SuccessFactors;
+        public List<string> FailureFactors;
+    }
+    
+    [Serializable]
+    public class HistoricalStrategy
+    {
+        public StrategyType StrategyType;
+        public float Effectiveness;
+        public float Cost;
+        public float Duration;
+        public bool WasSuccessful;
+        public SimilarityScore SimilarityToCurrentSituation;
+        public string Context;
+    }
+    
+    [Serializable]
+    public class SimilarityScore
+    {
+        public float OverallSimilarity;
+        public Dictionary<string, float> FactorSimilarities;
+        public float ConfidenceLevel;
+    }
+    
+    [Serializable]
+    public class PatternMatch
+    {
+        public string PatternName;
+        public float MatchScore;
+        public List<string> MatchingFeatures;
+        public StrategyRecommendation RecommendedResponse;
+        public float HistoricalSuccessRate;
+        public string PatternDescription;
+    }
+    
+    #endregion
+    
+    #region Optimization
+    
+    [Serializable]
+    public class OptimizationObjectives
+    {
+        public OptimizationObjective PrimaryObjective;
+        public List<OptimizationObjective> SecondaryObjectives;
+        public Dictionary<string, float> ObjectiveWeights;
+        public List<string> Constraints;
+        public float AcceptableTradeoffThreshold;
+    }
+    
+    [Serializable]
+    public class OptimizationObjective
+    {
+        public OptimizationType OptimizationType;
+        public string Name;
+        public string ObjectiveName;
+        public float TargetValue;
+        public float Weight;
+        public float Priority;
+        public bool IsConstraint;
+        public float MinimumAcceptableValue;
+        public float MaximumAcceptableValue;
+        public string MeasurementUnit;
+    }
+    
+    public enum OptimizationType
+    {
+        Maximize,
+        Minimize,
+        Target,
+        Effectiveness,
+        ResourceEfficiency,
+        Speed,
+        RiskMinimization,
+        CostMinimization,
+        QualityMaximization
+    }
+    
+    [Serializable]
+    public class OptimizationResult
+    {
+        public bool Success;
+        public string Message;
+        public Dictionary<string, float> OptimizedParameters;
+        public float ObjectiveValue;
+        public Dictionary<string, float> ObjectiveBreakdown;
+        public int IterationsUsed;
+        public float ConvergenceScore;
+        public OptimizationMethod MethodUsed;
+        public TimeSpan OptimizationTime;
+        public float ImprovementPercent;
+        public List<string> OptimizationSteps;
+    }
+    
+    public enum OptimizationMethod
+    {
+        GeneticAlgorithm,
+        SimulatedAnnealing,
+        ParticleSwarm,
+        GradientDescent,
+        MultiObjective,
+        Hybrid,
+        Heuristic
+    }
+    
+    [Serializable]
+    public class CandidateStrategy
+    {
+        public StrategyType StrategyType;
+        public float ApplicabilityScore;
+        public float EstimatedEffectiveness;
+        public float ResourceCost;
+        public float ImplementationTime;
+        public RiskLevel RiskLevel;
+        public Dictionary<string, float> Parameters;
+        public List<string> RequiredConditions;
+        public float NoveltyScore;
+        public bool IsHybridStrategy;
+        public List<StrategyType> ComponentStrategies;
+    }
+    
+    #endregion
+    
+    #region AI and Machine Learning
+    
+    [Serializable]
+    public class DecisionContext
+    {
+        public IPMProblemContext ProblemContext;
+        public List<StrategyOption> AvailableOptions;
+        public ResourceConstraints ResourceConstraints;
+        public TimeConstraints TimeConstraints;
+        public float RiskTolerance;
+        public Dictionary<string, float> Preferences;
+        public HistoricalContext HistoricalContext;
+        public EnvironmentalContext EnvironmentalContext;
+    }
+    
+    [Serializable]
+    public class StrategyOption
+    {
+        public StrategyType StrategyType;
+        public Dictionary<string, float> Parameters;
+        public float EstimatedOutcome;
+        public float Confidence;
+        public List<string> Prerequisites;
+        public float ResourceRequirement;
+        public float TimeRequirement;
+    }
+    
+    [Serializable]
+    public class ResourceConstraints
+    {
+        public float MaxBudget;
+        public float MaxTimeHours;
+        public Dictionary<string, float> MaxResources;
+        public List<string> UnavailableEquipment;
+        public List<string> SkillLimitations;
+    }
+    
+    [Serializable]
+    public class HistoricalContext
+    {
+        public List<PreviousDecision> RecentDecisions;
+        public Dictionary<StrategyType, PerformanceRecord> StrategyHistory;
+        public float UserExperienceLevel;
+        public List<string> LearnedPreferences;
+        public List<string> AvoidedStrategies;
+    }
+    
+    [Serializable]
+    public class PreviousDecision
+    {
+        public DateTime DecisionTime;
+        public StrategyType ChosenStrategy;
+        public DecisionOutcome Outcome;
+        public float UserSatisfaction;
+        public List<string> LessonsLearned;
+        public bool WouldChooseAgain;
+    }
+    
+    [Serializable]
+    public class EnvironmentalContext
+    {
+        public Dictionary<EnvironmentalFactor, float> CurrentConditions;
+        public Dictionary<EnvironmentalFactor, float> ForecastedConditions;
+        public List<string> EnvironmentalChallenges;
+        public SeasonalContext SeasonalContext;
+        public WeatherPattern WeatherPattern;
+    }
+    
+    [Serializable]
+    public class SeasonalContext
+    {
+        public string CurrentSeason;
+        public float SeasonProgress; // 0-1
+        public Dictionary<string, float> SeasonalFactors;
+        public List<string> SeasonalChallenges;
+        public List<string> SeasonalOpportunities;
+    }
+    
+    [Serializable]
+    public class WeatherPattern
+    {
+        public string PatternType;
+        public float Confidence;
+        public List<WeatherEvent> ExpectedEvents;
+        public float Stability;
+        public List<string> Implications;
+    }
+    
+    [Serializable]
+    public class WeatherEvent
+    {
+        public DateTime ExpectedTime;
+        public string EventType;
+        public float Severity;
+        public float Probability;
+        public List<string> Impacts;
+    }
+    
+    [Serializable]
+    public class DecisionResult
+    {
+        public bool Success;
+        public StrategyType RecommendedStrategy;
+        public Dictionary<string, float> RecommendedParameters;
+        public float Confidence;
+        public string Reasoning;
+        public List<string> Considerations;
+        public List<AlternativeStrategy> Alternatives;
+        public RiskAssessment RiskAssessment;
+        public string Message;
+        public DecisionMetadata Metadata;
+    }
+    
+    [Serializable]
+    public class DecisionMetadata
+    {
+        public DateTime DecisionTime;
+        public string DecisionMethod;
+        public float ProcessingTimeMs;
+        public Dictionary<string, float> ModelConfidences;
+        public List<string> DataSources;
+        public string ModelVersion;
+        public float UncertaintyLevel;
+    }
+    
+    [Serializable]
+    public class MLModel
+    {
+        public string ModelName;
+        public string ModelType;
+        public float Accuracy;
+        public DateTime LastTrained;
+        public int TrainingDataSize;
+        public Dictionary<string, float> Parameters;
+        public ModelMetrics Metrics;
+        public string Version;
+        public bool IsActive;
+    }
+    
+    [Serializable]
+    public class ModelMetrics
+    {
+        public float Precision;
+        public float Recall;
+        public float F1Score;
+        public float AUC;
+        public float RMSE;
+        public float MAE;
+        public Dictionary<string, float> CustomMetrics;
+        public DateTime LastEvaluated;
+    }
+    
+    [Serializable]
+    public class NeuralNetworkArchitecture
+    {
+        public int InputSize;
+        public List<int> HiddenLayers;
+        public int OutputSize;
+        public string ActivationFunction;
+        public float LearningRate;
+        public float DropoutRate;
+        public string Optimizer;
+        public int BatchSize;
+        public int Epochs;
+    }
+    
+    #endregion
+    
+    #region Performance and Analytics
+    
+    [Serializable]
+    public class StrategyMetrics
+    {
+        public int TotalActiveStrategies;
+        public float AverageEffectiveness;
+        public float ResourceUtilization;
+        public float OptimizationAccuracy;
+        public float LearningProgress;
+        public Dictionary<StrategyType, PerformanceMetrics> StrategyPerformance;
+        public AISystemMetrics AIMetrics;
+        public DateTime LastUpdated;
+        public float SystemHealthScore;
+    }
+    
+    [Serializable]
+    public class PerformanceMetrics
+    {
+        public float AverageEffectiveness;
+        public float SuccessRate;
+        public float AverageCost;
+        public float AverageDuration;
+        public int TotalExecutions;
+        public float TrendDirection; // -1 to 1
+        public DateTime LastExecution;
+        public float ReliabilityScore;
+    }
+    
+    [Serializable]
+    public class AISystemMetrics
+    {
+        public float ModelAccuracy;
+        public float PredictionConfidence;
+        public float LearningRate;
+        public float DecisionSpeed;
+        public int TotalDecisions;
+        public float UserSatisfactionScore;
+        public Dictionary<string, float> ModelPerformance;
+        public float AdaptationScore;
+    }
+    
+    [Serializable]
+    public class PerformanceTracker
+    {
+        public List<PerformanceDataPoint> DataPoints;
+        public float MovingAverage;
+        public float Trend;
+        public float Variance;
+        public DateTime StartTime;
+        public float BestPerformance;
+        public float WorstPerformance;
+        public int WindowSize;
+    }
+    
+    [Serializable]
+    public class PerformanceDataPoint
+    {
+        public DateTime Timestamp;
+        public float Value;
+        public Dictionary<string, object> Context;
+        public string Notes;
+    }
+    
+    [Serializable]
+    public class StrategyPerformanceRecord
+    {
+        public StrategyType StrategyType;
+        public List<StrategyExecution> Executions;
+        public float AveragePerformance;
+        public float SuccessRate;
+        public Dictionary<string, float> PerformanceByContext;
+        public List<string> SuccessFactors;
+        public List<string> FailureFactors;
+        public TrendAnalysis Trend;
+    }
+    
+    [Serializable]
+    public class StrategyExecution
+    {
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public float Effectiveness;
+        public float Cost;
+        public bool WasSuccessful;
+        public Dictionary<string, float> Parameters;
+        public ExecutionContext Context;
+        public StrategyOutcome Outcome;
+        public List<string> Notes;
+    }
+    
+    [Serializable]
+    public class ExecutionContext
+    {
+        public Dictionary<EnvironmentalFactor, float> EnvironmentalConditions;
+        public ResourceAvailability ResourcesAvailable;
+        public float UserExperienceLevel;
+        public string Season;
+        public List<string> ConcurrentStrategies;
+        public Dictionary<string, object> CustomContext;
+    }
+    
+    [Serializable]
+    public class StrategyOutcome
+    {
+        public float EffectivenessAchieved;
+        public float ResourcesUsed;
+        public float TimeToComplete;
+        public bool GoalsAchieved;
+        public List<string> UnexpectedResults;
+        public List<string> SideEffects;
+        public float UserSatisfaction;
+        public List<Metric> Metrics;
+    }
+    
+    [Serializable]
+    public class Metric
+    {
+        public string Name;
+        public float Value;
+        public string Unit;
+        public float TargetValue;
+        public bool TargetAchieved;
+        public float PercentOfTarget;
+    }
+    
+    [Serializable]
+    public class TrendAnalysis
+    {
+        public float TrendSlope;
+        public float TrendDirection; // -1 declining, 0 stable, 1 improving
+        public float ConfidenceLevel;
+        public int DataPoints;
+        public DateTime AnalysisDate;
+        public string TrendDescription;
+        public List<string> TrendFactors;
+    }
+    
+    [Serializable]
+    public class StrategyMilestone
+    {
+        public string Name;
+        public DateTime TargetDate;
+        public DateTime? CompletionDate;
+        public bool IsCompleted;
+        public float Progress; // 0-1
+        public List<string> Requirements;
+        public string Description;
+        public MilestoneType Type;
+    }
+    
+    public enum MilestoneType
+    {
+        Planning,
+        Preparation,
+        Implementation,
+        Monitoring,
+        Evaluation,
+        Completion
+    }
+    
+    #endregion
+    
+    #region Supporting Systems
+    
+    [Serializable]
+    public class StrategyUpdateScheduler
+    {
+        public float StrategyUpdateInterval;
+        public float OptimizationInterval;
+        public DateTime LastStrategyUpdate;
+        public DateTime LastOptimizationUpdate;
+        public List<ScheduledUpdate> ScheduledUpdates;
+        public bool IsActive;
+    }
+    
+    [Serializable]
+    public class ScheduledUpdate
+    {
+        public DateTime ScheduledTime;
+        public UpdateType UpdateType;
+        public string TargetSystem;
+        public Dictionary<string, object> Parameters;
+        public bool IsCompleted;
+    }
+    
+    public enum UpdateType
+    {
+        StrategyUpdate,
+        OptimizationUpdate,
+        PerformanceUpdate,
+        LearningUpdate,
+        ModelUpdate,
+        DataSync
+    }
+    
+    #endregion
+}

@@ -1,0 +1,30 @@
+{
+    "name": "ProjectChimera.UI",
+    "rootNamespace": "ProjectChimera.UI",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Community",
+        "ProjectChimera.Events",
+        "ProjectChimera.Systems.Effects",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Systems.Progression",
+        "ProjectChimera.Systems.Events",
+        "ProjectChimera.Systems.Competition",
+        "ProjectChimera.Systems.Narrative",
+        "ProjectChimera.Systems.IPM",
+        "ProjectChimera.Systems.Equipment",
+        "ProjectChimera.Systems.Genetics",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

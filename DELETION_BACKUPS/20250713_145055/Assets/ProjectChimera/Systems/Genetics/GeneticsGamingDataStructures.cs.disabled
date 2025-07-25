@@ -1,0 +1,1316 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using ProjectChimera.Data;
+
+namespace ProjectChimera.Systems.Genetics.Gaming
+{
+    /// <summary>
+    /// Enhanced gaming data structures for Project Chimera's sophisticated genetics system.
+    /// Combines world-class scientific genetics with innovative gaming mechanics for
+    /// an entertaining and educational cannabis cultivation experience.
+    /// </summary>
+
+    #region Breeding Challenges & Puzzles
+
+    [Serializable]
+    public class BreedingChallenge
+    {
+        public string ChallengeId = Guid.NewGuid().ToString();
+        public string ChallengeName = "";
+        public string Description = "";
+        public DifficultyLevel Difficulty = DifficultyLevel.Beginner;
+        
+        [Header("Challenge Parameters")]
+        public List<TargetTrait> RequiredTraits = new List<TargetTrait>();
+        public List<string> AvailableParentStrains = new List<string>();
+        public int MaxGenerations = 5;
+        public int MaxAttempts = 10;
+        public float TimeLimit = 300f; // 5 minutes
+        
+        [Header("Scoring & Rewards")]
+        public int BasePoints = 100;
+        public float AccuracyMultiplier = 2f;
+        public float SpeedBonus = 1.5f;
+        public List<string> UnlockableRewards = new List<string>();
+        public List<string> AchievementTriggers = new List<string>();
+        
+        [Header("Educational Elements")]
+        public List<string> LearningObjectives = new List<string>();
+        public string ScientificExplanation = "";
+        public List<string> RealWorldApplications = new List<string>();
+    }
+
+    [Serializable]
+    public class TargetTrait
+    {
+        public string TraitName = "";
+        public float TargetValue = 0.5f;
+        public float ToleranceRange = 0.05f;
+        public bool IsRequired = true;
+        public int Priority = 1; // 1 = highest priority
+        public string TraitCategory = ""; // "Cannabinoids", "Terpenes", "Morphology", etc.
+    }
+
+    [Serializable]
+    public class BreedingAttempt
+    {
+        public string AttemptId = Guid.NewGuid().ToString();
+        public string ChallengeId = "";
+        public string PlayerId = "";
+        public DateTime StartTime = DateTime.Now;
+        public DateTime? EndTime = null;
+        
+        public List<BreedingStep> BreedingSteps = new List<BreedingStep>();
+        public BreedingResult FinalResult = null;
+        public int GenerationsUsed = 0;
+        public float AccuracyScore = 0f;
+        public float SpeedScore = 0f;
+        public int TotalPoints = 0;
+        
+        public bool IsCompleted = false;
+        public bool WasSuccessful = false;
+        public string FailureReason = "";
+    }
+
+    [Serializable]
+    public class BreedingStep
+    {
+        public int Generation = 1;
+        public string Parent1Id = "";
+        public string Parent2Id = "";
+        public string OffspringId = "";
+        public Dictionary<string, float> PredictedTraits = new Dictionary<string, float>();
+        public Dictionary<string, float> ActualTraits = new Dictionary<string, float>();
+        public float StepAccuracy = 0f;
+        public string PlayerReasoning = ""; // Why player chose these parents
+    }
+
+    #endregion
+
+    #region Sensory Training & Terpene Games
+
+    [Serializable]
+    public class SensoryTrainingSession
+    {
+        public string SessionId = Guid.NewGuid().ToString();
+        public string PlayerId = "";
+        public SensoryGameType GameType = SensoryGameType.TerpeneIdentification;
+        public DifficultyLevel Difficulty = DifficultyLevel.Beginner;
+        
+        [Header("Session Configuration")]
+        public List<string> TargetTerpenes = new List<string>();
+        public int NumberOfSamples = 5;
+        public float TimePerSample = 30f;
+        public bool AllowHints = true;
+        public bool ShowScientificNames = false;
+        
+        [Header("Progress Tracking")]
+        public List<SensoryChallenge> Challenges = new List<SensoryChallenge>();
+        public float OverallAccuracy = 0f;
+        public float AverageResponseTime = 0f;
+        public int CurrentStreak = 0;
+        public int LongestStreak = 0;
+        
+        [Header("Rewards & Progression")]
+        public int ExperienceGained = 0;
+        public List<string> UnlockedTerpenes = new List<string>();
+        public List<string> EarnedBadges = new List<string>();
+        public bool LevelUpAchieved = false;
+    }
+
+    [Serializable]
+    public class SensoryChallenge
+    {
+        public string ChallengeId = Guid.NewGuid().ToString();
+        public string TerpeneProfile = ""; // JSON serialized terpene data
+        public List<string> AnswerOptions = new List<string>();
+        public string CorrectAnswer = "";
+        public string PlayerAnswer = "";
+        
+        public DateTime PresentationTime = DateTime.Now;
+        public DateTime? ResponseTime = null;
+        public float ResponseDuration = 0f;
+        public bool IsCorrect = false;
+        public bool HintUsed = false;
+        
+        public string VisualDescription = "";
+        public List<string> AromaticDescriptors = new List<string>();
+        public string ScientificExplanation = "";
+    }
+
+    public enum SensoryGameType
+    {
+        TerpeneIdentification,
+        AromaticBlending,
+        ConcentrationDetection,
+        ProfileMatching,
+        NoveltyDetection,
+        QualityAssessment
+    }
+
+    #endregion
+
+    #region Competition & Tournament System
+
+    [Serializable]
+    public class GeneticsCompetition
+    {
+        public string CompetitionId = Guid.NewGuid().ToString();
+        public string CompetitionName = "";
+        public string Description = "";
+        public CompetitionType Type = CompetitionType.BreedingChallenge;
+        
+        [Header("Competition Settings")]
+        public DateTime StartDate = DateTime.Now.AddDays(1);
+        public DateTime EndDate = DateTime.Now.AddDays(8);
+        public DateTime RegistrationDeadline = DateTime.Now.AddHours(12);
+        public int MaxParticipants = 100;
+        public bool IsPublic = true;
+        public string RequiredSkillLevel = "Intermediate";
+        
+        [Header("Challenge Parameters")]
+        public CompetitionObjective Objective = null;
+        public List<string> AllowedStrains = new List<string>();
+        public Dictionary<string, object> Rules = new Dictionary<string, object>();
+        public List<string> BannedTechniques = new List<string>();
+        
+        [Header("Scoring & Prizes")]
+        public CompetitionScoring ScoringSystem = null;
+        public List<CompetitionPrize> Prizes = new List<CompetitionPrize>();
+        public Dictionary<string, float> CategoryWeights = new Dictionary<string, float>();
+        
+        [Header("Participants & Results")]
+        public List<CompetitionEntry> Entries = new List<CompetitionEntry>();
+        public List<CompetitionResult> Results = new List<CompetitionResult>();
+        public bool IsCompleted = false;
+        public DateTime? CompletionTime = null;
+    }
+
+    [Serializable]
+    public class CompetitionObjective
+    {
+        public string ObjectiveName = "";
+        public string Description = "";
+        public List<TargetTrait> RequiredTraits = new List<TargetTrait>();
+        public List<string> BonusObjectives = new List<string>();
+        public Dictionary<string, float> ScoringWeights = new Dictionary<string, float>();
+        public bool AllowInnovation = true;
+        public string ThemeCategory = ""; // "Medical", "Recreational", "Industrial", etc.
+    }
+
+    [Serializable]
+    public class CompetitionEntry
+    {
+        public string EntryId = Guid.NewGuid().ToString();
+        public string ParticipantId = "";
+        public string ParticipantName = "";
+        public string StrainName = "";
+        public string StrainId = "";
+        
+        public Dictionary<string, float> SubmittedTraits = new Dictionary<string, float>();
+        public List<string> BreedingLineage = new List<string>();
+        public string BreedingStrategy = "";
+        public string Innovation = "";
+        
+        public DateTime SubmissionTime = DateTime.Now;
+        public bool IsValidEntry = true;
+        public List<string> ValidationIssues = new List<string>();
+    }
+
+    [Serializable]
+    public class CompetitionResult
+    {
+        public string EntryId = "";
+        public string ParticipantName = "";
+        public int FinalRank = 0;
+        public float TotalScore = 0f;
+        
+        public Dictionary<string, float> CategoryScores = new Dictionary<string, float>();
+        public List<string> AwardsWon = new List<string>();
+        public string JudgeComments = "";
+        public bool ReceivedInnovationBonus = false;
+    }
+
+    public enum CompetitionType
+    {
+        BreedingChallenge,
+        InnovationContest,
+        SpeedBreeding,
+        TargetedTraits,
+        QualityMaximization,
+        CommunityChoice,
+        ScientificAccuracy
+    }
+
+    #endregion
+
+    #region Discovery & Innovation System
+
+    [Serializable]
+    public class GeneticDiscovery
+    {
+        public string DiscoveryId = Guid.NewGuid().ToString();
+        public string DiscovererPlayerId = "";
+        public string DiscoveryName = "";
+        public DiscoveryType Type = DiscoveryType.NovelCombination;
+        
+        [Header("Discovery Details")]
+        public string StrainId = "";
+        public Dictionary<string, float> NovelTraits = new Dictionary<string, float>();
+        public string GeneticMechanism = "";
+        public float RarityScore = 0f;
+        public float InnovationValue = 0f;
+        
+        [Header("Scientific Validation")]
+        public bool IsValidated = false;
+        public List<string> ValidationTests = new List<string>();
+        public string ScientificExplanation = "";
+        public List<string> PotentialApplications = new List<string>();
+        
+        [Header("Recognition & Rewards")]
+        public DateTime DiscoveryDate = DateTime.Now;
+        public int DiscoveryPoints = 0;
+        public List<string> AchievementsUnlocked = new List<string>();
+        public bool IsPubliclyShared = false;
+        public int CommunityVotes = 0;
+        public float CommunityRating = 0f;
+    }
+
+    [Serializable]
+    public class InnovationTracker
+    {
+        public string TrackerId = Guid.NewGuid().ToString();
+        public string PlayerId = "";
+        
+        public Dictionary<string, int> DiscoveryCount = new Dictionary<string, int>();
+        public List<string> RecentDiscoveries = new List<string>();
+        public float InnovationScore = 0f;
+        public int InnovationRank = 0;
+        
+        public List<string> SpecializationAreas = new List<string>();
+        public Dictionary<string, float> ExpertiseLevel = new Dictionary<string, float>();
+        public List<string> ResearchInterests = new List<string>();
+    }
+
+    public enum DiscoveryType
+    {
+        NovelCombination,
+        UnexpectedTrait,
+        HighRarityStrain,
+        ScientificBreakthrough,
+        MethodInnovation,
+        QualityRecord,
+        EfficiencyImprovement
+    }
+
+    #endregion
+
+    #region Progression & Achievement System
+
+    [Serializable]
+    public class GeneticsSkillProfile
+    {
+        public string PlayerId = "";
+        public int OverallLevel = 1;
+        public long TotalExperience = 0;
+        public long ExperienceToNextLevel = 1000;
+        
+        [Header("Skill Categories")]
+        public SkillCategory BreedingSkills = new SkillCategory();
+        public SkillCategory SensorySkills = new SkillCategory();
+        public SkillCategory ScientificKnowledge = new SkillCategory();
+        public SkillCategory InnovationAbility = new SkillCategory();
+        public SkillCategory CompetitionPerformance = new SkillCategory();
+        
+        [Header("Unlocked Abilities")]
+        public List<string> UnlockedTechniques = new List<string>();
+        public List<string> AvailableStrains = new List<string>();
+        public List<string> AccessibleEquipment = new List<string>();
+        public Dictionary<string, int> ResourceBonuses = new Dictionary<string, int>();
+        
+        [Header("Statistics")]
+        public PlayerStatistics Statistics = new PlayerStatistics();
+        public List<string> CompletedChallenges = new List<string>();
+        public List<string> WonCompetitions = new List<string>();
+        public List<string> MadeDiscoveries = new List<string>();
+    }
+
+    [Serializable]
+    public class SkillCategory
+    {
+        public string CategoryName = "";
+        public int Level = 1;
+        public long Experience = 0;
+        public long ExperienceToNext = 500;
+        
+        public List<string> LearnedTechniques = new List<string>();
+        public Dictionary<string, float> SubSkillLevels = new Dictionary<string, float>();
+        public List<string> AvailableUpgrades = new List<string>();
+        public float Mastery = 0f; // 0-1 scale
+    }
+
+    [Serializable]
+    public class PlayerStatistics
+    {
+        [Header("Breeding Statistics")]
+        public int TotalCrosses = 0;
+        public int SuccessfulBreeds = 0;
+        public float BreedingSuccessRate = 0f;
+        public int GenerationsCreated = 0;
+        public float AverageTraitAccuracy = 0f;
+        
+        [Header("Discovery Statistics")]
+        public int NovelCombinations = 0;
+        public int RareTraitFinds = 0;
+        public int InnovationPoints = 0;
+        public int SharedDiscoveries = 0;
+        
+        [Header("Competition Statistics")]
+        public int CompetitionsEntered = 0;
+        public int CompetitionsWon = 0;
+        public int PodiumFinishes = 0;
+        public float AverageCompetitionRank = 0f;
+        
+        [Header("Learning Statistics")]
+        public int ChallengesCompleted = 0;
+        public int TerpenesProficient = 0;
+        public float SensoryAccuracy = 0f;
+        public int HoursPlayed = 0;
+    }
+
+    [Serializable]
+    public class GeneticsAchievement
+    {
+        public string AchievementId = "";
+        public string Name = "";
+        public string Description = "";
+        public AchievementCategory Category = AchievementCategory.Breeding;
+        public DifficultyLevel Difficulty = DifficultyLevel.Beginner;
+        
+        public List<AchievementCriteria> Criteria = new List<AchievementCriteria>();
+        public bool IsHidden = false;
+        public bool IsRepeatable = false;
+        
+        public List<AchievementReward> Rewards = new List<AchievementReward>();
+        public string IconPath = "";
+        public string BadgePath = "";
+    }
+
+    [Serializable]
+    public class AchievementCriteria
+    {
+        public string CriteriaType = ""; // "StatisticThreshold", "SpecificAction", "Combination"
+        public Dictionary<string, object> Parameters = new Dictionary<string, object>();
+        public bool IsCompleted = false;
+        public float Progress = 0f;
+    }
+
+    public enum AchievementCategory
+    {
+        Breeding,
+        Discovery,
+        Competition,
+        Sensory,
+        Scientific,
+        Innovation,
+        Community,
+        Mastery
+    }
+
+    #endregion
+
+    #region Community & Social Features
+
+    [Serializable]
+    public class BreedingProject
+    {
+        public string ProjectId = Guid.NewGuid().ToString();
+        public string ProjectName = "";
+        public string Description = "";
+        public string CreatorId = "";
+        
+        [Header("Project Settings")]
+        public bool IsPublic = true;
+        public bool AllowCollaboration = true;
+        public int MaxCollaborators = 5;
+        public string RequiredSkillLevel = "Beginner";
+        
+        [Header("Project Goals")]
+        public List<TargetTrait> TargetTraits = new List<TargetTrait>();
+        public string ProjectObjective = "";
+        public DateTime TargetCompletion = DateTime.Now.AddDays(30);
+        public float ProgressPercentage = 0f;
+        
+        [Header("Collaboration")]
+        public List<string> CollaboratorIds = new List<string>();
+        public List<BreedingContribution> Contributions = new List<BreedingContribution>();
+        public Dictionary<string, string> SharedResources = new Dictionary<string, string>();
+        
+        [Header("Community Engagement")]
+        public int Followers = 0;
+        public int Likes = 0;
+        public List<string> Comments = new List<string>();
+        public float CommunityRating = 0f;
+        public bool IsFeatured = false;
+    }
+
+    [Serializable]
+    public class BreedingContribution
+    {
+        public string ContributorId = "";
+        public string ContributionType = ""; // "Strain", "Knowledge", "Analysis", "Testing"
+        public string Description = "";
+        public DateTime ContributionDate = DateTime.Now;
+        public float ContributionValue = 0f; // Calculated impact
+        public int VotesReceived = 0;
+    }
+
+    [Serializable]
+    public class StrainShare
+    {
+        public string ShareId = Guid.NewGuid().ToString();
+        public string StrainId = "";
+        public string StrainName = "";
+        public string SharerId = "";
+        public string SharerName = "";
+        
+        public string Description = "";
+        public List<string> BreedingNotes = new List<string>();
+        public Dictionary<string, float> TraitData = new Dictionary<string, float>();
+        public List<string> Photos = new List<string>();
+        
+        public bool IsPublic = true;
+        public bool AllowDownload = true;
+        public string LicenseType = "Creative Commons";
+        public List<string> UsageRestrictions = new List<string>();
+        
+        public int Downloads = 0;
+        public int Likes = 0;
+        public float Rating = 0f;
+        public List<string> UserReviews = new List<string>();
+    }
+
+    #endregion
+
+    #region Enums and Supporting Types
+
+    [Serializable]
+    public class CompetitionScoring
+    {
+        public Dictionary<string, float> TraitWeights = new Dictionary<string, float>();
+        public float InnovationBonus = 0.2f;
+        public float AccuracyWeight = 0.4f;
+        public float RarityWeight = 0.3f;
+        public float QualityWeight = 0.3f;
+        public bool AllowTieBreakers = true;
+        public string TieBreakerMethod = "Innovation";
+    }
+
+    [Serializable]
+    public class CompetitionPrize
+    {
+        public int Rank = 1;
+        public string PrizeName = "";
+        public PrizeType Type = PrizeType.Experience;
+        public int Value = 0;
+        public string Description = "";
+        public List<string> AdditionalRewards = new List<string>();
+    }
+
+    public enum PrizeType
+    {
+        Experience,
+        Currency,
+        Equipment,
+        Strain,
+        Achievement,
+        Title,
+        SpecialAccess
+    }
+
+    [Serializable]
+    public class AchievementReward
+    {
+        public RewardType Type = RewardType.Experience;
+        public int Amount = 0;
+        public string ItemId = "";
+        public string Description = "";
+    }
+
+    public enum RewardType
+    {
+        Experience,
+        SkillPoints,
+        Currency,
+        Equipment,
+        Strain,
+        Technique,
+        Access,
+        Cosmetic
+    }
+
+    #endregion
+
+    #region Competition System Enums
+
+    public enum CompetitionCategory
+    {
+        Genetics,
+        Aromatics,
+        Innovation,
+        Collaborative,
+        Speed,
+        Quality,
+        Scientific,
+        Community
+    }
+
+    public enum CompetitiveRanking
+    {
+        Unranked,
+        Novice,
+        Intermediate,
+        Advanced,
+        Elite,
+        Champion
+    }
+
+    public enum CompetitionTier
+    {
+        Beginner,
+        Intermediate,
+        Advanced,
+        Elite,
+        Master
+    }
+
+    public enum CompetitionEntryResult
+    {
+        Failed,
+        Accepted,
+        MatchmakingFailed,
+        NotEligible,
+        TournamentFull
+    }
+
+    public enum TournamentJoinResult
+    {
+        Successful,
+        TournamentNotFound,
+        NotEligible,
+        TournamentFull,
+        RequirementsNotMet
+    }
+
+    public enum TournamentCreationResult
+    {
+        Successful,
+        Failed,
+        InsufficientPermissions,
+        InvalidParameters
+    }
+
+    public enum PeerRatingResult
+    {
+        Successful,
+        Failed,
+        InvalidTarget,
+        RateLimited
+    }
+
+    [Serializable]
+    public class CompetitionPerformanceResult
+    {
+        public string ResultID = "";
+        public string EntryID = "";
+        public CompetitionPerformance Performance;
+        public float EvaluationTime = 0f;
+        public float TechnicalScore = 0f;
+        public float CreativityScore = 0f;
+        public float InnovationScore = 0f;
+        public float QualityScore = 0f;
+        public float OverallScore = 0f;
+        public int Placement = 1;
+        public float ReputationGained = 0f;
+        public float RatingChange = 0f;
+        public bool IsVictory = false;
+    }
+
+    public enum CompetitionResultType
+    {
+        Victory,
+        Defeat,
+        Participation,
+        InvalidEntry,
+        Disqualified
+    }
+
+    #endregion
+
+    #region Competition System Classes
+
+    [Serializable]
+    public class CompetitiveMetrics
+    {
+        public int Wins = 0;
+        public int Losses = 0;
+        public int TotalMatches = 0;
+        public float OverallRating = 1000f;
+        public float TotalReputationGained = 0f;
+        public float AveragePerformance = 0.5f;
+        public List<string> RecentMatches = new List<string>();
+    }
+
+    [Serializable]
+    public class CompetitionInfo
+    {
+        public string CompetitionID = "";
+        public string CompetitionName = "";
+        public CompetitionCategory Category;
+        public CompetitionTier Tier;
+        public string Description = "";
+        public float RequiredRating = 0f;
+        public float RequiredReputation = 0f;
+        public int MaxParticipants = 100;
+        public int CurrentParticipants = 0;
+        public float PrizePool = 0f;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public bool IsActive = true;
+    }
+
+    [Serializable]
+    public class CompetitionPerformance
+    {
+        public string PerformanceID = "";
+        public float? BreedingAccuracy = null;
+        public float? GeneticStability = null;
+        public float? TraitExpression = null;
+        public float? SensoryAccuracy = null;
+        public float? BlendingPrecision = null;
+        public float? AromaticQuality = null;
+        public float? CreativityRating = null;
+        public float? InnovationValue = null;
+        public float? UniquenessScore = null;
+        public float? NoveltyScore = null;
+        public float? ImpactScore = null;
+        public float? FeasibilityScore = null;
+        public float? ExecutionQuality = null;
+        public float? ResultQuality = null;
+        public float? ConsistencyScore = null;
+        public Dictionary<string, float> CustomMetrics = new Dictionary<string, float>();
+        public string Notes = "";
+    }
+
+    [Serializable]
+    public class Tournament
+    {
+        public string TournamentID = "";
+        public string TournamentName = "";
+        public TournamentType TournamentType;
+        public CompetitionCategory Category;
+        public CompetitionTier Tier;
+        public int MaxParticipants = 100;
+        public int CurrentParticipants = 0;
+        public TournamentEntryRequirements EntryRequirements;
+        public float PrizePool = 0f;
+        public float StartTime = 0f;
+        public float Duration = 86400f; // 24 hours
+        public float CreationTime = 0f;
+        public bool IsActive = true;
+        public List<string> ParticipantIDs = new List<string>();
+    }
+
+    [Serializable]
+    public class TournamentEntryRequirements
+    {
+        public float MinimumRating = 0f;
+        public float MinimumReputation = 0f;
+        public int MinimumTournaments = 0;
+        public CompetitionTier RequiredTier = CompetitionTier.Beginner;
+        public List<string> RequiredAchievements = new List<string>();
+        public bool RequireVerification = false;
+    }
+
+    public enum TournamentType
+    {
+        SingleElimination,
+        DoubleElimination,
+        RoundRobin,
+        Swiss,
+        Ladder,
+        Seasonal
+    }
+
+    [Serializable]
+    public class TournamentSpec
+    {
+        public string TournamentName = "";
+        public TournamentType TournamentType = TournamentType.SingleElimination;
+        public CompetitionCategory Category = CompetitionCategory.Genetics;
+        public CompetitionTier Tier = CompetitionTier.Beginner;
+        public int MaxParticipants = 100;
+        public TournamentEntryRequirements EntryRequirements;
+        public float PrizePool = 0f;
+        public DateTime ScheduledStartTime;
+        public float DurationHours = 24f;
+        public string Description = "";
+        public bool IsPublic = true;
+        public string CreatorID = "";
+    }
+
+    [Serializable]
+    public class MatchmakingResult
+    {
+        public bool IsSuccessful = false;
+        public string MatchID = "";
+        public List<string> OpponentIDs = new List<string>();
+        public float AverageOpponentRating = 0f;
+        public float ExpectedDifficulty = 0.5f;
+        public string FailureReason = "";
+        public DateTime MatchTime;
+    }
+
+
+    [Serializable]
+    public class CompetitiveAchievement
+    {
+        public string AchievementID = "";
+        public string AchievementName = "";
+        public string Description = "";
+        public float EarnedTime = 0f;
+        public float ReputationBonus = 0f;
+        public object RelatedPerformance;
+        public CompetitionCategory Category = CompetitionCategory.Genetics;
+        public bool IsPublic = true;
+    }
+
+    [Serializable]
+    public class CompetitiveReputation
+    {
+        public float OverallRating = 1000f;
+        public string ReputationLevel = "Novice";
+        public CompetitiveRanking Ranking = CompetitiveRanking.Unranked;
+        public List<CompetitionCategory> CategorySpecializations = new List<CompetitionCategory>();
+        public float PeerRating = 0f;
+        public List<string> LegacyAchievements = new List<string>();
+        public float ReputationTrend = 0f;
+    }
+
+    [Serializable]
+    public class CompetitiveStatistics
+    {
+        public int TotalTournamentsEntered = 0;
+        public int TotalTournamentsWon = 0;
+        public int CompetitionsCompleted = 0;
+        public float WinRate = 0f;
+        public int CurrentWinStreak = 0;
+        public int BestWinStreak = 0;
+        public Dictionary<CompetitionCategory, CompetitiveMetrics> CategoryRecords = new Dictionary<CompetitionCategory, CompetitiveMetrics>();
+        public float AveragePerformanceRating = 0f;
+        public float CompetitiveGrowthRate = 0f;
+    }
+
+    [Serializable]
+    public class TournamentBracket
+    {
+        public string TournamentID = "";
+        public string BracketType = "";
+        public List<string> ParticipantIDs = new List<string>();
+        public Dictionary<string, int> Standings = new Dictionary<string, int>();
+        public List<string> Matches = new List<string>();
+        public string CurrentRound = "Round 1";
+        public bool IsCompleted = false;
+    }
+
+    [Serializable]
+    public class TournamentLeaderboard
+    {
+        public string TournamentID = "";
+        public string TournamentName = "";
+        public float GenerationTime = 0f;
+        public List<TournamentParticipant> Participants = new List<TournamentParticipant>();
+        public string WinnerID = "";
+        public bool IsFinalized = false;
+    }
+
+    [Serializable]
+    public class TournamentParticipant
+    {
+        public string ParticipantID = "";
+        public string ParticipantName = "";
+        public float CurrentScore = 0f;
+        public int CurrentRank = 0;
+        public bool IsActive = true;
+        public float JoinTime = 0f;
+        public Dictionary<string, float> PerformanceScores = new Dictionary<string, float>();
+    }
+
+    [Serializable]
+    public class ScheduledTournament
+    {
+        public string TournamentID = "";
+        public string TournamentName = "";
+        public DateTime ScheduledStart;
+        public DateTime RegistrationDeadline;
+        public CompetitionCategory Category;
+        public CompetitionTier Tier;
+        public int MaxParticipants = 100;
+        public int RegisteredParticipants = 0;
+        public float PrizePool = 0f;
+        public string Description = "";
+        public bool IsOpen = true;
+    }
+
+    [Serializable]
+    public class CompetitiveGamingState
+    {
+        public CompetitiveRanking CurrentRanking;
+        public float CompetitiveRating;
+        public float TotalReputationPoints;
+        public int ActiveTournaments;
+        public int CompletedTournaments;
+        public int TournamentVictories;
+        public int CurrentWinStreak;
+        public int BestWinStreak;
+        public List<CompetitionTier> UnlockedCompetitionTiers;
+        public List<string> EarnedAchievements;
+        public List<CompetitionCategory> CompetitiveSpecializations;
+    }
+
+    [Serializable]
+    public class CompetitiveGamingMetrics
+    {
+        public int TournamentsEntered;
+        public int TournamentsWon;
+        public int CompetitionsCompleted;
+        public float TotalReputationGained;
+        public float CompetitiveRating;
+        public CompetitiveRanking CurrentRanking;
+        public float WinRate;
+        public int CurrentWinStreak;
+        public int BestWinStreak;
+    }
+
+    #endregion
+
+    #region MonoBehaviour Placeholder Components
+
+    // Placeholder MonoBehaviour components for compilation
+    public class CompetitiveAnalyticsEngine : MonoBehaviour 
+    { 
+        public void UpdateSystem(float deltaTime) { }
+    }
+
+    public class PerformanceTracker : MonoBehaviour 
+    { 
+        public void UpdateSystem(float deltaTime) { }
+    }
+
+    public class SkillAssessmentSystem : MonoBehaviour 
+    { 
+        public void UpdateSystem(float deltaTime) { }
+    }
+
+    public class CompetitiveMetricsCollector : MonoBehaviour 
+    { 
+        public void UpdateSystem(float deltaTime) { }
+    }
+
+    public class PeerRatingSystem : MonoBehaviour 
+    { 
+        public float GetCurrentRating() { return 0f; }
+        public PeerRatingResult SubmitRating(string targetPlayerID, PeerRating rating) { return PeerRatingResult.Successful; }
+    }
+
+    public class TournamentScheduler
+    {
+        public void ScheduleTournament(Tournament tournament) { }
+        public List<ScheduledTournament> GetScheduledTournaments(float timeRangeHours) { return new List<ScheduledTournament>(); }
+        public void UpdateSystem(float deltaTime) { }
+    }
+
+    public class CompetitionBracketManager
+    {
+        public void CreateTournamentBracket(Tournament tournament) { }
+        public TournamentBracket GetTournamentBracket(string tournamentID) { return null; }
+    }
+
+    public class ReputationManager
+    {
+        // Placeholder implementation
+    }
+
+    public class LegacyTracker
+    {
+        // Placeholder implementation
+    }
+
+    public class VisualGeneticInterface : MonoBehaviour
+    {
+        // Placeholder implementation
+    }
+
+    public class SocialRecognitionSystem : MonoBehaviour
+    {
+        // Placeholder implementation
+    }
+
+    public class MentorshipFacilitationSystem : MonoBehaviour
+    {
+        // Placeholder implementation
+    }
+
+    public class InnovationShowcaseManager : MonoBehaviour
+    {
+        // Placeholder implementation
+    }
+
+    public class LegacyRecognitionSystem : MonoBehaviour
+    {
+        // Placeholder implementation
+    }
+
+    [Serializable]
+    public class PeerRating
+    {
+        public float Rating = 0f;
+        public string Comment = "";
+        public string Category = "";
+    }
+
+    #endregion
+
+    #region Event Data Classes
+
+    [Serializable]
+    public class CompetitionEntryEventData
+    {
+        public CompetitionEntry Entry;
+        public CompetitionCategory Category;
+        public CompetitionTier Tier;
+        public MatchmakingResult MatchmakingResult;
+    }
+
+    [Serializable]
+    public class TournamentVictoryEventData
+    {
+        public CompetitionEntry Entry;
+        public object Result;
+        public float VictoryMargin;
+        public CompetitionTier CompetitionTier;
+    }
+
+    [Serializable]
+    public class CompetitiveAchievementEventData
+    {
+        public CompetitiveAchievement Achievement;
+        public float ReputationBonus;
+    }
+
+    [Serializable]
+    public class RankingChangeEventData
+    {
+        public CompetitiveRanking PreviousRanking;
+        public CompetitiveRanking NewRanking;
+        public float Rating;
+        public float Reputation;
+    }
+
+    [Serializable]
+    public class EliteTierUnlockEventData
+    {
+        public CompetitionTier UnlockedTier;
+        public float UnlockTime;
+        public float Rating;
+        public float Reputation;
+    }
+
+    [Serializable]
+    public class ReputationGainEventData
+    {
+        public float ReputationGain;
+        public string Source;
+        public CompetitionCategory Category;
+    }
+
+    [Serializable]
+    public class ScientificGamingState
+    {
+        public float OverallLevel = 1f;
+        public long TotalExperience = 0L;
+        public float GeneticsSkillLevel = 1f;
+        public float AromaticsSkillLevel = 1f;
+        public float ScientificKnowledgeLevel = 1f;
+        public float InnovationLevel = 1f;
+        public float CompetitionLevel = 1f;
+        public int DiscoveriesMade = 0;
+        public int ChallengesCompleted = 0;
+        public int CompetitionsWon = 0;
+        public float ScientificReputation = 0f;
+        public List<string> UnlockedTechniques = new List<string>();
+        public List<string> Achievements = new List<string>();
+    }
+
+    #endregion
+
+    #region Community Collaboration Types
+
+    [Serializable]
+    public class CommunityCollaborationConfigSO : ChimeraConfigSO
+    {
+        public bool EnableMentorship = true;
+        public bool EnablePeerReviews = true;
+        public int MaxCollaborators = 10;
+        public float ReputationDecayRate = 0.01f;
+    }
+
+    [Serializable]
+    public class MentorshipProgramConfigSO : ChimeraConfigSO
+    {
+        public int MaxMentees = 3;
+        public float MinMentorLevel = 10f;
+        public bool EnableAutoMatching = true;
+        public int SessionDurationMinutes = 60;
+    }
+
+    [Serializable]
+    public class CollaborativeProjectLibrarySO : ChimeraConfigSO
+    {
+        public List<ProjectTemplate> ProjectTemplates = new List<ProjectTemplate>();
+        public int MaxActiveProjects = 5;
+        public bool EnablePublicProjects = true;
+    }
+
+    [Serializable]
+    public class MentorshipRequest
+    {
+        public string RequestId = Guid.NewGuid().ToString();
+        public string MenteeId = "";
+        public string PreferredMentorId = "";
+        public List<string> InterestAreas = new List<string>();
+        public string PersonalMessage = "";
+        public DateTime RequestTime = DateTime.Now;
+        public MentorshipRequestStatus Status = MentorshipRequestStatus.Pending;
+    }
+
+    [Serializable]
+    public class MentorshipGuidance
+    {
+        public string GuidanceId = Guid.NewGuid().ToString();
+        public string MentorId = "";
+        public string MenteeId = "";
+        public string Topic = "";
+        public string Advice = "";
+        public List<string> RecommendedResources = new List<string>();
+        public DateTime ProvidedAt = DateTime.Now;
+        public float Helpfulness = 0f;
+    }
+
+    [Serializable]
+    public class MentorshipMilestone
+    {
+        public string MilestoneId = Guid.NewGuid().ToString();
+        public string Title = "";
+        public string Description = "";
+        public bool IsCompleted = false;
+        public DateTime CompletedAt = DateTime.MinValue;
+        public string Evidence = "";
+        public float RewardPoints = 0f;
+    }
+
+    [Serializable]
+    public class MentorshipMilestoneResult
+    {
+        public bool WasSuccessful = false;
+        public string Message = "";
+        public float PointsAwarded = 0f;
+        public List<string> UnlockedRewards = new List<string>();
+    }
+
+    [Serializable]
+    public class MentorshipGuidanceResult
+    {
+        public bool WasSuccessful = false;
+        public string Message = "";
+        public MentorshipGuidance Guidance = null;
+    }
+
+    [Serializable]
+    public class MentorshipOpportunity
+    {
+        public string OpportunityId = Guid.NewGuid().ToString();
+        public string Title = "";
+        public string Description = "";
+        public List<string> RequiredSkills = new List<string>();
+        public string MentorId = "";
+        public int MaxMentees = 3;
+        public DateTime StartDate = DateTime.Now;
+        public DateTime EndDate = DateTime.Now.AddDays(30);
+    }
+
+    [Serializable]
+    public class CollaborativeProjectSpec
+    {
+        public string ProjectId = Guid.NewGuid().ToString();
+        public string ProjectName = "";
+        public string Description = "";
+        public List<string> RequiredSkills = new List<string>();
+        public int MaxCollaborators = 5;
+        public DateTime Deadline = DateTime.Now.AddDays(30);
+        public float DifficultyLevel = 1f;
+        public List<string> ExpectedOutcomes = new List<string>();
+    }
+
+    [Serializable]
+    public class CollaborativeProjectResult
+    {
+        public bool WasSuccessful = false;
+        public string Message = "";
+        public string ProjectId = "";
+        public List<string> ParticipantIds = new List<string>();
+        public Dictionary<string, float> IndividualContributions = new Dictionary<string, float>();
+    }
+
+    [Serializable]
+    public class ProjectRole
+    {
+        public string RoleId = Guid.NewGuid().ToString();
+        public string RoleName = "";
+        public string Description = "";
+        public List<string> Responsibilities = new List<string>();
+        public List<string> RequiredSkills = new List<string>();
+        public float TimeCommitmentHours = 0f;
+    }
+
+    [Serializable]
+    public class ProjectJoinResult
+    {
+        public bool WasSuccessful = false;
+        public string Message = "";
+        public string AssignedRole = "";
+        public List<string> NextSteps = new List<string>();
+    }
+
+    [Serializable]
+    public class ProjectContribution
+    {
+        public string ContributionId = Guid.NewGuid().ToString();
+        public string ProjectId = "";
+        public string ContributorId = "";
+        public string ContributionType = "";
+        public string Description = "";
+        public DateTime SubmittedAt = DateTime.Now;
+        public float QualityRating = 0f;
+        public List<string> PeerReviews = new List<string>();
+    }
+
+    [Serializable]
+    public class ProjectContributionResult
+    {
+        public bool WasAccepted = false;
+        public string Feedback = "";
+        public float QualityScore = 0f;
+        public int PointsAwarded = 0;
+    }
+
+    [Serializable]
+    public class ScientificInnovation
+    {
+        public string InnovationId = Guid.NewGuid().ToString();
+        public string Title = "";
+        public string Description = "";
+        public string InnovatorId = "";
+        public List<string> CollaboratorIds = new List<string>();
+        public DateTime DiscoveredAt = DateTime.Now;
+        public float ImpactScore = 0f;
+        public List<string> Applications = new List<string>();
+        public bool IsValidated = false;
+    }
+
+    [Serializable]
+    public class ProjectTemplate
+    {
+        public string TemplateId = Guid.NewGuid().ToString();
+        public string Name = "";
+        public string Description = "";
+        public List<ProjectRole> Roles = new List<ProjectRole>();
+        public int EstimatedDurationDays = 30;
+        public DifficultyLevel Difficulty = DifficultyLevel.Intermediate;
+    }
+
+    public enum MentorshipRequestStatus
+    {
+        Pending,
+        Accepted,
+        Declined,
+        Cancelled,
+        Completed
+    }
+
+    #endregion
+
+    #region IPM System Types
+
+    [Serializable]
+    public class IPMSystemInitializer : MonoBehaviour
+    {
+        public bool IsInitialized = false;
+        
+        private void Start()
+        {
+            Initialize();
+        }
+        
+        public void Initialize()
+        {
+            IsInitialized = true;
+        }
+    }
+
+    #endregion
+
+    #region Core Genetics Types
+
+    // Note: BreedingResult, BreedingSimulator, PlantGenotype defined in separate files
+    // Note: SensoryResponse defined in SensoryTrainingSystem.cs
+
+    [Serializable] 
+    public class GeneticsConfigSO : ChimeraConfigSO
+    {
+        public string ConfigId = Guid.NewGuid().ToString();
+        public bool EnableAdvancedGenetics = true;
+        public bool EnableMutations = true;
+        public float BaseMutationRate = 0.001f;
+        public bool AllowInbreeding = false;
+        public int MaxGenerations = 10;
+    }
+
+    #endregion
+
+    #region Placeholder Support Classes
+
+    // Placeholder MonoBehaviour classes for compilation
+    public class MentorshipFacilitationSystem : MonoBehaviour { }
+    public class MentorMatchingEngine : MonoBehaviour { }
+    public class MentorshipProgressTracker : MonoBehaviour { }
+    public class MentorshipRewardsManager : MonoBehaviour { }
+    public class SocialRecognitionSystem : MonoBehaviour { }
+    public class PeerEndorsementManager : MonoBehaviour { }
+    public class CommunityReputationTracker : MonoBehaviour { }
+    public class SocialAchievementSystem : MonoBehaviour { }
+    public class CollaborativeResearchManager : MonoBehaviour { }
+    public class ProjectCoordinationEngine : MonoBehaviour { }
+    public class KnowledgeExchangeHub : MonoBehaviour { }
+    public class CommunityInnovationTracker : MonoBehaviour { }
+    public class InnovationShowcaseManager : MonoBehaviour { }
+    public class KnowledgeDocumentationSystem : MonoBehaviour { }
+    public class CommunityLearningPlatform : MonoBehaviour { }
+    public class ExpertConsultationSystem : MonoBehaviour { }
+
+    // Base config class
+    public class ChimeraConfigSO : ScriptableObject { }
+
+    #endregion
+}

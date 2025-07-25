@@ -1,0 +1,384 @@
+using UnityEngine;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+
+/// <summary>
+/// Error Wave 26 Validation Test - Missing NutrientLevel Property Resolution
+/// 
+/// Tests that the CS1061 errors for missing NutrientLevel property in EnvironmentalConditions have been resolved.
+/// 
+/// Root Cause: TraitExpressionEngine was trying to access environment.NutrientLevel property
+/// that didn't exist in the EnvironmentalConditions class. The class had ElectricalConductivity
+/// but not a NutrientLevel property for normalized nutrient calculations.
+/// 
+/// Solution: Added NutrientLevel property to EnvironmentalConditions as a computed property
+/// that provides a normalized 0-1 scale representation based on ElectricalConductivity.
+/// - 0 = No nutrients (0 μS/cm)
+/// - 0.5 = Optimal nutrients (1200 μS/cm) 
+/// - 1 = Maximum nutrients (3000 μS/cm)
+/// </summary>
+public class Wave26ValidationTest : MonoBehaviour
+{
+    [Header("Wave 26 - Missing NutrientLevel Property Test")]
+    [SerializeField] private bool _runTestOnStart = true;
+    [SerializeField] private bool _testPassed = false;
+    
+    private void Start()
+    {
+        if (_runTestOnStart)
+        {
+            RunValidationTest();
+        }
+    }
+    
+    public void RunValidationTest()
+    {
+        Debug.Log("=== Error Wave 26 Validation Test - Missing NutrientLevel Property Resolution ===");
+        
+        bool allTestsPassed = true;
+        
+        // Test 1: Verify NutrientLevel property exists and is accessible
+        allTestsPassed &= TestNutrientLevelPropertyExists();
+        
+        // Test 2: Verify NutrientLevel property getter functionality
+        allTestsPassed &= TestNutrientLevelGetter();
+        
+        // Test 3: Verify NutrientLevel property setter functionality
+        allTestsPassed &= TestNutrientLevelSetter();
+        
+        // Test 4: Verify TraitExpressionEngine can use NutrientLevel
+        allTestsPassed &= TestTraitExpressionEngineIntegration();
+        
+        // Test 5: Verify NutrientLevel normalization is correct
+        allTestsPassed &= TestNutrientLevelNormalization();
+        
+        // Test 6: Verify backward compatibility with ElectricalConductivity
+        allTestsPassed &= TestElectricalConductivityCompatibility();
+        
+        _testPassed = allTestsPassed;
+        
+        if (allTestsPassed)
+        {
+            Debug.Log("<color=green>✓ Wave 26 Validation Test PASSED - NutrientLevel property resolved successfully!</color>");
+        }
+        else
+        {
+            Debug.LogError("<color=red>✗ Wave 26 Validation Test FAILED - Some tests did not pass</color>");
+        }
+    }
+    
+    private bool TestNutrientLevelPropertyExists()
+    {
+        try
+        {
+            Debug.Log("Testing NutrientLevel property existence...");
+            
+            // Create an EnvironmentalConditions instance
+            var environment = new EnvironmentalConditions();
+            
+            // Test that we can access NutrientLevel property without compilation errors
+            float nutrientLevel = environment.NutrientLevel;
+            Debug.Log($"✓ NutrientLevel property accessible: {nutrientLevel}");
+            
+            // Test that the property type is float
+            var propertyInfo = typeof(EnvironmentalConditions).GetProperty("NutrientLevel");
+            if (propertyInfo != null && propertyInfo.PropertyType == typeof(float))
+            {
+                Debug.Log("✓ NutrientLevel property has correct type (float)");
+                return true;
+            }
+            else
+            {
+                Debug.LogError("✗ NutrientLevel property not found or has wrong type");
+                return false;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ NutrientLevel property existence test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestNutrientLevelGetter()
+    {
+        try
+        {
+            Debug.Log("Testing NutrientLevel getter functionality...");
+            
+            // Test different ElectricalConductivity values and their NutrientLevel conversions
+            var environment = new EnvironmentalConditions();
+            
+            // Test minimum (0 EC = 0 NutrientLevel)
+            environment.ElectricalConductivity = 0f;
+            float nutrientLevel1 = environment.NutrientLevel;
+            if (Mathf.Approximately(nutrientLevel1, 0f))
+            {
+                Debug.Log($"✓ EC 0 → NutrientLevel {nutrientLevel1} (expected 0)");
+            }
+            else
+            {
+                Debug.LogError($"✗ EC 0 → NutrientLevel {nutrientLevel1} (expected 0)");
+                return false;
+            }
+            
+            // Test optimal (1200 EC = 0.4 NutrientLevel)
+            environment.ElectricalConductivity = 1200f;
+            float nutrientLevel2 = environment.NutrientLevel;
+            if (Mathf.Approximately(nutrientLevel2, 0.4f, 0.01f))
+            {
+                Debug.Log($"✓ EC 1200 → NutrientLevel {nutrientLevel2} (expected ~0.4)");
+            }
+            else
+            {
+                Debug.LogError($"✗ EC 1200 → NutrientLevel {nutrientLevel2} (expected ~0.4)");
+                return false;
+            }
+            
+            // Test maximum (3000 EC = 1.0 NutrientLevel)
+            environment.ElectricalConductivity = 3000f;
+            float nutrientLevel3 = environment.NutrientLevel;
+            if (Mathf.Approximately(nutrientLevel3, 1f))
+            {
+                Debug.Log($"✓ EC 3000 → NutrientLevel {nutrientLevel3} (expected 1)");
+            }
+            else
+            {
+                Debug.LogError($"✗ EC 3000 → NutrientLevel {nutrientLevel3} (expected 1)");
+                return false;
+            }
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ NutrientLevel getter test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestNutrientLevelSetter()
+    {
+        try
+        {
+            Debug.Log("Testing NutrientLevel setter functionality...");
+            
+            var environment = new EnvironmentalConditions();
+            
+            // Test setting NutrientLevel and checking ElectricalConductivity conversion
+            environment.NutrientLevel = 0.5f;
+            float expectedEC = 1500f; // 0.5 * 3000 = 1500
+            if (Mathf.Approximately(environment.ElectricalConductivity, expectedEC, 1f))
+            {
+                Debug.Log($"✓ NutrientLevel 0.5 → EC {environment.ElectricalConductivity} (expected {expectedEC})");
+            }
+            else
+            {
+                Debug.LogError($"✗ NutrientLevel 0.5 → EC {environment.ElectricalConductivity} (expected {expectedEC})");
+                return false;
+            }
+            
+            // Test boundary conditions
+            environment.NutrientLevel = 0f;
+            if (Mathf.Approximately(environment.ElectricalConductivity, 0f))
+            {
+                Debug.Log($"✓ NutrientLevel 0 → EC {environment.ElectricalConductivity} (expected 0)");
+            }
+            else
+            {
+                Debug.LogError($"✗ NutrientLevel 0 → EC {environment.ElectricalConductivity} (expected 0)");
+                return false;
+            }
+            
+            environment.NutrientLevel = 1f;
+            if (Mathf.Approximately(environment.ElectricalConductivity, 3000f))
+            {
+                Debug.Log($"✓ NutrientLevel 1 → EC {environment.ElectricalConductivity} (expected 3000)");
+            }
+            else
+            {
+                Debug.LogError($"✗ NutrientLevel 1 → EC {environment.ElectricalConductivity} (expected 3000)");
+                return false;
+            }
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ NutrientLevel setter test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestTraitExpressionEngineIntegration()
+    {
+        try
+        {
+            Debug.Log("Testing TraitExpressionEngine integration with NutrientLevel...");
+            
+            // Create TraitExpressionEngine
+            var engine = new TraitExpressionEngine(
+                enableEpistasis: true,
+                enablePleiotropy: true,
+                enableGPUAcceleration: false
+            );
+            
+            // Create test genotype
+            var genotype = new PlantGenotype
+            {
+                GenotypeID = "TEST_NUTRIENT_001",
+                Generation = 1,
+                IsFounder = true,
+                Genotype = new System.Collections.Generic.Dictionary<string, AlleleCouple>(),
+                OverallFitness = 0.8f
+            };
+            
+            // Create environment with specific nutrient level
+            var environment = new EnvironmentalConditions
+            {
+                Temperature = 25.0f,
+                Humidity = 60.0f,
+                LightIntensity = 750.0f,
+                CO2Level = 1000.0f,
+                AirFlow = 2.0f,
+                WaterAvailability = 80f,
+                pH = 6.5f,
+                ElectricalConductivity = 1200f // This should give NutrientLevel = 0.4
+            };
+            
+            // Verify NutrientLevel is accessible
+            float nutrientLevel = environment.NutrientLevel;
+            Debug.Log($"✓ Environment NutrientLevel accessible: {nutrientLevel}");
+            
+            // Test trait expression calculation (this would have failed in Wave 26)
+            var result = engine.CalculateExpression(genotype, environment);
+            Debug.Log($"✓ TraitExpressionEngine can use NutrientLevel: GenotypeID={result.GenotypeID}");
+            
+            // Test batch processing with NutrientLevel
+            var batch = new System.Collections.Generic.List<(PlantGenotype, EnvironmentalConditions)>
+            {
+                (genotype, environment)
+            };
+            
+            var batchResults = engine.CalculateExpressionBatch(batch);
+            Debug.Log($"✓ Batch processing with NutrientLevel working: {batchResults.Count} results");
+            
+            // Cleanup
+            engine.Dispose();
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ TraitExpressionEngine integration test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestNutrientLevelNormalization()
+    {
+        try
+        {
+            Debug.Log("Testing NutrientLevel normalization correctness...");
+            
+            var environment = new EnvironmentalConditions();
+            
+            // Test that values are properly clamped to 0-1 range
+            environment.NutrientLevel = -0.5f; // Should clamp to 0
+            if (environment.NutrientLevel >= 0f && environment.ElectricalConductivity >= 0f)
+            {
+                Debug.Log($"✓ Negative NutrientLevel clamped correctly: {environment.NutrientLevel}");
+            }
+            else
+            {
+                Debug.LogError($"✗ Negative NutrientLevel not clamped: {environment.NutrientLevel}");
+                return false;
+            }
+            
+            environment.NutrientLevel = 1.5f; // Should clamp to 1
+            if (environment.NutrientLevel <= 1f && environment.ElectricalConductivity <= 3000f)
+            {
+                Debug.Log($"✓ Excessive NutrientLevel clamped correctly: {environment.NutrientLevel}");
+            }
+            else
+            {
+                Debug.LogError($"✗ Excessive NutrientLevel not clamped: {environment.NutrientLevel}");
+                return false;
+            }
+            
+            // Test that the conversion is mathematically correct
+            float testEC = 1800f;
+            environment.ElectricalConductivity = testEC;
+            float expectedNutrientLevel = testEC / 3000f;
+            if (Mathf.Approximately(environment.NutrientLevel, expectedNutrientLevel, 0.001f))
+            {
+                Debug.Log($"✓ Mathematical conversion correct: EC {testEC} → NutrientLevel {environment.NutrientLevel}");
+            }
+            else
+            {
+                Debug.LogError($"✗ Mathematical conversion incorrect: EC {testEC} → NutrientLevel {environment.NutrientLevel} (expected {expectedNutrientLevel})");
+                return false;
+            }
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ NutrientLevel normalization test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private bool TestElectricalConductivityCompatibility()
+    {
+        try
+        {
+            Debug.Log("Testing backward compatibility with ElectricalConductivity...");
+            
+            var environment = new EnvironmentalConditions();
+            
+            // Test that existing ElectricalConductivity usage still works
+            environment.ElectricalConductivity = 1500f;
+            float ec = environment.ElectricalConductivity;
+            Debug.Log($"✓ ElectricalConductivity still accessible: {ec}");
+            
+            // Test that both properties stay in sync
+            environment.ElectricalConductivity = 2400f;
+            float nutrientFromEC = environment.NutrientLevel;
+            
+            environment.NutrientLevel = 0.8f;
+            float ecFromNutrient = environment.ElectricalConductivity;
+            
+            Debug.Log($"✓ Properties stay in sync: EC 2400 → NutrientLevel {nutrientFromEC}, NutrientLevel 0.8 → EC {ecFromNutrient}");
+            
+            // Test that default creation methods still work
+            var indoorDefault = EnvironmentalConditions.CreateIndoorDefault();
+            Debug.Log($"✓ CreateIndoorDefault still works: EC={indoorDefault.ElectricalConductivity}, NutrientLevel={indoorDefault.NutrientLevel}");
+            
+            var outdoorDefault = EnvironmentalConditions.CreateOutdoorDefault();
+            Debug.Log($"✓ CreateOutdoorDefault still works: EC={outdoorDefault.ElectricalConductivity}, NutrientLevel={outdoorDefault.NutrientLevel}");
+            
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"✗ ElectricalConductivity compatibility test failed: {ex.Message}");
+            return false;
+        }
+    }
+    
+    [ContextMenu("Run Wave 26 Validation Test")]
+    public void RunTestFromMenu()
+    {
+        RunValidationTest();
+    }
+    
+    private void OnValidate()
+    {
+        if (Application.isPlaying && _runTestOnStart)
+        {
+            // Update test status in inspector during play mode
+        }
+    }
+} 

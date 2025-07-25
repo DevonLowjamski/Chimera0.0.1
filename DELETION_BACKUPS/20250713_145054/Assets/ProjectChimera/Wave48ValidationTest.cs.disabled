@@ -1,0 +1,247 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Wave 48 Validation Test: Verify fully qualified type names in variable declarations resolve all compiler issues.
+    /// 
+    /// This test validates:
+    /// 1. ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault() works correctly
+    /// 2. VPD property assignment works (line 338 issue)
+    /// 3. ElectricalConductivity property assignment works (line 343 issue)
+    /// 4. CalculateDerivedValues() method call works (line 349 issue)
+    /// 5. No CS1061 errors for property access on Data.Cultivation.EnvironmentalConditions
+    /// 6. No CS0029 type conversion errors
+    /// 7. ConvertToDataCultivationConditions method compiles and works correctly
+    /// </summary>
+    public class Wave48ValidationTest : MonoBehaviour
+    {
+        [Header("Wave 48 Validation - Variable Declaration Type Resolution")]
+        public bool runTestOnStart = true;
+        
+        void Start()
+        {
+            if (runTestOnStart)
+            {
+                RunValidationTest();
+            }
+        }
+        
+        public void RunValidationTest()
+        {
+            Debug.Log("=== Wave 48 Validation Test: Variable Declaration Type Resolution ===");
+            
+            bool allTestsPassed = true;
+            
+            // Test 1: Verify CreateIndoorDefault() with fully qualified type name
+            allTestsPassed &= TestCreateIndoorDefaultWithFullyQualifiedType();
+            
+            // Test 2: Verify VPD property assignment (line 338 issue)
+            allTestsPassed &= TestVPDPropertyAssignment();
+            
+            // Test 3: Verify ElectricalConductivity property assignment (line 343 issue)
+            allTestsPassed &= TestElectricalConductivityPropertyAssignment();
+            
+            // Test 4: Verify CalculateDerivedValues method call (line 349 issue)
+            allTestsPassed &= TestCalculateDerivedValuesMethodCall();
+            
+            // Test 5: Verify complete type conversion simulation
+            allTestsPassed &= TestCompleteTypeConversionSimulation();
+            
+            // Test 6: Verify PlantUpdateProcessor compilation
+            allTestsPassed &= TestPlantUpdateProcessorCompilation();
+            
+            if (allTestsPassed)
+            {
+                Debug.Log("✅ Wave 48 Validation PASSED: All variable declaration type resolution tests successful!");
+            }
+            else
+            {
+                Debug.LogError("❌ Wave 48 Validation FAILED: Some variable declaration type resolution tests failed!");
+            }
+        }
+        
+        private bool TestCreateIndoorDefaultWithFullyQualifiedType()
+        {
+            try
+            {
+                // Test the exact line that was causing issues (line 322)
+                var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Verify the object was created correctly
+                bool isInitialized = dataConditions.IsInitialized();
+                bool hasValidTemperature = dataConditions.Temperature > 0f;
+                bool hasValidHumidity = dataConditions.Humidity > 0f;
+                
+                Debug.Log($"✅ CreateIndoorDefault with fully qualified type successful: Initialized={isInitialized}, Temp={dataConditions.Temperature}, Humidity={dataConditions.Humidity}");
+                return isInitialized && hasValidTemperature && hasValidHumidity;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ CreateIndoorDefault with fully qualified type failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestVPDPropertyAssignment()
+        {
+            try
+            {
+                // Test the exact line that was causing CS1061 error (line 338)
+                var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test VPD property assignment - this was failing in Wave 48
+                float testTemperature = 24f;
+                float testHumidity = 55f;
+                dataConditions.VPD = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CalculateVPD(testTemperature, testHumidity);
+                
+                // Verify the assignment worked
+                bool vpdAssigned = dataConditions.VPD > 0f;
+                
+                Debug.Log($"✅ VPD property assignment successful: VPD={dataConditions.VPD} kPa");
+                return vpdAssigned;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ VPD property assignment failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestElectricalConductivityPropertyAssignment()
+        {
+            try
+            {
+                // Test the exact line that was causing CS1061 error (line 343)
+                var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test ElectricalConductivity property assignment - this was failing in Wave 48
+                float testEC = 1500f; // Simulate systemsConditions.EC
+                dataConditions.ElectricalConductivity = testEC;
+                
+                // Verify the assignment worked
+                bool ecAssigned = dataConditions.ElectricalConductivity == testEC;
+                
+                Debug.Log($"✅ ElectricalConductivity property assignment successful: EC={dataConditions.ElectricalConductivity} μS/cm");
+                return ecAssigned;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ ElectricalConductivity property assignment failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestCalculateDerivedValuesMethodCall()
+        {
+            try
+            {
+                // Test the exact line that was causing CS1061 error (line 349)
+                var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Set some test values first
+                dataConditions.Temperature = 25f;
+                dataConditions.Humidity = 60f;
+                
+                // Test CalculateDerivedValues method call - this was failing in Wave 48
+                dataConditions.CalculateDerivedValues();
+                
+                // Verify the method executed (VPD should be calculated)
+                bool derivedValuesCalculated = dataConditions.VPD > 0f;
+                
+                Debug.Log($"✅ CalculateDerivedValues method call successful: VPD={dataConditions.VPD}, DewPoint={dataConditions.DewPoint}");
+                return derivedValuesCalculated;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ CalculateDerivedValues method call failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestCompleteTypeConversionSimulation()
+        {
+            try
+            {
+                // Simulate the complete ConvertToDataCultivationConditions method logic
+                
+                // Create a Systems.Cultivation.EnvironmentalConditions (input)
+                var systemsConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CreateOptimal();
+                
+                // Create a Data.Cultivation.EnvironmentalConditions (output) - this is the problematic line
+                var dataConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test all the property assignments that were failing
+                dataConditions.Temperature = systemsConditions.Temperature;
+                dataConditions.Humidity = systemsConditions.Humidity;
+                dataConditions.LightIntensity = systemsConditions.LightIntensity;
+                dataConditions.CO2Level = systemsConditions.CO2Level;
+                dataConditions.AirFlow = systemsConditions.AirCirculation / 100f;
+                dataConditions.pH = systemsConditions.pH;
+                dataConditions.PhotoperiodHours = systemsConditions.PhotoperiodHours;
+                dataConditions.WaterAvailability = systemsConditions.MoisureLevel;
+                
+                // Test the problematic VPD assignment (line 338)
+                dataConditions.VPD = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CalculateVPD(
+                    systemsConditions.Temperature, 
+                    systemsConditions.Humidity);
+                
+                // Test the problematic ElectricalConductivity assignment (line 343)
+                dataConditions.ElectricalConductivity = systemsConditions.EC;
+                
+                // Test the problematic CalculateDerivedValues call (line 349)
+                dataConditions.CalculateDerivedValues();
+                
+                // Verify conversion worked
+                bool conversionSuccessful = dataConditions.Temperature == systemsConditions.Temperature &&
+                                          dataConditions.Humidity == systemsConditions.Humidity &&
+                                          dataConditions.ElectricalConductivity == systemsConditions.EC &&
+                                          dataConditions.VPD > 0f;
+                
+                Debug.Log($"✅ Complete type conversion simulation successful: Temp={dataConditions.Temperature}, EC={dataConditions.ElectricalConductivity}, VPD={dataConditions.VPD}");
+                return conversionSuccessful;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Complete type conversion simulation failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantUpdateProcessorCompilation()
+        {
+            try
+            {
+                // Test that PlantUpdateProcessor can be created (this tests compilation)
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                // Test that the methods compile and can be called
+                var stats = processor.GetCacheStatistics();
+                var performanceMetrics = processor.GetPerformanceMetrics();
+                
+                // Test cache operations
+                processor.ClearTraitExpressionCache();
+                processor.OptimizePerformance();
+                
+                Debug.Log($"✅ PlantUpdateProcessor compilation successful: Cache size={stats.cacheSize}, Performance metrics available");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ PlantUpdateProcessor compilation failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        [ContextMenu("Run Wave 48 Validation")]
+        public void RunValidationFromMenu()
+        {
+            RunValidationTest();
+        }
+    }
+} 

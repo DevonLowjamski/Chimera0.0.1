@@ -1,0 +1,1016 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Progression;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Advanced milestone progression system for Project Chimera featuring cross-category synergies,
+    /// dynamic milestone generation, and intelligent progression pathways. Integrates seamlessly
+    /// with cultivation, facility construction, environmental management, and economic systems
+    /// to provide meaningful long-term progression goals that adapt to player playstyle.
+    /// 
+    /// Key Features:
+    /// - Cross-Category Synergies: Milestones that span multiple achievement categories
+    /// - Dynamic Generation: AI-driven milestone creation based on player behavior
+    /// - Adaptive Pathways: Progression routes that adjust to player preferences
+    /// - Mastery Tracking: Deep expertise recognition across all game systems
+    /// - Legacy Achievements: Long-term goals spanning multiple gameplay sessions
+    /// </summary>
+    public class MilestoneProgressionSystem : IDisposable
+    {
+        [Header("Milestone Configuration")]
+        [SerializeField] private AchievementLibrarySO _achievementLibrary;
+        [SerializeField] private AchievementConfigSO _achievementConfig;
+        [SerializeField] private MilestoneConfigSO _milestoneConfig;
+        
+        [Header("Progression Settings")]
+        [SerializeField] private bool _enableCrossCategorySynergies = true;
+        [SerializeField] private bool _enableDynamicMilestones = true;
+        [SerializeField] private bool _enableAdaptivePathways = true;
+        [SerializeField] private bool _enableMasteryTracking = true;
+        [SerializeField] private bool _enableLegacyAchievements = true;
+        
+        [Header("Synergy Configuration")]
+        [SerializeField] private float _synergyMultiplier = 1.5f;
+        [SerializeField] private int _maxActiveSynergies = 5;
+        [SerializeField] private float _synergyDecayRate = 0.95f;
+        [SerializeField] private TimeSpan _synergyTimeWindow = TimeSpan.FromHours(24);
+        
+        [Header("Dynamic Generation")]
+        [SerializeField] private bool _enableAIGeneration = true;
+        [SerializeField] private int _maxDynamicMilestones = 10;
+        [SerializeField] private float _generationThreshold = 0.7f;
+        [SerializeField] private float _adaptationRate = 0.1f;
+        
+        // Core Milestone Systems
+        private MilestoneTracker _milestoneTracker;
+        private CrossCategorySynergyEngine _synergyEngine;
+        private DynamicMilestoneGenerator _dynamicGenerator;
+        private AdaptivePathwayManager _pathwayManager;
+        private MasteryProgressionAnalyzer _masteryAnalyzer;
+        private LegacyAchievementCoordinator _legacyCoordinator;
+        
+        // Milestone State Management
+        private Dictionary<string, MilestoneProgress> _activeMilestones = new Dictionary<string, MilestoneProgress>();
+        private Dictionary<string, CompletedMilestone> _completedMilestones = new Dictionary<string, CompletedMilestone>();
+        private Dictionary<string, MilestoneSynergy> _activeSynergies = new Dictionary<string, MilestoneSynergy>();
+        private Queue<DynamicMilestone> _generatedMilestones = new Queue<DynamicMilestone>();
+        
+        // Player Progression Tracking
+        private PlayerProgressionProfile _progressionProfile;
+        private Dictionary<AchievementCategory, CategoryMastery> _categoryMastery = new Dictionary<AchievementCategory, CategoryMastery>();
+        private List<ProgressionPathway> _availablePathways = new List<ProgressionPathway>();
+        private Dictionary<string, PathwayProgress> _pathwayProgress = new Dictionary<string, PathwayProgress>();
+        
+        // Synergy and Cross-Category Systems
+        private SynergyCalculator _synergyCalculator;
+        private CrossCategoryCorrelationEngine _correlationEngine;
+        private ProgressionSynergyDetector _synergyDetector;
+        private CategoryBalanceAnalyzer _balanceAnalyzer;
+        
+        // Analytics and Intelligence
+        private MilestoneAnalyticsEngine _analyticsEngine;
+        private PlayerBehaviorProfiler _behaviorProfiler;
+        private ProgressionPredictionEngine _predictionEngine;
+        private AdaptationAlgorithm _adaptationAlgorithm;
+        
+        // Performance and Optimization
+        private MilestonePerformanceMonitor _performanceMonitor;
+        private ProgressionCache _progressionCache;
+        private BatchMilestoneProcessor _batchProcessor;
+        
+        // System Metrics
+        private MilestoneSystemMetrics _systemMetrics = new MilestoneSystemMetrics();
+        
+        // Events
+        public event Action<string, MilestoneProgress> OnMilestoneProgressUpdated;
+        public event Action<string, CompletedMilestone> OnMilestoneCompleted;
+        public event Action<string, MilestoneSynergy> OnSynergyActivated;
+        public event Action<string, DynamicMilestone> OnDynamicMilestoneGenerated;
+        public event Action<string, ProgressionPathway> OnPathwayUnlocked;
+        public event Action<AchievementCategory, CategoryMastery> OnMasteryLevelAchieved;
+        
+        #region Initialization
+        
+        public void Initialize(AchievementLibrarySO achievementLibrary, AchievementConfigSO achievementConfig, MilestoneConfigSO milestoneConfig)
+        {
+            _achievementLibrary = achievementLibrary;
+            _achievementConfig = achievementConfig;
+            _milestoneConfig = milestoneConfig;
+            
+            InitializeCoreComponents();
+            InitializeSynergyEngine();
+            InitializeDynamicGeneration();
+            InitializeAdaptivePathways();
+            InitializeMasteryTracking();
+            InitializeAnalyticsAndIntelligence();
+            InitializePerformanceOptimization();
+            
+            LoadPlayerProgressionProfile();
+            LoadActiveMilestones();
+            InitializeProgressionPathways();
+            
+            Debug.Log("Milestone Progression System initialized successfully");
+        }
+        
+        private void InitializeCoreComponents()
+        {
+            // Initialize milestone tracker
+            _milestoneTracker = new MilestoneTracker();
+            _milestoneTracker.Initialize(_achievementLibrary, _milestoneConfig);
+            
+            // Initialize milestone performance monitor
+            _performanceMonitor = new MilestonePerformanceMonitor();
+            _performanceMonitor.Initialize(_milestoneConfig);
+            
+            // Initialize batch processor
+            _batchProcessor = new BatchMilestoneProcessor();
+            _batchProcessor.Initialize(_milestoneConfig.MaxMilestonesPerUpdate);
+            
+            // Initialize progression cache
+            _progressionCache = new ProgressionCache();
+            _progressionCache.Initialize(_milestoneConfig.MaxCachedMilestones);
+        }
+        
+        private void InitializeSynergyEngine()
+        {
+            if (!_enableCrossCategorySynergies) return;
+            
+            // Initialize synergy engine
+            _synergyEngine = new CrossCategorySynergyEngine();
+            _synergyEngine.Initialize(_milestoneConfig, _synergyMultiplier, _maxActiveSynergies);
+            
+            // Initialize synergy calculator
+            _synergyCalculator = new SynergyCalculator();
+            _synergyCalculator.Initialize(_milestoneConfig, _synergyTimeWindow);
+            
+            // Initialize correlation engine
+            _correlationEngine = new CrossCategoryCorrelationEngine();
+            _correlationEngine.Initialize(_milestoneConfig);
+            
+            // Initialize synergy detector
+            _synergyDetector = new ProgressionSynergyDetector();
+            _synergyDetector.Initialize(_milestoneConfig, _generationThreshold);
+            
+            // Initialize balance analyzer
+            _balanceAnalyzer = new CategoryBalanceAnalyzer();
+            _balanceAnalyzer.Initialize(_milestoneConfig);
+        }
+        
+        private void InitializeDynamicGeneration()
+        {
+            if (!_enableDynamicMilestones) return;
+            
+            // Initialize dynamic milestone generator
+            _dynamicGenerator = new DynamicMilestoneGenerator();
+            _dynamicGenerator.Initialize(_milestoneConfig, _maxDynamicMilestones);
+            
+            if (_enableAIGeneration)
+            {
+                _dynamicGenerator.EnableAIGeneration(_generationThreshold);
+            }
+        }
+        
+        private void InitializeAdaptivePathways()
+        {
+            if (!_enableAdaptivePathways) return;
+            
+            // Initialize adaptive pathway manager
+            _pathwayManager = new AdaptivePathwayManager();
+            _pathwayManager.Initialize(_milestoneConfig, _adaptationRate);
+        }
+        
+        private void InitializeMasteryTracking()
+        {
+            if (!_enableMasteryTracking) return;
+            
+            // Initialize mastery progression analyzer
+            _masteryAnalyzer = new MasteryProgressionAnalyzer();
+            _masteryAnalyzer.Initialize(_milestoneConfig);
+            
+            // Initialize category mastery for all achievement categories
+            foreach (AchievementCategory category in Enum.GetValues(typeof(AchievementCategory)))
+            {
+                _categoryMastery[category] = new CategoryMastery
+                {
+                    Category = category,
+                    MasteryLevel = MasteryLevel.Novice,
+                    ProgressionPoints = 0,
+                    LastUpdate = DateTime.Now
+                };
+            }
+        }
+        
+        private void InitializeAnalyticsAndIntelligence()
+        {
+            // Initialize analytics engine
+            _analyticsEngine = new MilestoneAnalyticsEngine();
+            _analyticsEngine.Initialize(_milestoneConfig);
+            
+            // Initialize behavior profiler
+            _behaviorProfiler = new PlayerBehaviorProfiler();
+            _behaviorProfiler.Initialize(_milestoneConfig);
+            
+            // Initialize prediction engine
+            _predictionEngine = new ProgressionPredictionEngine();
+            _predictionEngine.Initialize(_milestoneConfig);
+            
+            // Initialize adaptation algorithm
+            _adaptationAlgorithm = new AdaptationAlgorithm();
+            _adaptationAlgorithm.Initialize(_milestoneConfig, _adaptationRate);
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            // Performance monitoring is already initialized in core components
+            Debug.Log("Milestone progression performance optimization initialized");
+        }
+        
+        private void LoadPlayerProgressionProfile()
+        {
+            // This would integrate with Project Chimera's save system
+            _progressionProfile = new PlayerProgressionProfile
+            {
+                PlayerId = SystemInfo.deviceUniqueIdentifier, // Placeholder
+                OverallProgressionLevel = 1,
+                TotalMilestonePoints = 0,
+                CompletedMilestones = new List<string>(),
+                ActivePathways = new List<string>(),
+                PreferredCategories = new List<AchievementCategory>(),
+                PlaystyleProfile = new PlaystyleProfile(),
+                CreationTime = DateTime.Now,
+                LastUpdate = DateTime.Now
+            };
+        }
+        
+        private void LoadActiveMilestones()
+        {
+            // Load active milestones from save system
+            var availableMilestones = _achievementLibrary.GetAvailableMilestones(_progressionProfile);
+            
+            foreach (var milestone in availableMilestones)
+            {
+                if (!_activeMilestones.ContainsKey(milestone.MilestoneId))
+                {
+                    var progress = new MilestoneProgress
+                    {
+                        MilestoneId = milestone.MilestoneId,
+                        Milestone = milestone,
+                        CurrentProgress = 0f,
+                        StartTime = DateTime.Now,
+                        LastUpdate = DateTime.Now,
+                        IsActive = true
+                    };
+                    
+                    _activeMilestones[milestone.MilestoneId] = progress;
+                }
+            }
+            
+            Debug.Log($"Loaded {_activeMilestones.Count} active milestones");
+        }
+        
+        private void InitializeProgressionPathways()
+        {
+            var pathways = _achievementLibrary.GetProgressionPathways();
+            
+            foreach (var pathway in pathways)
+            {
+                if (IsPathwayAvailable(pathway, _progressionProfile))
+                {
+                    _availablePathways.Add(pathway);
+                    
+                    var pathwayProgress = new PathwayProgress
+                    {
+                        PathwayId = pathway.PathwayId,
+                        Pathway = pathway,
+                        CurrentStep = 0,
+                        OverallProgress = 0f,
+                        IsUnlocked = true,
+                        UnlockTime = DateTime.Now
+                    };
+                    
+                    _pathwayProgress[pathway.PathwayId] = pathwayProgress;
+                }
+            }
+            
+            Debug.Log($"Initialized {_availablePathways.Count} progression pathways");
+        }
+        
+        #endregion
+        
+        #region Public Interface
+        
+        public void ProcessAchievementUnlock(UnlockedAchievement unlockedAchievement, PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                // Update milestone progress
+                UpdateMilestoneProgress(unlockedAchievement);
+                
+                // Check for synergy activations
+                CheckSynergyActivations(unlockedAchievement);
+                
+                // Update category mastery
+                UpdateCategoryMastery(unlockedAchievement);
+                
+                // Update pathway progress
+                UpdatePathwayProgress(unlockedAchievement);
+                
+                // Generate dynamic milestones if needed
+                CheckDynamicMilestoneGeneration(unlockedAchievement, playerProfile);
+                
+                // Update analytics
+                _analyticsEngine?.TrackAchievementImpact(unlockedAchievement);
+                
+                _systemMetrics.AchievementsProcessed++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing achievement unlock in milestone system: {ex.Message}");
+                _systemMetrics.ProcessingErrors++;
+            }
+        }
+        
+        public void UpdateMilestoneProgress(UnlockedAchievement unlockedAchievement)
+        {
+            try
+            {
+                var updatedMilestones = new List<string>();
+                
+                foreach (var milestoneProgress in _activeMilestones.Values.ToList())
+                {
+                    var previousProgress = milestoneProgress.CurrentProgress;
+                    var milestone = milestoneProgress.Milestone;
+                    
+                    // Check if this achievement contributes to the milestone
+                    if (DoesAchievementContributeToMilestone(unlockedAchievement.AchievementId, milestone))
+                    {
+                        var newProgress = CalculateMilestoneProgress(milestone, _progressionProfile);
+                        milestoneProgress.CurrentProgress = newProgress;
+                        milestoneProgress.LastUpdate = DateTime.Now;
+                        
+                        // Apply synergy bonuses
+                        if (_enableCrossCategorySynergies)
+                        {
+                            var synergyBonus = CalculateSynergyBonus(milestone, unlockedAchievement);
+                            milestoneProgress.CurrentProgress = Mathf.Min(1f, milestoneProgress.CurrentProgress + synergyBonus);
+                        }
+                        
+                        // Check for completion
+                        if (milestoneProgress.CurrentProgress >= 1f && previousProgress < 1f)
+                        {
+                            CompleteMilestone(milestoneProgress);
+                        }
+                        else if (milestoneProgress.CurrentProgress > previousProgress)
+                        {
+                            OnMilestoneProgressUpdated?.Invoke(milestoneProgress.MilestoneId, milestoneProgress);
+                        }
+                        
+                        updatedMilestones.Add(milestoneProgress.MilestoneId);
+                    }
+                }
+                
+                _systemMetrics.MilestoneUpdates += updatedMilestones.Count;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error updating milestone progress: {ex.Message}");
+                _systemMetrics.UpdateErrors++;
+            }
+        }
+        
+        public List<MilestoneProgress> GetActiveMilestones()
+        {
+            return _activeMilestones.Values.Where(m => m.IsActive).ToList();
+        }
+        
+        public List<CompletedMilestone> GetCompletedMilestones()
+        {
+            return _completedMilestones.Values.ToList();
+        }
+        
+        public List<MilestoneSynergy> GetActiveSynergies()
+        {
+            return _activeSynergies.Values.Where(s => s.IsActive).ToList();
+        }
+        
+        public List<ProgressionPathway> GetAvailablePathways()
+        {
+            return _availablePathways.ToList();
+        }
+        
+        public List<DynamicMilestone> GetGeneratedMilestones()
+        {
+            return _generatedMilestones.ToList();
+        }
+        
+        public CategoryMastery GetCategoryMastery(AchievementCategory category)
+        {
+            return _categoryMastery.GetValueOrDefault(category, new CategoryMastery { Category = category, MasteryLevel = MasteryLevel.Novice });
+        }
+        
+        public PlayerProgressionProfile GetProgressionProfile()
+        {
+            return _progressionProfile;
+        }
+        
+        public MilestoneSystemMetrics GetSystemMetrics()
+        {
+            return _systemMetrics;
+        }
+        
+        #endregion
+        
+        #region Milestone Management
+        
+        private void CompleteMilestone(MilestoneProgress milestoneProgress)
+        {
+            try
+            {
+                milestoneProgress.IsActive = false;
+                milestoneProgress.CompletionTime = DateTime.Now;
+                
+                var completedMilestone = new CompletedMilestone
+                {
+                    MilestoneId = milestoneProgress.MilestoneId,
+                    Milestone = milestoneProgress.Milestone,
+                    CompletionTime = DateTime.Now,
+                    SynergyBonuses = GetAppliedSynergyBonuses(milestoneProgress.MilestoneId),
+                    ProgressionContext = CreateProgressionContext()
+                };
+                
+                _completedMilestones[milestoneProgress.MilestoneId] = completedMilestone;
+                _progressionProfile.CompletedMilestones.Add(milestoneProgress.MilestoneId);
+                
+                // Calculate milestone rewards and progression points
+                var milestonePoints = CalculateMilestonePoints(milestoneProgress.Milestone);
+                _progressionProfile.TotalMilestonePoints += milestonePoints;
+                
+                // Check for progression level up
+                CheckProgressionLevelUp(milestonePoints);
+                
+                // Unlock new milestones
+                UnlockNewMilestones(completedMilestone);
+                
+                // Update pathways
+                UpdatePathwaysOnMilestoneCompletion(completedMilestone);
+                
+                // Trigger events
+                OnMilestoneCompleted?.Invoke(milestoneProgress.MilestoneId, completedMilestone);
+                
+                // Analytics tracking
+                _analyticsEngine?.TrackMilestoneCompletion(completedMilestone);
+                
+                Debug.Log($"Milestone completed: {milestoneProgress.Milestone.MilestoneName}");
+                _systemMetrics.MilestonesCompleted++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error completing milestone {milestoneProgress.MilestoneId}: {ex.Message}");
+                _systemMetrics.CompletionErrors++;
+            }
+        }
+        
+        private float CalculateMilestoneProgress(MilestoneSO milestone, PlayerProgressionProfile profile)
+        {
+            var requirements = milestone.Requirements;
+            if (requirements == null || !requirements.Any()) return 1f;
+            
+            var metRequirements = 0;
+            var totalRequirements = requirements.Count;
+            
+            foreach (var requirement in requirements)
+            {
+                if (IsRequirementMet(requirement, profile))
+                {
+                    metRequirements++;
+                }
+            }
+            
+            return milestone.CalculationType switch
+            {
+                MilestoneCalculationType.AllRequired => metRequirements == totalRequirements ? 1f : (float)metRequirements / totalRequirements,
+                MilestoneCalculationType.AnyRequired => metRequirements > 0 ? 1f : 0f,
+                MilestoneCalculationType.Percentage => (float)metRequirements / totalRequirements,
+                MilestoneCalculationType.Weighted => CalculateWeightedProgress(requirements, profile),
+                _ => (float)metRequirements / totalRequirements
+            };
+        }
+        
+        private bool IsRequirementMet(MilestoneRequirement requirement, PlayerProgressionProfile profile)
+        {
+            return requirement.RequirementType switch
+            {
+                MilestoneRequirementType.Achievement => profile.CompletedMilestones.Contains(requirement.TargetId),
+                MilestoneRequirementType.Category => GetCategoryCount(requirement.CategoryTarget, profile) >= requirement.RequiredCount,
+                MilestoneRequirementType.Points => profile.TotalMilestonePoints >= requirement.RequiredCount,
+                MilestoneRequirementType.Level => profile.OverallProgressionLevel >= requirement.RequiredCount,
+                MilestoneRequirementType.Custom => EvaluateCustomRequirement(requirement, profile),
+                _ => false
+            };
+        }
+        
+        private float CalculateWeightedProgress(List<MilestoneRequirement> requirements, PlayerProgressionProfile profile)
+        {
+            var totalWeight = requirements.Sum(req => req.Weight);
+            var achievedWeight = requirements.Where(req => IsRequirementMet(req, profile)).Sum(req => req.Weight);
+            
+            return totalWeight > 0 ? achievedWeight / totalWeight : 0f;
+        }
+        
+        private bool DoesAchievementContributeToMilestone(string achievementId, MilestoneSO milestone)
+        {
+            if (milestone.Requirements == null) return false;
+            
+            return milestone.Requirements.Any(req => 
+                req.RequirementType == MilestoneRequirementType.Achievement && req.TargetId == achievementId);
+        }
+        
+        #endregion
+        
+        #region Cross-Category Synergies
+        
+        private void CheckSynergyActivations(UnlockedAchievement unlockedAchievement)
+        {
+            if (!_enableCrossCategorySynergies || _synergyEngine == null) return;
+            
+            try
+            {
+                var potentialSynergies = _synergyEngine.DetectPotentialSynergies(unlockedAchievement, _progressionProfile);
+                
+                foreach (var synergy in potentialSynergies)
+                {
+                    if (!_activeSynergies.ContainsKey(synergy.SynergyId) && synergy.ActivationThreshold <= synergy.CurrentStrength)
+                    {
+                        ActivateSynergy(synergy);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error checking synergy activations: {ex.Message}");
+                _systemMetrics.SynergyErrors++;
+            }
+        }
+        
+        private void ActivateSynergy(MilestoneSynergy synergy)
+        {
+            try
+            {
+                synergy.IsActive = true;
+                synergy.ActivationTime = DateTime.Now;
+                
+                _activeSynergies[synergy.SynergyId] = synergy;
+                
+                // Apply synergy effects to relevant milestones
+                ApplySynergyEffects(synergy);
+                
+                OnSynergyActivated?.Invoke(synergy.SynergyId, synergy);
+                
+                Debug.Log($"Synergy activated: {synergy.SynergyName}");
+                _systemMetrics.SynergiesActivated++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error activating synergy {synergy.SynergyId}: {ex.Message}");
+                _systemMetrics.SynergyErrors++;
+            }
+        }
+        
+        private void ApplySynergyEffects(MilestoneSynergy synergy)
+        {
+            foreach (var affectedMilestoneId in synergy.AffectedMilestones)
+            {
+                if (_activeMilestones.TryGetValue(affectedMilestoneId, out var milestoneProgress))
+                {
+                    var synergyBonus = synergy.EffectStrength * _synergyMultiplier;
+                    milestoneProgress.SynergyBonuses[synergy.SynergyId] = synergyBonus;
+                    
+                    // Recalculate progress with synergy bonus
+                    var baseProgress = CalculateMilestoneProgress(milestoneProgress.Milestone, _progressionProfile);
+                    var totalBonus = milestoneProgress.SynergyBonuses.Values.Sum();
+                    milestoneProgress.CurrentProgress = Mathf.Min(1f, baseProgress + totalBonus);
+                }
+            }
+        }
+        
+        private float CalculateSynergyBonus(MilestoneSO milestone, UnlockedAchievement achievement)
+        {
+            if (_synergyCalculator == null) return 0f;
+            
+            return _synergyCalculator.CalculateBonus(milestone, achievement, _activeSynergies.Values.ToList());
+        }
+        
+        private List<string> GetAppliedSynergyBonuses(string milestoneId)
+        {
+            if (!_activeMilestones.TryGetValue(milestoneId, out var progress))
+                return new List<string>();
+            
+            return progress.SynergyBonuses.Keys.ToList();
+        }
+        
+        #endregion
+        
+        #region Category Mastery
+        
+        private void UpdateCategoryMastery(UnlockedAchievement unlockedAchievement)
+        {
+            if (!_enableMasteryTracking) return;
+            
+            try
+            {
+                var category = unlockedAchievement.Achievement.Category;
+                if (!_categoryMastery.TryGetValue(category, out var mastery))
+                {
+                    mastery = new CategoryMastery
+                    {
+                        Category = category,
+                        MasteryLevel = MasteryLevel.Novice,
+                        ProgressionPoints = 0,
+                        LastUpdate = DateTime.Now
+                    };
+                    _categoryMastery[category] = mastery;
+                }
+                
+                // Calculate mastery points from achievement
+                var masteryPoints = CalculateMasteryPoints(unlockedAchievement.Achievement);
+                mastery.ProgressionPoints += masteryPoints;
+                mastery.LastUpdate = DateTime.Now;
+                
+                // Check for mastery level advancement
+                var newMasteryLevel = CalculateMasteryLevel(mastery.ProgressionPoints);
+                if (newMasteryLevel > mastery.MasteryLevel)
+                {
+                    mastery.MasteryLevel = newMasteryLevel;
+                    OnMasteryLevelAchieved?.Invoke(category, mastery);
+                    
+                    Debug.Log($"Mastery level achieved: {category} - {newMasteryLevel}");
+                    _systemMetrics.MasteryLevelsAchieved++;
+                }
+                
+                _systemMetrics.MasteryUpdates++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error updating category mastery: {ex.Message}");
+                _systemMetrics.MasteryErrors++;
+            }
+        }
+        
+        private int CalculateMasteryPoints(AchievementSO achievement)
+        {
+            var basePoints = achievement.PointValue;
+            
+            // Apply rarity multiplier
+            var rarityMultiplier = achievement.Rarity switch
+            {
+                AchievementRarity.Common => 1f,
+                AchievementRarity.Uncommon => 1.5f,
+                AchievementRarity.Rare => 2f,
+                AchievementRarity.Epic => 3f,
+                AchievementRarity.Legendary => 5f,
+                AchievementRarity.Mythic => 10f,
+                _ => 1f
+            };
+            
+            // Apply difficulty multiplier
+            var difficultyMultiplier = achievement.Difficulty switch
+            {
+                AchievementDifficulty.Trivial => 0.5f,
+                AchievementDifficulty.Easy => 0.75f,
+                AchievementDifficulty.Medium => 1f,
+                AchievementDifficulty.Hard => 1.5f,
+                AchievementDifficulty.Expert => 2f,
+                AchievementDifficulty.Master => 3f,
+                AchievementDifficulty.Grandmaster => 5f,
+                _ => 1f
+            };
+            
+            return Mathf.RoundToInt(basePoints * rarityMultiplier * difficultyMultiplier);
+        }
+        
+        private MasteryLevel CalculateMasteryLevel(int progressionPoints)
+        {
+            return progressionPoints switch
+            {
+                < 100 => MasteryLevel.Novice,
+                < 500 => MasteryLevel.Apprentice,
+                < 1500 => MasteryLevel.Journeyman,
+                < 3500 => MasteryLevel.Expert,
+                < 7500 => MasteryLevel.Master,
+                < 15000 => MasteryLevel.Grandmaster,
+                _ => MasteryLevel.Legendary
+            };
+        }
+        
+        #endregion
+        
+        #region Adaptive Pathways
+        
+        private void UpdatePathwayProgress(UnlockedAchievement unlockedAchievement)
+        {
+            if (!_enableAdaptivePathways) return;
+            
+            try
+            {
+                foreach (var pathwayProgress in _pathwayProgress.Values.ToList())
+                {
+                    if (!pathwayProgress.IsUnlocked) continue;
+                    
+                    var pathway = pathwayProgress.Pathway;
+                    if (DoesAchievementContributeToPathway(unlockedAchievement.AchievementId, pathway))
+                    {
+                        var previousProgress = pathwayProgress.OverallProgress;
+                        UpdatePathwayStep(pathwayProgress, unlockedAchievement);
+                        
+                        if (pathwayProgress.OverallProgress > previousProgress)
+                        {
+                            CheckPathwayCompletion(pathwayProgress);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error updating pathway progress: {ex.Message}");
+                _systemMetrics.PathwayErrors++;
+            }
+        }
+        
+        private void UpdatePathwayStep(PathwayProgress pathwayProgress, UnlockedAchievement achievement)
+        {
+            var pathway = pathwayProgress.Pathway;
+            var currentStep = pathwayProgress.CurrentStep;
+            
+            if (currentStep < pathway.Steps.Count)
+            {
+                var step = pathway.Steps[currentStep];
+                if (step.RequiredAchievements.Contains(achievement.AchievementId))
+                {
+                    pathwayProgress.CurrentStep++;
+                    pathwayProgress.OverallProgress = (float)pathwayProgress.CurrentStep / pathway.Steps.Count;
+                    pathwayProgress.LastUpdate = DateTime.Now;
+                }
+            }
+        }
+        
+        private void CheckPathwayCompletion(PathwayProgress pathwayProgress)
+        {
+            if (pathwayProgress.OverallProgress >= 1f && !pathwayProgress.IsCompleted)
+            {
+                pathwayProgress.IsCompleted = true;
+                pathwayProgress.CompletionTime = DateTime.Now;
+                
+                // Unlock pathway rewards and new pathways
+                UnlockPathwayRewards(pathwayProgress);
+                UnlockNextPathways(pathwayProgress);
+                
+                Debug.Log($"Pathway completed: {pathwayProgress.Pathway.PathwayName}");
+                _systemMetrics.PathwaysCompleted++;
+            }
+        }
+        
+        private bool DoesAchievementContributeToPathway(string achievementId, ProgressionPathway pathway)
+        {
+            return pathway.Steps.Any(step => step.RequiredAchievements.Contains(achievementId));
+        }
+        
+        #endregion
+        
+        #region Dynamic Milestone Generation
+        
+        private void CheckDynamicMilestoneGeneration(UnlockedAchievement unlockedAchievement, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableDynamicMilestones || _dynamicGenerator == null) return;
+            
+            try
+            {
+                // Analyze player behavior and preferences
+                var behaviorProfile = _behaviorProfiler?.AnalyzeBehavior(playerProfile);
+                
+                // Generate potential milestones
+                var generatedMilestones = _dynamicGenerator.GenerateMilestones(unlockedAchievement, behaviorProfile, _progressionProfile);
+                
+                foreach (var milestone in generatedMilestones)
+                {
+                    if (_generatedMilestones.Count < _maxDynamicMilestones)
+                    {
+                        _generatedMilestones.Enqueue(milestone);
+                        OnDynamicMilestoneGenerated?.Invoke(milestone.MilestoneId, milestone);
+                        
+                        Debug.Log($"Dynamic milestone generated: {milestone.MilestoneName}");
+                        _systemMetrics.DynamicMilestonesGenerated++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in dynamic milestone generation: {ex.Message}");
+                _systemMetrics.GenerationErrors++;
+            }
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private int GetCategoryCount(AchievementCategory category, PlayerProgressionProfile profile)
+        {
+            // This would count achievements in the category from the player's profile
+            return 0; // Placeholder implementation
+        }
+        
+        private bool EvaluateCustomRequirement(MilestoneRequirement requirement, PlayerProgressionProfile profile)
+        {
+            // Custom requirement evaluation logic would go here
+            return false; // Placeholder implementation
+        }
+        
+        private int CalculateMilestonePoints(MilestoneSO milestone)
+        {
+            var basePoints = milestone.BasePoints;
+            var difficultyMultiplier = milestone.Difficulty switch
+            {
+                MilestoneDifficulty.Easy => 1f,
+                MilestoneDifficulty.Medium => 1.5f,
+                MilestoneDifficulty.Hard => 2f,
+                MilestoneDifficulty.Expert => 3f,
+                MilestoneDifficulty.Master => 5f,
+                _ => 1f
+            };
+            
+            return Mathf.RoundToInt(basePoints * difficultyMultiplier);
+        }
+        
+        private void CheckProgressionLevelUp(int milestonePoints)
+        {
+            var requiredPoints = CalculateRequiredPointsForNextLevel(_progressionProfile.OverallProgressionLevel);
+            
+            if (_progressionProfile.TotalMilestonePoints >= requiredPoints)
+            {
+                _progressionProfile.OverallProgressionLevel++;
+                Debug.Log($"Progression level up: {_progressionProfile.OverallProgressionLevel}");
+                _systemMetrics.ProgressionLevelUps++;
+            }
+        }
+        
+        private int CalculateRequiredPointsForNextLevel(int currentLevel)
+        {
+            // Exponential progression requirement
+            return Mathf.RoundToInt(1000 * Mathf.Pow(1.5f, currentLevel - 1));
+        }
+        
+        private void UnlockNewMilestones(CompletedMilestone completedMilestone)
+        {
+            var newMilestones = _achievementLibrary.GetMilestonesUnlockedBy(completedMilestone.MilestoneId);
+            
+            foreach (var milestone in newMilestones)
+            {
+                if (!_activeMilestones.ContainsKey(milestone.MilestoneId))
+                {
+                    var progress = new MilestoneProgress
+                    {
+                        MilestoneId = milestone.MilestoneId,
+                        Milestone = milestone,
+                        CurrentProgress = 0f,
+                        StartTime = DateTime.Now,
+                        LastUpdate = DateTime.Now,
+                        IsActive = true
+                    };
+                    
+                    _activeMilestones[milestone.MilestoneId] = progress;
+                }
+            }
+        }
+        
+        private void UpdatePathwaysOnMilestoneCompletion(CompletedMilestone completedMilestone)
+        {
+            // Check if any new pathways should be unlocked
+            var newPathways = _achievementLibrary.GetPathwaysUnlockedBy(completedMilestone.MilestoneId);
+            
+            foreach (var pathway in newPathways)
+            {
+                if (!_pathwayProgress.ContainsKey(pathway.PathwayId))
+                {
+                    var pathwayProgress = new PathwayProgress
+                    {
+                        PathwayId = pathway.PathwayId,
+                        Pathway = pathway,
+                        CurrentStep = 0,
+                        OverallProgress = 0f,
+                        IsUnlocked = true,
+                        UnlockTime = DateTime.Now
+                    };
+                    
+                    _pathwayProgress[pathway.PathwayId] = pathwayProgress;
+                    _availablePathways.Add(pathway);
+                    
+                    OnPathwayUnlocked?.Invoke(pathway.PathwayId, pathway);
+                }
+            }
+        }
+        
+        private void UnlockPathwayRewards(PathwayProgress pathwayProgress)
+        {
+            // Implementation for pathway reward distribution
+        }
+        
+        private void UnlockNextPathways(PathwayProgress pathwayProgress)
+        {
+            // Implementation for unlocking subsequent pathways
+        }
+        
+        private bool IsPathwayAvailable(ProgressionPathway pathway, PlayerProgressionProfile profile)
+        {
+            // Check if pathway prerequisites are met
+            return pathway.Prerequisites == null || 
+                   pathway.Prerequisites.All(prereq => profile.CompletedMilestones.Contains(prereq));
+        }
+        
+        private ProgressionContext CreateProgressionContext()
+        {
+            return new ProgressionContext
+            {
+                Timestamp = DateTime.Now,
+                ProgressionLevel = _progressionProfile.OverallProgressionLevel,
+                TotalMilestonePoints = _progressionProfile.TotalMilestonePoints,
+                ActiveSynergies = _activeSynergies.Keys.ToList(),
+                CategoryMasteryLevels = _categoryMastery.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.MasteryLevel)
+            };
+        }
+        
+        #endregion
+        
+        #region IDisposable Implementation
+        
+        public void Dispose()
+        {
+            _milestoneTracker?.Dispose();
+            _synergyEngine?.Dispose();
+            _dynamicGenerator?.Dispose();
+            _pathwayManager?.Dispose();
+            _masteryAnalyzer?.Dispose();
+            _legacyCoordinator?.Dispose();
+            _analyticsEngine?.Dispose();
+            _behaviorProfiler?.Dispose();
+            _predictionEngine?.Dispose();
+            _performanceMonitor?.Dispose();
+            _progressionCache?.Dispose();
+            _batchProcessor?.Dispose();
+            
+            _activeMilestones.Clear();
+            _completedMilestones.Clear();
+            _activeSynergies.Clear();
+            _categoryMastery.Clear();
+            _availablePathways.Clear();
+            _pathwayProgress.Clear();
+            _generatedMilestones.Clear();
+            
+            OnMilestoneProgressUpdated = null;
+            OnMilestoneCompleted = null;
+            OnSynergyActivated = null;
+            OnDynamicMilestoneGenerated = null;
+            OnPathwayUnlocked = null;
+            OnMasteryLevelAchieved = null;
+        }
+        
+        #endregion
+    }
+    
+    /// <summary>
+    /// Milestone progress data for tracking milestone completion.
+    /// </summary>
+    [Serializable]
+    public class MilestoneProgress
+    {
+        public string MilestoneId;
+        public string PlayerId;
+        public float CompletionPercentage;
+        public DateTime StartDate;
+        public DateTime LastUpdate;
+        public Dictionary<string, float> SubGoalProgress;
+        public List<string> CompletedSubGoals;
+        public bool IsCompleted;
+        public float DifficultyMultiplier;
+    }
+    
+    /// <summary>
+    /// Milestone synergy data for tracking synergistic effects.
+    /// </summary>
+    [Serializable]
+    public class MilestoneSynergy
+    {
+        public string SynergyId;
+        public List<string> RequiredMilestones;
+        public Dictionary<string, float> SynergyBonuses;
+        public float SynergyMultiplier;
+        public DateTime ActivationDate;
+        public bool IsActive;
+        public string SynergyDescription;
+        public List<string> UnlockedFeatures;
+    }
+}

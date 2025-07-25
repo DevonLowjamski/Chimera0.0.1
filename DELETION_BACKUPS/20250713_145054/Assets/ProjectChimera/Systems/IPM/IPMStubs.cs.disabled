@@ -1,0 +1,70 @@
+using UnityEngine;
+using System.Collections.Generic;
+using ProjectChimera.Systems.Gaming.IPM;
+using ProjectChimera.Data.IPM;
+using System;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Minimal stub implementations for IPM system classes that are not defined in IPMGamingDataStructures.cs
+    /// Most types are now properly defined in the IPMGamingDataStructures file.
+    /// </summary>
+    
+    // Simple helper methods for types that need additional functionality beyond data structures
+    public static class IPMHelpers
+    {
+        public static Dictionary<string, object> GetNeuralNetworkArchitecture()
+        {
+            return new Dictionary<string, object>
+            {
+                ["InputNodes"] = 10,
+                ["HiddenLayers"] = new[] { 20, 15 },
+                ["OutputNodes"] = 5,
+                ["ActivationFunction"] = "ReLU"
+            };
+        }
+        
+        public static Dictionary<string, object> GetPatternRecognitionSettings()
+        {
+            return new Dictionary<string, object>
+            {
+                ["MinConfidence"] = 0.7f,
+                ["MaxPatterns"] = 100,
+                ["LearningRate"] = 0.1f
+            };
+        }
+        
+        public static List<OptimizationObjective> GetOptimizationObjectives()
+        {
+            return new List<OptimizationObjective>
+            {
+                new OptimizationObjective { ObjectiveName = "Effectiveness", Weight = 0.4f },
+                new OptimizationObjective { ObjectiveName = "ResourceEfficiency", Weight = 0.3f },
+                new OptimizationObjective { ObjectiveName = "Speed", Weight = 0.3f }
+            };
+        }
+        
+        public static Dictionary<string, object> GetGeneticAlgorithmParameters()
+        {
+            return new Dictionary<string, object>
+            {
+                ["PopulationSize"] = 50,
+                ["MutationRate"] = 0.1f,
+                ["CrossoverRate"] = 0.8f,
+                ["MaxGenerations"] = 100
+            };
+        }
+        
+        public static Dictionary<string, object> GetSimulatedAnnealingParameters()
+        {
+            return new Dictionary<string, object>
+            {
+                ["InitialTemperature"] = 1000.0f,
+                ["CoolingRate"] = 0.95f,
+                ["MinTemperature"] = 0.01f,
+                ["MaxIterations"] = 1000
+            };
+        }
+    }
+}

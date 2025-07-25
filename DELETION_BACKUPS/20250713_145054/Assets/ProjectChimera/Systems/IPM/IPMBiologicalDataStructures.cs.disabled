@@ -1,0 +1,1474 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Supporting data structures and helper classes for the IPM Biological Control System.
+    /// Defines specialized classes for ecosystem modeling, population dynamics, species interactions,
+    /// and environmental dependencies to support advanced biological control strategies.
+    /// </summary>
+    
+    #region Population and Species Management
+    
+    [Serializable]
+    public class OrganismPopulationState
+    {
+        public string OrganismId;
+        public int CurrentPopulation;
+        public int MaxPopulation;
+        public float ReproductionRate;
+        public float MortalityRate;
+        public EstablishmentStatus EstablishmentStatus;
+        public float EstablishmentProbability;
+        public DateTime LastUpdate;
+        public float EnvironmentalStress;
+        public float PredationPressure;
+        public float HuntingSuccess;
+        public Dictionary<string, int> AgeStructure = new Dictionary<string, int>();
+        public List<PopulationEvent> PopulationHistory = new List<PopulationEvent>();
+    }
+    
+    public enum EstablishmentStatus
+    {
+        Establishing,
+        Established,
+        Declining,
+        Failed,
+        Dormant
+    }
+    
+    [Serializable]
+    public class SpeciesProfile
+    {
+        public BeneficialOrganismType OrganismType;
+        public float ReproductionModifier;
+        public float EcosystemImpact;
+        public float OptimalTemperature;
+        public float TemperatureTolerance;
+        public float OptimalHumidity;
+        public float HumidityTolerance;
+        public List<PestType> PrimaryPrey;
+        public List<PestType> SecondaryPrey;
+        public float SearchEfficiency;
+        public float ConversionEfficiency; // Prey to offspring
+        public int GenerationTime; // Days
+        public float DispersalAbility;
+        public SeasonalActivityPattern SeasonalPattern;
+        public List<string> RequiredHabitats;
+        public Dictionary<string, float> NutritionalRequirements;
+    }
+    
+    [Serializable]
+    public class SeasonalActivityPattern
+    {
+        public Dictionary<string, float> MonthlyActivity = new Dictionary<string, float>();
+        public float OverwinteringSurvival;
+        public bool RequiresDiapause;
+        public TemperatureThresholds DevelopmentThresholds;
+        public int ColdToleranceDays;
+    }
+    
+    [Serializable]
+    public class TemperatureThresholds
+    {
+        public float DevelopmentThreshold; // Minimum temp for development
+        public float OptimalDevelopment;   // Optimal temp for fastest development
+        public float UpperLethalTemp;     // Temperature that causes mortality
+        public float LowerLethalTemp;     // Lower lethal temperature
+    }
+    
+    [Serializable]
+    public class PopulationEvent
+    {
+        public DateTime Timestamp;
+        public PopulationEventType EventType;
+        public int PopulationChange;
+        public string Cause;
+        public Dictionary<string, object> EventData;
+    }
+    
+    public enum PopulationEventType
+    {
+        Reproduction,
+        Mortality,
+        Migration,
+        Predation,
+        Environmental,
+        Disease,
+        Starvation,
+        Establishment,
+        Dispersal
+    }
+    
+    #endregion
+    
+    #region Ecosystem Modeling
+    
+    [Serializable]
+    public class EcosystemMetrics
+    {
+        public float OverallBalance;
+        public float SpeciesDiversity;
+        public float PredatorPreyRatio;
+        public int TotalOrganisms;
+        public int TotalSpecies;
+        public float SystemStability;
+        public float BiomassDistribution;
+        public DateTime LastUpdate;
+        public Dictionary<string, float> TrophicLevels = new Dictionary<string, float>();
+        public List<EcosystemTrend> RecentTrends = new List<EcosystemTrend>();
+    }
+    
+    [Serializable]
+    public class EcosystemNiche
+    {
+        public BeneficialOrganismType OrganismType;
+        public float NicheSize;
+        public float CompetitiveStrength;
+        public Dictionary<string, float> ResourceRequirements;
+        public Dictionary<string, float> EnvironmentalTolerances;
+        public List<BeneficialOrganismType> Competitors;
+        public float NicheOverlap;
+        public EcosystemRole EcologicalRole;
+    }
+    
+    public enum EcosystemRole
+    {
+        PrimaryPredator,
+        SecondaryPredator,
+        Parasitoid,
+        Pathogen,
+        Pollinator,
+        Decomposer,
+        Omnivore
+    }
+    
+    [Serializable]
+    public class FoodWebConnection
+    {
+        public BeneficialOrganismType PredatorType;
+        public PestType PreyType;
+        public float PredationEfficiency;
+        public float ConnectionStrength;
+        public bool IsActive;
+        public float EnergyTransferRate;
+        public Dictionary<string, float> SeasonalVariation;
+        public List<EnvironmentalModifier> EnvironmentalModifiers;
+    }
+    
+    [Serializable]
+    public class EnvironmentalModifier
+    {
+        public string FactorName;
+        public float ModifierValue;
+        public EnvironmentalFactorType FactorType;
+        public float OptimalRange;
+        public float ToleranceRange;
+    }
+    
+    public enum EnvironmentalFactorType
+    {
+        Temperature,
+        Humidity,
+        Light,
+        pH,
+        Nutrients,
+        Pesticides,
+        CO2,
+        Airflow
+    }
+    
+    [Serializable]
+    public class EcosystemTrend
+    {
+        public DateTime Timestamp;
+        public TrendType Type;
+        public float Value;
+        public float ChangeRate;
+        public string Description;
+        public TrendSeverity Severity;
+    }
+    
+    public enum TrendType
+    {
+        PopulationGrowth,
+        PopulationDecline,
+        SpeciesExtinction,
+        NewEstablishment,
+        BalanceShift,
+        DiversityChange
+    }
+    
+    public enum TrendSeverity
+    {
+        Minimal,
+        Low,
+        Moderate,
+        High,
+        Critical
+    }
+    
+    #endregion
+    
+    #region Ecosystem Balance Calculator
+    
+    /// <summary>
+    /// Calculates and monitors ecosystem balance using multiple ecological metrics.
+    /// </summary>
+    public class EcosystemBalanceCalculator : IDisposable
+    {
+        private readonly float _optimalBalance;
+        private readonly float _imbalanceThreshold;
+        private Dictionary<string, float> _speciesWeights = new Dictionary<string, float>();
+        private List<BalanceIndicator> _balanceIndicators = new List<BalanceIndicator>();
+        
+        public EcosystemBalanceCalculator(float optimalBalance, float imbalanceThreshold)
+        {
+            _optimalBalance = optimalBalance;
+            _imbalanceThreshold = imbalanceThreshold;
+            InitializeBalanceIndicators();
+        }
+        
+        public float CalculateBalance(List<BeneficialOrganismData> organisms, List<PestInvasionData> pests)
+        {
+            var indicators = new List<float>();
+            
+            // Species diversity indicator
+            indicators.Add(CalculateSpeciesDiversityBalance(organisms));
+            
+            // Predator-prey ratio indicator
+            indicators.Add(CalculatePredatorPreyBalance(organisms, pests));
+            
+            // Population distribution indicator
+            indicators.Add(CalculatePopulationDistributionBalance(organisms));
+            
+            // Environmental suitability indicator
+            indicators.Add(CalculateEnvironmentalSuitabilityBalance(organisms));
+            
+            // Temporal stability indicator
+            indicators.Add(CalculateTemporalStabilityBalance(organisms));
+            
+            // Calculate weighted average
+            return indicators.Average();
+        }
+        
+        private void InitializeBalanceIndicators()
+        {
+            _balanceIndicators.AddRange(new[]
+            {
+                new BalanceIndicator { Name = "SpeciesDiversity", Weight = 0.25f, OptimalValue = 0.8f },
+                new BalanceIndicator { Name = "PredatorPreyRatio", Weight = 0.3f, OptimalValue = 0.15f },
+                new BalanceIndicator { Name = "PopulationDistribution", Weight = 0.2f, OptimalValue = 0.75f },
+                new BalanceIndicator { Name = "EnvironmentalSuitability", Weight = 0.15f, OptimalValue = 0.8f },
+                new BalanceIndicator { Name = "TemporalStability", Weight = 0.1f, OptimalValue = 0.7f }
+            });
+        }
+        
+        private float CalculateSpeciesDiversityBalance(List<BeneficialOrganismData> organisms)
+        {
+            if (!organisms.Any()) return 0f;
+            
+            var speciesCount = organisms.GroupBy(o => o.Type).Count();
+            var totalSpeciesAvailable = Enum.GetValues(typeof(BeneficialOrganismType)).Length;
+            
+            var diversity = (float)speciesCount / totalSpeciesAvailable;
+            
+            // Shannon diversity index calculation
+            var proportions = organisms.GroupBy(o => o.Type)
+                .Select(g => (float)g.Sum(o => o.PopulationSize) / organisms.Sum(o => o.PopulationSize))
+                .Where(p => p > 0);
+            
+            var shannonIndex = -proportions.Sum(p => p * Mathf.Log(p));
+            var maxShannon = Mathf.Log(speciesCount);
+            var evenness = maxShannon > 0 ? shannonIndex / maxShannon : 0f;
+            
+            return (diversity + evenness) / 2f;
+        }
+        
+        private float CalculatePredatorPreyBalance(List<BeneficialOrganismData> organisms, List<PestInvasionData> pests)
+        {
+            var totalPredators = organisms.Sum(o => o.PopulationSize);
+            var totalPrey = pests.Sum(p => p.PopulationSize);
+            
+            if (totalPrey == 0) return totalPredators == 0 ? 1f : 0f;
+            
+            var ratio = (float)totalPredators / totalPrey;
+            var optimalRatio = 0.15f; // 15% predator to prey ratio
+            
+            // Calculate how close we are to optimal ratio
+            var deviation = Mathf.Abs(ratio - optimalRatio) / optimalRatio;
+            return Mathf.Max(0f, 1f - deviation);
+        }
+        
+        private float CalculatePopulationDistributionBalance(List<BeneficialOrganismData> organisms)
+        {
+            if (!organisms.Any()) return 0f;
+            
+            var populations = organisms.Select(o => o.PopulationSize).ToList();
+            var mean = (float)populations.Average();
+            var variance = populations.Sum(p => Mathf.Pow(p - mean, 2)) / populations.Count;
+            var stdDev = Mathf.Sqrt(variance);
+            
+            // Coefficient of variation (lower is more balanced)
+            var cv = mean > 0 ? stdDev / mean : 1f;
+            
+            return Mathf.Max(0f, 1f - cv);
+        }
+        
+        private float CalculateEnvironmentalSuitabilityBalance(List<BeneficialOrganismData> organisms)
+        {
+            if (!organisms.Any()) return 0f;
+            
+            var avgStress = (float)organisms.Average(o => o.EnvironmentalStress);
+            return 1f - avgStress;
+        }
+        
+        private float CalculateTemporalStabilityBalance(List<BeneficialOrganismData> organisms)
+        {
+            // This would track population changes over time
+            // For now, return a baseline stability
+            return 0.7f;
+        }
+        
+        public void Dispose()
+        {
+            _speciesWeights.Clear();
+            _balanceIndicators.Clear();
+        }
+    }
+    
+    [Serializable]
+    public class BalanceIndicator
+    {
+        public string Name;
+        public float Weight;
+        public float OptimalValue;
+        public float CurrentValue;
+        public float Contribution;
+    }
+    
+    #endregion
+    
+    #region Predator-Prey Dynamics
+    
+    /// <summary>
+    /// Manages complex predator-prey population dynamics using ecological models.
+    /// </summary>
+    public class PredatorPreyDynamics : IDisposable
+    {
+        private readonly float _predationEfficiency;
+        private Dictionary<string, LotkaVolterraParameters> _populationModels = new Dictionary<string, LotkaVolterraParameters>();
+        private List<PredationEvent> _predationHistory = new List<PredationEvent>();
+        
+        public PredatorPreyDynamics(float predationEfficiency)
+        {
+            _predationEfficiency = predationEfficiency;
+        }
+        
+        public float CalculatePredationRate(BeneficialOrganismData predator, PestInvasionData prey, float deltaTime)
+        {
+            var baseRate = CalculateBasePredationRate(predator, prey);
+            var environmentalModifier = CalculateEnvironmentalModifier(predator, prey);
+            var densityModifier = CalculateDensityDependentModifier(predator, prey);
+            var handlingTimeModifier = CalculateHandlingTimeModifier(predator);
+            
+            return baseRate * environmentalModifier * densityModifier * handlingTimeModifier * deltaTime;
+        }
+        
+        private float CalculateBasePredationRate(BeneficialOrganismData predator, PestInvasionData prey)
+        {
+            var attackRate = GetAttackRate(predator.Type, prey.PestType);
+            var searchEfficiency = predator.HuntingEfficiency;
+            var preyVulnerability = GetPreyVulnerability(prey.PestType);
+            
+            return attackRate * searchEfficiency * preyVulnerability * _predationEfficiency;
+        }
+        
+        private float CalculateEnvironmentalModifier(BeneficialOrganismData predator, PestInvasionData prey)
+        {
+            // Environmental factors affect predation success
+            var temperature = GetCurrentTemperature();
+            var humidity = GetCurrentHumidity();
+            var lightLevel = GetCurrentLightLevel();
+            
+            var tempEffect = CalculateTemperatureEffect(predator.Type, temperature);
+            var humidityEffect = CalculateHumidityEffect(predator.Type, humidity);
+            var lightEffect = CalculateLightEffect(predator.Type, lightLevel);
+            
+            return (tempEffect + humidityEffect + lightEffect) / 3f;
+        }
+        
+        private float CalculateDensityDependentModifier(BeneficialOrganismData predator, PestInvasionData prey)
+        {
+            // Type II functional response (Holling)
+            var preyDensity = prey.PopulationSize / 1000f; // Normalize
+            var handlingTime = GetHandlingTime(predator.Type);
+            var attackRate = GetAttackRate(predator.Type, prey.PestType);
+            
+            return (attackRate * preyDensity) / (1f + attackRate * handlingTime * preyDensity);
+        }
+        
+        private float CalculateHandlingTimeModifier(BeneficialOrganismData predator)
+        {
+            var baseHandlingTime = GetHandlingTime(predator.Type);
+            var experienceModifier = Mathf.Clamp01(predator.HuntingEfficiency);
+            
+            return 1f / (baseHandlingTime * (1f - experienceModifier * 0.3f));
+        }
+        
+        private float GetAttackRate(BeneficialOrganismType predator, PestType prey)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs when prey == PestType.Aphids => 0.8f,
+                BeneficialOrganismType.PredatoryMites when prey == PestType.SpiderMites => 0.9f,
+                BeneficialOrganismType.LacewingLarvae when prey == PestType.Aphids => 0.7f,
+                BeneficialOrganismType.Parasitoids when prey == PestType.Whiteflies => 0.6f,
+                _ => 0.3f // Non-optimal predator-prey combinations
+            };
+        }
+        
+        private float GetPreyVulnerability(PestType prey)
+        {
+            return prey switch
+            {
+                PestType.Aphids => 0.9f,      // Highly vulnerable
+                PestType.SpiderMites => 0.8f, // Vulnerable
+                PestType.Thrips => 0.6f,      // Moderately vulnerable
+                PestType.Whiteflies => 0.7f,  // Vulnerable
+                PestType.Scale => 0.4f,       // Protected by scale
+                _ => 0.5f
+            };
+        }
+        
+        private float GetHandlingTime(BeneficialOrganismType predator)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => 0.1f,
+                BeneficialOrganismType.PredatoryMites => 0.05f,
+                BeneficialOrganismType.LacewingLarvae => 0.15f,
+                BeneficialOrganismType.Parasitoids => 0.3f,
+                _ => 0.2f
+            };
+        }
+        
+        private float CalculateTemperatureEffect(BeneficialOrganismType predator, float temperature)
+        {
+            var optimalTemp = GetOptimalTemperature(predator);
+            var tolerance = GetTemperatureTolerance(predator);
+            
+            var deviation = Mathf.Abs(temperature - optimalTemp);
+            return Mathf.Max(0.1f, 1f - (deviation / tolerance));
+        }
+        
+        private float CalculateHumidityEffect(BeneficialOrganismType predator, float humidity)
+        {
+            var optimalHumidity = GetOptimalHumidity(predator);
+            var tolerance = GetHumidityTolerance(predator);
+            
+            var deviation = Mathf.Abs(humidity - optimalHumidity);
+            return Mathf.Max(0.1f, 1f - (deviation / tolerance));
+        }
+        
+        private float CalculateLightEffect(BeneficialOrganismType predator, float lightLevel)
+        {
+            // Most beneficial insects are more active in moderate light
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => Mathf.Clamp01(lightLevel * 1.2f),
+                BeneficialOrganismType.PredatoryMites => 1f - Mathf.Abs(lightLevel - 0.6f) * 2f,
+                BeneficialOrganismType.LacewingLarvae => Mathf.Clamp01(lightLevel * 0.8f + 0.3f),
+                _ => 1f
+            };
+        }
+        
+        // Environmental getters (would integrate with environmental systems)
+        private float GetCurrentTemperature() => UnityEngine.Random.Range(18f, 28f);
+        private float GetCurrentHumidity() => UnityEngine.Random.Range(0.4f, 0.8f);
+        private float GetCurrentLightLevel() => UnityEngine.Random.Range(0.3f, 1f);
+        
+        private float GetOptimalTemperature(BeneficialOrganismType predator)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => 22f,
+                BeneficialOrganismType.PredatoryMites => 25f,
+                BeneficialOrganismType.LacewingLarvae => 24f,
+                BeneficialOrganismType.Parasitoids => 23f,
+                _ => 23f
+            };
+        }
+        
+        private float GetTemperatureTolerance(BeneficialOrganismType predator)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => 8f,
+                BeneficialOrganismType.PredatoryMites => 6f,
+                BeneficialOrganismType.LacewingLarvae => 7f,
+                BeneficialOrganismType.Parasitoids => 5f,
+                _ => 7f
+            };
+        }
+        
+        private float GetOptimalHumidity(BeneficialOrganismType predator)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => 0.6f,
+                BeneficialOrganismType.PredatoryMites => 0.7f,
+                BeneficialOrganismType.LacewingLarvae => 0.55f,
+                BeneficialOrganismType.Parasitoids => 0.65f,
+                _ => 0.6f
+            };
+        }
+        
+        private float GetHumidityTolerance(BeneficialOrganismType predator)
+        {
+            return predator switch
+            {
+                BeneficialOrganismType.Ladybugs => 0.3f,
+                BeneficialOrganismType.PredatoryMites => 0.25f,
+                BeneficialOrganismType.LacewingLarvae => 0.35f,
+                BeneficialOrganismType.Parasitoids => 0.2f,
+                _ => 0.3f
+            };
+        }
+        
+        public void Dispose()
+        {
+            _populationModels.Clear();
+            _predationHistory.Clear();
+        }
+    }
+    
+    [Serializable]
+    public class LotkaVolterraParameters
+    {
+        public float PredatorGrowthRate;
+        public float PreyGrowthRate;
+        public float PredationEfficiency;
+        public float PredatorMortality;
+        public string PredatorSpecies;
+        public string PreySpecies;
+    }
+    
+    [Serializable]
+    public class PredationEvent
+    {
+        public DateTime Timestamp;
+        public string PredatorId;
+        public string PreyId;
+        public int PreyConsumed;
+        public float PredationRate;
+        public Vector3 Location;
+        public Dictionary<string, float> EnvironmentalConditions;
+    }
+    
+    #endregion
+    
+    #region Establishment Prediction
+    
+    /// <summary>
+    /// Predicts establishment success for beneficial organism releases.
+    /// </summary>
+    public class EstablishmentPredictor : IDisposable
+    {
+        private readonly float _baseEstablishmentRate;
+        private Dictionary<BeneficialOrganismType, EstablishmentModel> _models = new Dictionary<BeneficialOrganismType, EstablishmentModel>();
+        private List<EstablishmentOutcome> _establishmentHistory = new List<EstablishmentOutcome>();
+        
+        public EstablishmentPredictor(float baseEstablishmentRate)
+        {
+            _baseEstablishmentRate = baseEstablishmentRate;
+            InitializeEstablishmentModels();
+        }
+        
+        public float PredictEstablishment(BeneficialOrganismData organism)
+        {
+            var model = _models.GetValueOrDefault(organism.Type);
+            if (model == null) return _baseEstablishmentRate;
+            
+            var factors = new List<float>();
+            
+            // Population size factor
+            factors.Add(CalculatePopulationSizeFactor(organism.PopulationSize, model));
+            
+            // Environmental suitability factor
+            factors.Add(CalculateEnvironmentalSuitabilityFactor(organism, model));
+            
+            // Release timing factor
+            factors.Add(CalculateTimingFactor(organism, model));
+            
+            // Prey availability factor
+            factors.Add(CalculatePreyAvailabilityFactor(organism, model));
+            
+            // Competition factor
+            factors.Add(CalculateCompetitionFactor(organism, model));
+            
+            // Release quality factor
+            factors.Add(CalculateReleaseQualityFactor(organism, model));
+            
+            var weightedAverage = factors.Average();
+            return Mathf.Clamp01(_baseEstablishmentRate * weightedAverage);
+        }
+        
+        private void InitializeEstablishmentModels()
+        {
+            foreach (BeneficialOrganismType organismType in Enum.GetValues(typeof(BeneficialOrganismType)))
+            {
+                _models[organismType] = CreateEstablishmentModel(organismType);
+            }
+        }
+        
+        private EstablishmentModel CreateEstablishmentModel(BeneficialOrganismType organismType)
+        {
+            return organismType switch
+            {
+                BeneficialOrganismType.Ladybugs => new EstablishmentModel
+                {
+                    MinimumPopulation = 50,
+                    OptimalPopulation = 200,
+                    TemperatureRange = new Vector2(15f, 30f),
+                    HumidityRange = new Vector2(0.4f, 0.8f),
+                    OptimalReleaseMonth = 4, // April
+                    RequiredPreyDensity = 100,
+                    CompetitionSensitivity = 0.3f,
+                    EstablishmentTime = 14 // days
+                },
+                BeneficialOrganismType.PredatoryMites => new EstablishmentModel
+                {
+                    MinimumPopulation = 100,
+                    OptimalPopulation = 500,
+                    TemperatureRange = new Vector2(18f, 32f),
+                    HumidityRange = new Vector2(0.5f, 0.9f),
+                    OptimalReleaseMonth = 5, // May
+                    RequiredPreyDensity = 200,
+                    CompetitionSensitivity = 0.2f,
+                    EstablishmentTime = 10 // days
+                },
+                _ => new EstablishmentModel
+                {
+                    MinimumPopulation = 75,
+                    OptimalPopulation = 300,
+                    TemperatureRange = new Vector2(16f, 28f),
+                    HumidityRange = new Vector2(0.45f, 0.75f),
+                    OptimalReleaseMonth = 4,
+                    RequiredPreyDensity = 150,
+                    CompetitionSensitivity = 0.4f,
+                    EstablishmentTime = 12
+                }
+            };
+        }
+        
+        private float CalculatePopulationSizeFactor(int populationSize, EstablishmentModel model)
+        {
+            if (populationSize < model.MinimumPopulation)
+            {
+                return (float)populationSize / model.MinimumPopulation * 0.5f; // Reduced success below minimum
+            }
+            
+            if (populationSize <= model.OptimalPopulation)
+            {
+                return Mathf.Lerp(0.5f, 1f, (float)(populationSize - model.MinimumPopulation) / 
+                    (model.OptimalPopulation - model.MinimumPopulation));
+            }
+            
+            // Diminishing returns above optimal
+            return 1f - ((populationSize - model.OptimalPopulation) / (float)model.OptimalPopulation * 0.2f);
+        }
+        
+        private float CalculateEnvironmentalSuitabilityFactor(BeneficialOrganismData organism, EstablishmentModel model)
+        {
+            var currentTemp = GetCurrentTemperature();
+            var currentHumidity = GetCurrentHumidity();
+            
+            var tempSuitability = IsInRange(currentTemp, model.TemperatureRange) ? 1f : 
+                CalculateRangeDeviation(currentTemp, model.TemperatureRange);
+            
+            var humiditySuitability = IsInRange(currentHumidity, model.HumidityRange) ? 1f : 
+                CalculateRangeDeviation(currentHumidity, model.HumidityRange);
+            
+            return (tempSuitability + humiditySuitability) / 2f;
+        }
+        
+        private float CalculateTimingFactor(BeneficialOrganismData organism, EstablishmentModel model)
+        {
+            var currentMonth = DateTime.Now.Month;
+            var monthDeviation = Mathf.Abs(currentMonth - model.OptimalReleaseMonth);
+            
+            // Account for wraparound (December to January)
+            if (monthDeviation > 6) monthDeviation = 12 - monthDeviation;
+            
+            return Mathf.Max(0.3f, 1f - (monthDeviation / 6f) * 0.7f);
+        }
+        
+        private float CalculatePreyAvailabilityFactor(BeneficialOrganismData organism, EstablishmentModel model)
+        {
+            var totalPrey = 0;
+            foreach (var preyType in organism.TargetPests)
+            {
+                totalPrey += GetPestPopulation(preyType);
+            }
+            
+            if (totalPrey < model.RequiredPreyDensity)
+            {
+                return (float)totalPrey / model.RequiredPreyDensity * 0.6f; // Reduced success with low prey
+            }
+            
+            return Mathf.Min(1f, (float)totalPrey / model.RequiredPreyDensity);
+        }
+        
+        private float CalculateCompetitionFactor(BeneficialOrganismData organism, EstablishmentModel model)
+        {
+            var competitors = GetCompetitorCount(organism.Type);
+            var competitionPressure = competitors * model.CompetitionSensitivity;
+            
+            return Mathf.Max(0.2f, 1f - competitionPressure);
+        }
+        
+        private float CalculateReleaseQualityFactor(BeneficialOrganismData organism, EstablishmentModel model)
+        {
+            // Factors affecting release quality
+            var survivalRate = organism.SurvivalRate;
+            var huntingEfficiency = organism.HuntingEfficiency;
+            var environmentalStress = organism.EnvironmentalStress;
+            
+            var qualityScore = (survivalRate + huntingEfficiency + (1f - environmentalStress)) / 3f;
+            return Mathf.Clamp01(qualityScore);
+        }
+        
+        private bool IsInRange(float value, Vector2 range)
+        {
+            return value >= range.x && value <= range.y;
+        }
+        
+        private float CalculateRangeDeviation(float value, Vector2 range)
+        {
+            if (value < range.x)
+            {
+                var deviation = (range.x - value) / range.x;
+                return Mathf.Max(0.1f, 1f - deviation);
+            }
+            
+            if (value > range.y)
+            {
+                var deviation = (value - range.y) / range.y;
+                return Mathf.Max(0.1f, 1f - deviation);
+            }
+            
+            return 1f;
+        }
+        
+        // Placeholder methods (would integrate with other systems)
+        private float GetCurrentTemperature() => UnityEngine.Random.Range(18f, 28f);
+        private float GetCurrentHumidity() => UnityEngine.Random.Range(0.4f, 0.8f);
+        private int GetPestPopulation(PestType pestType) => UnityEngine.Random.Range(50, 300);
+        private int GetCompetitorCount(BeneficialOrganismType organismType) => UnityEngine.Random.Range(0, 3);
+        
+        public void RecordEstablishmentOutcome(BeneficialOrganismData organism, bool successful, int daysToEstablishment)
+        {
+            var outcome = new EstablishmentOutcome
+            {
+                OrganismType = organism.Type,
+                PopulationSize = organism.PopulationSize,
+                Successful = successful,
+                DaysToEstablishment = daysToEstablishment,
+                EnvironmentalConditions = GetCurrentEnvironmentalConditions(),
+                ReleaseDate = organism.ReleaseTime,
+                PredictedProbability = PredictEstablishment(organism)
+            };
+            
+            _establishmentHistory.Add(outcome);
+            
+            // Update model based on outcome
+            UpdateEstablishmentModel(outcome);
+        }
+        
+        private void UpdateEstablishmentModel(EstablishmentOutcome outcome)
+        {
+            // Machine learning-like model updating based on actual outcomes
+            if (_models.TryGetValue(outcome.OrganismType, out var model))
+            {
+                var learningRate = 0.1f;
+                var actualSuccess = outcome.Successful ? 1f : 0f;
+                var error = actualSuccess - outcome.PredictedProbability;
+                
+                // Adjust model parameters based on error
+                if (error > 0.2f) // Underestimated success
+                {
+                    model.MinimumPopulation = Mathf.RoundToInt(model.MinimumPopulation * (1f - learningRate));
+                    model.RequiredPreyDensity = Mathf.RoundToInt(model.RequiredPreyDensity * (1f - learningRate));
+                }
+                else if (error < -0.2f) // Overestimated success
+                {
+                    model.MinimumPopulation = Mathf.RoundToInt(model.MinimumPopulation * (1f + learningRate));
+                    model.RequiredPreyDensity = Mathf.RoundToInt(model.RequiredPreyDensity * (1f + learningRate));
+                }
+                
+                _models[outcome.OrganismType] = model;
+            }
+        }
+        
+        private Dictionary<string, float> GetCurrentEnvironmentalConditions()
+        {
+            return new Dictionary<string, float>
+            {
+                ["Temperature"] = GetCurrentTemperature(),
+                ["Humidity"] = GetCurrentHumidity(),
+                ["Light"] = UnityEngine.Random.Range(0.3f, 1f),
+                ["Month"] = DateTime.Now.Month
+            };
+        }
+        
+        public void Dispose()
+        {
+            _models.Clear();
+            _establishmentHistory.Clear();
+        }
+    }
+    
+    [Serializable]
+    public class EstablishmentModel
+    {
+        public int MinimumPopulation;
+        public int OptimalPopulation;
+        public Vector2 TemperatureRange;
+        public Vector2 HumidityRange;
+        public int OptimalReleaseMonth;
+        public int RequiredPreyDensity;
+        public float CompetitionSensitivity;
+        public int EstablishmentTime;
+    }
+    
+    [Serializable]
+    public class EstablishmentOutcome
+    {
+        public BeneficialOrganismType OrganismType;
+        public int PopulationSize;
+        public bool Successful;
+        public int DaysToEstablishment;
+        public Dictionary<string, float> EnvironmentalConditions;
+        public DateTime ReleaseDate;
+        public float PredictedProbability;
+    }
+    
+    #endregion
+    
+    #region Environmental Dependency Processing
+    
+    /// <summary>
+    /// Processes environmental dependencies for beneficial organism survival and reproduction.
+    /// </summary>
+    public class EnvironmentalDependencyProcessor : IDisposable
+    {
+        private readonly bool _enableTemperatureDependency;
+        private readonly bool _enableHumidityDependency;
+        private readonly bool _enableHostPlantDependency;
+        private readonly float _stressTolerance;
+        
+        private Dictionary<BeneficialOrganismType, EnvironmentalRequirements> _requirements = new Dictionary<BeneficialOrganismType, EnvironmentalRequirements>();
+        
+        public EnvironmentalDependencyProcessor(bool enableTemp, bool enableHumidity, bool enableHost, float stressTolerance)
+        {
+            _enableTemperatureDependency = enableTemp;
+            _enableHumidityDependency = enableHumidity;
+            _enableHostPlantDependency = enableHost;
+            _stressTolerance = stressTolerance;
+            
+            InitializeEnvironmentalRequirements();
+        }
+        
+        public float GetGrowthModifier(BeneficialOrganismType organismType)
+        {
+            var requirements = _requirements.GetValueOrDefault(organismType);
+            if (requirements == null) return 1f;
+            
+            var modifiers = new List<float>();
+            
+            if (_enableTemperatureDependency)
+            {
+                modifiers.Add(CalculateTemperatureModifier(requirements));
+            }
+            
+            if (_enableHumidityDependency)
+            {
+                modifiers.Add(CalculateHumidityModifier(requirements));
+            }
+            
+            if (_enableHostPlantDependency)
+            {
+                modifiers.Add(CalculateHostPlantModifier(requirements));
+            }
+            
+            return modifiers.Any() ? modifiers.Average() : 1f;
+        }
+        
+        public float GetCapacityModifier(BeneficialOrganismType organismType)
+        {
+            var growthModifier = GetGrowthModifier(organismType);
+            
+            // Capacity is more sensitive to environmental stress
+            return Mathf.Pow(growthModifier, 1.5f);
+        }
+        
+        public float CalculateEnvironmentalStress(BeneficialOrganismType organismType)
+        {
+            var requirements = _requirements.GetValueOrDefault(organismType);
+            if (requirements == null) return 0f;
+            
+            var stressFactors = new List<float>();
+            
+            if (_enableTemperatureDependency)
+            {
+                stressFactors.Add(CalculateTemperatureStress(requirements));
+            }
+            
+            if (_enableHumidityDependency)
+            {
+                stressFactors.Add(CalculateHumidityStress(requirements));
+            }
+            
+            if (_enableHostPlantDependency)
+            {
+                stressFactors.Add(CalculateHostPlantStress(requirements));
+            }
+            
+            var averageStress = stressFactors.Any() ? stressFactors.Average() : 0f;
+            return Mathf.Min(1f, averageStress);
+        }
+        
+        public float GetEstablishmentSuitability(BeneficialOrganismType organismType)
+        {
+            var stress = CalculateEnvironmentalStress(organismType);
+            var growthModifier = GetGrowthModifier(organismType);
+            
+            return (1f - stress + growthModifier) / 2f;
+        }
+        
+        private void InitializeEnvironmentalRequirements()
+        {
+            foreach (BeneficialOrganismType organismType in Enum.GetValues(typeof(BeneficialOrganismType)))
+            {
+                _requirements[organismType] = CreateEnvironmentalRequirements(organismType);
+            }
+        }
+        
+        private EnvironmentalRequirements CreateEnvironmentalRequirements(BeneficialOrganismType organismType)
+        {
+            return organismType switch
+            {
+                BeneficialOrganismType.Ladybugs => new EnvironmentalRequirements
+                {
+                    OptimalTemperature = 22f,
+                    TemperatureTolerance = 8f,
+                    MinTemperature = 10f,
+                    MaxTemperature = 35f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.3f,
+                    MinHumidity = 0.3f,
+                    MaxHumidity = 0.9f,
+                    RequiredHostPlants = new List<string> { "Cannabis", "Herbs", "Vegetables" },
+                    CriticalFactors = new List<string> { "Temperature", "Prey" }
+                },
+                BeneficialOrganismType.PredatoryMites => new EnvironmentalRequirements
+                {
+                    OptimalTemperature = 25f,
+                    TemperatureTolerance = 6f,
+                    MinTemperature = 15f,
+                    MaxTemperature = 32f,
+                    OptimalHumidity = 0.7f,
+                    HumidityTolerance = 0.25f,
+                    MinHumidity = 0.45f,
+                    MaxHumidity = 0.95f,
+                    RequiredHostPlants = new List<string> { "Cannabis", "Tomatoes", "Peppers" },
+                    CriticalFactors = new List<string> { "Humidity", "Temperature" }
+                },
+                _ => new EnvironmentalRequirements
+                {
+                    OptimalTemperature = 23f,
+                    TemperatureTolerance = 7f,
+                    MinTemperature = 12f,
+                    MaxTemperature = 30f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.3f,
+                    MinHumidity = 0.35f,
+                    MaxHumidity = 0.85f,
+                    RequiredHostPlants = new List<string> { "Cannabis" },
+                    CriticalFactors = new List<string> { "Temperature" }
+                }
+            };
+        }
+        
+        private float CalculateTemperatureModifier(EnvironmentalRequirements requirements)
+        {
+            var currentTemp = GetCurrentTemperature();
+            
+            if (currentTemp < requirements.MinTemperature || currentTemp > requirements.MaxTemperature)
+            {
+                return 0.1f; // Severe stress outside viable range
+            }
+            
+            var deviation = Mathf.Abs(currentTemp - requirements.OptimalTemperature);
+            var normalizedDeviation = deviation / requirements.TemperatureTolerance;
+            
+            return Mathf.Max(0.2f, 1f - normalizedDeviation);
+        }
+        
+        private float CalculateHumidityModifier(EnvironmentalRequirements requirements)
+        {
+            var currentHumidity = GetCurrentHumidity();
+            
+            if (currentHumidity < requirements.MinHumidity || currentHumidity > requirements.MaxHumidity)
+            {
+                return 0.1f; // Severe stress outside viable range
+            }
+            
+            var deviation = Mathf.Abs(currentHumidity - requirements.OptimalHumidity);
+            var normalizedDeviation = deviation / requirements.HumidityTolerance;
+            
+            return Mathf.Max(0.2f, 1f - normalizedDeviation);
+        }
+        
+        private float CalculateHostPlantModifier(EnvironmentalRequirements requirements)
+        {
+            var availableHosts = GetAvailableHostPlants();
+            var suitableHosts = requirements.RequiredHostPlants.Intersect(availableHosts).Count();
+            var requiredHosts = requirements.RequiredHostPlants.Count;
+            
+            if (suitableHosts == 0) return 0.1f; // No suitable hosts
+            
+            return (float)suitableHosts / requiredHosts;
+        }
+        
+        private float CalculateTemperatureStress(EnvironmentalRequirements requirements)
+        {
+            var currentTemp = GetCurrentTemperature();
+            
+            if (currentTemp < requirements.MinTemperature)
+            {
+                return (requirements.MinTemperature - currentTemp) / requirements.MinTemperature;
+            }
+            
+            if (currentTemp > requirements.MaxTemperature)
+            {
+                return (currentTemp - requirements.MaxTemperature) / requirements.MaxTemperature;
+            }
+            
+            var deviation = Mathf.Abs(currentTemp - requirements.OptimalTemperature);
+            return deviation / requirements.TemperatureTolerance;
+        }
+        
+        private float CalculateHumidityStress(EnvironmentalRequirements requirements)
+        {
+            var currentHumidity = GetCurrentHumidity();
+            
+            if (currentHumidity < requirements.MinHumidity)
+            {
+                return (requirements.MinHumidity - currentHumidity) / requirements.MinHumidity;
+            }
+            
+            if (currentHumidity > requirements.MaxHumidity)
+            {
+                return (currentHumidity - requirements.MaxHumidity) / (1f - requirements.MaxHumidity);
+            }
+            
+            var deviation = Mathf.Abs(currentHumidity - requirements.OptimalHumidity);
+            return deviation / requirements.HumidityTolerance;
+        }
+        
+        private float CalculateHostPlantStress(EnvironmentalRequirements requirements)
+        {
+            var modifier = CalculateHostPlantModifier(requirements);
+            return 1f - modifier;
+        }
+        
+        // Environmental getters (would integrate with environmental systems)
+        private float GetCurrentTemperature() => UnityEngine.Random.Range(18f, 28f);
+        private float GetCurrentHumidity() => UnityEngine.Random.Range(0.4f, 0.8f);
+        private List<string> GetAvailableHostPlants() => new List<string> { "Cannabis", "Herbs" };
+        
+        public void Dispose()
+        {
+            _requirements.Clear();
+        }
+    }
+    
+    [Serializable]
+    public class EnvironmentalRequirements
+    {
+        public float OptimalTemperature;
+        public float TemperatureTolerance;
+        public float MinTemperature;
+        public float MaxTemperature;
+        public float OptimalHumidity;
+        public float HumidityTolerance;
+        public float MinHumidity;
+        public float MaxHumidity;
+        public List<string> RequiredHostPlants;
+        public List<string> CriticalFactors;
+    }
+    
+    #endregion
+    
+    #region Multi-Species Interaction Management
+    
+    /// <summary>
+    /// Manages complex interactions between multiple beneficial organism species.
+    /// </summary>
+    public class MultiSpeciesInteractionManager : IDisposable
+    {
+        private readonly bool _enableInteractions;
+        private Dictionary<string, SpeciesInteraction> _interactions = new Dictionary<string, SpeciesInteraction>();
+        private List<InteractionEvent> _interactionHistory = new List<InteractionEvent>();
+        
+        public MultiSpeciesInteractionManager(bool enableInteractions)
+        {
+            _enableInteractions = enableInteractions;
+            if (_enableInteractions)
+            {
+                InitializeSpeciesInteractions();
+            }
+        }
+        
+        public void ProcessInteractions(List<BeneficialOrganismData> organisms, Dictionary<string, OrganismPopulationState> populations)
+        {
+            if (!_enableInteractions || organisms.Count < 2) return;
+            
+            var speciesGroups = organisms.GroupBy(o => o.Type).ToList();
+            
+            foreach (var group1 in speciesGroups)
+            {
+                foreach (var group2 in speciesGroups)
+                {
+                    if (group1.Key != group2.Key)
+                    {
+                        ProcessSpeciesInteraction(group1.Key, group2.Key, group1.ToList(), group2.ToList(), populations);
+                    }
+                }
+            }
+        }
+        
+        private void InitializeSpeciesInteractions()
+        {
+            var interactions = new List<(BeneficialOrganismType species1, BeneficialOrganismType species2, InteractionType type, float intensity)>
+            {
+                (BeneficialOrganismType.Ladybugs, BeneficialOrganismType.LacewingLarvae, InteractionType.Competition, 0.3f),
+                (BeneficialOrganismType.PredatoryMites, BeneficialOrganismType.Parasitoids, InteractionType.Facilitation, 0.2f),
+                (BeneficialOrganismType.Ladybugs, BeneficialOrganismType.PredatoryMites, InteractionType.Neutral, 0.0f),
+                (BeneficialOrganismType.LacewingLarvae, BeneficialOrganismType.Parasitoids, InteractionType.Facilitation, 0.15f),
+                (BeneficialOrganismType.PredatoryBeetles, BeneficialOrganismType.PredatoryMites, InteractionType.Competition, 0.25f)
+            };
+            
+            foreach (var (species1, species2, type, intensity) in interactions)
+            {
+                var interactionKey = $"{species1}_{species2}";
+                _interactions[interactionKey] = new SpeciesInteraction
+                {
+                    Species1 = species1,
+                    Species2 = species2,
+                    InteractionType = type,
+                    Intensity = intensity,
+                    IsActive = true,
+                    LastUpdate = DateTime.Now
+                };
+            }
+        }
+        
+        private void ProcessSpeciesInteraction(BeneficialOrganismType species1, BeneficialOrganismType species2,
+            List<BeneficialOrganismData> organisms1, List<BeneficialOrganismData> organisms2,
+            Dictionary<string, OrganismPopulationState> populations)
+        {
+            var interactionKey = $"{species1}_{species2}";
+            if (!_interactions.TryGetValue(interactionKey, out var interaction)) return;
+            
+            switch (interaction.InteractionType)
+            {
+                case InteractionType.Competition:
+                    ProcessCompetition(organisms1, organisms2, interaction, populations);
+                    break;
+                case InteractionType.Facilitation:
+                    ProcessFacilitation(organisms1, organisms2, interaction, populations);
+                    break;
+                case InteractionType.Predation:
+                    ProcessPredation(organisms1, organisms2, interaction, populations);
+                    break;
+                case InteractionType.Neutral:
+                    // No interaction effects
+                    break;
+            }
+        }
+        
+        private void ProcessCompetition(List<BeneficialOrganismData> organisms1, List<BeneficialOrganismData> organisms2,
+            SpeciesInteraction interaction, Dictionary<string, OrganismPopulationState> populations)
+        {
+            var totalPop1 = organisms1.Sum(o => o.PopulationSize);
+            var totalPop2 = organisms2.Sum(o => o.PopulationSize);
+            
+            // Competition reduces reproduction rates based on relative populations
+            var competitionPressure1 = (float)totalPop2 / (totalPop1 + totalPop2) * interaction.Intensity;
+            var competitionPressure2 = (float)totalPop1 / (totalPop1 + totalPop2) * interaction.Intensity;
+            
+            foreach (var organism in organisms1)
+            {
+                if (populations.TryGetValue(organism.OrganismId, out var state))
+                {
+                    state.ReproductionRate *= (1f - competitionPressure1);
+                    populations[organism.OrganismId] = state;
+                }
+            }
+            
+            foreach (var organism in organisms2)
+            {
+                if (populations.TryGetValue(organism.OrganismId, out var state))
+                {
+                    state.ReproductionRate *= (1f - competitionPressure2);
+                    populations[organism.OrganismId] = state;
+                }
+            }
+            
+            RecordInteractionEvent(interaction, InteractionOutcome.Competition, competitionPressure1 + competitionPressure2);
+        }
+        
+        private void ProcessFacilitation(List<BeneficialOrganismData> organisms1, List<BeneficialOrganismData> organisms2,
+            SpeciesInteraction interaction, Dictionary<string, OrganismPopulationState> populations)
+        {
+            // Facilitation improves survival and reproduction rates
+            var facilitationBonus = interaction.Intensity;
+            
+            foreach (var organism in organisms1)
+            {
+                if (populations.TryGetValue(organism.OrganismId, out var state))
+                {
+                    state.ReproductionRate *= (1f + facilitationBonus);
+                    state.MortalityRate *= (1f - facilitationBonus * 0.5f);
+                    populations[organism.OrganismId] = state;
+                }
+            }
+            
+            foreach (var organism in organisms2)
+            {
+                if (populations.TryGetValue(organism.OrganismId, out var state))
+                {
+                    state.ReproductionRate *= (1f + facilitationBonus);
+                    state.MortalityRate *= (1f - facilitationBonus * 0.5f);
+                    populations[organism.OrganismId] = state;
+                }
+            }
+            
+            RecordInteractionEvent(interaction, InteractionOutcome.Facilitation, facilitationBonus);
+        }
+        
+        private void ProcessPredation(List<BeneficialOrganismData> predators, List<BeneficialOrganismData> prey,
+            SpeciesInteraction interaction, Dictionary<string, OrganismPopulationState> populations)
+        {
+            // Intraguild predation between beneficial species
+            var predationRate = interaction.Intensity;
+            
+            foreach (var preyOrganism in prey)
+            {
+                if (populations.TryGetValue(preyOrganism.OrganismId, out var preyState))
+                {
+                    var totalPredators = predators.Sum(p => p.PopulationSize);
+                    var predationPressure = totalPredators * predationRate * 0.001f; // Scale factor
+                    
+                    preyState.MortalityRate += predationPressure;
+                    preyState.PredationPressure = predationPressure;
+                    populations[preyOrganism.OrganismId] = preyState;
+                }
+            }
+            
+            RecordInteractionEvent(interaction, InteractionOutcome.Predation, predationRate);
+        }
+        
+        private void RecordInteractionEvent(SpeciesInteraction interaction, InteractionOutcome outcome, float intensity)
+        {
+            var interactionEvent = new InteractionEvent
+            {
+                Timestamp = DateTime.Now,
+                Species1 = interaction.Species1,
+                Species2 = interaction.Species2,
+                InteractionType = interaction.InteractionType,
+                Outcome = outcome,
+                Intensity = intensity,
+                Location = Vector3.zero // Would be calculated from organism positions
+            };
+            
+            _interactionHistory.Add(interactionEvent);
+            
+            // Limit history size
+            if (_interactionHistory.Count > 1000)
+            {
+                _interactionHistory.RemoveAt(0);
+            }
+        }
+        
+        public void Dispose()
+        {
+            _interactions.Clear();
+            _interactionHistory.Clear();
+        }
+    }
+    
+    [Serializable]
+    public class SpeciesInteraction
+    {
+        public BeneficialOrganismType Species1;
+        public BeneficialOrganismType Species2;
+        public InteractionType InteractionType;
+        public float Intensity;
+        public bool IsActive;
+        public DateTime LastUpdate;
+        public Dictionary<string, float> EnvironmentalModifiers = new Dictionary<string, float>();
+    }
+    
+    public enum InteractionType
+    {
+        Competition,
+        Facilitation,
+        Predation,
+        Neutral,
+        Mutualism,
+        Commensalism
+    }
+    
+    [Serializable]
+    public class InteractionEvent
+    {
+        public DateTime Timestamp;
+        public BeneficialOrganismType Species1;
+        public BeneficialOrganismType Species2;
+        public InteractionType InteractionType;
+        public InteractionOutcome Outcome;
+        public float Intensity;
+        public Vector3 Location;
+    }
+    
+    public enum InteractionOutcome
+    {
+        Competition,
+        Facilitation,
+        Predation,
+        Neutral,
+        BothBenefited,
+        OneBenefited,
+        BothHarmed
+    }
+    
+    #endregion
+    
+    #region Ecosystem Alerts and Rebalancing
+    
+    [Serializable]
+    public class EcosystemAlert
+    {
+        public EcosystemAlertType AlertType;
+        public AlertSeverity Severity;
+        public string Message;
+        public DateTime Timestamp;
+        public List<string> RecommendedActions;
+        public bool IsResolved;
+        public string ResolutionNotes;
+    }
+    
+    public enum EcosystemAlertType
+    {
+        Imbalance,
+        Warning,
+        SpeciesExtinction,
+        Overpopulation,
+        UnderPopulation,
+        EnvironmentalStress,
+        Competition,
+        SystemFailure
+    }
+    
+    // AlertSeverity enum is defined in IPMAnalyticsDataStructures.cs
+    
+    [Serializable]
+    public class RebalancingAction
+    {
+        public RebalancingActionType ActionType;
+        public BeneficialOrganismType OrganismType;
+        public int TargetChange;
+        public float Priority;
+        public string Reason;
+        public DateTime ScheduledTime;
+    }
+    
+    public enum RebalancingActionType
+    {
+        Boost,
+        Reduce,
+        Relocate,
+        Remove,
+        Supplement,
+        Modify
+    }
+    
+    #endregion
+    
+    #region Performance Optimization
+    
+    /// <summary>
+    /// Schedules organism updates for optimal performance.
+    /// </summary>
+    public class OrganismUpdateScheduler
+    {
+        private readonly int _maxUpdatesPerFrame;
+        private Queue<string> _updateQueue = new Queue<string>();
+        private Dictionary<string, DateTime> _lastUpdates = new Dictionary<string, DateTime>();
+        private Dictionary<string, float> _updatePriorities = new Dictionary<string, float>();
+        
+        public OrganismUpdateScheduler(int maxUpdatesPerFrame)
+        {
+            _maxUpdatesPerFrame = maxUpdatesPerFrame;
+        }
+        
+        public List<string> GetOrganismsForUpdate(List<string> allOrganismIds)
+        {
+            var updates = new List<string>();
+            
+            // Calculate priorities for all organisms
+            foreach (var organismId in allOrganismIds)
+            {
+                _updatePriorities[organismId] = CalculateUpdatePriority(organismId);
+            }
+            
+            // Sort by priority and take top organisms for update
+            var prioritizedOrganisms = allOrganismIds
+                .OrderByDescending(id => _updatePriorities.GetValueOrDefault(id))
+                .Take(_maxUpdatesPerFrame);
+            
+            foreach (var organismId in prioritizedOrganisms)
+            {
+                updates.Add(organismId);
+                _lastUpdates[organismId] = DateTime.Now;
+            }
+            
+            return updates;
+        }
+        
+        private float CalculateUpdatePriority(string organismId)
+        {
+            var timeSinceUpdate = _lastUpdates.TryGetValue(organismId, out var lastUpdate) 
+                ? (DateTime.Now - lastUpdate).TotalSeconds 
+                : float.MaxValue;
+            
+            // Higher priority for organisms that haven't been updated recently
+            var timePriority = Mathf.Min(10f, (float)timeSinceUpdate / 60f); // Max priority after 10 minutes
+            
+            // Add randomness to prevent patterns
+            var randomFactor = UnityEngine.Random.Range(0.8f, 1.2f);
+            
+            return timePriority * randomFactor;
+        }
+    }
+    
+    #endregion
+}

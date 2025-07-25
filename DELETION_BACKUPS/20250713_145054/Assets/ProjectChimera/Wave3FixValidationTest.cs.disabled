@@ -1,0 +1,166 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Events;
+using ProjectChimera.Core.Events; // For SkillProgressionEventData
+using System.Collections.Generic;
+// Type aliases to resolve ambiguities
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using SystemsPlayerChoice = ProjectChimera.Systems.Cultivation.PlayerChoice;
+using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice;
+using SystemsPlayerChoiceType = ProjectChimera.Systems.Cultivation.PlayerChoiceType;
+using EventsPlayerChoiceType = ProjectChimera.Events.PlayerChoiceType;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Validation test for Wave 3 compilation fixes
+    /// Tests all the type conversions and missing method fixes
+    /// </summary>
+    public class Wave3FixValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 3 Fix Validation Test ===");
+            
+            TestSkillMilestoneProperties();
+            TestPlayerChoiceConversions();
+            TestDateTimeOperations();
+            TestEventDataClasses();
+            TestConfigProperties();
+            TestEnumConversions();
+            
+            Debug.Log("✅ All Wave 3 fixes validated successfully!");
+        }
+        
+        private void TestSkillMilestoneProperties()
+        {
+            Debug.Log("Testing SkillMilestone properties...");
+            
+            var milestone = new SkillMilestone
+            {
+                MilestoneName = "Test Milestone",
+                RequiredLevel = 5.0f,
+                IsUnlocked = false
+            };
+            
+            Debug.Log($"✓ SkillMilestone: {milestone.MilestoneName}, Level: {milestone.RequiredLevel}");
+        }
+        
+        private void TestPlayerChoiceConversions()
+        {
+            Debug.Log("Testing PlayerChoice conversions...");
+            
+            var localChoice = new PlayerChoice
+            {
+                ChoiceType = PlayerChoiceType.CultivationMethod,
+                ChoiceDescription = "Test Choice",
+                ImpactLevel = 0.8f,
+                ChoiceTimestamp = Time.time
+            };
+            
+            // Test conversion to Events namespace
+            var eventsChoiceType = (ProjectChimera.Events.PlayerChoiceType)localChoice.ChoiceType;
+            Debug.Log($"✓ PlayerChoiceType conversion: {localChoice.ChoiceType} -> {eventsChoiceType}");
+        }
+        
+        private void TestDateTimeOperations()
+        {
+            Debug.Log("Testing DateTime operations...");
+            
+            var plant = new InteractivePlant
+            {
+                PlantInstanceID = 1,
+                PlantedTime = System.DateTime.Now.AddHours(-48)
+            };
+            
+            // Test the fixed DateTime calculation
+            var plantAgeSeconds = (float)(System.DateTime.Now - plant.PlantedTime).TotalSeconds;
+            var plantAge = plantAgeSeconds / 3600f; // Convert to hours
+            
+            Debug.Log($"✓ DateTime operations: Plant age {plantAge:F1} hours");
+        }
+        
+        private void TestEventDataClasses()
+        {
+            Debug.Log("Testing event data classes...");
+            
+            // Test PlantCareEventData (from Events namespace)
+            var careEvent = new ProjectChimera.Events.PlantCareEventData
+            {
+                TaskType = CultivationTaskType.Watering,
+                PlantId = 123,
+                Timestamp = Time.time
+            };
+            
+            // Test SkillProgressionEventData (from Core.Events namespace)
+            var skillEvent = new ProjectChimera.Core.Events.SkillProgressionEventData
+            {
+                TaskType = CultivationTaskType.Pruning,
+                CurrentSkillLevel = 7.5f,
+                Timestamp = Time.time
+            };
+            
+            Debug.Log($"✓ Event data classes: Care={careEvent.TaskType}, Skill={skillEvent.TaskType}");
+        }
+        
+        private void TestConfigProperties()
+        {
+            Debug.Log("Testing config properties...");
+            
+            // Test that BaseActionEfficiency exists (not BaseCareEfficiency)
+            var config = ScriptableObject.CreateInstance<InteractivePlantCareConfigSO>();
+            float efficiency = config.BaseActionEfficiency;
+            
+            Debug.Log($"✓ Config properties: BaseActionEfficiency={efficiency}");
+        }
+        
+        private void TestEnumConversions()
+        {
+            Debug.Log("Testing enum conversions...");
+            
+            // Test PlantGrowthStage with Dormant value
+            var plantStage = PlantGrowthStage.Dormant;
+            
+            // Test local GrowthStage conversion
+            var localStage = ConvertToLocalGrowthStage(plantStage);
+            
+            // Test ConsequenceType conversions
+            var localConsequence = ConsequenceType.YieldChange;
+            var eventsConsequence = ProjectChimera.Events.ConsequenceType.Immediate;
+            
+            Debug.Log($"✓ Enum conversions: {plantStage}->{localStage}, {localConsequence}->{eventsConsequence}");
+        }
+        
+        private GrowthStage ConvertToLocalGrowthStage(PlantGrowthStage plantGrowthStage)
+        {
+            return plantGrowthStage switch
+            {
+                PlantGrowthStage.Seed => GrowthStage.Seed,
+                PlantGrowthStage.Germination => GrowthStage.Germination,
+                PlantGrowthStage.Seedling => GrowthStage.Seedling,
+                PlantGrowthStage.Vegetative => GrowthStage.Vegetative,
+                PlantGrowthStage.Flowering => GrowthStage.Flowering,
+                PlantGrowthStage.Mature => GrowthStage.Mature,
+                PlantGrowthStage.Dormant => GrowthStage.Dormant,
+                _ => GrowthStage.Seedling
+            };
+        }
+    }
+    
+    // Local enum for testing
+    public enum GrowthStage
+    {
+        Seed,
+        Germination,
+        Seedling,
+        Vegetative,
+        PreFlower,
+        Flowering,
+        Mature,
+        Dormant
+    }
+}

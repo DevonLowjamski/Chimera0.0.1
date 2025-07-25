@@ -1,0 +1,254 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Environment;
+using ProjectChimera.Data.Environment;
+using ProjectChimera.Data.Cultivation;
+using System;
+using System.Linq;
+
+/// <summary>
+/// Error Wave 35 Validation Test - Environmental Method and StressType Errors Resolution
+/// 
+/// Tests that the CS1503, CS1061, and CS0117 errors for missing methods, namespace conflicts, 
+/// and missing enum values have been resolved in PlantUpdateProcessor.cs and PlantInstance.cs.
+/// 
+/// Errors resolved:
+/// - CS1503: Type conversion issues between different EnvironmentalConditions types
+/// - CS1061: Missing GetEnvironmentalConditions method in EnvironmentalManager
+/// - CS1061: Missing IsInitialized method in EnvironmentalConditions
+/// - CS0117: Missing CreateIndoorDefault method in EnvironmentalConditions
+/// - CS0117: Missing StressType enum values (Temperature, Heat, Cold, Light, Water, Drought, Flood, Nutrient, Atmospheric)
+/// 
+/// Root cause:
+/// - PlantInstance was calling GetEnvironmentalConditions() but EnvironmentalManager only had GetCurrentConditions()
+/// - Missing StressType enum values in Systems.Genetics namespace for comprehensive stress handling
+/// - Type conversion issues between Environment and Cultivation EnvironmentalConditions types
+/// 
+/// Solution applied:
+/// - Added GetEnvironmentalConditions() compatibility methods to EnvironmentalManager
+/// - Updated StressType enum in Systems.Genetics to include all required values
+/// - Verified proper using aliases for namespace resolution
+/// </summary>
+public class Wave35ValidationTest : MonoBehaviour
+{
+    [Header("Wave 35 Validation Results")]
+    public Wave35ValidationResults Results;
+    
+    [System.Serializable]
+    public class Wave35ValidationResults
+    {
+        [Header("EnvironmentalManager Method Tests")]
+        public bool GetEnvironmentalConditionsMethodExists = false;
+        public bool GetEnvironmentalConditionsWithPositionExists = false;
+        public bool MethodsReturnCorrectTypes = false;
+        
+        [Header("EnvironmentalConditions Method Tests")]
+        public bool IsInitializedMethodExists = false;
+        public bool CreateIndoorDefaultMethodExists = false;
+        public bool MethodsWorkCorrectly = false;
+        
+        [Header("StressType Enum Tests")]
+        public bool TemperatureValueExists = false;
+        public bool HeatValueExists = false;
+        public bool ColdValueExists = false;
+        public bool LightValueExists = false;
+        public bool WaterValueExists = false;
+        public bool DroughtValueExists = false;
+        public bool FloodValueExists = false;
+        public bool NutrientValueExists = false;
+        public bool AtmosphericValueExists = false;
+        public bool AllStressTypesExist = false;
+        
+        [Header("Type Conversion Tests")]
+        public bool EnvironmentalConditionsTypeConversionWorks = false;
+        public bool NamespaceAliasesWork = false;
+        
+        [Header("Overall Results")]
+        public bool AllErrorsResolved = false;
+        public string ValidationSummary = "";
+    }
+    
+    void Start()
+    {
+        ValidateWave35Fixes();
+    }
+    
+    private void ValidateWave35Fixes()
+    {
+        Debug.Log("=== Error Wave 35 Validation Test ===");
+        
+        ValidateEnvironmentalManagerMethods();
+        ValidateEnvironmentalConditionsMethods();
+        ValidateStressTypeEnum();
+        ValidateTypeConversions();
+        ValidateNamespaceAliases();
+        
+        // Overall validation
+        Results.AllErrorsResolved = Results.GetEnvironmentalConditionsMethodExists &&
+                                   Results.GetEnvironmentalConditionsWithPositionExists &&
+                                   Results.MethodsReturnCorrectTypes &&
+                                   Results.IsInitializedMethodExists &&
+                                   Results.CreateIndoorDefaultMethodExists &&
+                                   Results.MethodsWorkCorrectly &&
+                                   Results.AllStressTypesExist &&
+                                   Results.EnvironmentalConditionsTypeConversionWorks &&
+                                   Results.NamespaceAliasesWork;
+        
+        Results.ValidationSummary = Results.AllErrorsResolved ? 
+            "✅ All Error Wave 35 environmental method and enum issues resolved successfully!" : 
+            "❌ Some Error Wave 35 environmental method and enum issues remain unresolved.";
+        
+        Debug.Log($"Wave 35 Validation Complete: {Results.ValidationSummary}");
+    }
+    
+    private void ValidateEnvironmentalManagerMethods()
+    {
+        try
+        {
+            // Test CS1061: GetEnvironmentalConditions method exists
+            var environmentManager = new GameObject("TestEnvironmentalManager").AddComponent<EnvironmentalManager>();
+            
+            // Test method without parameters
+            var conditions1 = environmentManager.GetEnvironmentalConditions();
+            Results.GetEnvironmentalConditionsMethodExists = conditions1 != null;
+            
+            // Test method with Vector3 parameter
+            var conditions2 = environmentManager.GetEnvironmentalConditions(Vector3.zero);
+            Results.GetEnvironmentalConditionsWithPositionExists = conditions2 != null;
+            
+            // Test that methods return correct types
+            Results.MethodsReturnCorrectTypes = conditions1.GetType().Name == "EnvironmentalConditions" &&
+                                               conditions2.GetType().Name == "EnvironmentalConditions";
+            
+            Debug.Log("✅ EnvironmentalManager GetEnvironmentalConditions methods exist and work correctly");
+            
+            // Cleanup
+            DestroyImmediate(environmentManager.gameObject);
+        }
+        catch (System.Exception ex)
+        {
+            Results.GetEnvironmentalConditionsMethodExists = false;
+            Results.GetEnvironmentalConditionsWithPositionExists = false;
+            Results.MethodsReturnCorrectTypes = false;
+            Debug.LogError($"❌ EnvironmentalManager methods validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateEnvironmentalConditionsMethods()
+    {
+        try
+        {
+            // Test CS0117: CreateIndoorDefault method exists
+            var indoorConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+            Results.CreateIndoorDefaultMethodExists = indoorConditions != null;
+            
+            // Test CS1061: IsInitialized method exists and works
+            bool isInitialized = indoorConditions.IsInitialized();
+            Results.IsInitializedMethodExists = true;
+            
+            // Test that methods work correctly
+            Results.MethodsWorkCorrectly = isInitialized && indoorConditions.Temperature > 0f;
+            
+            Debug.Log("✅ EnvironmentalConditions CreateIndoorDefault and IsInitialized methods work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.CreateIndoorDefaultMethodExists = false;
+            Results.IsInitializedMethodExists = false;
+            Results.MethodsWorkCorrectly = false;
+            Debug.LogError($"❌ EnvironmentalConditions methods validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateStressTypeEnum()
+    {
+        try
+        {
+            // Test CS0117: All required StressType enum values exist
+            var stressTypeValues = Enum.GetValues(typeof(ProjectChimera.Systems.Genetics.StressType));
+            var stressTypeNames = stressTypeValues.Cast<ProjectChimera.Systems.Genetics.StressType>()
+                                                 .Select(v => v.ToString())
+                                                 .ToArray();
+            
+            Results.TemperatureValueExists = stressTypeNames.Contains("Temperature");
+            Results.HeatValueExists = stressTypeNames.Contains("Heat");
+            Results.ColdValueExists = stressTypeNames.Contains("Cold");
+            Results.LightValueExists = stressTypeNames.Contains("Light");
+            Results.WaterValueExists = stressTypeNames.Contains("Water");
+            Results.DroughtValueExists = stressTypeNames.Contains("Drought");
+            Results.FloodValueExists = stressTypeNames.Contains("Flood");
+            Results.NutrientValueExists = stressTypeNames.Contains("Nutrient");
+            Results.AtmosphericValueExists = stressTypeNames.Contains("Atmospheric");
+            
+            Results.AllStressTypesExist = Results.TemperatureValueExists &&
+                                         Results.HeatValueExists &&
+                                         Results.ColdValueExists &&
+                                         Results.LightValueExists &&
+                                         Results.WaterValueExists &&
+                                         Results.DroughtValueExists &&
+                                         Results.FloodValueExists &&
+                                         Results.NutrientValueExists &&
+                                         Results.AtmosphericValueExists;
+            
+            Debug.Log($"✅ StressType enum validation complete - Found {stressTypeNames.Length} values, all required values present: {Results.AllStressTypesExist}");
+        }
+        catch (System.Exception ex)
+        {
+            Results.AllStressTypesExist = false;
+            Debug.LogError($"❌ StressType enum validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateTypeConversions()
+    {
+        try
+        {
+            // Test CS1503: Type conversion between different EnvironmentalConditions types
+            var cultivationConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+            
+            // Test that we can work with both types through proper aliases
+            // This simulates what PlantUpdateProcessor and PlantInstance are doing
+            ProjectChimera.Data.Cultivation.EnvironmentalConditions aliasedConditions = cultivationConditions;
+            
+            Results.EnvironmentalConditionsTypeConversionWorks = aliasedConditions != null &&
+                                                                aliasedConditions.Temperature > 0f;
+            
+            Debug.Log("✅ EnvironmentalConditions type conversion works correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentalConditionsTypeConversionWorks = false;
+            Debug.LogError($"❌ Type conversion validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateNamespaceAliases()
+    {
+        try
+        {
+            // Test that namespace aliases work correctly
+            // This simulates the using aliases in PlantUpdateProcessor and PlantInstance
+            
+            // Test EnvironmentalManager alias resolution
+            var managerType = typeof(ProjectChimera.Systems.Environment.EnvironmentalManager);
+            
+            // Test EnvironmentalConditions alias resolution
+            var cultivationConditionsType = typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions);
+            
+            // Test StressType alias resolution
+            var stressTypeType = typeof(ProjectChimera.Systems.Genetics.StressType);
+            
+            Results.NamespaceAliasesWork = managerType != null &&
+                                          cultivationConditionsType != null &&
+                                          stressTypeType != null;
+            
+            Debug.Log("✅ Namespace aliases work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.NamespaceAliasesWork = false;
+            Debug.LogError($"❌ Namespace aliases validation failed: {ex.Message}");
+        }
+    }
+} 

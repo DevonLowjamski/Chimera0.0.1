@@ -1,0 +1,210 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <!-- Environmental Control Panel Layout -->
+    <ui:VisualElement name="environmental-control" class="environmental-root">
+        
+        <!-- Header Section -->
+        <ui:VisualElement name="header-section" class="environmental-header">
+            <ui:VisualElement class="header-left">
+                <ui:Label text="🌡️ Environmental Control Center" class="panel-title" />
+                <ui:Label name="selected-zone-label" text="Vegetative Room" class="zone-title" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="header-center">
+                <ui:DropdownField name="zone-selector" label="Active Zone" class="zone-selector" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="header-right">
+                <ui:Button name="optimize-zone-btn" text="⚡ Optimize Zone" class="action-button optimize-btn" />
+                <ui:Button name="copy-settings-btn" text="📋 Copy Settings" class="action-button copy-btn" />
+                <ui:Button name="emergency-stop-btn" text="🚨 Emergency Stop" class="action-button emergency-btn" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Control Area -->
+        <ui:VisualElement name="main-controls" class="control-main">
+            
+            <!-- Left Panel - Environmental Controls -->
+            <ui:VisualElement name="controls-panel" class="controls-section">
+                
+                <!-- Temperature Control Section -->
+                <ui:VisualElement name="temperature-section" class="control-group">
+                    <ui:VisualElement class="control-header">
+                        <ui:Label text="🌡️ Temperature Control" class="section-title" />
+                        <ui:Button name="temperature-auto-btn" text="AUTO OFF" class="auto-button auto-off" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="control-content">
+                        <ui:VisualElement class="reading-display">
+                            <ui:Label text="Current:" class="reading-label" />
+                            <ui:Label name="current-temperature" text="22.5°C" class="reading-value" />
+                            <ui:ProgressBar name="temperature-stability" value="0.85" title="Stability: 85%" class="stability-bar" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="control-inputs">
+                            <ui:Slider name="temperature-slider" low-value="15" high-value="35" value="22" class="control-slider" />
+                            <ui:FloatField name="temperature-field" value="22" class="control-field" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Humidity Control Section -->
+                <ui:VisualElement name="humidity-section" class="control-group">
+                    <ui:VisualElement class="control-header">
+                        <ui:Label text="💧 Humidity Control" class="section-title" />
+                        <ui:Button name="humidity-auto-btn" text="AUTO OFF" class="auto-button auto-off" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="control-content">
+                        <ui:VisualElement class="reading-display">
+                            <ui:Label text="Current:" class="reading-label" />
+                            <ui:Label name="current-humidity" text="58.2%" class="reading-value" />
+                            <ui:ProgressBar name="humidity-stability" value="0.92" title="Stability: 92%" class="stability-bar" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="control-inputs">
+                            <ui:Slider name="humidity-slider" low-value="30" high-value="80" value="55" class="control-slider" />
+                            <ui:FloatField name="humidity-field" value="55" class="control-field" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- CO2 Control Section -->
+                <ui:VisualElement name="co2-section" class="control-group">
+                    <ui:VisualElement class="control-header">
+                        <ui:Label text="💨 CO₂ Control" class="section-title" />
+                        <ui:Button name="co2-auto-btn" text="AUTO OFF" class="auto-button auto-off" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="control-content">
+                        <ui:VisualElement class="reading-display">
+                            <ui:Label text="Current:" class="reading-label" />
+                            <ui:Label name="current-co2" text="1150 ppm" class="reading-value" />
+                            <ui:ProgressBar name="co2-stability" value="0.78" title="Stability: 78%" class="stability-bar" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="control-inputs">
+                            <ui:Slider name="co2-slider" low-value="400" high-value="1800" value="1000" class="control-slider" />
+                            <ui:FloatField name="co2-field" value="1000" class="control-field" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Lighting Control Section -->
+                <ui:VisualElement name="lighting-section" class="control-group">
+                    <ui:VisualElement class="control-header">
+                        <ui:Label text="💡 Lighting Control" class="section-title" />
+                        <ui:Toggle name="lighting-on-toggle" value="true" text="Power" class="lighting-toggle" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="control-content">
+                        <ui:VisualElement class="reading-display">
+                            <ui:Label text="Current:" class="reading-label" />
+                            <ui:Label name="current-light" text="450 PPFD" class="reading-value" />
+                            <ui:ProgressBar name="dli-progress" value="0.65" title="DLI: 32.4 mol/m²/day" class="dli-bar" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="lighting-controls">
+                            <ui:VisualElement class="control-row">
+                                <ui:Label text="Intensity:" class="control-label" />
+                                <ui:Slider name="light-intensity-slider" low-value="0" high-value="1000" value="450" class="control-slider" />
+                                <ui:FloatField name="light-intensity-field" value="450" class="control-field" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="control-row">
+                                <ui:Label text="Mode:" class="control-label" />
+                                <ui:DropdownField name="lighting-mode-dropdown" class="mode-dropdown" />
+                            </ui:VisualElement>
+                            
+                            <ui:VisualElement class="control-row">
+                                <ui:Label text="Photoperiod:" class="control-label" />
+                                <ui:Slider name="photoperiod-slider" low-value="8" high-value="24" value="18" class="control-slider" />
+                                <ui:Label name="photoperiod-label" text="18h 0m" class="photoperiod-display" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Right Panel - Advanced Controls &amp; Status -->
+            <ui:VisualElement name="status-panel" class="status-section">
+                
+                <!-- Equipment Status -->
+                <ui:VisualElement name="equipment-status" class="status-group">
+                    <ui:Label text="🔧 Equipment Status" class="section-title" />
+                    
+                    <ui:VisualElement class="equipment-grid">
+                        <ui:VisualElement name="hvac-status-panel" class="equipment-card status-online">
+                            <ui:Label text="HVAC System" class="equipment-name" />
+                            <ui:Label text="Online" class="equipment-status" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="lighting-status-panel" class="equipment-card status-on">
+                            <ui:Label text="LED Arrays" class="equipment-name" />
+                            <ui:Label text="Operational" class="equipment-status" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="fan-status-panel" class="equipment-card status-on">
+                            <ui:Label text="Ventilation" class="equipment-name" />
+                            <ui:Label text="Running" class="equipment-status" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement name="co2-status-panel" class="equipment-card status-normal">
+                            <ui:Label text="CO₂ System" class="equipment-name" />
+                            <ui:Label text="Normal" class="equipment-status" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Advanced Controls -->
+                <ui:VisualElement name="advanced-panel" class="status-group">
+                    <ui:Label text="⚙️ Advanced Controls" class="section-title" />
+                    
+                    <ui:VisualElement class="advanced-controls">
+                        <ui:VisualElement class="control-row">
+                            <ui:Label text="VPD Target:" class="control-label" />
+                            <ui:Slider name="vpd-slider" low-value="0.4" high-value="1.6" value="1.0" class="control-slider" />
+                            <ui:Label name="vpd-label" text="1.00 kPa" class="vpd-display" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="control-row">
+                            <ui:Label text="Airflow Rate:" class="control-label" />
+                            <ui:Slider name="airflow-slider" low-value="0" high-value="100" value="75" class="control-slider" />
+                            <ui:Label text="75%" class="airflow-display" />
+                        </ui:VisualElement>
+                        
+                        <ui:VisualElement class="fan-controls">
+                            <ui:Toggle name="circulation-fan-toggle" value="true" text="Circulation Fan" class="fan-toggle" />
+                            <ui:Toggle name="exhaust-fan-toggle" value="true" text="Exhaust Fan" class="fan-toggle" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <!-- Scheduling Panel -->
+                <ui:VisualElement name="schedule-panel" class="status-group">
+                    <ui:VisualElement class="schedule-header">
+                        <ui:Label text="📅 Scheduling" class="section-title" />
+                        <ui:Toggle name="automation-enabled-toggle" value="true" text="Auto" class="automation-toggle" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement class="schedule-content">
+                        <ui:Button name="add-schedule-btn" text="+ Add Schedule" class="add-schedule-btn" />
+                        <ui:VisualElement name="schedule-list" class="schedule-list">
+                            <!-- Schedules will be populated dynamically -->
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+        <!-- Footer Status -->
+        <ui:VisualElement name="footer-status" class="environmental-footer">
+            <ui:Label text="🟢 All Environmental Systems Operational" class="footer-status-message" />
+            <ui:Label text="Zone Temperature: 22.5°C | Humidity: 58.2% | CO₂: 1150 ppm" class="footer-readings" />
+            <ui:Label text="Last Update: 5 seconds ago" class="footer-timestamp" />
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,58 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Events;
+using ProjectChimera.Data.Cultivation;
+// Type aliases to resolve ambiguous references
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using EventsCultivationTaskType = ProjectChimera.Events.CultivationTaskType;
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+using EventsCareQuality = ProjectChimera.Events.CareQuality;
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test for latest round of error fixes
+    /// </summary>
+    public class LatestErrorFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Latest Error Fix Test ===");
+            
+            // Test CareAction class vs enum distinction
+            TestCareActionTypes();
+            
+            // Test system compilation
+            TestSystemCompilation();
+            
+            Debug.Log("Latest error fix test completed!");
+        }
+        
+        private void TestCareActionTypes()
+        {
+            Debug.Log("Testing CareAction type distinction...");
+            
+            // Test local CareAction class (with properties)
+            var careAction = new CareAction
+            {
+                TaskType = CultivationTaskType.Watering,
+                Timestamp = Time.time
+            };
+            
+            Debug.Log($"✓ CareAction class works: {careAction.TaskType}");
+        }
+        
+        private void TestSystemCompilation()
+        {
+            Debug.Log("Testing system compilation...");
+            
+            var careSystem = GetComponent<InteractivePlantCareSystem>();
+            var enhancedManager = GetComponent<EnhancedCultivationGamingManager>();
+            var timeSystem = GetComponent<TimeAccelerationGamingSystem>();
+            
+            Debug.Log("✓ Major systems compile and are accessible");
+        }
+    }
+}

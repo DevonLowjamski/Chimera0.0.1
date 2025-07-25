@@ -1,0 +1,39 @@
+using UnityEngine;
+using ProjectChimera.Data.Cultivation;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test to verify duplicate definition fixes
+    /// </summary>
+    public class DuplicateFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Duplicate Fix Test ===");
+            
+            // Test that SkillMilestone can be accessed without ambiguity
+            var milestone = new SkillMilestone
+            {
+                MilestoneId = "test",
+                MilestoneName = "Test Milestone",
+                Description = "Test milestone description"
+            };
+            
+            Debug.Log($"✓ SkillMilestone accessible: {milestone.MilestoneName}");
+            
+            // Test InteractivePlantCareConfigSO compilation
+            var config = ScriptableObject.CreateInstance<InteractivePlantCareConfigSO>();
+            if (config != null)
+            {
+                Debug.Log($"✓ InteractivePlantCareConfigSO compiles and instantiates");
+                
+                // Test SkillMilestones property access
+                config.SkillMilestones.Add(milestone);
+                Debug.Log($"✓ SkillMilestones property works: {config.SkillMilestones.Count} milestones");
+            }
+            
+            Debug.Log("Duplicate fix test completed successfully!");
+        }
+    }
+}

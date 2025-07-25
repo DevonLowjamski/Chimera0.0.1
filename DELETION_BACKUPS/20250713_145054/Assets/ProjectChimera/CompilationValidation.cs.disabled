@@ -1,0 +1,76 @@
+using UnityEngine;
+using ProjectChimera.Systems.Narrative;
+using ProjectChimera.Data.Narrative;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Progression;
+// Aliases to resolve ambiguous references
+using DataNarrativeState = ProjectChimera.Data.Narrative.NarrativeState;
+using SystemsNarrativeState = ProjectChimera.Systems.Narrative.NarrativeState;
+using DataCharacterRelationship = ProjectChimera.Data.Narrative.CharacterRelationship;
+using SystemsCharacterRelationship = ProjectChimera.Systems.Narrative.CharacterRelationship;
+using DataNarrativeEvent = ProjectChimera.Data.Narrative.NarrativeEvent;
+using SystemsNarrativeEvent = ProjectChimera.Systems.Narrative.NarrativeEvent;
+using DataPlayerDecision = ProjectChimera.Data.Narrative.PlayerDecision;
+using SystemsPlayerDecision = ProjectChimera.Systems.Narrative.PlayerDecision;
+using DataBranchingNarrativeEngine = ProjectChimera.Data.Narrative.BranchingNarrativeEngine;
+using SystemsBranchingNarrativeEngine = ProjectChimera.Systems.Narrative.BranchingNarrativeEngine;
+using DataTaskType = ProjectChimera.Data.Cultivation.TaskType;
+using NarrativeTaskType = ProjectChimera.Data.Narrative.TaskType;
+using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
+using CultivationExperienceSource = ProjectChimera.Data.Cultivation.ExperienceSource;
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Enhanced compilation validation script to test if major errors are resolved
+    /// </summary>
+    public class CompilationValidation : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("Compilation validation: Major systems compile successfully");
+            
+            // Test Data.Narrative types
+            var learningMoment = new LearningMoment();
+            var educationalTracker = new EducationalProgressTracker();
+            var narrativeState = new DataNarrativeState();
+            var characterRelationship = new DataCharacterRelationship("test");
+            var narrativeEvent = new DataNarrativeEvent();
+            
+            // Test type conversions
+            characterRelationship.ModifyTrust(5f);
+            characterRelationship.ModifyRespect(3f);
+            characterRelationship.ModifyInfluence(2f);
+            
+            // Test PlayerDecision with proper DecisionContext
+            var playerDecision = new DataPlayerDecision();
+            playerDecision.Context = new DecisionContext();
+            var additionalData = playerDecision.Context.AdditionalData();
+            
+            // Test Systems.Narrative types
+            var narrativeEngine = GetComponent<SystemsBranchingNarrativeEngine>();
+            var consequenceTracker = GetComponent<ConsequenceTrackingSystem>();
+            
+            // Test Systems.Cultivation types
+            var automationSystem = GetComponent<EarnedAutomationProgressionSystem>();
+            var careSystem = GetComponent<InteractivePlantCareSystem>();
+            
+            // Test enum conversions
+            var cultivationTask = DataCultivationTaskType.Watering;
+            var narrativeTask = NarrativeTaskType.Watering;
+            
+            // Test new enum values
+            var breedingTask = DataCultivationTaskType.Breeding;
+            var processingTask = DataCultivationTaskType.Processing;
+            var constructionTask = DataCultivationTaskType.Construction;
+            var automationTask = DataCultivationTaskType.Automation;
+            
+            // Test experience source
+            var experienceSource = ProgressionExperienceSource.PlantCare;
+            
+            Debug.Log("All major types, methods, and enums validated successfully - compilation errors resolved");
+        }
+    }
+}

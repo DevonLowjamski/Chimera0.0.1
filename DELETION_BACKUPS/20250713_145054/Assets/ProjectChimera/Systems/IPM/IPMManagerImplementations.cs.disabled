@@ -1,0 +1,786 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.Interfaces;
+
+// Use the existing data structures from IPMDataStructures.cs
+using IPMBattleData = ProjectChimera.Data.IPM.IPMBattleData;
+using IPMBattleConfiguration = ProjectChimera.Data.IPM.IPMBattleConfiguration;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Core IPM Pest Manager implementation for the Enhanced IPM Gaming System.
+    /// Manages pest populations, behaviors, and invasion dynamics.
+    /// </summary>
+    public class IPMPestManager : IPMSystemBase, IIPMPestManager
+    {
+        [Header("Pest Management Configuration")]
+        [SerializeField] private bool _enableDynamicPopulations = true;
+        [SerializeField] private float _populationUpdateInterval = 1f;
+        [SerializeField] private int _maxPestPopulation = 1000;
+        
+        // Events
+        public event Action<PestInvasionData> OnInvasionStarted;
+        public event Action<PestInvasionData> OnInvasionEnded;
+        public event Action<PestType, int> OnPopulationChanged;
+        
+        private Dictionary<PestType, int> _pestPopulations = new Dictionary<PestType, int>();
+        private List<PestInvasionData> _activeInvasions = new List<PestInvasionData>();
+        private float _lastPopulationUpdate;
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMPestManager";
+            InitializePestPopulations();
+            base.OnManagerInitialize();
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!_isActive) return;
+            
+            if (Time.time - _lastPopulationUpdate >= _populationUpdateInterval)
+            {
+                UpdatePestPopulations();
+                _lastPopulationUpdate = Time.time;
+            }
+            
+            base.OnManagerUpdate();
+        }
+        
+        public void StartInvasion(PestInvasionData invasionData)
+        {
+            _activeInvasions.Add(invasionData);
+            OnInvasionStarted?.Invoke(invasionData);
+        }
+        
+        public void EndInvasion(string invasionId)
+        {
+            var invasion = _activeInvasions.FirstOrDefault(i => i.InvasionId == invasionId);
+            if (invasion != null)
+            {
+                _activeInvasions.Remove(invasion);
+                OnInvasionEnded?.Invoke(invasion);
+            }
+        }
+        
+        public List<PestInvasionData> GetActiveInvasions()
+        {
+            return new List<PestInvasionData>(_activeInvasions);
+        }
+        
+        public void UpdatePestPopulation(PestType pestType, int populationChange)
+        {
+            if (!_pestPopulations.ContainsKey(pestType))
+                _pestPopulations[pestType] = 0;
+                
+            _pestPopulations[pestType] = Mathf.Max(0, _pestPopulations[pestType] + populationChange);
+            OnPopulationChanged?.Invoke(pestType, _pestPopulations[pestType]);
+        }
+        
+        public int GetPestPopulation(PestType pestType)
+        {
+            return _pestPopulations.GetValueOrDefault(pestType, 0);
+        }
+        
+        private void InitializePestPopulations()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _pestPopulations[pestType] = 0;
+            }
+        }
+        
+        private void UpdatePestPopulations()
+        {
+            if (!_enableDynamicPopulations) return;
+            
+            foreach (var pestType in _pestPopulations.Keys.ToList())
+            {
+                var currentPop = _pestPopulations[pestType];
+                var naturalGrowth = Mathf.RoundToInt(currentPop * 0.01f); // 1% growth per update
+                var newPop = Mathf.Min(_maxPestPopulation, currentPop + naturalGrowth);
+                
+                if (newPop != currentPop)
+                {
+                    _pestPopulations[pestType] = newPop;
+                    OnPopulationChanged?.Invoke(pestType, newPop);
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// IPM Biological Manager implementation for biological control strategies.
+    /// </summary>
+    public class IPMBiologicalManager : IPMSystemBase, IIPMBiologicalManager
+    {
+        [Header("Biological Control Configuration")]
+        [SerializeField] private int _maxBeneficialOrganisms = 500;
+        [SerializeField] private float _releaseEffectiveness = 0.8f;
+        
+        // Events
+        public event Action<BeneficialOrganismData> OnOrganismReleased;
+        public event Action<string> OnOrganismExpired;
+        public event Action<PestType, float> OnBiologicalControlApplied;
+        
+        private Dictionary<string, BeneficialOrganismData> _activeOrganisms = new Dictionary<string, BeneficialOrganismData>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMBiologicalManager";
+            base.OnManagerInitialize();
+        }
+        
+        public void ReleaseBeneficialOrganism(BeneficialOrganismData organismData)
+        {
+            if (_activeOrganisms.Count < _maxBeneficialOrganisms)
+            {
+                _activeOrganisms[organismData.OrganismId] = organismData;
+                OnOrganismReleased?.Invoke(organismData);
+            }
+        }
+        
+        public void RemoveOrganism(string organismId)
+        {
+            if (_activeOrganisms.Remove(organismId))
+            {
+                OnOrganismExpired?.Invoke(organismId);
+            }
+        }
+        
+        public List<BeneficialOrganismData> GetActiveBeneficialOrganisms()
+        {
+            return _activeOrganisms.Values.ToList();
+        }
+        
+        public float CalculateBiologicalEffectiveness(PestType targetPest, BeneficialOrganismType controlAgent)
+        {
+            return _releaseEffectiveness * UnityEngine.Random.Range(0.7f, 1.0f);
+        }
+        
+        public bool CanReleaseBeneficialOrganism(BeneficialOrganismType organismType, Vector3 location)
+        {
+            return _activeOrganisms.Count < _maxBeneficialOrganisms;
+        }
+    }
+    
+    /// <summary>
+    /// IPM Defense Manager implementation for defensive structures and strategies.
+    /// </summary>
+    public class IPMDefenseManager : IPMSystemBase, IIPMDefenseManager
+    {
+        [Header("Defense Configuration")]
+        [SerializeField] private int _maxDefenseStructures = 100;
+        [SerializeField] private float _defenseEffectiveness = 0.75f;
+        
+        // Events
+        public event Action<DefenseStructureData> OnDefenseDeployed;
+        public event Action<string> OnDefenseDestroyed;
+        public event Action<string, float> OnDefenseActivated;
+        
+        private Dictionary<string, DefenseStructureData> _activeDefenses = new Dictionary<string, DefenseStructureData>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMDefenseManager";
+            base.OnManagerInitialize();
+        }
+        
+        public void DeployDefense(DefenseStructureData defenseData)
+        {
+            if (_activeDefenses.Count < _maxDefenseStructures)
+            {
+                _activeDefenses[defenseData.StructureId] = defenseData;
+                OnDefenseDeployed?.Invoke(defenseData);
+            }
+        }
+        
+        public void RemoveDefense(string defenseId)
+        {
+            if (_activeDefenses.Remove(defenseId))
+            {
+                OnDefenseDestroyed?.Invoke(defenseId);
+            }
+        }
+        
+        public List<DefenseStructureData> GetActiveDefenses()
+        {
+            return _activeDefenses.Values.ToList();
+        }
+        
+        public float CalculateDefenseEffectiveness(DefenseStructureType defenseType, PestType targetPest)
+        {
+            return _defenseEffectiveness * UnityEngine.Random.Range(0.6f, 1.0f);
+        }
+        
+        public bool CanDeployDefense(DefenseStructureType defenseType, Vector3 location)
+        {
+            return _activeDefenses.Count < _maxDefenseStructures;
+        }
+    }
+    
+    /// <summary>
+    /// IPM Chemical Manager implementation for chemical control strategies.
+    /// </summary>
+    public class IPMChemicalManager : IPMSystemBase, IIPMChemicalManager
+    {
+        [Header("Chemical Control Configuration")]
+        [SerializeField] private float _applicationEffectiveness = 0.85f;
+        [SerializeField] private float _resistanceDevelopmentRate = 0.01f;
+        
+        // Events
+        public event Action<ChemicalApplicationData> OnChemicalApplied;
+        public event Action<string, float> OnResistanceDeveloped;
+        public event Action<string, float> OnApplicationDegraded;
+        
+        private Dictionary<string, ChemicalApplicationData> _activeApplications = new Dictionary<string, ChemicalApplicationData>();
+        private Dictionary<PestType, Dictionary<string, float>> _resistanceLevels = new Dictionary<PestType, Dictionary<string, float>>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMChemicalManager";
+            InitializeResistanceLevels();
+            base.OnManagerInitialize();
+        }
+        
+        public void ApplyChemical(ChemicalApplicationData applicationData)
+        {
+            _activeApplications[applicationData.ApplicationId] = applicationData;
+            OnChemicalApplied?.Invoke(applicationData);
+        }
+        
+        public void UpdateApplications(float deltaTime)
+        {
+            foreach (var application in _activeApplications.Values.ToList())
+            {
+                application.CurrentEffectiveness -= application.DegradationRate * deltaTime;
+                
+                if (application.CurrentEffectiveness <= 0)
+                {
+                    RemoveApplication(application.ApplicationId);
+                }
+            }
+        }
+        
+        public void RemoveApplication(string applicationId)
+        {
+            _activeApplications.Remove(applicationId);
+        }
+        
+        public List<ChemicalApplicationData> GetActiveApplications()
+        {
+            return _activeApplications.Values.ToList();
+        }
+        
+        public float CalculateResistanceLevel(PestType pestType, string chemicalType)
+        {
+            if (_resistanceLevels.TryGetValue(pestType, out var pestResistance))
+            {
+                return pestResistance.GetValueOrDefault(chemicalType, 0f);
+            }
+            return 0f;
+        }
+        
+        public bool CanApplyChemical(string chemicalType, Vector3 position)
+        {
+            return true; // Simplified implementation
+        }
+        
+        private void InitializeResistanceLevels()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _resistanceLevels[pestType] = new Dictionary<string, float>();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// IPM Resource Manager implementation for resource management and economy.
+    /// </summary>
+    public class IPMResourceManager : IPMSystemBase, IIPMResourceManager
+    {
+        [Header("Resource Configuration")]
+        [SerializeField] private int _startingBudget = 10000;
+        
+        // Events
+        public event Action<string, IPMResourceData> OnResourceUpdated;
+        public event Action<string, float> OnResourceDepleted;
+        public event Action<string, float> OnResourceGenerated;
+        
+        private Dictionary<string, IPMResourceData> _resources = new Dictionary<string, IPMResourceData>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMResourceManager";
+            InitializeResources();
+            base.OnManagerInitialize();
+        }
+        
+        public bool ConsumeResource(string resourceId, int amount)
+        {
+            if (_resources.TryGetValue(resourceId, out var resource))
+            {
+                if (resource.CurrentAmount >= amount)
+                {
+                    resource.CurrentAmount -= amount;
+                    resource.LastUpdated = DateTime.Now;
+                    OnResourceUpdated?.Invoke(resourceId, resource);
+                    
+                    if (resource.CurrentAmount == 0)
+                    {
+                        OnResourceDepleted?.Invoke(resourceId, 0f);
+                    }
+                    
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        public void AddResource(string resourceId, int amount)
+        {
+            if (_resources.TryGetValue(resourceId, out var resource))
+            {
+                resource.CurrentAmount = Mathf.Min(resource.MaxAmount, resource.CurrentAmount + amount);
+                resource.LastUpdated = DateTime.Now;
+                OnResourceUpdated?.Invoke(resourceId, resource);
+                
+                if (amount > 0)
+                {
+                    OnResourceGenerated?.Invoke(resourceId, amount);
+                }
+            }
+        }
+        
+        public IPMResourceData GetResource(string resourceId)
+        {
+            return _resources.GetValueOrDefault(resourceId);
+        }
+        
+        public Dictionary<string, IPMResourceData> GetAllResources()
+        {
+            return new Dictionary<string, IPMResourceData>(_resources);
+        }
+        
+        public bool CanAfford(Dictionary<string, int> requiredResources)
+        {
+            foreach (var requirement in requiredResources)
+            {
+                if (!_resources.TryGetValue(requirement.Key, out var resource) ||
+                    resource.CurrentAmount < requirement.Value)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public float CalculateTotalCost(Dictionary<string, int> resources)
+        {
+            float totalCost = 0f;
+            foreach (var resource in resources)
+            {
+                if (_resources.TryGetValue(resource.Key, out var resourceData))
+                {
+                    totalCost += resourceData.CostPerUnit * resource.Value;
+                }
+            }
+            return totalCost;
+        }
+        
+        private void InitializeResources()
+        {
+            // Initialize basic resources
+            _resources["Budget"] = new IPMResourceData
+            {
+                ResourceId = "Budget",
+                ResourceName = "Budget",
+                CurrentAmount = _startingBudget,
+                MaxAmount = 100000,
+                CostPerUnit = 1f,
+                IsLimited = true
+            };
+            
+            _resources["BiologicalAgents"] = new IPMResourceData
+            {
+                ResourceId = "BiologicalAgents",
+                ResourceName = "Biological Control Agents",
+                CurrentAmount = 50,
+                MaxAmount = 200,
+                CostPerUnit = 25f,
+                RegenerationRate = 0.1f,
+                IsLimited = true
+            };
+            
+            _resources["Chemicals"] = new IPMResourceData
+            {
+                ResourceId = "Chemicals",
+                ResourceName = "Chemical Pesticides",
+                CurrentAmount = 100,
+                MaxAmount = 500,
+                CostPerUnit = 15f,
+                IsLimited = true
+            };
+        }
+    }
+    
+    /// <summary>
+    /// IPM AI Manager implementation for AI systems and machine learning.
+    /// </summary>
+    public class IPMAIManager : IPMSystemBase, IIPMAIManager
+    {
+        [Header("AI Configuration")]
+        [SerializeField] private float _learningRate = 0.1f;
+        [SerializeField] private int _maxLearningCycles = 100;
+        [SerializeField] private bool _enablePredictiveAnalytics = true;
+        
+        // Events
+        public event Action<PestAIBehavior> OnAIBehaviorUpdated;
+        public event Action<IPMLearningData> OnLearningCompleted;
+        public event Action<IPMRecommendation> OnRecommendationGenerated;
+        
+        private Dictionary<PestType, PestAIBehavior> _aiBehaviors = new Dictionary<PestType, PestAIBehavior>();
+        private List<IPMLearningData> _learningHistory = new List<IPMLearningData>();
+        private IPMRecommendationEngine _recommendationEngine;
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMAIManager";
+            InitializeAIBehaviors();
+            _recommendationEngine = new IPMRecommendationEngine();
+            base.OnManagerInitialize();
+        }
+        
+        public void UpdateAIBehavior(PestType pestType, Dictionary<string, float> learningData)
+        {
+            if (_aiBehaviors.TryGetValue(pestType, out var behavior))
+            {
+                behavior.UpdateBehavior(learningData, _learningRate);
+                _aiBehaviors[pestType] = behavior;
+                OnAIBehaviorUpdated?.Invoke(behavior);
+            }
+        }
+        
+        public PestAIBehavior GetAIBehavior(PestType pestType)
+        {
+            return _aiBehaviors.GetValueOrDefault(pestType, new PestAIBehavior { PestType = pestType });
+        }
+        
+        public void ProcessLearningData(IPMLearningData learningData)
+        {
+            _learningHistory.Add(learningData);
+            
+            // Process learning data for AI improvement
+            if (_learningHistory.Count > _maxLearningCycles)
+            {
+                _learningHistory.RemoveAt(0); // Keep only recent learning data
+            }
+            
+            OnLearningCompleted?.Invoke(learningData);
+        }
+        
+        public IPMRecommendation GenerateRecommendation(string playerId, IPMBattleData battleData)
+        {
+            var recommendation = _recommendationEngine.GenerateRecommendation(playerId, battleData, _aiBehaviors);
+            OnRecommendationGenerated?.Invoke(recommendation);
+            return recommendation;
+        }
+        
+        public float PredictStrategyEffectiveness(IPMStrategyType strategy, IPMBattleData battleData)
+        {
+            if (!_enablePredictiveAnalytics) return 0.5f;
+            
+            // Simplified prediction algorithm
+            var baseEffectiveness = GetBaseStrategyEffectiveness(strategy);
+            var contextModifier = CalculateContextModifier(battleData);
+            return Mathf.Clamp01(baseEffectiveness * contextModifier);
+        }
+        
+        private void InitializeAIBehaviors()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _aiBehaviors[pestType] = new PestAIBehavior
+                {
+                    PestType = pestType,
+                    AggressionLevel = 0.5f,
+                    AdaptationRate = 0.3f,
+                    IntelligenceLevel = 0.4f
+                };
+            }
+        }
+        
+        private float GetBaseStrategyEffectiveness(IPMStrategyType strategy)
+        {
+            return strategy switch
+            {
+                IPMStrategyType.Preventive => 0.7f,
+                IPMStrategyType.Biological => 0.8f,
+                IPMStrategyType.Chemical => 0.6f,
+                IPMStrategyType.Environmental => 0.75f,
+                IPMStrategyType.Integrated => 0.9f,
+                IPMStrategyType.Emergency => 0.5f,
+                _ => 0.5f
+            };
+        }
+        
+        private float CalculateContextModifier(IPMBattleData battleData)
+        {
+            // Consider battle context factors
+            return UnityEngine.Random.Range(0.8f, 1.2f);
+        }
+    }
+    
+    /// <summary>
+    /// IPM Network Manager implementation for multiplayer and networking.
+    /// </summary>
+    public class IPMNetworkManager : IPMSystemBase, IIPMNetworkManager
+    {
+        [Header("Network Configuration")]
+        [SerializeField] private int _maxPlayers = 8;
+        [SerializeField] private bool _enableHostMigration = true;
+        [SerializeField] private float _networkUpdateRate = 20f;
+        
+        // Events
+        public event Action<string> OnPlayerJoined;
+        public event Action<string> OnPlayerLeft;
+        public event Action<IPMGameEvent> OnNetworkEventReceived;
+        
+        private List<string> _connectedPlayers = new List<string>();
+        private string _hostPlayerId = "";
+        private bool _isHost = false;
+        private Dictionary<string, IPMMultiplayerSession> _activeSessions = new Dictionary<string, IPMMultiplayerSession>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMNetworkManager";
+            base.OnManagerInitialize();
+        }
+        
+        public bool StartMultiplayerSession(IPMBattleConfiguration config)
+        {
+            var sessionId = Guid.NewGuid().ToString();
+            var session = new IPMMultiplayerSession
+            {
+                SessionId = sessionId,
+                Configuration = config,
+                HostPlayerId = _hostPlayerId,
+                IsActive = true
+            };
+            
+            _activeSessions[sessionId] = session;
+            _isHost = true;
+            
+            return true;
+        }
+        
+        public void EndMultiplayerSession(string sessionId)
+        {
+            if (_activeSessions.Remove(sessionId))
+            {
+                // Notify all players about session end
+                var endEvent = new IPMGameEvent
+                {
+                    EventType = "SessionEnded",
+                    SessionId = sessionId,
+                    Timestamp = DateTime.Now
+                };
+                SendNetworkEvent(endEvent);
+            }
+        }
+        
+        public void SendNetworkEvent(IPMGameEvent gameEvent)
+        {
+            // Simulate network event sending
+            OnNetworkEventReceived?.Invoke(gameEvent);
+        }
+        
+        public void SynchronizeState(string sessionId)
+        {
+            if (_activeSessions.TryGetValue(sessionId, out var session))
+            {
+                // Synchronize game state across all players
+                var syncEvent = new IPMGameEvent
+                {
+                    EventType = "StateSynchronization",
+                    SessionId = sessionId,
+                    Timestamp = DateTime.Now
+                };
+                SendNetworkEvent(syncEvent);
+            }
+        }
+        
+        public List<string> GetConnectedPlayers()
+        {
+            return new List<string>(_connectedPlayers);
+        }
+        
+        public bool IsHost()
+        {
+            return _isHost;
+        }
+        
+        public void AddPlayer(string playerId)
+        {
+            if (!_connectedPlayers.Contains(playerId))
+            {
+                _connectedPlayers.Add(playerId);
+                OnPlayerJoined?.Invoke(playerId);
+            }
+        }
+        
+        public void RemovePlayer(string playerId)
+        {
+            if (_connectedPlayers.Remove(playerId))
+            {
+                OnPlayerLeft?.Invoke(playerId);
+                
+                // Handle host migration if needed
+                if (playerId == _hostPlayerId && _enableHostMigration && _connectedPlayers.Count > 0)
+                {
+                    _hostPlayerId = _connectedPlayers[0];
+                    _isHost = (_hostPlayerId == GetLocalPlayerId());
+                }
+            }
+        }
+        
+        private string GetLocalPlayerId()
+        {
+            // Return local player ID - simplified implementation
+            return "LocalPlayer";
+        }
+    }
+    
+    /// <summary>
+    /// IPM Notification Manager implementation for notifications and alerts.
+    /// </summary>
+    public class IPMNotificationManager : IPMSystemBase, IIPMNotificationManager
+    {
+        [Header("Notification Configuration")]
+        [SerializeField] private int _maxActiveNotifications = 10;
+        [SerializeField] private float _notificationDuration = 5f;
+        [SerializeField] private bool _enableAchievementNotifications = true;
+        
+        // Events
+        public event Action<IPMNotification> OnNotificationCreated;
+        public event Action<string> OnNotificationDismissed;
+        public event Action<string> OnAchievementUnlocked;
+        
+        private Dictionary<string, IPMNotification> _activeNotifications = new Dictionary<string, IPMNotification>();
+        private Queue<IPMNotification> _notificationQueue = new Queue<IPMNotification>();
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = "IPMNotificationManager";
+            base.OnManagerInitialize();
+        }
+        
+        protected override void Update()
+        {
+            base.Update();
+            ProcessNotificationQueue();
+            UpdateActiveNotifications();
+        }
+        
+        public void CreateNotification(IPMNotification notification)
+        {
+            if (_activeNotifications.Count < _maxActiveNotifications)
+            {
+                _activeNotifications[notification.NotificationId] = notification;
+                OnNotificationCreated?.Invoke(notification);
+            }
+            else
+            {
+                _notificationQueue.Enqueue(notification);
+            }
+        }
+        
+        public void DismissNotification(string notificationId)
+        {
+            if (_activeNotifications.Remove(notificationId))
+            {
+                OnNotificationDismissed?.Invoke(notificationId);
+                ProcessNotificationQueue();
+            }
+        }
+        
+        public List<IPMNotification> GetActiveNotifications()
+        {
+            return _activeNotifications.Values.ToList();
+        }
+        
+        public void TriggerAchievement(string achievementId)
+        {
+            if (_enableAchievementNotifications)
+            {
+                var notification = new IPMNotification
+                {
+                    NotificationId = Guid.NewGuid().ToString(),
+                    Title = "Achievement Unlocked!",
+                    Message = $"You unlocked: {achievementId}",
+                    Type = "Achievement",
+                    Priority = 2,
+                    Duration = _notificationDuration,
+                    Timestamp = DateTime.Now
+                };
+                
+                CreateNotification(notification);
+                OnAchievementUnlocked?.Invoke(achievementId);
+            }
+        }
+        
+        public void SendAlert(string alertType, string message, int priority = 1)
+        {
+            var notification = new IPMNotification
+            {
+                NotificationId = Guid.NewGuid().ToString(),
+                Title = alertType,
+                Message = message,
+                Type = "Alert",
+                Priority = priority,
+                Duration = _notificationDuration,
+                Timestamp = DateTime.Now
+            };
+            
+            CreateNotification(notification);
+        }
+        
+        private void ProcessNotificationQueue()
+        {
+            while (_notificationQueue.Count > 0 && _activeNotifications.Count < _maxActiveNotifications)
+            {
+                var notification = _notificationQueue.Dequeue();
+                _activeNotifications[notification.NotificationId] = notification;
+                OnNotificationCreated?.Invoke(notification);
+            }
+        }
+        
+        private void UpdateActiveNotifications()
+        {
+            var expiredNotifications = new List<string>();
+            
+            foreach (var kvp in _activeNotifications)
+            {
+                var notification = kvp.Value;
+                var elapsed = (float)(DateTime.Now - notification.Timestamp).TotalSeconds;
+                
+                if (elapsed >= notification.Duration)
+                {
+                    expiredNotifications.Add(kvp.Key);
+                }
+            }
+            
+            foreach (var notificationId in expiredNotifications)
+            {
+                DismissNotification(notificationId);
+            }
+        }
+    }
+} 

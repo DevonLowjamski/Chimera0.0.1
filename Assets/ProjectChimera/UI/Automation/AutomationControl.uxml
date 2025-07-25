@@ -1,0 +1,365 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <!-- 
+    Project Chimera - Automation Control UXML Layout
+    Comprehensive automation interface with multi-tab design for rules, sensors, devices, schedules, and templates
+    -->
+    
+    <ui:VisualElement name="automation-root" class="automation-root">
+        
+        <!-- Header Section -->
+        <ui:VisualElement name="automation-header" class="automation-header">
+            <ui:VisualElement name="header-left" class="header-left">
+                <ui:Label text="Automation Control" name="panel-title" class="panel-title" />
+                <ui:Label text="Advanced Automation Management &amp; Rule Engine" name="panel-subtitle" class="panel-subtitle" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="header-right" class="header-right">
+                <ui:VisualElement name="status-indicators" class="status-indicators">
+                    <ui:Label text="50 Active Rules" name="active-rules-count" class="status-label" />
+                    <ui:Label text="24/26 Sensors Online" name="online-sensors-count" class="status-label" />
+                    <ui:Label text="18 Connected Devices" name="connected-devices-count" class="status-label" />
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="network-health" class="network-health">
+                    <ui:Label text="Network Health" class="metric-label" />
+                    <ui:ProgressBar value="0.92" name="network-health-bar" class="health-bar" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Main Navigation Tabs -->
+        <ui:VisualElement name="tab-navigation" class="tab-navigation">
+            <ui:Button text="Rules" name="rules-tab" class="nav-tab tab-active" />
+            <ui:Button text="Sensors" name="sensors-tab" class="nav-tab" />
+            <ui:Button text="Devices" name="devices-tab" class="nav-tab" />
+            <ui:Button text="Schedules" name="schedules-tab" class="nav-tab" />
+            <ui:Button text="Templates" name="templates-tab" class="nav-tab" />
+        </ui:VisualElement>
+        
+        <!-- Main Content Area -->
+        <ui:VisualElement name="automation-main" class="automation-main">
+            
+            <!-- Rules Panel -->
+            <ui:VisualElement name="rules-panel" class="tab-panel">
+                <ui:VisualElement name="rules-header" class="panel-section-header">
+                    <ui:VisualElement name="rules-info" class="section-info">
+                        <ui:Label text="Automation Rules" class="section-title" />
+                        <ui:Label text="50 Active Rules" name="active-rules-count" class="count-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="rules-controls" class="section-controls">
+                        <ui:Button text="Create Rule" name="create-rule-button" class="action-btn create-btn" />
+                        <ui:Button text="Import" name="import-rules-button" class="action-btn import-btn" />
+                        <ui:Button text="Export" name="export-rules-button" class="action-btn export-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="rules-content" class="rules-content">
+                    <!-- Active Rules List -->
+                    <ui:VisualElement name="rules-list-section" class="content-section">
+                        <ui:Label text="Active Rules" class="subsection-title" />
+                        <ui:ScrollView name="active-rules-scroll" class="rules-scroll">
+                            <ui:VisualElement name="active-rules-list" class="rules-list" />
+                        </ui:ScrollView>
+                        
+                        <ui:VisualElement name="rule-stats-container" class="stats-container">
+                            <ui:VisualElement name="stat-item" class="stat-item">
+                                <ui:Label text="Triggered Today" class="stat-label" />
+                                <ui:Label text="127" class="stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="stat-item" class="stat-item">
+                                <ui:Label text="Success Rate" class="stat-label" />
+                                <ui:Label text="98.5%" class="stat-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="stat-item" class="stat-item">
+                                <ui:Label text="Avg Response" class="stat-label" />
+                                <ui:Label text="1.2s" class="stat-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Rule Builder -->
+                    <ui:VisualElement name="rule-builder-section" class="content-section">
+                        <ui:Label text="Rule Builder" class="subsection-title" />
+                        <ui:VisualElement name="rule-builder-panel" class="rule-builder">
+                            
+                            <!-- Basic Rule Info -->
+                            <ui:VisualElement name="rule-basic-info" class="builder-section">
+                                <ui:TextField label="Rule Name" name="rule-name-field" value="New Automation Rule" class="rule-input" />
+                                <ui:TextField label="Description" name="rule-description-field" multiline="true" class="rule-input description-field" />
+                                
+                                <ui:VisualElement name="rule-options" class="rule-options">
+                                    <ui:Toggle label="Enabled" name="rule-enabled-toggle" value="true" class="rule-toggle" />
+                                    <ui:VisualElement name="priority-section" class="priority-section">
+                                        <ui:Label text="Priority" class="priority-label" />
+                                        <ui:Slider low-value="1" high-value="10" value="5" name="rule-priority-slider" class="priority-slider" />
+                                        <ui:Label text="5" name="priority-value" class="priority-value" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                            
+                            <!-- Trigger Section -->
+                            <ui:VisualElement name="trigger-section" class="builder-section">
+                                <ui:Label text="Trigger Conditions" class="builder-section-title" />
+                                <ui:VisualElement name="trigger-config" class="trigger-config">
+                                    <ui:DropdownField label="Trigger Type" name="trigger-type-dropdown" class="trigger-dropdown" />
+                                    <ui:DropdownField label="Sensor Source" name="sensor-source-dropdown" class="trigger-dropdown" />
+                                    <ui:DropdownField label="Operator" name="operator-dropdown" class="trigger-dropdown" />
+                                    <ui:FloatField label="Target Value" name="trigger-value-field" class="trigger-input" />
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                            
+                            <!-- Conditions Section -->
+                            <ui:VisualElement name="conditions-section" class="builder-section">
+                                <ui:VisualElement name="conditions-header" class="section-header">
+                                    <ui:Label text="Additional Conditions" class="builder-section-title" />
+                                    <ui:Button text="Add Condition" name="add-condition-button" class="add-btn" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="conditions-list" class="conditions-list" />
+                            </ui:VisualElement>
+                            
+                            <!-- Actions Section -->
+                            <ui:VisualElement name="actions-section" class="builder-section">
+                                <ui:VisualElement name="actions-header" class="section-header">
+                                    <ui:Label text="Actions to Execute" class="builder-section-title" />
+                                    <ui:Button text="Add Action" name="add-action-button" class="add-btn" />
+                                </ui:VisualElement>
+                                <ui:VisualElement name="actions-list" class="actions-list" />
+                            </ui:VisualElement>
+                            
+                            <!-- Rule Controls -->
+                            <ui:VisualElement name="rule-controls" class="rule-controls">
+                                <ui:Button text="Test Rule" name="test-rule-button" class="control-btn test-btn" />
+                                <ui:Button text="Save Rule" name="save-rule-button" class="control-btn save-btn" />
+                                <ui:Button text="Reset" name="reset-rule-button" class="control-btn reset-btn" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Sensors Panel -->
+            <ui:VisualElement name="sensors-panel" class="tab-panel hidden">
+                <ui:VisualElement name="sensors-header" class="panel-section-header">
+                    <ui:VisualElement name="sensors-info" class="section-info">
+                        <ui:Label text="Sensor Network" class="section-title" />
+                        <ui:Label text="24/26 Online" name="online-sensors-count" class="count-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="sensors-controls" class="section-controls">
+                        <ui:Button text="Add Sensor" name="add-sensor-button" class="action-btn add-btn" />
+                        <ui:Button text="Calibrate" name="calibrate-sensors-button" class="action-btn calibrate-btn" />
+                        <ui:Button text="Refresh" name="refresh-sensors-button" class="action-btn refresh-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="sensors-content" class="sensors-content">
+                    <!-- Network Overview -->
+                    <ui:VisualElement name="network-overview" class="content-section">
+                        <ui:Label text="Network Health" class="subsection-title" />
+                        <ui:VisualElement name="network-metrics" class="network-metrics">
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Overall Health" class="metric-label" />
+                                <ui:ProgressBar value="0.92" name="network-health-bar" class="health-bar" />
+                                <ui:Label text="92%" class="metric-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Response Time" class="metric-label" />
+                                <ui:Label text="1.2s avg" class="metric-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Data Quality" class="metric-label" />
+                                <ui:ProgressBar value="0.95" class="quality-bar" />
+                                <ui:Label text="95%" class="metric-value" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Sensor Network Map -->
+                    <ui:VisualElement name="network-map-section" class="content-section">
+                        <ui:Label text="Network Topology" class="subsection-title" />
+                        <ui:VisualElement name="sensor-network-map" class="network-map">
+                            <!-- Visual network representation would be implemented in code -->
+                            <ui:Label text="Interactive sensor network visualization" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Sensors List -->
+                    <ui:VisualElement name="sensors-list-section" class="content-section">
+                        <ui:Label text="All Sensors" class="subsection-title" />
+                        <ui:ScrollView name="sensors-scroll" class="sensors-scroll">
+                            <ui:VisualElement name="sensors-list" class="sensors-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                    
+                    <!-- Sensor Details -->
+                    <ui:VisualElement name="sensor-details-section" class="content-section">
+                        <ui:Label text="Sensor Details" class="subsection-title" />
+                        <ui:VisualElement name="sensor-details-panel" class="details-panel">
+                            <ui:Label text="Select a sensor to view details" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Sensor Alerts -->
+                    <ui:VisualElement name="sensor-alerts-section" class="content-section">
+                        <ui:Label text="Active Alerts" class="subsection-title" />
+                        <ui:VisualElement name="sensor-alerts-container" class="alerts-container" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Devices Panel -->
+            <ui:VisualElement name="devices-panel" class="tab-panel hidden">
+                <ui:VisualElement name="devices-header" class="panel-section-header">
+                    <ui:VisualElement name="devices-info" class="section-info">
+                        <ui:Label text="IoT Devices" class="section-title" />
+                        <ui:Label text="18 Connected" name="connected-devices-count" class="count-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="devices-controls" class="section-controls">
+                        <ui:Button text="Scan Network" name="scan-devices-button" class="action-btn scan-btn" />
+                        <ui:Button text="Add Device" name="add-device-button" class="action-btn add-btn" />
+                        <ui:Button text="Create Group" name="create-group-button" class="action-btn group-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="devices-content" class="devices-content">
+                    <!-- Device Network Status -->
+                    <ui:VisualElement name="device-network-section" class="content-section">
+                        <ui:Label text="Device Network" class="subsection-title" />
+                        <ui:VisualElement name="device-metrics" class="device-metrics">
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Network Health" class="metric-label" />
+                                <ui:ProgressBar value="0.88" name="device-network-bar" class="health-bar" />
+                                <ui:Label text="88%" class="metric-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Total Devices" class="metric-label" />
+                                <ui:Label text="18" class="metric-value" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="metric-row" class="metric-row">
+                                <ui:Label text="Online Devices" class="metric-label" />
+                                <ui:Label text="16" class="metric-value online-count" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Device Groups -->
+                    <ui:VisualElement name="device-groups-section" class="content-section">
+                        <ui:Label text="Device Groups" class="subsection-title" />
+                        <ui:VisualElement name="device-groups-container" class="groups-container" />
+                    </ui:VisualElement>
+                    
+                    <!-- Devices List -->
+                    <ui:VisualElement name="devices-list-section" class="content-section">
+                        <ui:Label text="All Devices" class="subsection-title" />
+                        <ui:ScrollView name="devices-scroll" class="devices-scroll">
+                            <ui:VisualElement name="devices-list" class="devices-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                    
+                    <!-- Device Controls -->
+                    <ui:VisualElement name="device-controls-section" class="content-section">
+                        <ui:Label text="Device Controls" class="subsection-title" />
+                        <ui:VisualElement name="device-controls-panel" class="controls-panel">
+                            <ui:Label text="Select a device to view controls" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Schedules Panel -->
+            <ui:VisualElement name="schedules-panel" class="tab-panel hidden">
+                <ui:VisualElement name="schedules-header" class="panel-section-header">
+                    <ui:VisualElement name="schedules-info" class="section-info">
+                        <ui:Label text="Automation Schedules" class="section-title" />
+                        <ui:Label text="12 Active" name="active-schedules-count" class="count-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="schedules-controls" class="section-controls">
+                        <ui:Button text="Create Schedule" name="create-schedule-button" class="action-btn create-btn" />
+                        <ui:Button text="Import Schedule" name="import-schedule-button" class="action-btn import-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="schedules-content" class="schedules-content">
+                    <!-- Schedule Calendar -->
+                    <ui:VisualElement name="schedule-calendar-section" class="content-section">
+                        <ui:Label text="Schedule Calendar" class="subsection-title" />
+                        <ui:VisualElement name="schedule-calendar" class="schedule-calendar">
+                            <ui:Label text="Interactive calendar view would be implemented here" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Upcoming Events -->
+                    <ui:VisualElement name="upcoming-events-section" class="content-section">
+                        <ui:Label text="Upcoming Events" class="subsection-title" />
+                        <ui:VisualElement name="upcoming-events-container" class="events-container" />
+                    </ui:VisualElement>
+                    
+                    <!-- Schedules List -->
+                    <ui:VisualElement name="schedules-list-section" class="content-section">
+                        <ui:Label text="All Schedules" class="subsection-title" />
+                        <ui:ScrollView name="schedules-scroll" class="schedules-scroll">
+                            <ui:VisualElement name="schedules-list" class="schedules-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Templates Panel -->
+            <ui:VisualElement name="templates-panel" class="tab-panel hidden">
+                <ui:VisualElement name="templates-header" class="panel-section-header">
+                    <ui:VisualElement name="templates-info" class="section-info">
+                        <ui:Label text="Rule Templates" class="section-title" />
+                        <ui:Label text="25 Available" class="count-label" />
+                    </ui:VisualElement>
+                    
+                    <ui:VisualElement name="templates-controls" class="section-controls">
+                        <ui:DropdownField label="Category" name="template-category-dropdown" class="filter-dropdown" />
+                        <ui:TextField placeholder-text="Search templates..." name="template-search-field" class="search-field" />
+                        <ui:Button text="Create Template" name="create-template-button" class="action-btn create-btn" />
+                        <ui:Button text="Import" name="import-template-button" class="action-btn import-btn" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                
+                <ui:VisualElement name="templates-content" class="templates-content">
+                    <!-- Templates List -->
+                    <ui:VisualElement name="templates-list-section" class="content-section">
+                        <ui:Label text="Available Templates" class="subsection-title" />
+                        <ui:ScrollView name="templates-scroll" class="templates-scroll">
+                            <ui:VisualElement name="templates-list" class="templates-list" />
+                        </ui:ScrollView>
+                    </ui:VisualElement>
+                    
+                    <!-- Template Preview -->
+                    <ui:VisualElement name="template-preview-section" class="content-section">
+                        <ui:Label text="Template Preview" class="subsection-title" />
+                        <ui:VisualElement name="template-preview" class="template-preview">
+                            <ui:Label text="Select a template to preview" class="placeholder-text" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Status Bar -->
+        <ui:VisualElement name="automation-status-bar" class="status-bar">
+            <ui:VisualElement name="status-left" class="status-section">
+                <ui:Label text="System Status: Operational" name="system-status" class="status-text" />
+                <ui:Label text="Last Update: 2 seconds ago" name="last-update" class="status-text" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="status-center" class="status-section">
+                <ui:Label text="Rules: 50 Active" name="rules-status" class="status-text" />
+                <ui:Label text="Sensors: 24/26 Online" name="sensors-status" class="status-text" />
+                <ui:Label text="Devices: 16/18 Connected" name="devices-status" class="status-text" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement name="status-right" class="status-section">
+                <ui:Label text="Performance: Excellent" name="performance-status" class="status-text" />
+                <ui:Label text="Next Maintenance: 3 days" name="maintenance-status" class="status-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

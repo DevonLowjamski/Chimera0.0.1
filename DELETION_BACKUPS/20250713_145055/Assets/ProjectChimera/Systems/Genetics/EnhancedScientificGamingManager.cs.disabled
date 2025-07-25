@@ -1,0 +1,1147 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Core.Logging;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Enhanced Scientific Gaming Manager - Unified genetics and terpene gaming system
+    /// Implements competitive breeding, aromatic mastery, and community-driven scientific discovery
+    /// Based on Tech Spec 11-12 v2.0: Enhanced Scientific Gaming System
+    /// </summary>
+    public class EnhancedScientificGamingManager : ChimeraManager, IChimeraManager
+    {
+        [Header("Genetics Gaming Systems")]
+        [SerializeField] private GeneticsGamingSystem _geneticsGamingSystem;
+        [SerializeField] private BreedingChallengeManager _breedingChallengeManager;
+        [SerializeField] private GeneticDiscoveryEngine _geneticDiscoveryEngine;
+        [SerializeField] private VisualGeneticInterface _visualGeneticInterface;
+        
+        [Header("Aromatic Gaming Systems")]
+        [SerializeField] private AromaticGamingSystem _aromaticGamingSystem;
+        [SerializeField] private SensoryTrainingSystem _sensoryTrainingSystem;
+        [SerializeField] private AromaticCreationStudio _aromaticCreationStudio;
+        [SerializeField] private TerpeneAnalysisGamingSystem _terpeneAnalysisSystem;
+        
+        [Header("Competition Systems")]
+        [SerializeField] private ScientificCompetitionManager _competitionManager;
+        [SerializeField] private TournamentEventManager _tournamentEventManager;
+        [SerializeField] private CompetitiveMatchmakingSystem _matchmakingSystem;
+        [SerializeField] private AchievementRecognitionSystem _achievementSystem;
+        
+        [Header("Community Systems")]
+        [SerializeField] private CommunityCollaborationSystem _communitySystem;
+        [SerializeField] private SocialRecognitionSystem _socialRecognitionSystem;
+        [SerializeField] private MentorshipFacilitationSystem _mentorshipSystem;
+        [SerializeField] private InnovationShowcaseManager _innovationShowcase;
+        
+        [Header("Progression Systems")]
+        [SerializeField] private ScientificProgressionSystem _progressionSystem;
+        [SerializeField] private ScientificSkillTreeManager _skillTreeManager;
+        [SerializeField] private ScientificAchievementTracker _achievementTracker;
+        [SerializeField] private LegacyRecognitionSystem _legacySystem;
+        
+        [Header("Configuration")]
+        [SerializeField] private EnhancedScientificGamingConfigSO _scientificGamingConfig;
+        
+        [Header("Scientific Gaming Event Channels")]
+        [SerializeField] private GameEventChannelSO _onGeneticDiscoveryMade;
+        [SerializeField] private GameEventChannelSO _onBreedingChallengeCompleted;
+        [SerializeField] private GameEventChannelSO _onAromaticMasteryAchieved;
+        [SerializeField] private GameEventChannelSO _onSensorySkillImproved;
+        [SerializeField] private GameEventChannelSO _onCompetitionEntered;
+        [SerializeField] private GameEventChannelSO _onTournamentWon;
+        [SerializeField] private GameEventChannelSO _onInnovationShared;
+        [SerializeField] private GameEventChannelSO _onMentorshipEstablished;
+        [SerializeField] private GameEventChannelSO _onScientificMilestoneReached;
+        [SerializeField] private GameEventChannelSO _onCommunityProjectCompleted;
+        [SerializeField] private GameEventChannelSO _onLegacyAchievementEarned;
+        [SerializeField] private GameEventChannelSO _onScientificReputationChanged;
+        
+        // Manager State
+        private bool _isInitialized = false;
+        private ScientificGamingState _currentGamingState;
+        
+        // Gaming Performance Metrics
+        private float _sessionStartTime;
+        private int _geneticDiscoveriesMade = 0;
+        private int _breedingChallengesCompleted = 0;
+        private int _aromaticProfilesCreated = 0;
+        private int _competitionsEntered = 0;
+        private int _tournamentVictories = 0;
+        private int _innovationsShared = 0;
+        private int _mentorshipInteractions = 0;
+        private float _totalScientificReputationGained = 0f;
+        
+        #region IChimeraManager Implementation
+        
+        public bool IsInitialized => _isInitialized;
+        
+        protected override void OnManagerInitialize()
+        {
+            if (_isInitialized)
+            {
+                ChimeraLogger.LogWarning("EnhancedScientificGamingManager already initialized", this);
+                return;
+            }
+            
+            try
+            {
+                ValidateConfiguration();
+                InitializeGeneticsGaming();
+                InitializeAromaticGaming();
+                InitializeCompetitionSystems();
+                InitializeCommunitySystemsInternal();
+                InitializeProgressionSystems();
+                InitializeScientificGamingState();
+                RegisterEventHandlers();
+                
+                _sessionStartTime = Time.time;
+                _isInitialized = true;
+                
+                ChimeraLogger.Log("EnhancedScientificGamingManager initialized successfully", this);
+            }
+            catch (System.Exception ex)
+            {
+                ChimeraLogger.LogError($"Failed to initialize EnhancedScientificGamingManager: {ex.Message}", this);
+                throw;
+            }
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            if (!_isInitialized) return;
+            
+            UnregisterEventHandlers();
+            SaveScientificGamingMetrics();
+            
+            _isInitialized = false;
+            ChimeraLogger.Log("EnhancedScientificGamingManager shutdown completed", this);
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!_isInitialized) return;
+            
+            // Update all gaming systems
+            UpdateGeneticsGaming();
+            UpdateAromaticGaming();
+            UpdateCompetitionSystems();
+            UpdateCommunitySystemsUpdate();
+            UpdateProgressionSystems();
+            UpdateScientificGamingMetrics();
+        }
+        
+        private void UpdateGeneticsGaming()
+        {
+            _geneticsGamingSystem?.UpdateSystem(Time.deltaTime);
+            _breedingChallengeManager?.UpdateSystem(Time.deltaTime);
+            _geneticDiscoveryEngine?.UpdateSystem(Time.deltaTime);
+        }
+        
+        private void UpdateAromaticGaming()
+        {
+            _aromaticGamingSystem?.UpdateSystem(Time.deltaTime);
+            _sensoryTrainingSystem?.UpdateSystem(Time.deltaTime);
+            _aromaticCreationStudio?.UpdateSystem(Time.deltaTime);
+            _terpeneAnalysisSystem?.UpdateSystem(Time.deltaTime);
+        }
+        
+        private void UpdateCompetitionSystems()
+        {
+            _competitionManager?.UpdateSystem(Time.deltaTime);
+            _tournamentEventManager?.UpdateSystem(Time.deltaTime);
+            _matchmakingSystem?.UpdateSystem(Time.deltaTime);
+        }
+        
+        private void UpdateCommunitySystemsUpdate()
+        {
+            _communitySystem?.UpdateSystem(Time.deltaTime);
+            // Note: _socialRecognitionSystem, _mentorshipSystem, _innovationShowcase are data classes - no UpdateSystem needed
+        }
+        
+        private void UpdateProgressionSystems()
+        {
+            _progressionSystem?.Update(Time.deltaTime);
+            _skillTreeManager?.Update();
+            // Note: _achievementTracker, _legacySystem may not need frequent updates
+        }
+        
+        private void UpdateScientificGamingMetrics()
+        {
+            // Update scientific gaming performance metrics
+            _currentGamingState.SessionDuration = Time.time - _sessionStartTime;
+            _currentGamingState.CompletedDiscoveries = _geneticDiscoveriesMade;
+            _currentGamingState.ActiveChallenges = _breedingChallengesCompleted;
+            _currentGamingState.CommunityContributions = _innovationsShared;
+            
+            // Log metrics periodically for debugging
+            if (Time.time % 60f < Time.deltaTime) // Every 60 seconds
+            {
+                ChimeraLogger.Log($"Scientific Gaming Metrics - Discoveries: {_geneticDiscoveriesMade}, " +
+                    $"Challenges: {_breedingChallengesCompleted}, Innovations: {_innovationsShared}", this);
+            }
+        }
+        
+        #endregion
+        
+        #region System Initialization
+        
+        private void ValidateConfiguration()
+        {
+            if (_scientificGamingConfig == null)
+                throw new System.NullReferenceException("EnhancedScientificGamingConfigSO is required");
+                
+            // Validate all required systems are assigned
+            if (_geneticsGamingSystem == null) CreateGeneticsGamingSystem();
+            if (_aromaticGamingSystem == null) CreateAromaticGamingSystem();
+            if (_competitionManager == null) CreateScientificCompetitionManager();
+            if (_communitySystem == null) CreateCommunityCollaborationSystem();
+            if (_progressionSystem == null) CreateScientificProgressionSystem();
+        }
+        
+        private void InitializeGeneticsGaming()
+        {
+            ChimeraLogger.Log("Initializing Genetics Gaming Systems...", this);
+            
+            _geneticsGamingSystem?.Initialize(_scientificGamingConfig.GeneticsGamingConfig);
+            // _breedingChallengeManager?.Initialize(_scientificGamingConfig.BreedingChallengeConfig);
+            // _geneticDiscoveryEngine?.Initialize(_scientificGamingConfig.GeneticDiscoveryConfig);
+            // _visualGeneticInterface?.Initialize(_scientificGamingConfig.GeneticInterfaceConfig);
+            
+            ChimeraLogger.Log("Genetics Gaming Systems initialized", this);
+        }
+        
+        private void InitializeAromaticGaming()
+        {
+            ChimeraLogger.Log("Initializing Aromatic Gaming Systems...", this);
+            
+            _aromaticGamingSystem?.Initialize(_scientificGamingConfig.AromaticGamingConfig);
+            _sensoryTrainingSystem?.Initialize(_scientificGamingConfig.SensoryTrainingConfig);
+            _aromaticCreationStudio?.Initialize(_scientificGamingConfig.AromaticCreationConfig);
+            _terpeneAnalysisSystem?.Initialize(_scientificGamingConfig.TerpeneAnalysisConfig);
+            
+            ChimeraLogger.Log("Aromatic Gaming Systems initialized", this);
+        }
+        
+        private void InitializeCompetitionSystems()
+        {
+            ChimeraLogger.Log("Initializing Competition Systems...", this);
+            
+            _competitionManager?.Initialize(_scientificGamingConfig.CompetitionConfig);
+            _tournamentEventManager?.Initialize(_scientificGamingConfig.TournamentEventConfig);
+            _matchmakingSystem?.Initialize(_scientificGamingConfig.MatchmakingConfig);
+            _achievementSystem?.Initialize(_scientificGamingConfig.AchievementRecognitionConfig);
+            
+            ChimeraLogger.Log("Competition Systems initialized", this);
+        }
+        
+        private void InitializeCommunitySystemsInternal()
+        {
+            ChimeraLogger.Log("Initializing Community Systems...", this);
+            
+            _communitySystem?.Initialize(_scientificGamingConfig.CommunityCollaborationConfig);
+            _socialRecognitionSystem?.Initialize(_scientificGamingConfig.SocialRecognitionConfig);
+            _mentorshipSystem?.Initialize(_scientificGamingConfig.MentorshipConfig);
+            _innovationShowcase?.Initialize(_scientificGamingConfig.InnovationShowcaseConfig);
+            
+            ChimeraLogger.Log("Community Systems initialized", this);
+        }
+        
+        private void InitializeProgressionSystems()
+        {
+            ChimeraLogger.Log("Initializing Progression Systems...", this);
+            
+            _progressionSystem?.Initialize(_scientificGamingConfig.ProgressionConfig);
+            _skillTreeManager?.Initialize(_scientificGamingConfig.ScientificSkillTreeConfig);
+            _achievementTracker?.Initialize(_scientificGamingConfig.AchievementTrackingConfig);
+            _legacySystem?.Initialize(_scientificGamingConfig.LegacyRecognitionConfig);
+            
+            ChimeraLogger.Log("Progression Systems initialized", this);
+        }
+        
+        private void InitializeScientificGamingState()
+        {
+            _currentGamingState = new ScientificGamingState
+            {
+                SessionStartTime = Time.time,
+                CurrentGeneticsSkillLevel = GeneticsSkillLevel.Beginner,
+                CurrentAromaticSkillLevel = AromaticSkillLevel.Beginner,
+                CompetitiveRanking = CompetitiveRanking.Unranked,
+                ScientificReputationLevel = ScientificReputationLevel.Novice,
+                ActiveChallenges = 0,
+                CompletedDiscoveries = 0,
+                CommunityContributions = 0
+            };
+        }
+        
+        #endregion
+        
+        #region System Creation (Auto-instantiation)
+        
+        private void CreateGeneticsGamingSystem()
+        {
+            var systemGO = new GameObject("GeneticsGamingSystem");
+            systemGO.transform.SetParent(transform);
+            _geneticsGamingSystem = systemGO.AddComponent<GeneticsGamingSystem>();
+            
+            var challengeManagerGO = new GameObject("BreedingChallengeManager");
+            challengeManagerGO.transform.SetParent(systemGO.transform);
+            _breedingChallengeManager = challengeManagerGO.AddComponent<BreedingChallengeManager>();
+            
+            var discoveryEngineGO = new GameObject("GeneticDiscoveryEngine");
+            discoveryEngineGO.transform.SetParent(systemGO.transform);
+            _geneticDiscoveryEngine = discoveryEngineGO.AddComponent<GeneticDiscoveryEngine>();
+            
+            var interfaceGO = new GameObject("VisualGeneticInterface");
+            interfaceGO.transform.SetParent(systemGO.transform);
+            _visualGeneticInterface = interfaceGO.AddComponent<VisualGeneticInterface>();
+        }
+        
+        private void CreateAromaticGamingSystem()
+        {
+            var systemGO = new GameObject("AromaticGamingSystem");
+            systemGO.transform.SetParent(transform);
+            _aromaticGamingSystem = systemGO.AddComponent<AromaticGamingSystem>();
+            
+            var sensoryTrainingGO = new GameObject("SensoryTrainingSystem");
+            sensoryTrainingGO.transform.SetParent(systemGO.transform);
+            _sensoryTrainingSystem = sensoryTrainingGO.AddComponent<SensoryTrainingSystem>();
+            
+            var creationStudioGO = new GameObject("AromaticCreationStudio");
+            creationStudioGO.transform.SetParent(systemGO.transform);
+            _aromaticCreationStudio = creationStudioGO.AddComponent<AromaticCreationStudio>();
+            
+            var analysisSystemGO = new GameObject("TerpeneAnalysisGamingSystem");
+            analysisSystemGO.transform.SetParent(systemGO.transform);
+            _terpeneAnalysisSystem = analysisSystemGO.AddComponent<TerpeneAnalysisGamingSystem>();
+        }
+        
+        private void CreateScientificCompetitionManager()
+        {
+            var systemGO = new GameObject("ScientificCompetitionManager");
+            systemGO.transform.SetParent(transform);
+            _competitionManager = systemGO.AddComponent<ScientificCompetitionManager>();
+            
+            var tournamentManagerGO = new GameObject("TournamentEventManager");
+            tournamentManagerGO.transform.SetParent(systemGO.transform);
+            _tournamentEventManager = tournamentManagerGO.AddComponent<TournamentEventManager>();
+            
+            var matchmakingGO = new GameObject("CompetitiveMatchmakingSystem");
+            matchmakingGO.transform.SetParent(systemGO.transform);
+            _matchmakingSystem = matchmakingGO.AddComponent<CompetitiveMatchmakingSystem>();
+            
+            var achievementGO = new GameObject("AchievementRecognitionSystem");
+            achievementGO.transform.SetParent(systemGO.transform);
+            _achievementSystem = achievementGO.AddComponent<AchievementRecognitionSystem>();
+        }
+        
+        private void CreateCommunityCollaborationSystem()
+        {
+            var systemGO = new GameObject("CommunityCollaborationSystem");
+            systemGO.transform.SetParent(transform);
+            _communitySystem = systemGO.AddComponent<CommunityCollaborationSystem>();
+            
+            var socialRecognitionGO = new GameObject("SocialRecognitionSystem");
+            socialRecognitionGO.transform.SetParent(systemGO.transform);
+            _socialRecognitionSystem = socialRecognitionGO.AddComponent<SocialRecognitionSystem>();
+            
+            var mentorshipGO = new GameObject("MentorshipFacilitationSystem");
+            mentorshipGO.transform.SetParent(systemGO.transform);
+            _mentorshipSystem = mentorshipGO.AddComponent<MentorshipFacilitationSystem>();
+            
+            var innovationGO = new GameObject("InnovationShowcaseManager");
+            innovationGO.transform.SetParent(systemGO.transform);
+            _innovationShowcase = innovationGO.AddComponent<InnovationShowcaseManager>();
+        }
+        
+        private void CreateScientificProgressionSystem()
+        {
+            var systemGO = new GameObject("ScientificProgressionSystem");
+            systemGO.transform.SetParent(transform);
+            _progressionSystem = systemGO.AddComponent<ScientificProgressionSystem>();
+            
+            var skillTreeManagerGO = new GameObject("ScientificSkillTreeManager");
+            skillTreeManagerGO.transform.SetParent(systemGO.transform);
+            _skillTreeManager = skillTreeManagerGO.AddComponent<ScientificSkillTreeManager>();
+            
+            var achievementTrackerGO = new GameObject("ScientificAchievementTracker");
+            achievementTrackerGO.transform.SetParent(systemGO.transform);
+            _achievementTracker = achievementTrackerGO.AddComponent<ScientificAchievementTracker>();
+            
+            var legacySystemGO = new GameObject("LegacyRecognitionSystem");
+            legacySystemGO.transform.SetParent(systemGO.transform);
+            _legacySystem = legacySystemGO.AddComponent<LegacyRecognitionSystem>();
+        }
+        
+        #endregion
+        
+        #region Event System
+        
+        private void RegisterEventHandlers()
+        {
+            if (_onGeneticDiscoveryMade != null)
+                _onGeneticDiscoveryMade.EventRaised += OnGeneticDiscoveryMade;
+                
+            if (_onBreedingChallengeCompleted != null)
+                _onBreedingChallengeCompleted.EventRaised += OnBreedingChallengeCompleted;
+                
+            if (_onAromaticMasteryAchieved != null)
+                _onAromaticMasteryAchieved.EventRaised += OnAromaticMasteryAchieved;
+                
+            if (_onSensorySkillImproved != null)
+                _onSensorySkillImproved.EventRaised += OnSensorySkillImproved;
+                
+            if (_onCompetitionEntered != null)
+                _onCompetitionEntered.EventRaised += OnCompetitionEntered;
+                
+            if (_onTournamentWon != null)
+                _onTournamentWon.EventRaised += OnTournamentWon;
+                
+            if (_onInnovationShared != null)
+                _onInnovationShared.EventRaised += OnInnovationShared;
+                
+            if (_onMentorshipEstablished != null)
+                _onMentorshipEstablished.EventRaised += OnMentorshipEstablished;
+        }
+        
+        private void UnregisterEventHandlers()
+        {
+            if (_onGeneticDiscoveryMade != null)
+                _onGeneticDiscoveryMade.EventRaised -= OnGeneticDiscoveryMade;
+                
+            if (_onBreedingChallengeCompleted != null)
+                _onBreedingChallengeCompleted.EventRaised -= OnBreedingChallengeCompleted;
+                
+            if (_onAromaticMasteryAchieved != null)
+                _onAromaticMasteryAchieved.EventRaised -= OnAromaticMasteryAchieved;
+                
+            if (_onSensorySkillImproved != null)
+                _onSensorySkillImproved.EventRaised -= OnSensorySkillImproved;
+                
+            if (_onCompetitionEntered != null)
+                _onCompetitionEntered.EventRaised -= OnCompetitionEntered;
+                
+            if (_onTournamentWon != null)
+                _onTournamentWon.EventRaised -= OnTournamentWon;
+                
+            if (_onInnovationShared != null)
+                _onInnovationShared.EventRaised -= OnInnovationShared;
+                
+            if (_onMentorshipEstablished != null)
+                _onMentorshipEstablished.EventRaised -= OnMentorshipEstablished;
+        }
+        
+        #endregion
+        
+        #region Event Handlers
+        
+        private void OnGeneticDiscoveryMade(object eventData)
+        {
+            _geneticDiscoveriesMade++;
+            
+            if (eventData is GeneticDiscoveryEventData discoveryData)
+            {
+                ProcessGeneticDiscovery(discoveryData);
+                UpdateScientificReputation(discoveryData.DiscoveryValue);
+                EvaluateProgressionOpportunities(discoveryData);
+            }
+        }
+        
+        private void OnBreedingChallengeCompleted(object eventData)
+        {
+            _breedingChallengesCompleted++;
+            
+            if (eventData is BreedingChallengeEventData challengeData)
+            {
+                ProcessChallengeCompletion(challengeData);
+                UpdateGeneticsSkillLevel(challengeData);
+                CheckCompetitionEligibility(challengeData);
+            }
+        }
+        
+        private void OnAromaticMasteryAchieved(object eventData)
+        {
+            if (eventData is AromaticMasteryEventData masteryData)
+            {
+                ProcessAromaticMasteryAchievement(masteryData);
+                UpdateAromaticSkillLevel(masteryData);
+                UnlockAromaticInnovationOpportunities(masteryData);
+            }
+        }
+        
+        private void OnSensorySkillImproved(object eventData)
+        {
+            if (eventData is SensorySkillEventData skillData)
+            {
+                ProcessSensorySkillImprovement(skillData);
+                UpdateAromaticProgressionPaths(skillData);
+            }
+        }
+        
+        private void OnCompetitionEntered(object eventData)
+        {
+            _competitionsEntered++;
+            
+            if (eventData is CompetitionEntryEventData entryData)
+            {
+                ProcessCompetitionEntry(entryData);
+                UpdateCompetitiveExperience(entryData);
+            }
+        }
+        
+        private void OnTournamentWon(object eventData)
+        {
+            _tournamentVictories++;
+            
+            if (eventData is TournamentVictoryEventData victoryData)
+            {
+                ProcessTournamentVictory(victoryData);
+                UpdateCompetitiveRanking(victoryData);
+                UnlockEliteCompetitionTiers(victoryData);
+            }
+        }
+        
+        private void OnInnovationShared(object eventData)
+        {
+            _innovationsShared++;
+            
+            if (eventData is InnovationSharingEventData innovationData)
+            {
+                ProcessInnovationSharing(innovationData);
+                UpdateCommunityContribution(innovationData);
+                EvaluateMentorshipOpportunities(innovationData);
+            }
+        }
+        
+        private void OnMentorshipEstablished(object eventData)
+        {
+            _mentorshipInteractions++;
+            
+            if (eventData is MentorshipEventData mentorshipData)
+            {
+                ProcessMentorshipEstablishment(mentorshipData);
+                UpdateCommunityStanding(mentorshipData);
+            }
+        }
+        
+        #endregion
+        
+        #region Core Scientific Gaming Mechanics
+        
+        private void ProcessGeneticDiscovery(GeneticDiscoveryEventData discoveryData)
+        {
+            // Process genetic discovery and update systems
+            var discoveryValue = CalculateDiscoveryValue(discoveryData);
+            _progressionSystem?.AddDiscoveryExperience(discoveryData.DiscoveryType, discoveryValue);
+            
+            // Check for breakthrough achievements
+            _achievementTracker?.EvaluateGeneticBreakthroughs(discoveryData);
+            
+            // Update genetic library
+            _geneticDiscoveryEngine?.RegisterDiscovery(discoveryData);
+        }
+        
+        private void ProcessChallengeCompletion(BreedingChallengeEventData challengeData)
+        {
+            // Process challenge completion and calculate rewards
+            var skillGain = CalculateSkillGain(challengeData.ChallengeType, challengeData.CompletionQuality);
+            _skillTreeManager?.AddSkillExperience(ScientificSkillBranch.Genetics, skillGain);
+            
+            // Unlock new challenges based on performance
+            _breedingChallengeManager?.EvaluateNewChallengeUnlocks(challengeData);
+        }
+        
+        private void ProcessAromaticMasteryAchievement(AromaticMasteryEventData masteryData)
+        {
+            // Process aromatic mastery achievement
+            var masteryValue = CalculateMasteryValue(masteryData);
+            _progressionSystem?.AddMasteryExperience(ScientificSkillBranch.Aromatics, masteryValue);
+            
+            // Unlock advanced aromatic tools and techniques
+            _aromaticCreationStudio?.UnlockAdvancedFeatures(masteryData.MasteryLevel);
+        }
+        
+        private void ProcessCompetitionEntry(CompetitionEntryEventData entryData)
+        {
+            // Process competition entry and prepare for competitive gameplay
+            var entryResult = _matchmakingSystem?.ProcessCompetitionEntry(entryData);
+            if (entryResult?.IsSuccessful == true)
+            {
+                _currentGamingState.ActiveChallenges++;
+                UpdateCompetitiveExperience(entryData);
+            }
+        }
+        
+        private void ProcessTournamentVictory(TournamentVictoryEventData victoryData)
+        {
+            // Process tournament victory and apply rewards
+            var reputationGain = CalculateReputationGain(victoryData);
+            _totalScientificReputationGained += reputationGain;
+            
+            // Update competitive ranking
+            _currentGamingState.CompetitiveRanking = CalculateNewRanking(victoryData);
+            
+            // Unlock elite competition tiers
+            _tournamentEventManager?.EvaluateEliteTierUnlocks(victoryData);
+        }
+        
+        #endregion
+        
+        #region Public API
+        
+        /// <summary>
+        /// Start a genetic breeding challenge with specified parameters
+        /// </summary>
+        public BreedingChallengeResult StartBreedingChallenge(BreedingChallengeType challengeType, BreedingObjective objective)
+        {
+            if (!_isInitialized || _breedingChallengeManager == null)
+                return BreedingChallengeResult.Failed;
+                
+            return _breedingChallengeManager.StartChallenge(challengeType, objective);
+        }
+        
+        /// <summary>
+        /// Create custom aromatic profile with specified terpene composition
+        /// </summary>
+        public AromaticCreationResult CreateAromaticProfile(TerpeneComposition composition, AromaticObjective objective)
+        {
+            if (!_isInitialized || _aromaticCreationStudio == null)
+                return AromaticCreationResult.Failed;
+                
+            return _aromaticCreationStudio.CreateProfile(composition, objective);
+        }
+        
+        /// <summary>
+        /// Enter scientific competition with specified category and skill level
+        /// </summary>
+        public CompetitionEntryResult EnterCompetition(CompetitionCategory category, CompetitionTier tier)
+        {
+            if (!_isInitialized || _competitionManager == null)
+                return CompetitionEntryResult.Failed;
+                
+            return _competitionManager.EnterCompetition(category, tier);
+        }
+        
+        /// <summary>
+        /// Share scientific innovation with community
+        /// </summary>
+        public InnovationSharingResult ShareInnovation(ScientificInnovation innovation)
+        {
+            if (!_isInitialized || _innovationShowcase == null)
+                return InnovationSharingResult.Failed;
+                
+            return _innovationShowcase.ShareInnovation(innovation);
+        }
+        
+        /// <summary>
+        /// Establish mentorship relationship (as mentor or mentee)
+        /// </summary>
+        public MentorshipResult EstablishMentorship(MentorshipType type, MentorshipCriteria criteria)
+        {
+            if (!_isInitialized || _mentorshipSystem == null)
+                return MentorshipResult.Failed;
+                
+            return _mentorshipSystem.EstablishMentorship(type, criteria);
+        }
+        
+        /// <summary>
+        /// Get current scientific gaming state
+        /// </summary>
+        public ScientificGamingState GetCurrentGamingState()
+        {
+            return _currentGamingState;
+        }
+        
+        /// <summary>
+        /// Get scientific gaming performance metrics for current session
+        /// </summary>
+        public ScientificGamingMetrics GetSessionMetrics()
+        {
+            return new ScientificGamingMetrics
+            {
+                SessionDuration = Time.time - _sessionStartTime,
+                GeneticDiscoveriesMade = _geneticDiscoveriesMade,
+                BreedingChallengesCompleted = _breedingChallengesCompleted,
+                AromaticProfilesCreated = _aromaticProfilesCreated,
+                CompetitionsEntered = _competitionsEntered,
+                TournamentVictories = _tournamentVictories,
+                InnovationsShared = _innovationsShared,
+                MentorshipInteractions = _mentorshipInteractions,
+                TotalScientificReputationGained = _totalScientificReputationGained,
+                CurrentScientificLevel = CalculateOverallScientificLevel()
+            };
+        }
+        
+        #endregion
+        
+        #region Utility Methods
+        
+        private float CalculateDiscoveryValue(GeneticDiscoveryEventData discoveryData)
+        {
+            return discoveryData.DiscoveryType switch
+            {
+                GeneticDiscoveryType.NovelTrait => 50.0f,
+                GeneticDiscoveryType.TraitCombination => 30.0f,
+                GeneticDiscoveryType.GeneticStability => 20.0f,
+                GeneticDiscoveryType.ExpressionOptimization => 25.0f,
+                _ => 10.0f
+            };
+        }
+        
+        private float CalculateSkillGain(BreedingChallengeType challengeType, float completionQuality)
+        {
+            var baseGain = _scientificGamingConfig.SkillProgressionRate;
+            var qualityMultiplier = Mathf.Clamp(completionQuality, 0.1f, 2.0f);
+            var difficultyMultiplier = GetChallengeDifficultyMultiplier(challengeType);
+            
+            return baseGain * qualityMultiplier * difficultyMultiplier;
+        }
+        
+        private float CalculateMasteryValue(AromaticMasteryEventData masteryData)
+        {
+            return masteryData.MasteryLevel switch
+            {
+                AromaticMasteryLevel.Apprentice => 25.0f,
+                AromaticMasteryLevel.Journeyman => 50.0f,
+                AromaticMasteryLevel.Expert => 100.0f,
+                AromaticMasteryLevel.Master => 200.0f,
+                _ => 10.0f
+            };
+        }
+        
+        private float CalculateReputationGain(TournamentVictoryEventData victoryData)
+        {
+            var baseGain = 100.0f;
+            var tierMultiplier = GetTierMultiplier(victoryData.CompetitionTier);
+            var difficultyMultiplier = GetDifficultyMultiplier(victoryData.VictoryMargin);
+            
+            return baseGain * tierMultiplier * difficultyMultiplier;
+        }
+        
+        private CompetitiveRanking CalculateNewRanking(TournamentVictoryEventData victoryData)
+        {
+            var currentRanking = _currentGamingState.CompetitiveRanking;
+            var rankingPoints = CalculateRankingPoints(victoryData);
+            
+            // Simplified ranking progression logic
+            if (rankingPoints >= 1000 && currentRanking < CompetitiveRanking.Elite)
+                return CompetitiveRanking.Elite;
+            if (rankingPoints >= 500 && currentRanking < CompetitiveRanking.Advanced)
+                return CompetitiveRanking.Advanced;
+            if (rankingPoints >= 200 && currentRanking < CompetitiveRanking.Intermediate)
+                return CompetitiveRanking.Intermediate;
+            if (rankingPoints >= 50 && currentRanking < CompetitiveRanking.Novice)
+                return CompetitiveRanking.Novice;
+                
+            return currentRanking;
+        }
+        
+        private float GetChallengeDifficultyMultiplier(BreedingChallengeType challengeType)
+        {
+            return challengeType switch
+            {
+                BreedingChallengeType.BasicCross => 1.0f,
+                BreedingChallengeType.MultiTrait => 1.5f,
+                BreedingChallengeType.StabilityChallenge => 2.0f,
+                BreedingChallengeType.InnovationChallenge => 2.5f,
+                _ => 1.0f
+            };
+        }
+        
+        private float GetTierMultiplier(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 1.0f,
+                CompetitionTier.Intermediate => 1.5f,
+                CompetitionTier.Advanced => 2.0f,
+                CompetitionTier.Elite => 3.0f,
+                CompetitionTier.Master => 5.0f,
+                _ => 1.0f
+            };
+        }
+        
+        private float GetDifficultyMultiplier(float victoryMargin)
+        {
+            if (victoryMargin >= 0.8f) return 1.5f;
+            if (victoryMargin >= 0.6f) return 1.3f;
+            if (victoryMargin >= 0.4f) return 1.1f;
+            return 1.0f;
+        }
+        
+        private float CalculateRankingPoints(TournamentVictoryEventData victoryData)
+        {
+            // This would integrate with existing competitive ranking system
+            return victoryData.VictoryMargin * GetTierMultiplier(victoryData.CompetitionTier) * 100f;
+        }
+        
+        private ScientificLevel CalculateOverallScientificLevel()
+        {
+            var geneticsLevel = (int)_currentGamingState.CurrentGeneticsSkillLevel;
+            var aromaticLevel = (int)_currentGamingState.CurrentAromaticSkillLevel;
+            var averageLevel = (geneticsLevel + aromaticLevel) / 2;
+            
+            return (ScientificLevel)Mathf.Clamp(averageLevel, 0, 5);
+        }
+        
+        private void UpdateScientificReputation(float reputationGain)
+        {
+            _totalScientificReputationGained += reputationGain;
+            
+            var newLevel = CalculateReputationLevel(_totalScientificReputationGained);
+            if (newLevel != _currentGamingState.ScientificReputationLevel)
+            {
+                _currentGamingState.ScientificReputationLevel = newLevel;
+                _onScientificReputationChanged?.RaiseEvent(new ScientificReputationEventData
+                {
+                    NewReputationLevel = newLevel,
+                    ReputationGain = reputationGain,
+                    TotalReputation = _totalScientificReputationGained
+                });
+            }
+        }
+        
+        private ScientificReputationLevel CalculateReputationLevel(float totalReputation)
+        {
+            if (totalReputation >= 5000f) return ScientificReputationLevel.Legendary;
+            if (totalReputation >= 2000f) return ScientificReputationLevel.Renowned;
+            if (totalReputation >= 1000f) return ScientificReputationLevel.Recognized;
+            if (totalReputation >= 500f) return ScientificReputationLevel.Established;
+            if (totalReputation >= 100f) return ScientificReputationLevel.Emerging;
+            return ScientificReputationLevel.Novice;
+        }
+        
+        private void UpdateGeneticsSkillLevel(BreedingChallengeEventData challengeData)
+        {
+            // Update genetics skill level based on challenge performance
+            var skillGain = CalculateSkillGain(challengeData.ChallengeType, challengeData.CompletionQuality);
+            _skillTreeManager?.AddSkillExperience(ScientificSkillBranch.Genetics, skillGain);
+        }
+        
+        private void UpdateAromaticSkillLevel(AromaticMasteryEventData masteryData)
+        {
+            // Update aromatic skill level based on mastery achievement
+            var masteryValue = CalculateMasteryValue(masteryData);
+            _skillTreeManager?.AddSkillExperience(ScientificSkillBranch.Aromatics, masteryValue);
+        }
+        
+        private void UpdateCompetitiveExperience(CompetitionEntryEventData entryData)
+        {
+            // Update competitive experience and ranking potential
+            _currentGamingState.ActiveChallenges++;
+        }
+        
+        private void UpdateCompetitiveRanking(TournamentVictoryEventData victoryData)
+        {
+            // Update competitive ranking based on tournament performance
+            _currentGamingState.CompetitiveRanking = CalculateNewRanking(victoryData);
+        }
+        
+        private void EvaluateProgressionOpportunities(GeneticDiscoveryEventData discoveryData)
+        {
+            // Evaluate new progression opportunities based on discoveries
+            _progressionSystem?.EvaluateProgressionUnlocks(discoveryData);
+        }
+        
+        private void CheckCompetitionEligibility(BreedingChallengeEventData challengeData)
+        {
+            // Check if player is now eligible for new competition tiers
+            _competitionManager?.EvaluateEligibilityUpdates(challengeData);
+        }
+        
+        private void UnlockAromaticInnovationOpportunities(AromaticMasteryEventData masteryData)
+        {
+            // Unlock new aromatic innovation opportunities
+            _aromaticCreationStudio?.UnlockInnovationOpportunities(masteryData);
+        }
+        
+        private void UpdateAromaticProgressionPaths(SensorySkillEventData skillData)
+        {
+            // Update aromatic progression paths based on sensory skill development
+            _progressionSystem?.UpdateAromaticProgressionPaths(skillData);
+        }
+        
+        private void UnlockEliteCompetitionTiers(TournamentVictoryEventData victoryData)
+        {
+            // Unlock elite competition tiers based on tournament success
+            _tournamentEventManager?.EvaluateEliteTierUnlocks(victoryData);
+        }
+        
+        private void ProcessInnovationSharing(InnovationSharingEventData innovationData)
+        {
+            // Process innovation sharing and community contribution
+            _communitySystem?.ProcessInnovationSharing(innovationData);
+            UpdateCommunityContribution(innovationData);
+        }
+        
+        private void UpdateCommunityContribution(InnovationSharingEventData innovationData)
+        {
+            // Update community contribution metrics
+            _currentGamingState.CommunityContributions++;
+        }
+        
+        private void EvaluateMentorshipOpportunities(InnovationSharingEventData innovationData)
+        {
+            // Evaluate mentorship opportunities based on innovation sharing
+            _mentorshipSystem?.EvaluateMentorshipOpportunities(innovationData);
+        }
+        
+        private void ProcessMentorshipEstablishment(MentorshipEventData mentorshipData)
+        {
+            // Process mentorship establishment
+            _communitySystem?.ProcessMentorshipEstablishment(mentorshipData);
+            UpdateCommunityStanding(mentorshipData);
+        }
+        
+        private void UpdateCommunityStanding(MentorshipEventData mentorshipData)
+        {
+            // Update community standing based on mentorship activity
+            var standingGain = CalculateCommunityStandingGain(mentorshipData);
+            UpdateScientificReputation(standingGain);
+        }
+        
+        private float CalculateCommunityStandingGain(MentorshipEventData mentorshipData)
+        {
+            return mentorshipData.MentorshipType switch
+            {
+                MentorshipType.Mentor => 25.0f,
+                MentorshipType.Mentee => 10.0f,
+                MentorshipType.PeerCollaboration => 15.0f,
+                _ => 5.0f
+            };
+        }
+        
+        private void SaveScientificGamingMetrics()
+        {
+            var metrics = GetSessionMetrics();
+            ChimeraLogger.Log($"Scientific Gaming Session Completed - Duration: {metrics.SessionDuration:F1}s, " +
+                            $"Discoveries: {metrics.GeneticDiscoveriesMade}, " +
+                            $"Challenges: {metrics.BreedingChallengesCompleted}, " +
+                            $"Competitions: {metrics.CompetitionsEntered}, " +
+                            $"Reputation: {metrics.TotalScientificReputationGained:F1}", this);
+        }
+        
+        #endregion
+        
+        #region Unity Lifecycle
+        
+        protected override void Update()
+        {
+            if (!_isInitialized) return;
+            
+            // Update all scientific gaming systems
+            _geneticsGamingSystem?.UpdateSystem(Time.deltaTime);
+            _aromaticGamingSystem?.UpdateSystem(Time.deltaTime);
+            _competitionManager?.UpdateSystem(Time.deltaTime);
+            _communitySystem?.UpdateSystem(Time.deltaTime);
+            _progressionSystem?.UpdateSystem(Time.deltaTime);
+        }
+        
+        private void OnDestroy()
+        {
+            ShutdownManager();
+        }
+        
+        #endregion
+    }
+    
+    #region Data Structures
+    
+    [System.Serializable]
+    public class ScientificGamingState
+    {
+        public float SessionStartTime;
+        public float SessionDuration;
+        public GeneticsSkillLevel CurrentGeneticsSkillLevel;
+        public AromaticSkillLevel CurrentAromaticSkillLevel;
+        public CompetitiveRanking CompetitiveRanking;
+        public ScientificReputationLevel ScientificReputationLevel;
+        public int ActiveChallenges;
+        public int CompletedDiscoveries;
+        public int CommunityContributions;
+    }
+    
+    [System.Serializable]
+    public class ScientificGamingMetrics
+    {
+        public float SessionDuration;
+        public int GeneticDiscoveriesMade;
+        public int BreedingChallengesCompleted;
+        public int AromaticProfilesCreated;
+        public int CompetitionsEntered;
+        public int TournamentVictories;
+        public int InnovationsShared;
+        public int MentorshipInteractions;
+        public float TotalScientificReputationGained;
+        public ScientificLevel CurrentScientificLevel;
+    }
+    
+    // Scientific Gaming Enums
+    public enum GeneticsSkillLevel
+    {
+        Beginner,
+        Novice,
+        Intermediate,
+        Advanced,
+        Expert,
+        Master
+    }
+    
+    public enum AromaticSkillLevel
+    {
+        Beginner,
+        Novice,
+        Intermediate,
+        Advanced,
+        Expert,
+        Master
+    }
+    
+    public enum CompetitiveRanking
+    {
+        Unranked,
+        Novice,
+        Intermediate,
+        Advanced,
+        Elite,
+        Champion
+    }
+    
+    public enum ScientificReputationLevel
+    {
+        Novice,
+        Emerging,
+        Established,
+        Recognized,
+        Renowned,
+        Legendary
+    }
+    
+    public enum ScientificLevel
+    {
+        Beginner,
+        Novice,
+        Intermediate,
+        Advanced,
+        Expert,
+        Master
+    }
+    
+    public enum ScientificSkillBranch
+    {
+        Genetics,
+        Aromatics,
+        Competition,
+        Community,
+        Innovation,
+        Mentorship
+    }
+    
+    public enum GeneticDiscoveryType
+    {
+        NovelTrait,
+        TraitCombination,
+        GeneticStability,
+        ExpressionOptimization,
+        BreedingInnovation
+    }
+    
+    public enum BreedingChallengeType
+    {
+        BasicCross,
+        MultiTrait,
+        StabilityChallenge,
+        InnovationChallenge,
+        SpeedBreeding
+    }
+    
+    public enum AromaticMasteryLevel
+    {
+        Apprentice,
+        Journeyman,
+        Expert,
+        Master,
+        GrandMaster
+    }
+    
+    public enum CompetitionCategory
+    {
+        Genetics,
+        Aromatics,
+        Innovation,
+        Collaborative,
+        Speed
+    }
+    
+    public enum CompetitionTier
+    {
+        Beginner,
+        Intermediate,
+        Advanced,
+        Elite,
+        Master
+    }
+    
+    public enum MentorshipType
+    {
+        Mentor,
+        Mentee,
+        PeerCollaboration,
+        GroupProject
+    }
+    
+    // Result Enums
+    public enum BreedingChallengeResult
+    {
+        Perfect,
+        Successful,
+        Adequate,
+        Suboptimal,
+        Failed
+    }
+    
+    public enum AromaticCreationResult
+    {
+        Exceptional,
+        Successful,
+        Adequate,
+        Needs_Improvement,
+        Failed
+    }
+    
+    public enum CompetitionEntryResult
+    {
+        Accepted,
+        Waitlisted,
+        Rejected,
+        Failed
+    }
+    
+    public enum InnovationSharingResult
+    {
+        Featured,
+        Accepted,
+        Reviewed,
+        Rejected,
+        Failed
+    }
+    
+    public enum MentorshipResult
+    {
+        Established,
+        Pending,
+        Declined,
+        Failed
+    }
+    
+    // Placeholder component classes removed - use actual implementations from individual files
+    
+    #endregion
+}

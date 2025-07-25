@@ -1,0 +1,20 @@
+{
+    "name": "ProjectChimera.Systems.Progression",
+    "rootNamespace": "ProjectChimera.Systems.Progression",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Genetics",
+        "ProjectChimera.Events",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

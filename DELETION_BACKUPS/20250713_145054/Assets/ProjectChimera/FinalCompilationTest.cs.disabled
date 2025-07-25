@@ -1,0 +1,157 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Events;
+using ProjectChimera.Data.Construction;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Environment;
+using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Narrative;
+using ProjectChimera.Systems.Narrative;
+using ProjectChimera.Systems.Environment;
+
+// Comprehensive aliases to resolve ALL ambiguous references
+using ConstructionProjectType = ProjectChimera.Data.Construction.ProjectType;
+using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
+using CultivationExperienceSource = ProjectChimera.Data.Cultivation.ExperienceSource;
+using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
+using EventsCareAction = ProjectChimera.Events.CareAction;
+using EventsCultivationTaskType = ProjectChimera.Events.CultivationTaskType;
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using DataNarrativeState = ProjectChimera.Data.Narrative.NarrativeState;
+using SystemsNarrativeState = ProjectChimera.Systems.Narrative.NarrativeState;
+using DataCharacterRelationship = ProjectChimera.Data.Narrative.CharacterRelationship;
+using SystemsCharacterRelationship = ProjectChimera.Systems.Narrative.CharacterRelationship;
+using DataNarrativeEvent = ProjectChimera.Data.Narrative.NarrativeEvent;
+using SystemsNarrativeEvent = ProjectChimera.Systems.Narrative.NarrativeEvent;
+using DataPlayerDecision = ProjectChimera.Data.Narrative.PlayerDecision;
+using SystemsPlayerDecision = ProjectChimera.Systems.Narrative.PlayerDecision;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final comprehensive compilation test validating all error fixes
+    /// Tests all ambiguous references, missing definitions, and type conversions
+    /// </summary>
+    public class FinalCompilationTest : MonoBehaviour
+    {
+        [Header("Final Validation Results")]
+        [SerializeField] private bool _allCompilationErrorsFixed = false;
+        
+        void Start()
+        {
+            RunFinalCompilationTest();
+        }
+        
+        public void RunFinalCompilationTest()
+        {
+            Debug.Log("=== FINAL COMPILATION VALIDATION TEST ===");
+            
+            try
+            {
+                // Test 1: All ambiguous references resolved
+                TestAmbiguousReferencesResolved();
+                
+                // Test 2: All missing definitions accessible
+                TestMissingDefinitionsResolved();
+                
+                // Test 3: All enum values are correct
+                TestCorrectEnumValues();
+                
+                // Test 4: All type conversions work
+                TestTypeConversions();
+                
+                _allCompilationErrorsFixed = true;
+                
+                Debug.Log("🎉 FINAL COMPILATION TEST: SUCCESS!");
+                Debug.Log("✅ All ambiguous references resolved");
+                Debug.Log("✅ All missing definitions accessible");
+                Debug.Log("✅ All enum values are valid");
+                Debug.Log("✅ All type conversions work");
+                Debug.Log("🚀 PROJECT CHIMERA COMPILATION IS CLEAN!");
+            }
+            catch (System.Exception e)
+            {
+                _allCompilationErrorsFixed = false;
+                Debug.LogError($"❌ Final compilation test failed: {e.Message}");
+                Debug.LogError($"Stack trace: {e.StackTrace}");
+            }
+        }
+        
+        private void TestAmbiguousReferencesResolved()
+        {
+            // Test all previously ambiguous types
+            var progressionExp = ProgressionExperienceSource.PlantCare;
+            var cultivationExp = CultivationExperienceSource.PlantCare;
+            var projectType = ConstructionProjectType.GrowRoom;
+            var approach = DataCultivationApproach.OrganicTraditional;
+            var careAction = EventsCareAction.Watering;
+            var eventsTaskType = EventsCultivationTaskType.Watering;
+            var dataTaskType = DataCultivationTaskType.Watering;
+            
+            // Test narrative types
+            var dataState = new DataNarrativeState();
+            var dataRelationship = new DataCharacterRelationship("test");
+            var dataEvent = new DataNarrativeEvent();
+            var dataDecision = new DataPlayerDecision();
+            
+            Debug.Log($"✓ Ambiguous references resolved: {progressionExp}, {projectType}, {approach}, {careAction}");
+        }
+        
+        private void TestMissingDefinitionsResolved()
+        {
+            // Test previously missing types
+            var participantInfo = new ParticipantInfo
+            {
+                PlayerId = "test",
+                PlayerName = "Test Player",
+                Role = ParticipantRole.Lead
+            };
+            
+            var metrics = new ConstructionGamingMetrics
+            {
+                ActiveChallenges = 5,
+                TotalChallengesCompleted = 10,
+                TotalPlayers = 100
+            };
+            
+            var environmentalZone = new EnvironmentalZone
+            {
+                ZoneId = "test-zone",
+                ZoneName = "Test Zone",
+                ZoneType = EnvironmentalZoneType.VegetativeChamber.ToString(),
+                Status = EnvironmentalZoneStatus.Active
+            };
+            
+            Debug.Log($"✓ Missing definitions resolved: {participantInfo.Role}, {metrics.TotalChallengesCompleted}");
+        }
+        
+        private void TestCorrectEnumValues()
+        {
+            // Test all enum values are correct
+            var role = ParticipantRole.Architect;
+            var care = EventsCareAction.Feeding;
+            var zone = EnvironmentalZoneType.FloweringRoom;
+            var project = ConstructionProjectType.Greenhouse;
+            var cultivation = DataCultivationApproach.HydroponicPrecision;
+            var facility = FacilityDesignApproach.ModularExpandable;
+            
+            Debug.Log($"✓ Enum values valid: {role}, {care}, {zone}, {project}, {cultivation}, {facility}");
+        }
+        
+        private void TestTypeConversions()
+        {
+            // Test type conversions that were previously failing
+            var zoneTypeString = EnvironmentalZoneType.VegetativeChamber.ToString();
+            var roleString = ParticipantRole.Lead.ToString();
+            var approachString = DataCultivationApproach.OrganicTraditional.ToString();
+            
+            Debug.Log($"✓ Type conversions work: {zoneTypeString}, {roleString}, {approachString}");
+        }
+        
+        [ContextMenu("Run Final Compilation Test")]
+        public void RunFinalTest()
+        {
+            RunFinalCompilationTest();
+        }
+    }
+}

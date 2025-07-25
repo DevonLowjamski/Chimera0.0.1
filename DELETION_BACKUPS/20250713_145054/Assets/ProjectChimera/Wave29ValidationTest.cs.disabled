@@ -1,0 +1,229 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using System.Collections.Generic;
+
+/// <summary>
+/// Error Wave 29 Validation Test - Multiple Compilation Error Resolution
+/// 
+/// Tests that all compilation errors have been resolved:
+/// - CS1739: TraitExpressionEngine overload missing enableGPUAcceleration parameter
+/// - CS1061: Missing method definitions in GeneticPerformanceMonitor and TraitExpressionEngine  
+/// - CS1503: Type conversion issues between EnvironmentalConditions classes
+/// - CS0117: StressType enum missing values and EnvironmentalConditions missing CreateIndoorDefault
+/// 
+/// Root Cause: Multiple namespace conflicts and duplicate class definitions:
+/// - PlantUpdateProcessor using Data.Genetics.TraitExpressionEngine instead of Systems.Genetics version
+/// - PlantManager had duplicate GeneticPerformanceMonitor class without proper methods
+/// - Namespace ambiguities between Data and Systems assemblies
+/// 
+/// Solution: Proper using aliases and removal of duplicate class definitions.
+/// </summary>
+public class Wave29ValidationTest : MonoBehaviour
+{
+    [System.Serializable]
+    public class ValidationResults
+    {
+        public bool TraitExpressionEngineConstructorResolved;
+        public bool GeneticPerformanceMonitorMethodsExist;
+        public bool TraitExpressionEngineBatchMethodExists;
+        public bool StressTypeEnumComplete;
+        public bool EnvironmentalConditionsMethodsExist;
+        public bool NamespaceAliasesWorking;
+        public bool AllValidationsPassed;
+    }
+
+    public ValidationResults Results = new ValidationResults();
+
+    [ContextMenu("Run Wave 29 Validation")]
+    public void RunValidation()
+    {
+        Debug.Log("=== Error Wave 29 Validation Test ===");
+        
+        ValidateTraitExpressionEngineConstructor();
+        ValidateGeneticPerformanceMonitorMethods();
+        ValidateTraitExpressionEngineBatchMethod();
+        ValidateStressTypeEnum();
+        ValidateEnvironmentalConditionsMethods();
+        ValidateNamespaceAliases();
+        
+        Results.AllValidationsPassed = Results.TraitExpressionEngineConstructorResolved &&
+                                      Results.GeneticPerformanceMonitorMethodsExist &&
+                                      Results.TraitExpressionEngineBatchMethodExists &&
+                                      Results.StressTypeEnumComplete &&
+                                      Results.EnvironmentalConditionsMethodsExist &&
+                                      Results.NamespaceAliasesWorking;
+        
+        if (Results.AllValidationsPassed)
+        {
+            Debug.Log("✅ All Error Wave 29 validations passed!");
+        }
+        else
+        {
+            Debug.LogError("❌ Some Error Wave 29 validations failed. Check individual results.");
+        }
+    }
+
+    private void ValidateTraitExpressionEngineConstructor()
+    {
+        try
+        {
+            // Test CS1739: TraitExpressionEngine constructor with enableGPUAcceleration parameter
+            var engine = new TraitExpressionEngine(
+                enableEpistasis: true, 
+                enablePleiotropy: true, 
+                enableGPUAcceleration: true
+            );
+            
+            Results.TraitExpressionEngineConstructorResolved = true;
+            Debug.Log("✅ TraitExpressionEngine constructor with enableGPUAcceleration parameter works correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.TraitExpressionEngineConstructorResolved = false;
+            Debug.LogError($"❌ TraitExpressionEngine constructor validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateGeneticPerformanceMonitorMethods()
+    {
+        try
+        {
+            // Test CS1061: GeneticPerformanceMonitor missing RecordBatchUpdate and GetPerformanceData
+            var monitor = new GeneticPerformanceMonitor();
+            
+            // Test RecordBatchUpdate method
+            var stats = new GeneticPerformanceStats
+            {
+                TotalCalculations = 50,
+                AverageCalculationTimeMs = 8.5,
+                CacheHitRatio = 0.75,
+                BatchCalculations = 5,
+                AverageBatchTimeMs = 12.0
+            };
+            monitor.RecordBatchUpdate(20, stats);
+            
+            // Test GetPerformanceData method
+            var performanceData = monitor.GetPerformanceData();
+            
+            Results.GeneticPerformanceMonitorMethodsExist = true;
+            Debug.Log("✅ GeneticPerformanceMonitor RecordBatchUpdate and GetPerformanceData methods work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.GeneticPerformanceMonitorMethodsExist = false;
+            Debug.LogError($"❌ GeneticPerformanceMonitor methods validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateTraitExpressionEngineBatchMethod()
+    {
+        try
+        {
+            // Test CS1061: TraitExpressionEngine missing CalculateExpressionBatch method
+            var engine = new TraitExpressionEngine(true, true, true);
+            
+            var batchData = new List<(PlantGenotype, EnvironmentalConditions)>();
+            var genotype = new PlantGenotype();
+            var environment = new EnvironmentalConditions();
+            batchData.Add((genotype, environment));
+            
+            var results = engine.CalculateExpressionBatch(batchData);
+            
+            Results.TraitExpressionEngineBatchMethodExists = true;
+            Debug.Log("✅ TraitExpressionEngine CalculateExpressionBatch method works correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.TraitExpressionEngineBatchMethodExists = false;
+            Debug.LogError($"❌ TraitExpressionEngine batch method validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateStressTypeEnum()
+    {
+        try
+        {
+            // Test CS0117: StressType enum missing Temperature, Light, Water, Nutrient values
+            var temperatureStress = StressType.Temperature;
+            var lightStress = StressType.Light;
+            var waterStress = StressType.Water;
+            var nutrientStress = StressType.Nutrient;
+            var atmosphericStress = StressType.Atmospheric;
+            
+            // Test StressFactor with Severity property
+            var stressFactor = new StressFactor();
+            stressFactor.StressType = StressType.Temperature;
+            stressFactor.Severity = 0.6f;
+            
+            Results.StressTypeEnumComplete = true;
+            Debug.Log("✅ StressType enum has all required values and StressFactor.Severity property works");
+        }
+        catch (System.Exception ex)
+        {
+            Results.StressTypeEnumComplete = false;
+            Debug.LogError($"❌ StressType enum validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateEnvironmentalConditionsMethods()
+    {
+        try
+        {
+            // Test CS0117: EnvironmentalConditions missing CreateIndoorDefault method
+            var indoorConditions = EnvironmentalConditions.CreateIndoorDefault();
+            
+            // Test IsInitialized method
+            bool isInitialized = indoorConditions.IsInitialized();
+            
+            // Test NutrientLevel property (from Wave 26)
+            indoorConditions.NutrientLevel = 0.7f;
+            float nutrientLevel = indoorConditions.NutrientLevel;
+            
+            Results.EnvironmentalConditionsMethodsExist = true;
+            Debug.Log("✅ EnvironmentalConditions CreateIndoorDefault, IsInitialized, and NutrientLevel work correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentalConditionsMethodsExist = false;
+            Debug.LogError($"❌ EnvironmentalConditions methods validation failed: {ex.Message}");
+        }
+    }
+
+    private void ValidateNamespaceAliases()
+    {
+        try
+        {
+            // Test that namespace aliases are working properly
+            // This validates that we're using the correct TraitExpressionEngine from Systems.Genetics
+            var systemsEngine = new ProjectChimera.Systems.Genetics.TraitExpressionEngine(true, true, true);
+            
+            // Test that we can create both types without ambiguity
+            var dataGenotype = new ProjectChimera.Data.Genetics.PlantGenotype();
+            var cultivationConditions = new ProjectChimera.Data.Cultivation.EnvironmentalConditions();
+            
+            // Test that the Systems version has the advanced features
+            var batchData = new List<(PlantGenotype, EnvironmentalConditions)>();
+            batchData.Add((dataGenotype, cultivationConditions));
+            var batchResults = systemsEngine.CalculateExpressionBatch(batchData);
+            
+            Results.NamespaceAliasesWorking = true;
+            Debug.Log("✅ Namespace aliases working correctly - no ambiguous references");
+        }
+        catch (System.Exception ex)
+        {
+            Results.NamespaceAliasesWorking = false;
+            Debug.LogError($"❌ Namespace aliases validation failed: {ex.Message}");
+        }
+    }
+
+    void Start()
+    {
+        // Auto-run validation on start in development builds
+        #if UNITY_EDITOR
+        Invoke(nameof(RunValidation), 1f);
+        #endif
+    }
+} 

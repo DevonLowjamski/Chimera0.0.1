@@ -1,0 +1,469 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Events;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Integration component that connects the progression system with cultivation, genetics,
+    /// and facility management systems. Handles experience gain events and skill-based bonuses.
+    /// </summary>
+    [RequireComponent(typeof(ProgressionManager))]
+    public class ProgressionIntegrator : ChimeraMonoBehaviour
+    {
+        [Header("Integration Settings")]
+        [SerializeField] private bool _enableCultivationIntegration = true;
+        [SerializeField] private bool _enableGeneticsIntegration = true;
+        [SerializeField] private bool _enableFacilityIntegration = true;
+        [SerializeField] private bool _enableResearchIntegration = true;
+        
+        [Header("Experience Configuration")]
+        [SerializeField] private float _plantHarvestExperience = 50f;
+        [SerializeField] private float _breedingSuccessExperience = 150f;
+        [SerializeField] private float _facilityCompletionExperience = 200f;
+        [SerializeField] private float _researchMilestoneExperience = 100f;
+        
+        [Header("Skill Integration Mapping")]
+        [SerializeField] private List<SkillEffectMapping> _skillEffectMappings = new List<SkillEffectMapping>();
+        [SerializeField] private List<SkillSystemIntegration> _systemIntegrations = new List<SkillSystemIntegration>();
+        
+        // Component References
+        private ProgressionManager _progressionManager;
+        private ChimeraManager _plantManager;
+        private ChimeraManager _geneticsManager;
+        private ChimeraManager _facilityManager;
+        
+        // Experience tracking
+        private Dictionary<string, float> _lastKnownValues = new Dictionary<string, float>();
+        private float _lastIntegrationUpdate;
+        
+        private void Awake()
+        {
+            _progressionManager = GetComponent<ProgressionManager>();
+        }
+        
+        private void Start()
+        {
+            InitializeSystemReferences();
+            RegisterEventListeners();
+            InitializeSkillEffects();
+            
+            _lastIntegrationUpdate = Time.time;
+        }
+        
+        private void Update()
+        {
+            float currentTime = Time.time;
+            
+            // Update skill effects every second
+            if (currentTime - _lastIntegrationUpdate >= 1f)
+            {
+                UpdateSkillEffects();
+                _lastIntegrationUpdate = currentTime;
+            }
+        }
+        
+        private void InitializeSystemReferences()
+        {
+            var gameManager = GameManager.Instance;
+            
+            if (_enableCultivationIntegration)
+            {
+                _plantManager = gameManager.GetManagerByName("PlantManager");
+                if (_plantManager == null)
+                    LogWarning("PlantManager not found - cultivation integration disabled");
+            }
+            
+            if (_enableGeneticsIntegration)
+            {
+                _geneticsManager = gameManager.GetManagerByName("GeneticsManager");
+                if (_geneticsManager == null)
+                    LogWarning("GeneticsManager not found - genetics integration disabled");
+            }
+            
+            if (_enableFacilityIntegration)
+            {
+                _facilityManager = gameManager.GetManagerByName("FacilityManager");
+                if (_facilityManager == null)
+                    LogWarning("FacilityManager not found - facility integration disabled");
+            }
+        }
+        
+        private void RegisterEventListeners()
+        {
+            // Listen for cultivation events
+            if (_plantManager != null)
+            {
+                // Subscribe to plant lifecycle events
+                // Note: These would be actual event subscriptions in the real implementation
+                RegisterCultivationEvents();
+            }
+            
+            // Listen for genetics events
+            if (_geneticsManager != null)
+            {
+                RegisterGeneticsEvents();
+            }
+            
+            // Listen for facility events
+            if (_facilityManager != null)
+            {
+                RegisterFacilityEvents();
+            }
+        }
+        
+        private void RegisterCultivationEvents()
+        {
+            // Example event registrations - these would connect to actual events
+            LogInfo("Registered cultivation event listeners for progression integration");
+            
+            // Simulate some cultivation events for demonstration
+            InvokeRepeating(nameof(SimulateCultivationActivity), 10f, 30f);
+        }
+        
+        private void RegisterGeneticsEvents()
+        {
+            LogInfo("Registered genetics event listeners for progression integration");
+            
+            // Simulate genetics events
+            InvokeRepeating(nameof(SimulateGeneticsActivity), 15f, 60f);
+        }
+        
+        private void RegisterFacilityEvents()
+        {
+            LogInfo("Registered facility event listeners for progression integration");
+        }
+        
+        private void InitializeSkillEffects()
+        {
+            // Apply initial skill effects to all connected systems
+            foreach (var mapping in _skillEffectMappings)
+            {
+                ApplySkillEffectToSystem(mapping);
+            }
+        }
+        
+        private void UpdateSkillEffects()
+        {
+            if (_progressionManager == null)
+                return;
+            
+            // Update skill-based bonuses in connected systems
+            foreach (var integration in _systemIntegrations)
+            {
+                UpdateSystemIntegration(integration);
+            }
+        }
+        
+        private void UpdateSystemIntegration(SkillSystemIntegration integration)
+        {
+            var bonusCalculation = _progressionManager.CalculateSkillBonuses(integration.EffectType);
+            
+            switch (integration.TargetSystem)
+            {
+                case IntegrationSystem.Cultivation:
+                    ApplyCultivationBonuses(integration, bonusCalculation);
+                    break;
+                case IntegrationSystem.Genetics:
+                    ApplyGeneticsBonuses(integration, bonusCalculation);
+                    break;
+                case IntegrationSystem.Facilities:
+                    ApplyFacilityBonuses(integration, bonusCalculation);
+                    break;
+                case IntegrationSystem.Research:
+                    ApplyResearchBonuses(integration, bonusCalculation);
+                    break;
+            }
+        }
+        
+        private void ApplyCultivationBonuses(SkillSystemIntegration integration, SkillBonusCalculation bonusCalc)
+        {
+            if (_plantManager == null)
+                return;
+            
+            // Apply bonuses to cultivation system based on skill effects
+            switch (integration.EffectType)
+            {
+                case SkillEffectType.Yield_Bonus:
+                    ApplyYieldBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Growth_Speed:
+                    ApplyGrowthSpeedBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Quality_Bonus:
+                    ApplyQualityBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Disease_Resistance:
+                    ApplyDiseaseResistanceBonus(bonusCalc.TotalBonus);
+                    break;
+            }
+        }
+        
+        private void ApplyGeneticsBonuses(SkillSystemIntegration integration, SkillBonusCalculation bonusCalc)
+        {
+            if (_geneticsManager == null)
+                return;
+            
+            // Apply bonuses to genetics system
+            switch (integration.EffectType)
+            {
+                case SkillEffectType.Innovation_Rate:
+                    ApplyInnovationRateBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Success_Rate:
+                    ApplyBreedingSuccessBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Research_Speed:
+                    ApplyGeneticsResearchBonus(bonusCalc.TotalBonus);
+                    break;
+            }
+        }
+        
+        private void ApplyFacilityBonuses(SkillSystemIntegration integration, SkillBonusCalculation bonusCalc)
+        {
+            if (_facilityManager == null)
+                return;
+            
+            // Apply bonuses to facility system
+            switch (integration.EffectType)
+            {
+                case SkillEffectType.Cost_Reduction:
+                    ApplyConstructionCostReduction(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Time_Reduction:
+                    ApplyConstructionSpeedBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Energy_Efficiency:
+                    ApplyEnergyEfficiencyBonus(bonusCalc.TotalBonus);
+                    break;
+            }
+        }
+        
+        private void ApplyResearchBonuses(SkillSystemIntegration integration, SkillBonusCalculation bonusCalc)
+        {
+            // Apply bonuses to research speed and quality
+            switch (integration.EffectType)
+            {
+                case SkillEffectType.Research_Speed:
+                    ApplyResearchSpeedBonus(bonusCalc.TotalBonus);
+                    break;
+                case SkillEffectType.Innovation_Rate:
+                    ApplyResearchInnovationBonus(bonusCalc.TotalBonus);
+                    break;
+            }
+        }
+        
+        // Cultivation bonus applications
+        private void ApplyYieldBonus(float bonusPercentage)
+        {
+            // This would interface with the actual PlantManager to apply yield bonuses
+            LogInfo($"Applied yield bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyGrowthSpeedBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied growth speed bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyQualityBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied quality bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyDiseaseResistanceBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied disease resistance bonus: +{bonusPercentage:P}");
+        }
+        
+        // Genetics bonus applications
+        private void ApplyInnovationRateBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied innovation rate bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyBreedingSuccessBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied breeding success bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyGeneticsResearchBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied genetics research bonus: +{bonusPercentage:P}");
+        }
+        
+        // Facility bonus applications
+        private void ApplyConstructionCostReduction(float bonusPercentage)
+        {
+            LogInfo($"Applied construction cost reduction: -{bonusPercentage:P}");
+        }
+        
+        private void ApplyConstructionSpeedBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied construction speed bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyEnergyEfficiencyBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied energy efficiency bonus: +{bonusPercentage:P}");
+        }
+        
+        // Research bonus applications
+        private void ApplyResearchSpeedBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied research speed bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplyResearchInnovationBonus(float bonusPercentage)
+        {
+            LogInfo($"Applied research innovation bonus: +{bonusPercentage:P}");
+        }
+        
+        private void ApplySkillEffectToSystem(SkillEffectMapping mapping)
+        {
+            // Apply skill effects to specific systems based on mapping configuration
+            LogInfo($"Applied skill effect {mapping.EffectType} to {mapping.TargetSystem}");
+        }
+        
+        // Event handlers for experience gain
+        public void OnPlantHarvested(PlantInstance plant, float yield, float quality)
+        {
+            if (_progressionManager == null)
+                return;
+            
+            // Calculate experience based on yield and quality
+            float experienceGain = _plantHarvestExperience * (1f + quality * 0.5f);
+            
+            // Find relevant cultivation skills
+            var cultivationSkill = GetRelevantSkill(SkillCategory.Cultivation);
+            
+            _progressionManager.GainExperience(experienceGain, ExperienceSource.Plant_Harvest, cultivationSkill);
+            
+            LogInfo($"Gained {experienceGain:F1} experience from plant harvest (Quality: {quality:P})");
+        }
+        
+        public void OnBreedingSuccess(PlantStrainSO parentA, PlantStrainSO parentB, PlantStrainSO offspring)
+        {
+            if (_progressionManager == null)
+                return;
+            
+            var geneticsSkill = GetRelevantSkill(SkillCategory.Genetics);
+            _progressionManager.GainExperience(_breedingSuccessExperience, ExperienceSource.Breeding_Success, geneticsSkill);
+            
+            LogInfo($"Gained {_breedingSuccessExperience:F1} experience from breeding success");
+        }
+        
+        public void OnFacilityCompleted(string facilityId, float constructionQuality)
+        {
+            if (_progressionManager == null)
+                return;
+            
+            float experienceGain = _facilityCompletionExperience * (1f + constructionQuality * 0.3f);
+            
+            var managementSkill = GetRelevantSkill(SkillCategory.Management);
+            _progressionManager.GainExperience(experienceGain, ExperienceSource.Facility_Completion, managementSkill);
+            
+            LogInfo($"Gained {experienceGain:F1} experience from facility completion");
+        }
+        
+        public void OnResearchMilestone(ResearchProjectSO project, string milestoneName)
+        {
+            if (_progressionManager == null)
+                return;
+            
+            var researchSkill = GetRelevantSkill(SkillCategory.Research);
+            _progressionManager.GainExperience(_researchMilestoneExperience, ExperienceSource.Research_Completion, researchSkill);
+            
+            LogInfo($"Gained {_researchMilestoneExperience:F1} experience from research milestone: {milestoneName}");
+        }
+        
+        private SkillNodeSO GetRelevantSkill(SkillCategory category)
+        {
+            // Find the most relevant skill for the category from the player's skills
+            foreach (var skillData in _progressionManager.PlayerSkills.Values)
+            {
+                if (skillData.Skill.SkillCategory == category)
+                    return skillData.Skill;
+            }
+            return null;
+        }
+        
+        // Simulation methods for testing (would be removed in production)
+        private void SimulateCultivationActivity()
+        {
+            // Simulate plant harvest for testing
+            OnPlantHarvested(null, 100f, Random.Range(0.7f, 1f));
+        }
+        
+        private void SimulateGeneticsActivity()
+        {
+            // Simulate breeding success for testing
+            OnBreedingSuccess(null, null, null);
+        }
+        
+        private void OnDestroy()
+        {
+            // Unregister event listeners
+            CancelInvoke();
+        }
+    }
+    
+    [System.Serializable]
+    public class SkillEffectMapping
+    {
+        public SkillEffectType EffectType;
+        public IntegrationSystem TargetSystem;
+        public string TargetProperty;
+        public float EffectMultiplier = 1f;
+        public bool IsPercentage = true;
+        public string Description;
+    }
+    
+    [System.Serializable]
+    public class SkillSystemIntegration
+    {
+        public IntegrationSystem TargetSystem;
+        public SkillEffectType EffectType;
+        public float UpdateFrequency = 1f; // seconds
+        public bool IsActive = true;
+        public string IntegrationDescription;
+    }
+    
+    // Integration system enumeration
+    public enum IntegrationSystem
+    {
+        Cultivation,
+        Genetics,
+        Facilities,
+        Research,
+        Economy,
+        Quality_Control,
+        Technology,
+        Management
+    }
+    
+    /// <summary>
+    /// Plant strain data structure for cultivation progression.
+    /// </summary>
+    [Serializable]
+    public class PlantStrainSO : ChimeraDataSO
+    {
+        [Header("Strain Information")]
+        public string StrainName;
+        public string StrainId;
+        public string Description;
+        
+        [Header("Genetics")]
+        public Dictionary<string, float> GeneticTraits;
+        public float BaseYield;
+        public int GrowthTime;
+        
+        [Header("Requirements")]
+        public Dictionary<string, float> OptimalConditions;
+        public List<string> RequiredNutrients;
+        public float DifficultyLevel;
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "name": "ProjectChimera.Systems",
+    "rootNamespace": "ProjectChimera.Systems",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Events",
+        "ProjectChimera.Systems.Progression",
+        "Unity.TextMeshPro",
+        "Cinemachine",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

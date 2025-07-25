@@ -1,0 +1,988 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Systems.Events;
+using IPMGaming = ProjectChimera.Systems.Gaming.IPM;
+using IPMData = ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+using IPMRecommendation = ProjectChimera.Data.IPM.IPMRecommendation;
+using IPMBattleData = ProjectChimera.Data.IPM.IPMBattleData;
+using IPMBattleConfiguration = ProjectChimera.Data.IPM.IPMBattleConfiguration;
+using IPMBattleResult = ProjectChimera.Data.IPM.IPMBattleResult;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Core IPM Gaming Manager for Project Chimera's Enhanced IPM Gaming System.
+    /// Orchestrates strategic pest management combat, coordinates all IPM subsystems,
+    /// and provides the main interface for IPM gaming operations. Features advanced
+    /// battle coordination, multiplayer support, AI-driven opponents, and comprehensive
+    /// analytics for the ultimate strategic pest management experience.
+    /// 
+    /// Key Responsibilities:
+    /// - Central coordination of all IPM subsystems
+    /// - Battle lifecycle management and orchestration
+    /// - Multiplayer session coordination
+    /// - AI opponent management and adaptation
+    /// - Real-time invasion detection and response
+    /// - Performance monitoring and optimization
+    /// - Player progression and skill tracking
+    /// - Strategic recommendation and guidance
+    /// </summary>
+    public class IPMGamingManager : ChimeraManager, IIPMBattleManager, IIPMSystem
+    {
+        [Header("IPM Gaming Configuration")]
+        [SerializeField] private IPMData.IPMConfigSO _ipmConfig;
+        [SerializeField] private bool _enableRealTimeInvasions = true;
+        [SerializeField] private bool _enableMultiplayerSupport = true;
+        [SerializeField] private bool _enableAIOpponents = true;
+        [SerializeField] private bool _enableAdvancedAnalytics = true;
+        
+        [Header("System References")]
+        [SerializeField] private GameEventChannelSO _ipmEventChannel;
+        [SerializeField] private GameEventChannelSO _cultivationEventChannel;
+        [SerializeField] private GameEventChannelSO _environmentalEventChannel;
+        
+        [Header("Performance Settings")]
+        [SerializeField] private float _systemUpdateInterval = 0.1f;
+        [SerializeField] private int _maxConcurrentBattles = 5;
+        [SerializeField] private bool _enablePerformanceOptimization = true;
+        [SerializeField] private bool _enableDebugMode = false;
+        
+        // Core IPM System Properties
+        public bool IsInitialized { get; private set; }
+        public bool IsActive { get; private set; }
+        public string SystemId => "IPMGamingManager";
+        
+        // IPM Subsystem Managers
+        private IPMGaming.IIPMPestManager _pestManager;
+        private IPMGaming.IIPMBiologicalManager _biologicalManager;
+        private IPMGaming.IIPMDefenseManager _defenseManager;
+        private IPMGaming.IIPMEnvironmentalManager _environmentalManager;
+        private IPMGaming.IIPMChemicalManager _chemicalManager;
+        private IPMGaming.IIPMStrategyManager _strategyManager;
+        private IPMGaming.IIPMAnalyticsManager _analyticsManager;
+        private IPMGaming.IIPMResourceManager _resourceManager;
+        private IPMGaming.IIPMAIManager _aiManager;
+        private IPMGaming.IIPMNetworkManager _networkManager;
+        private IPMGaming.IIPMNotificationManager _notificationManager;
+        
+        // Battle Management
+        private Dictionary<string, IPMBattleData> _activeBattles = new Dictionary<string, IPMBattleData>();
+        private Dictionary<string, ProjectChimera.Systems.IPM.IPMBattleSession> _battleSessions = new Dictionary<string, ProjectChimera.Systems.IPM.IPMBattleSession>();
+        private Queue<IPMBattleConfiguration> _pendingBattles = new Queue<IPMBattleConfiguration>();
+        private Dictionary<string, IPMPlayerProfile> _playerProfiles = new Dictionary<string, IPMPlayerProfile>();
+        
+        // Real-time Invasion System
+        private IPMInvasionDetector _invasionDetector;
+        private Dictionary<string, IPMData.PestInvasionData> _activeInvasions = new Dictionary<string, IPMData.PestInvasionData>();
+        private float _lastInvasionCheck;
+        private float _invasionCheckInterval = 30f; // Check every 30 seconds
+        
+        // AI and Intelligence
+        private IPMDifficultyScaler _difficultyScaler;
+        private IPMPlayerBehaviorAnalyzer _behaviorAnalyzer;
+        private IPMRecommendationEngine _recommendationEngine;
+        private Dictionary<string, IPMData.PestAIBehavior> _aiOpponents = new Dictionary<string, IPMData.PestAIBehavior>();
+        
+        // Multiplayer and Networking
+        private Dictionary<string, IPMMultiplayerSession> _multiplayerSessions = new Dictionary<string, IPMMultiplayerSession>();
+        private IPMMatchmakingService _matchmakingService;
+        private bool _isMultiplayerHost = false;
+        
+        // Performance and Analytics
+        private IPMData.IPMSystemMetrics _systemMetrics = new IPMData.IPMSystemMetrics();
+        private IPMPerformanceMonitor _performanceMonitor;
+        private Dictionary<string, float> _subsystemPerformance = new Dictionary<string, float>();
+        private float _lastSystemUpdate;
+        
+        // Events
+        public event Action<IPMBattleData> OnBattleStarted;
+        public event Action<IPMBattleData> OnBattleEnded;
+        public event Action<IPMBattlePhase> OnBattlePhaseChanged;
+        public event Action<PestInvasionData> OnInvasionDetected;
+        public event Action<IPMPlayerProfile> OnPlayerJoined;
+        public event Action<string> OnPlayerLeft;
+        public event Action<IPMSystemMetrics> OnSystemMetricsUpdated;
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] Initializing Enhanced IPM Gaming System...");
+            }
+            
+            InitializeConfiguration();
+            InitializeSubsystems();
+            InitializeInvasionDetection();
+            InitializeAISystem();
+            InitializeMultiplayerSupport();
+            InitializePerformanceMonitoring();
+            SubscribeToEvents();
+            
+            IsInitialized = true;
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] Enhanced IPM Gaming System initialized successfully");
+            }
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!IsInitialized || !IsActive) return;
+            
+            try
+            {
+                if (Time.time - _lastSystemUpdate >= _systemUpdateInterval)
+                {
+                    UpdateIPMSystems(Time.deltaTime);
+                    UpdateBattleSessions(Time.deltaTime);
+                    UpdateInvasionDetection();
+                    UpdateAIOpponents();
+                    UpdateMultiplayerSessions();
+                    UpdatePerformanceMetrics();
+                    ProcessPendingBattles();
+                    
+                    _lastSystemUpdate = Time.time;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMGamingManager] Update error: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            Deactivate();
+            
+            // End all active battles
+            var battleIds = _activeBattles.Keys.ToList();
+            foreach (var battleId in battleIds)
+            {
+                EndBattle(battleId, IPMBattleOutcome.Abandoned);
+            }
+            
+            // Cleanup subsystems
+            CleanupSubsystems();
+            UnsubscribeFromEvents();
+            
+            IsInitialized = false;
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] Enhanced IPM Gaming System shutdown completed");
+            }
+        }
+        
+        #endregion
+        
+        #region IIPMSystem Implementation
+        
+        public void Initialize(IPMConfigSO config)
+        {
+            _ipmConfig = config;
+            if (!IsInitialized)
+            {
+                OnManagerInitialize();
+            }
+        }
+        
+        public void Activate()
+        {
+            if (!IsInitialized)
+            {
+                Debug.LogError("[IPMGamingManager] Cannot activate - system not initialized");
+                return;
+            }
+            
+            IsActive = true;
+            ActivateSubsystems();
+            
+            if (_enableRealTimeInvasions)
+            {
+                StartInvasionMonitoring();
+            }
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] IPM Gaming System activated");
+            }
+        }
+        
+        public void Deactivate()
+        {
+            IsActive = false;
+            DeactivateSubsystems();
+            StopInvasionMonitoring();
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] IPM Gaming System deactivated");
+            }
+        }
+        
+        public void Reset()
+        {
+            // End all battles
+            var battleIds = _activeBattles.Keys.ToList();
+            foreach (var battleId in battleIds)
+            {
+                EndBattle(battleId, IPMBattleOutcome.Abandoned);
+            }
+            
+            // Reset subsystems
+            ResetSubsystems();
+            
+            // Clear state
+            _activeBattles.Clear();
+            _battleSessions.Clear();
+            _activeInvasions.Clear();
+            _aiOpponents.Clear();
+            _multiplayerSessions.Clear();
+            _systemMetrics = new IPMData.IPMSystemMetrics();
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] IPM Gaming System reset completed");
+            }
+        }
+        
+        public IPMData.IPMSystemMetrics GetMetrics()
+        {
+            _systemMetrics.ActiveBattles = _activeBattles.Count;
+            _systemMetrics.TotalPlayersOnline = GetTotalPlayersOnline();
+            _systemMetrics.LastUpdate = DateTime.Now;
+            _systemMetrics.SubSystemPerformance = new Dictionary<string, float>(_subsystemPerformance);
+            
+            return _systemMetrics;
+        }
+        
+        #endregion
+        
+        #region IIPMBattleManager Implementation
+        
+        public bool StartBattle(IPMBattleConfiguration config)
+        {
+            try
+            {
+                if (!CanStartBattle())
+                {
+                    if (_enableDebugMode)
+                    {
+                        Debug.LogWarning("[IPMGamingManager] Cannot start battle - system not ready or limit reached");
+                    }
+                    return false;
+                }
+                
+                var battleData = CreateBattleData(config);
+                var session = new ProjectChimera.Systems.IPM.IPMBattleSession(battleData, _ipmConfig);
+                
+                _activeBattles[battleData.BattleId] = battleData;
+                _battleSessions[battleData.BattleId] = session;
+                
+                // Initialize battle subsystems
+                InitializeBattleSubsystems(battleData);
+                
+                // Start battle session
+                session.Start();
+                
+                OnBattleStarted?.Invoke(battleData);
+                PublishIPMEvent("BattleStarted", battleData);
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log($"[IPMGamingManager] Battle started: {battleData.BattleId} - {battleData.BattleName}");
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMGamingManager] Failed to start battle: {ex.Message}");
+                return false;
+            }
+        }
+        
+        public bool EndBattle(string battleId, IPMBattleOutcome result)
+        {
+            try
+            {
+                if (!_activeBattles.TryGetValue(battleId, out var battleData))
+                {
+                    return false;
+                }
+                
+                battleData.Result = new IPMBattleResult
+                {
+                    BattleId = battleId,
+                    Outcome = result,
+                    Victory = (result == IPMBattleOutcome.Victory),
+                    BattleDuration = DateTime.Now - battleData.StartTime
+                };
+                battleData.Duration = DateTime.Now - battleData.StartTime;
+                
+                // End battle session
+                if (_battleSessions.TryGetValue(battleId, out var session))
+                {
+                    session.End(result);
+                    _battleSessions.Remove(battleId);
+                }
+                
+                // Update player profiles
+                UpdatePlayerProfilesFromBattle(battleData);
+                
+                // Cleanup battle subsystems
+                CleanupBattleSubsystems(battleData);
+                
+                _activeBattles.Remove(battleId);
+                
+                OnBattleEnded?.Invoke(battleData);
+                PublishIPMEvent("BattleEnded", battleData);
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log($"[IPMGamingManager] Battle ended: {battleId} - Result: {result}");
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMGamingManager] Failed to end battle {battleId}: {ex.Message}");
+                return false;
+            }
+        }
+        
+        public IPMBattleData GetBattleData(string battleId)
+        {
+            return _activeBattles.GetValueOrDefault(battleId);
+        }
+        
+        public List<IPMBattleData> GetActiveBattles()
+        {
+            return _activeBattles.Values.ToList();
+        }
+        
+        public bool CanStartBattle()
+        {
+            return IsActive && 
+                   _activeBattles.Count < _maxConcurrentBattles &&
+                   (_ipmConfig?.CanStartBattle(_activeBattles.Count) ?? false);
+        }
+        
+        public void UpdateBattle(string battleId, float deltaTime)
+        {
+            if (_battleSessions.TryGetValue(battleId, out var session))
+            {
+                session.Update(deltaTime);
+                
+                // Check for phase changes
+                var newPhase = session.GetCurrentPhase();
+                if (_activeBattles.TryGetValue(battleId, out var battleData) && 
+                    battleData.CurrentPhase != newPhase)
+                {
+                    battleData.CurrentPhase = newPhase;
+                    _activeBattles[battleId] = battleData;
+                    OnBattlePhaseChanged?.Invoke(newPhase);
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Initialization
+        
+        private void InitializeConfiguration()
+        {
+            if (_ipmConfig == null)
+            {
+                Debug.LogError("[IPMGamingManager] IPM Configuration is null - creating default configuration");
+                // Create a default configuration or load from resources
+                return;
+            }
+            
+            _enableRealTimeInvasions = _ipmConfig.EnableRealTimeInvasions;
+            _enableMultiplayerSupport = _ipmConfig.EnableMultiplayerIPM;
+            _enableAIOpponents = _ipmConfig.EnableAIOpponents;
+            _maxConcurrentBattles = _ipmConfig.MaxSimultaneousBattles;
+            _invasionCheckInterval = 1f / _ipmConfig.InvasionFrequency;
+        }
+        
+        private void InitializeSubsystems()
+        {
+            // Find and initialize IPM subsystem managers
+            _pestManager = FindObjectOfType<IPMPestManager>();
+            _biologicalManager = FindObjectOfType<IPMBiologicalManager>();
+            _defenseManager = FindObjectOfType<IPMDefenseManager>();
+            _environmentalManager = FindObjectOfType<IPMEnvironmentalManager>();
+            _chemicalManager = FindObjectOfType<IPMChemicalManager>();
+            _strategyManager = FindObjectOfType<IPMStrategyManager>();
+            _analyticsManager = FindObjectOfType<IPMAnalyticsManager>();
+            _resourceManager = FindObjectOfType<IPMResourceManager>();
+            _aiManager = FindObjectOfType<IPMAIManager>();
+            _networkManager = FindObjectOfType<IPMNetworkManager>();
+            _notificationManager = FindObjectOfType<IPMNotificationManager>();
+            
+            // Initialize subsystems with configuration
+            InitializeSubsystem(_pestManager, "PestManager");
+            InitializeSubsystem(_biologicalManager, "BiologicalManager");
+            InitializeSubsystem(_defenseManager, "DefenseManager");
+            InitializeSubsystem(_environmentalManager, "EnvironmentalManager");
+            InitializeSubsystem(_chemicalManager, "ChemicalManager");
+            InitializeSubsystem(_strategyManager, "StrategyManager");
+            InitializeSubsystem(_analyticsManager, "AnalyticsManager");
+            InitializeSubsystem(_resourceManager, "ResourceManager");
+            InitializeSubsystem(_aiManager, "AIManager");
+            InitializeSubsystem(_networkManager, "NetworkManager");
+            InitializeSubsystem(_notificationManager, "NotificationManager");
+        }
+        
+        private void InitializeSubsystem(IIPMSystem subsystem, string name)
+        {
+            try
+            {
+                if (subsystem != null)
+                {
+                    subsystem.Initialize(_ipmConfig);
+                    if (_enableDebugMode)
+                    {
+                        Debug.Log($"[IPMGamingManager] {name} initialized successfully");
+                    }
+                }
+                else if (_enableDebugMode)
+                {
+                    Debug.LogWarning($"[IPMGamingManager] {name} not found - some IPM features may be limited");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMGamingManager] Failed to initialize {name}: {ex.Message}");
+            }
+        }
+        
+        private void InitializeInvasionDetection()
+        {
+            if (_enableRealTimeInvasions)
+            {
+                _invasionDetector = new IPMInvasionDetector(_ipmConfig);
+                _invasionDetector.OnInvasionDetected += HandleInvasionDetected;
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log("[IPMGamingManager] Invasion detection system initialized");
+                }
+            }
+        }
+        
+        private void InitializeAISystem()
+        {
+            if (_enableAIOpponents)
+            {
+                _difficultyScaler = new IPMDifficultyScaler(_ipmConfig);
+                _behaviorAnalyzer = new IPMPlayerBehaviorAnalyzer();
+                _recommendationEngine = new IPMRecommendationEngine(_ipmConfig);
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log("[IPMGamingManager] AI system initialized");
+                }
+            }
+        }
+        
+        private void InitializeMultiplayerSupport()
+        {
+            if (_enableMultiplayerSupport)
+            {
+                _matchmakingService = new IPMMatchmakingService(_ipmConfig);
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log("[IPMGamingManager] Multiplayer support initialized");
+                }
+            }
+        }
+        
+        private void InitializePerformanceMonitoring()
+        {
+            if (_enablePerformanceOptimization)
+            {
+                _performanceMonitor = new IPMPerformanceMonitor();
+                _performanceMonitor.Initialize();
+                
+                if (_enableDebugMode)
+                {
+                    Debug.Log("[IPMGamingManager] Performance monitoring initialized");
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region System Updates
+        
+        private void UpdateIPMSystems(float deltaTime)
+        {
+            // Update subsystem performance tracking
+            UpdateSubsystemPerformance("PestManager", () => _pestManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("BiologicalManager", () => _biologicalManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("DefenseManager", () => _defenseManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("EnvironmentalManager", () => _environmentalManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("ChemicalManager", () => _chemicalManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("StrategyManager", () => _strategyManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("AnalyticsManager", () => _analyticsManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("ResourceManager", () => _resourceManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("AIManager", () => _aiManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("NetworkManager", () => _networkManager?.GetMetrics().LastUpdate);
+            UpdateSubsystemPerformance("NotificationManager", () => _notificationManager?.GetMetrics().LastUpdate);
+        }
+        
+        private void UpdateSubsystemPerformance(string systemName, Func<DateTime?> getLastUpdate)
+        {
+            try
+            {
+                var lastUpdate = getLastUpdate?.Invoke();
+                if (lastUpdate.HasValue)
+                {
+                    var timeSinceUpdate = (DateTime.Now - lastUpdate.Value).TotalMilliseconds;
+                    _subsystemPerformance[systemName] = (float)timeSinceUpdate;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMGamingManager] Failed to update {systemName} performance: {ex.Message}");
+            }
+        }
+        
+        private void UpdateBattleSessions(float deltaTime)
+        {
+            var battleIds = _battleSessions.Keys.ToList();
+            foreach (var battleId in battleIds)
+            {
+                UpdateBattle(battleId, deltaTime);
+            }
+        }
+        
+        private void UpdateInvasionDetection()
+        {
+            if (!_enableRealTimeInvasions || _invasionDetector == null) return;
+            
+            if (Time.time - _lastInvasionCheck >= _invasionCheckInterval)
+            {
+                _invasionDetector.CheckForInvasions();
+                _lastInvasionCheck = Time.time;
+            }
+        }
+        
+        private void UpdateAIOpponents()
+        {
+            if (!_enableAIOpponents) return;
+            
+            foreach (var aiOpponent in _aiOpponents.Values)
+            {
+                // Update AI behavior based on player actions and game state
+                _aiManager?.UpdateAIBehavior(aiOpponent.PestType, new Dictionary<string, float>());
+            }
+        }
+        
+        private void UpdateMultiplayerSessions()
+        {
+            if (!_enableMultiplayerSupport) return;
+            
+            foreach (var session in _multiplayerSessions.Values.ToList())
+            {
+                session.Update(Time.deltaTime);
+                
+                if (session.IsExpired())
+                {
+                    _multiplayerSessions.Remove(session.SessionId);
+                }
+            }
+        }
+        
+        private void UpdatePerformanceMetrics()
+        {
+            if (_enablePerformanceOptimization && _performanceMonitor != null)
+            {
+                _performanceMonitor.Update();
+                
+                _systemMetrics.AverageFrameRate = _performanceMonitor.GetAverageFrameRate();
+                _systemMetrics.MemoryUsage = _performanceMonitor.GetMemoryUsage();
+                _systemMetrics.AIProcessingTime = _performanceMonitor.GetAIProcessingTime();
+            }
+            
+            OnSystemMetricsUpdated?.Invoke(_systemMetrics);
+        }
+        
+        private void ProcessPendingBattles()
+        {
+            while (_pendingBattles.Count > 0 && CanStartBattle())
+            {
+                var config = _pendingBattles.Dequeue();
+                StartBattle(config);
+            }
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private IPMBattleData CreateBattleData(IPMBattleConfiguration config)
+        {
+            return new IPMBattleData
+            {
+                BattleId = Guid.NewGuid().ToString(),
+                BattleName = $"IPM Battle {DateTime.Now:yyyy-MM-dd HH:mm}",
+                PrimaryThreat = config.EnabledPests?.FirstOrDefault() ?? PestType.Aphids,
+                SecondaryThreats = config.EnabledPests?.Skip(1).ToList() ?? new List<PestType>(),
+                Difficulty = config.Difficulty,
+                CurrentPhase = IPMBattlePhase.Preparation,
+                BattleProgress = 0f,
+                StartTime = DateTime.Now,
+                Duration = TimeSpan.Zero,
+                FacilityLocation = Vector3.zero,
+                ParticipantIds = new List<string> { "Player1" }, // TODO: Get from config
+                PlayerScores = new Dictionary<string, float>(),
+                IsMultiplayer = config.AllowMultiplayer,
+                FacilityId = "DefaultFacility" // TODO: Get from facility manager
+            };
+        }
+        
+        private void InitializeBattleSubsystems(IPMBattleData battleData)
+        {
+            // Initialize subsystems for this specific battle
+            // TODO: Configure subsystems based on battle requirements
+        }
+        
+        private void CleanupBattleSubsystems(IPMBattleData battleData)
+        {
+            // Cleanup subsystem state for this battle
+            // TODO: Reset subsystem state for battle cleanup
+        }
+        
+        private void UpdatePlayerProfilesFromBattle(IPMBattleData battleData)
+        {
+            // Update player profiles based on battle results
+            foreach (var participantId in battleData.ParticipantIds)
+            {
+                if (_playerProfiles.TryGetValue(participantId, out var profile))
+                {
+                    // Update profile statistics
+                    profile.Statistics.TotalBattles++;
+                    if (battleData.Result != null && battleData.Result.Outcome == IPMBattleOutcome.Victory)
+                    {
+                        profile.Statistics.BattlesWon++;
+                    }
+                    else
+                    {
+                        profile.Statistics.BattlesLost++;
+                    }
+                    
+                    profile.Statistics.WinRate = (float)profile.Statistics.BattlesWon / profile.Statistics.TotalBattles;
+                    _playerProfiles[participantId] = profile;
+                }
+            }
+        }
+        
+        private int GetTotalPlayersOnline()
+        {
+            return _playerProfiles.Count + _multiplayerSessions.Sum(s => s.Value.PlayerCount);
+        }
+        
+        private void PublishIPMEvent(string eventType, object eventData)
+        {
+            if (_ipmEventChannel != null)
+            {
+                var ipmEvent = new IPMGameEvent
+                {
+                    EventId = Guid.NewGuid().ToString(),
+                    EventType = eventType,
+                    Timestamp = DateTime.Now,
+                    EventData = new Dictionary<string, object> { ["data"] = eventData },
+                    IsNetworked = false,
+                    Priority = 1
+                };
+                
+                _ipmEventChannel.RaiseEvent(ipmEvent);
+            }
+        }
+        
+        #endregion
+        
+        #region Event Handling
+        
+        private void SubscribeToEvents()
+        {
+            if (_ipmEventChannel != null)
+            {
+                // Subscribe to IPM events
+            }
+            
+            if (_cultivationEventChannel != null)
+            {
+                // Subscribe to cultivation events for invasion triggers
+            }
+            
+            if (_environmentalEventChannel != null)
+            {
+                // Subscribe to environmental events for invasion conditions
+            }
+        }
+        
+        private void UnsubscribeFromEvents()
+        {
+            // Unsubscribe from all events
+        }
+        
+        private void HandleInvasionDetected(IPMData.PestInvasionData invasionData)
+        {
+            _activeInvasions[invasionData.InvasionId] = invasionData;
+            OnInvasionDetected?.Invoke(invasionData);
+            
+            // Trigger automatic battle if configured
+            if (_ipmConfig?.EnableRealTimeInvasions == true)
+            {
+                var battleConfig = CreateBattleConfigurationFromInvasion(invasionData);
+                if (CanStartBattle())
+                {
+                    StartBattle(battleConfig);
+                }
+                else
+                {
+                    _pendingBattles.Enqueue(battleConfig);
+                }
+            }
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log($"[IPMGamingManager] Invasion detected: {invasionData.InvasionId} - {invasionData.PestType}");
+            }
+        }
+        
+        private IPMGaming.IPMBattleConfiguration CreateBattleConfigurationFromInvasion(IPMData.PestInvasionData invasionData)
+        {
+            return new IPMGaming.IPMBattleConfiguration
+            {
+                Difficulty = IPMDifficultyLevel.Intermediate, // TODO: Calculate based on invasion
+                EnabledPests = new List<PestType> { invasionData.PestType },
+                AllowMultiplayer = false,
+                MaxPlayers = 1,
+                TimeLimit = TimeSpan.FromMinutes(5),
+                VictoryThreshold = 0.8f,
+                SpecialRules = new Dictionary<string, float>(),
+                AvailableDefenses = new List<string>(),
+                ResourceMultiplier = 1f,
+                EnableRealTimeEvents = true
+            };
+        }
+        
+        #endregion
+        
+        #region Subsystem Management
+        
+        private void ActivateSubsystems()
+        {
+            _pestManager?.Activate();
+            _biologicalManager?.Activate();
+            _defenseManager?.Activate();
+            _environmentalManager?.Activate();
+            _chemicalManager?.Activate();
+            _strategyManager?.Activate();
+            _analyticsManager?.Activate();
+            _resourceManager?.Activate();
+            _aiManager?.Activate();
+            _networkManager?.Activate();
+            _notificationManager?.Activate();
+        }
+        
+        private void DeactivateSubsystems()
+        {
+            _pestManager?.Deactivate();
+            _biologicalManager?.Deactivate();
+            _defenseManager?.Deactivate();
+            _environmentalManager?.Deactivate();
+            _chemicalManager?.Deactivate();
+            _strategyManager?.Deactivate();
+            _analyticsManager?.Deactivate();
+            _resourceManager?.Deactivate();
+            _aiManager?.Deactivate();
+            _networkManager?.Deactivate();
+            _notificationManager?.Deactivate();
+        }
+        
+        private void ResetSubsystems()
+        {
+            _pestManager?.Reset();
+            _biologicalManager?.Reset();
+            _defenseManager?.Reset();
+            _environmentalManager?.Reset();
+            _chemicalManager?.Reset();
+            _strategyManager?.Reset();
+            _analyticsManager?.Reset();
+            _resourceManager?.Reset();
+            _aiManager?.Reset();
+            _networkManager?.Reset();
+            _notificationManager?.Reset();
+        }
+        
+        private void CleanupSubsystems()
+        {
+            // Cleanup subsystem resources
+            _invasionDetector?.Dispose();
+            _performanceMonitor?.Dispose();
+        }
+        
+        private void StartInvasionMonitoring()
+        {
+            if (_invasionDetector != null)
+            {
+                _invasionDetector.StartMonitoring();
+            }
+        }
+        
+        private void StopInvasionMonitoring()
+        {
+            if (_invasionDetector != null)
+            {
+                _invasionDetector.StopMonitoring();
+            }
+        }
+        
+        #endregion
+        
+        #region Public API
+        
+        /// <summary>
+        /// Queue a battle to start when resources become available.
+        /// </summary>
+        public void QueueBattle(IPMGaming.IPMBattleConfiguration config)
+        {
+            _pendingBattles.Enqueue(config);
+        }
+        
+        /// <summary>
+        /// Get player profile for the specified player.
+        /// </summary>
+        public IPMData.IPMPlayerProfile GetPlayerProfile(string playerId)
+        {
+            return _playerProfiles.GetValueOrDefault(playerId);
+        }
+        
+        /// <summary>
+        /// Update player profile with new data.
+        /// </summary>
+        public void UpdatePlayerProfile(string playerId, IPMData.IPMPlayerProfile profile)
+        {
+            _playerProfiles[playerId] = profile;
+        }
+        
+        /// <summary>
+        /// Get all active invasions.
+        /// </summary>
+        public List<IPMData.PestInvasionData> GetActiveInvasions()
+        {
+            return _activeInvasions.Values.ToList();
+        }
+        
+        /// <summary>
+        /// Get system performance statistics.
+        /// </summary>
+        public Dictionary<string, float> GetPerformanceStatistics()
+        {
+            return new Dictionary<string, float>(_subsystemPerformance);
+        }
+        
+        #endregion
+        
+        #region IConfigurableGameSystem Implementation
+        
+        /// <summary>
+        /// Update system configuration during runtime.
+        /// </summary>
+        public void UpdateConfiguration(IPMData.IPMConfigSO config)
+        {
+            if (config == null)
+            {
+                if (_enableDebugMode)
+                    Debug.LogWarning("[IPMGamingManager] Cannot update with null configuration");
+                return;
+            }
+            
+            _ipmConfig = config;
+            
+            // Reinitialize subsystems with new configuration
+            if (IsInitialized)
+            {
+                InitializeSubsystems();
+            }
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] Configuration updated successfully");
+            }
+        }
+        
+        /// <summary>
+        /// Update system (called every frame).
+        /// </summary>
+        public void Update(float deltaTime)
+        {
+            if (!IsInitialized || !IsActive)
+                return;
+                
+            // Update all active battles
+            foreach (var battleData in _activeBattles.Values.ToList())
+            {
+                UpdateBattle(battleData.BattleId, deltaTime);
+            }
+            
+            // Update subsystem performance tracking
+            UpdatePerformanceMetrics();
+        }
+        
+        /// <summary>
+        /// Cleanup system resources.
+        /// </summary>
+        public void Cleanup()
+        {
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] Starting system cleanup...");
+            }
+            
+            // End all active battles
+            var battleIds = _activeBattles.Keys.ToList();
+            foreach (var battleId in battleIds)
+            {
+                EndBattle(battleId, IPMBattleOutcome.Abandoned);
+            }
+            
+            // Cleanup subsystems
+            CleanupSubsystems();
+            
+            // Clear all data structures
+            _activeBattles.Clear();
+            _activeInvasions.Clear();
+            _playerProfiles.Clear();
+            _subsystemPerformance.Clear();
+            
+            // Unsubscribe from events
+            UnsubscribeFromEvents();
+            
+            if (_enableDebugMode)
+            {
+                Debug.Log("[IPMGamingManager] System cleanup completed");
+            }
+        }
+        
+        #endregion
+    }
+}

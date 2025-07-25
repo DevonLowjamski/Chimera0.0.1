@@ -1,0 +1,1203 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Core.Logging;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data;
+using GeneticsData = ProjectChimera.Data.Genetics;
+using GeneticsGaming = ProjectChimera.Systems.Genetics.Gaming;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    #region Supporting Classes
+    
+    /// <summary>
+    /// Supporting classes that don't exist elsewhere in the codebase
+    /// </summary>
+    
+    [System.Serializable]
+    public class SkillNodeProgressionTracker : MonoBehaviour
+    {
+        // Component for tracking skill node progression
+    }
+    
+    [System.Serializable]
+    public class SkillSynergyEngine : MonoBehaviour
+    {
+        // Component for managing skill synergies
+    }
+    
+    [System.Serializable]
+    public class SkillUnlockManager : MonoBehaviour
+    {
+        // Component for managing skill unlocks
+    }
+    
+    [System.Serializable]
+    public class CrossSystemAchievementProcessor : MonoBehaviour
+    {
+        // Component for processing cross-system achievements
+    }
+    
+    [System.Serializable]
+    public class MilestoneRecognitionSystem : MonoBehaviour
+    {
+        // Component for milestone recognition
+    }
+    
+    [System.Serializable]
+    public class ProgressionRewardsManager : MonoBehaviour
+    {
+        // Component for managing progression rewards
+    }
+    
+    [System.Serializable]
+    public class ExpertiseRecognitionSystem : MonoBehaviour
+    {
+        // Component for expertise recognition
+    }
+    
+    [System.Serializable]
+    public class LegacyProgressionTracker : MonoBehaviour
+    {
+        // Component for tracking legacy progression
+    }
+    
+    [System.Serializable]
+    public class ScientificRankingSystem : MonoBehaviour
+    {
+        // Component for scientific ranking
+    }
+    
+    [System.Serializable]
+    public class ExperienceMultiplierEngine : MonoBehaviour
+    {
+        // Component for experience multipliers
+    }
+    
+    [System.Serializable]
+    public class SeasonalProgressionBonus : MonoBehaviour
+    {
+        public void Update(float deltaTime) { /* Implementation */ }
+    }
+    
+    [System.Serializable]
+    public class ProgressionAnalyticsCollector : MonoBehaviour
+    {
+        // Component for progression analytics
+    }
+    
+    #endregion
+    
+    /// <summary>
+    /// Scientific Progression System - Unified advancement framework for Enhanced Scientific Gaming System v2.0
+    /// Integrates genetics skills, aromatic mastery, competitive achievements, and community contributions
+    /// Implements cross-system skill trees, achievements, and reputation management
+    /// </summary>
+    public class ScientificProgressionSystem : MonoBehaviour
+    {
+        [Header("Progression Configuration")]
+        [SerializeField] private ScientificProgressionConfigSO _progressionConfig;
+        [SerializeField] private ScientificSkillTreeLibrarySO _skillTreeLibrary;
+        [SerializeField] private ScientificAchievementDatabaseSO _achievementDatabase;
+        
+        [Header("Skill Tree Management")]
+        [SerializeField] private ScientificSkillTreeManager _skillTreeManager;
+        [SerializeField] private SkillNodeProgressionTracker _skillProgressionTracker;
+        [SerializeField] private SkillSynergyEngine _skillSynergyEngine;
+        [SerializeField] private SkillUnlockManager _skillUnlockManager;
+        
+        [Header("Achievement Systems")]
+        [SerializeField] private ScientificAchievementTracker _achievementTracker;
+        [SerializeField] private CrossSystemAchievementProcessor _crossSystemProcessor;
+        [SerializeField] private MilestoneRecognitionSystem _milestoneSystem;
+        [SerializeField] private ProgressionRewardsManager _rewardsManager;
+        
+        [Header("Reputation & Recognition")]
+        [SerializeField] private ScientificReputationManager _reputationManager;
+        [SerializeField] private ExpertiseRecognitionSystem _expertiseSystem;
+        [SerializeField] private LegacyProgressionTracker _legacyTracker;
+        [SerializeField] private ScientificRankingSystem _rankingSystem;
+        
+        [Header("Experience Systems")]
+        [SerializeField] private UnifiedExperienceManager _experienceManager;
+        [SerializeField] private ExperienceMultiplierEngine _multiplierEngine;
+        [SerializeField] private SeasonalProgressionBonus _seasonalBonus;
+        [SerializeField] private ProgressionAnalyticsCollector _analyticsCollector;
+        
+        [Header("Progression Settings")]
+        [Range(0.1f, 3.0f)] public float GlobalExperienceMultiplier = 1.0f;
+        [Range(0.1f, 2.0f)] public float SkillSynergyBonus = 1.3f;
+        [Range(0.1f, 5.0f)] public float CrossSystemProgressionBonus = 1.8f;
+        [Range(1.0f, 10.0f)] public float MasteryUnlockThreshold = 5.0f;
+        [Range(0.1f, 1.0f)] public float ReputationDecayRate = 0.1f;
+        
+        // System State
+        private bool _isInitialized = false;
+        private Dictionary<SkillCategory, SkillTree> _activeSkillTrees = new Dictionary<SkillCategory, SkillTree>();
+        private Dictionary<string, ScientificAchievement> _unlockedAchievements = new Dictionary<string, ScientificAchievement>();
+        private List<ProgressionMilestone> _sessionMilestones = new List<ProgressionMilestone>();
+        private ScientificProgressionState _currentProgressionState;
+        
+        // Progression Performance Metrics
+        private float _totalScientificExperience = 0f;
+        private int _skillNodesUnlocked = 0;
+        private int _achievementsEarned = 0;
+        private int _milestonesReached = 0;
+        private float _overallScientificRank = 0f;
+        private Dictionary<SkillCategory, float> _categoryExpertiseLevel = new Dictionary<SkillCategory, float>();
+        private Dictionary<ScientificDiscipline, float> _disciplineReputation = new Dictionary<ScientificDiscipline, float>();
+        
+        // Cross-System Integration
+        private Dictionary<ScientificGamingSystem, float> _systemContributions = new Dictionary<ScientificGamingSystem, float>();
+        private List<CrossSystemSynergy> _activeSynergies = new List<CrossSystemSynergy>();
+        private ProgressionIntegrationState _integrationState;
+        
+        // Events
+        private GameEventChannelSO _onSkillUnlocked;
+        private GameEventChannelSO _onAchievementEarned;
+        private GameEventChannelSO _onMilestoneReached;
+        private GameEventChannelSO _onExpertiseRecognized;
+        private GameEventChannelSO _onReputationChanged;
+        private GameEventChannelSO _onProgressionSynergyActivated;
+        private GameEventChannelSO _onScientificRankAdvanced;
+        private GameEventChannelSO _onMasteryUnlocked;
+        private GameEventChannelSO _onLegacyAchievementEarned;
+        private GameEventChannelSO _onSeasonalProgressionCompleted;
+        
+        #region Initialization
+        
+        public void Initialize(ScientificProgressionConfigSO config)
+        {
+            if (_isInitialized)
+            {
+                ChimeraLogger.LogWarning("ScientificProgressionSystem already initialized", this);
+                return;
+            }
+            
+            _progressionConfig = config ?? _progressionConfig;
+            
+            if (_progressionConfig == null)
+            {
+                ChimeraLogger.LogError("ScientificProgressionConfigSO is required for initialization", this);
+                return;
+            }
+            
+            InitializeProgressionSystems();
+            InitializeSkillTrees();
+            InitializeAchievementSystems();
+            InitializeReputationSystems();
+            InitializeExperienceSystems();
+            InitializeCrossSystemIntegration();
+            InitializeProgressionState();
+            SetupEventChannels();
+            
+            _isInitialized = true;
+            ChimeraLogger.Log("ScientificProgressionSystem initialized successfully", this);
+        }
+        
+        private void InitializeProgressionSystems()
+        {
+            _activeSkillTrees.Clear();
+            _unlockedAchievements.Clear();
+            _sessionMilestones.Clear();
+            _categoryExpertiseLevel.Clear();
+            _disciplineReputation.Clear();
+            _systemContributions.Clear();
+            _activeSynergies.Clear();
+            
+            // Initialize progression subsystems
+            if (_skillTreeManager != null)
+                _skillTreeManager.Initialize(_progressionConfig?.SkillTreeConfig);
+            
+            if (_achievementTracker != null)
+                _achievementTracker.Initialize(_progressionConfig?.AchievementConfig);
+            
+            if (_reputationManager != null)
+                _reputationManager.Initialize(_progressionConfig?.ReputationConfig);
+            
+            if (_experienceManager != null)
+                _experienceManager.Initialize(_progressionConfig?.ExperienceConfig);
+        }
+        
+        private void InitializeSkillTrees()
+        {
+            if (_skillTreeLibrary == null) return;
+            
+            foreach (var skillTreeData in _skillTreeLibrary.SkillTrees)
+            {
+                var skillTree = CreateSkillTree(skillTreeData);
+                _activeSkillTrees[skillTreeData.Category] = skillTree;
+                _categoryExpertiseLevel[skillTreeData.Category] = 0f;
+                
+                ChimeraLogger.Log($"Initialized skill tree for {skillTreeData.Category}", this);
+            }
+            
+            SetupSkillTreeSynergies();
+        }
+        
+        private void InitializeAchievementSystems()
+        {
+            if (_achievementDatabase == null) return;
+            
+            foreach (var achievementData in _achievementDatabase.Achievements)
+            {
+                if (achievementData.IsCrossSystemAchievement)
+                {
+                    SetupCrossSystemAchievement(achievementData);
+                }
+                
+                TrackAchievementProgress(achievementData);
+            }
+            
+            InitializeMilestoneSystem();
+        }
+        
+        private void InitializeReputationSystems()
+        {
+            // Initialize reputation tracking for each scientific discipline
+            foreach (ScientificDiscipline discipline in System.Enum.GetValues(typeof(ScientificDiscipline)))
+            {
+                _disciplineReputation[discipline] = _progressionConfig?.BaseReputation ?? 0f;
+            }
+            
+            if (_reputationManager != null)
+            {
+                _reputationManager.OnReputationChanged += HandleReputationChange;
+            }
+            
+            if (_expertiseSystem != null)
+            {
+                // _expertiseSystem.Initialize(_progressionConfig?.ExpertiseConfig);
+            }
+        }
+        
+        private void InitializeExperienceSystems()
+        {
+            if (_experienceManager != null)
+            {
+                _experienceManager.OnExperienceGained += HandleExperienceGain;
+                _experienceManager.OnLevelUp += HandleLevelUp;
+            }
+            
+            if (_multiplierEngine != null)
+            {
+                // _multiplierEngine.Initialize(GlobalExperienceMultiplier);
+                // _multiplierEngine.SetSynergyBonus(SkillSynergyBonus);
+                // _multiplierEngine.SetCrossSystemBonus(CrossSystemProgressionBonus);
+            }
+            
+            InitializeSeasonalProgression();
+        }
+        
+        private void InitializeCrossSystemIntegration()
+        {
+            // Register for events from all scientific gaming systems
+            foreach (ScientificGamingSystem system in System.Enum.GetValues(typeof(ScientificGamingSystem)))
+            {
+                _systemContributions[system] = 0f;
+                RegisterSystemEvents(system);
+            }
+            
+            SetupProgressionIntegration();
+        }
+        
+        private void InitializeProgressionState()
+        {
+            _currentProgressionState = new ScientificProgressionState
+            {
+                SessionStartTime = Time.time,
+                TotalExperience = _totalScientificExperience,
+                OverallRank = _overallScientificRank,
+                ActiveSkillTrees = _activeSkillTrees.Count,
+                UnlockedAchievements = _unlockedAchievements.Count,
+                ExpertiseLevel = CalculateOverallExpertise(),
+                ReputationLevel = CalculateOverallReputation(),
+                ProgressionEfficiency = CalculateProgressionEfficiency()
+            };
+        }
+        
+        private void SetupEventChannels()
+        {
+            // Setup event channels for progression notifications
+            if (_onSkillUnlocked != null)
+                _onSkillUnlocked.OnEventRaisedWithData.AddListener HandleSkillUnlockedEvent;
+            
+            if (_onAchievementEarned != null)
+                _onAchievementEarned.OnEventRaisedWithData.AddListener HandleAchievementEarnedEvent;
+            
+            if (_onMilestoneReached != null)
+                _onMilestoneReached.OnEventRaisedWithData.AddListener HandleMilestoneReachedEvent;
+        }
+        
+        #endregion
+        
+        #region Skill Tree Management
+        
+        public SkillUnlockResult UnlockSkill(SkillCategory category, string skillNodeId, SkillUnlockMethod unlockMethod)
+        {
+            if (!_isInitialized)
+            {
+                ChimeraLogger.LogError("ScientificProgressionSystem not initialized", this);
+                return SkillUnlockResult.Failed;
+            }
+            
+            if (!_activeSkillTrees.ContainsKey(category))
+            {
+                ChimeraLogger.LogError($"Skill tree for category {category} not found", this);
+                return SkillUnlockResult.Failed;
+            }
+            
+            var skillTree = _activeSkillTrees[category];
+            var unlockResult = _skillTreeManager?.UnlockSkillNode(skillTree, skillNodeId, unlockMethod);
+            
+            if (unlockResult == SkillUnlockResult.Successful)
+            {
+                _skillNodesUnlocked++;
+                UpdateCategoryExpertise(category, skillNodeId);
+                CheckSkillSynergies(category, skillNodeId);
+                ProcessSkillUnlockRewards(category, skillNodeId, unlockMethod);
+                
+                _onSkillUnlocked?.RaiseEvent(new SkillUnlockedData(category, skillNodeId, unlockMethod));
+                
+                ChimeraLogger.Log($"Skill unlocked: {skillNodeId} in {category}", this);
+            }
+            
+            return unlockResult ?? SkillUnlockResult.Failed;
+        }
+        
+        public float GetSkillProgress(SkillCategory category, string skillNodeId)
+        {
+            if (!_activeSkillTrees.ContainsKey(category))
+                return 0f;
+            
+            return _skillProgressionTracker?.GetSkillProgress(category, skillNodeId) ?? 0f;
+        }
+        
+        public bool IsSkillUnlocked(SkillCategory category, string skillNodeId)
+        {
+            if (!_activeSkillTrees.ContainsKey(category))
+                return false;
+            
+            var skillTree = _activeSkillTrees[category];
+            return skillTree?.IsSkillUnlocked(skillNodeId) ?? false;
+        }
+        
+        public List<SkillNode> GetAvailableSkills(SkillCategory category)
+        {
+            if (!_activeSkillTrees.ContainsKey(category))
+                return new List<SkillNode>();
+            
+            var skillTree = _activeSkillTrees[category];
+            return skillTree?.GetAvailableSkills() ?? new List<SkillNode>();
+        }
+        
+        private void UpdateCategoryExpertise(SkillCategory category, string skillNodeId)
+        {
+            var expertiseGain = CalculateExpertiseGain(category, skillNodeId);
+            _categoryExpertiseLevel[category] += expertiseGain;
+            
+            CheckExpertiseMilestones(category);
+            UpdateOverallExpertise();
+        }
+        
+        private void CheckSkillSynergies(SkillCategory category, string skillNodeId)
+        {
+            var synergies = _skillSynergyEngine?.CheckSynergies(category, skillNodeId);
+            
+            if (synergies?.Any() == true)
+            {
+                foreach (var synergy in synergies)
+                {
+                    ActivateSkillSynergy(synergy);
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Achievement Management
+        
+        public AchievementResult ProcessAchievement(string achievementId, AchievementTriggerData triggerData)
+        {
+            if (!_isInitialized)
+                return AchievementResult.Failed;
+            
+            if (_unlockedAchievements.ContainsKey(achievementId))
+                return AchievementResult.AlreadyUnlocked;
+            
+            var achievement = GetAchievementData(achievementId);
+            if (achievement == null)
+                return AchievementResult.NotFound;
+            
+            var progressResult = _achievementTracker?.UpdateAchievementProgress(achievementId, triggerData);
+            
+            if (progressResult == AchievementProgressResult.Completed)
+            {
+                UnlockAchievement(achievement, triggerData);
+                return AchievementResult.Unlocked;
+            }
+            
+            return AchievementResult.ProgressUpdated;
+        }
+        
+        public void ProcessCrossSystemAchievement(CrossSystemAchievementData achievementData)
+        {
+            var crossSystemProgress = _crossSystemProcessor?.ProcessCrossSystemProgress(achievementData);
+            
+            if (crossSystemProgress?.IsCompleted == true)
+            {
+                UnlockCrossSystemAchievement(crossSystemProgress);
+            }
+        }
+        
+        public float GetAchievementProgress(string achievementId)
+        {
+            return _achievementTracker?.GetAchievementProgress(achievementId) ?? 0f;
+        }
+        
+        public List<ScientificAchievement> GetUnlockedAchievements()
+        {
+            return _unlockedAchievements.Values.ToList();
+        }
+        
+        private void UnlockAchievement(ScientificAchievement achievement, AchievementTriggerData triggerData)
+        {
+            _unlockedAchievements[achievement.AchievementID] = achievement;
+            _achievementsEarned++;
+            
+            ProcessAchievementRewards(achievement);
+            UpdateReputationFromAchievement(achievement);
+            CheckAchievementMilestones();
+            
+            _onAchievementEarned?.RaiseEvent(new AchievementEarnedData(achievement, triggerData));
+            
+            ChimeraLogger.Log($"Achievement unlocked: {achievement.DisplayName}", this);
+        }
+        
+        #endregion
+        
+        #region Reputation & Recognition
+        
+        public void UpdateReputationFromContribution(ScientificDiscipline discipline, ReputationContribution contribution)
+        {
+            if (!_disciplineReputation.ContainsKey(discipline))
+                _disciplineReputation[discipline] = 0f;
+            
+            var reputationGain = CalculateReputationGain(discipline, contribution);
+            _disciplineReputation[discipline] += reputationGain;
+            
+            UpdateOverallReputation();
+            CheckReputationMilestones(discipline);
+            
+            _onReputationChanged?.RaiseEvent(new ReputationChangedData(discipline, reputationGain));
+            
+            ChimeraLogger.Log($"Reputation updated for {discipline}: +{reputationGain:F2}", this);
+        }
+        
+        public void ProcessExpertiseRecognition(ExpertiseRecognitionData recognitionData)
+        {
+            _expertiseSystem?.ProcessExpertiseRecognition(recognitionData);
+            
+            if (recognitionData.IsLegacyAchievement)
+            {
+                ProcessLegacyAchievement(recognitionData);
+            }
+        }
+        
+        public float GetDisciplineReputation(ScientificDiscipline discipline)
+        {
+            return _disciplineReputation.ContainsKey(discipline) ? _disciplineReputation[discipline] : 0f;
+        }
+        
+        public ScientificRank GetCurrentRank()
+        {
+            return _rankingSystem?.CalculateCurrentRank(_overallScientificRank) ?? ScientificRank.Novice;
+        }
+        
+        private void UpdateOverallReputation()
+        {
+            var totalReputation = _disciplineReputation.Values.Sum();
+            var averageReputation = totalReputation / _disciplineReputation.Count;
+            
+            _overallScientificRank = averageReputation;
+            
+            CheckRankProgression();
+        }
+        
+        #endregion
+        
+        #region Experience Management
+        
+        public void AwardExperience(ExperienceAwardData experienceData)
+        {
+            if (!_isInitialized)
+                return;
+            
+            var multipliedExperience = _multiplierEngine?.CalculateExperienceWithMultipliers(experienceData) ?? experienceData.BaseExperience;
+            
+            _totalScientificExperience += multipliedExperience;
+            
+            UpdateSystemContribution(experienceData.Source, multipliedExperience);
+            CheckExperienceMilestones(multipliedExperience);
+            
+            _experienceManager?.ProcessExperienceGain(experienceData.ExperienceType, multipliedExperience);
+            
+            ChimeraLogger.Log($"Experience awarded: {multipliedExperience:F2} ({experienceData.ExperienceType})", this);
+        }
+        
+        public float GetTotalExperience()
+        {
+            return _totalScientificExperience;
+        }
+        
+        public ExperienceLevel GetExperienceLevel(ExperienceType experienceType)
+        {
+            return _experienceManager?.GetExperienceLevel(experienceType) ?? ExperienceLevel.Beginner;
+        }
+        
+        private void UpdateSystemContribution(ScientificGamingSystem source, float experienceAmount)
+        {
+            if (!_systemContributions.ContainsKey(source))
+                _systemContributions[source] = 0f;
+            
+            _systemContributions[source] += experienceAmount;
+            
+            CheckCrossSystemSynergies();
+        }
+        
+        #endregion
+        
+        #region Cross-System Integration
+        
+        public void ProcessCrossSystemSynergy(CrossSystemSynergyData synergyData)
+        {
+            var synergyBonus = CalculateCrossSystemBonus(synergyData);
+            
+            if (synergyBonus > 0f)
+            {
+                var activeSynergy = new CrossSystemSynergy(synergyData, synergyBonus);
+                _activeSynergies.Add(activeSynergy);
+                
+                ApplySynergyBonus(activeSynergy);
+                
+                _onProgressionSynergyActivated?.RaiseEvent(new SynergyActivatedData(activeSynergy));
+                
+                ChimeraLogger.Log($"Cross-system synergy activated: {synergyData.SynergyType}", this);
+            }
+        }
+        
+        public ProgressionIntegrationStatus GetIntegrationStatus()
+        {
+            var integrationMetrics = CalculateIntegrationMetrics();
+            
+            return new ProgressionIntegrationStatus
+            {
+                GeneticsIntegration = integrationMetrics.GeneticsContribution,
+                AromaticIntegration = integrationMetrics.AromaticContribution,
+                CompetitiveIntegration = integrationMetrics.CompetitiveContribution,
+                CommunityIntegration = integrationMetrics.CommunityContribution,
+                OverallIntegration = integrationMetrics.OverallIntegration,
+                SynergyActivations = _activeSynergies.Count
+            };
+        }
+        
+        private void RegisterSystemEvents(ScientificGamingSystem system)
+        {
+            // Register for events from specific gaming systems
+            switch (system)
+            {
+                case ScientificGamingSystem.Genetics:
+                    RegisterGeneticsEvents();
+                    break;
+                case ScientificGamingSystem.Aromatics:
+                    RegisterAromaticEvents();
+                    break;
+                case ScientificGamingSystem.Competition:
+                    RegisterCompetitionEvents();
+                    break;
+                case ScientificGamingSystem.Community:
+                    RegisterCommunityEvents();
+                    break;
+            }
+        }
+        
+        private void CheckCrossSystemSynergies()
+        {
+            var balanceScore = CalculateSystemBalance();
+            
+            if (balanceScore >= _progressionConfig?.SynergyThreshold)
+            {
+                var synergyData = new CrossSystemSynergyData
+                {
+                    SynergyType = CrossSystemSynergyType.Balanced,
+                    SystemContributions = _systemContributions,
+                    BalanceScore = balanceScore
+                };
+                
+                ProcessCrossSystemSynergy(synergyData);
+            }
+        }
+        
+        #endregion
+        
+        #region Milestone & Analytics
+        
+        public void CheckProgressionMilestones()
+        {
+            var currentMilestones = CalculateCurrentMilestones();
+            
+            foreach (var milestone in currentMilestones)
+            {
+                if (!_sessionMilestones.Contains(milestone))
+                {
+                    _sessionMilestones.Add(milestone);
+                    _milestonesReached++;
+                    
+                    ProcessMilestone(milestone);
+                    
+                    _onMilestoneReached?.RaiseEvent(new MilestoneData(milestone));
+                    
+                    ChimeraLogger.Log($"Progression milestone reached: {milestone.MilestoneType}", this);
+                }
+            }
+        }
+        
+        public ProgressionAnalytics GetProgressionAnalytics()
+        {
+            return new ProgressionAnalytics
+            {
+                SessionDuration = Time.time - _currentProgressionState.SessionStartTime,
+                TotalExperience = _totalScientificExperience,
+                SkillsUnlocked = _skillNodesUnlocked,
+                AchievementsEarned = _achievementsEarned,
+                MilestonesReached = _milestonesReached,
+                OverallRank = _overallScientificRank,
+                ExpertiseDistribution = _categoryExpertiseLevel,
+                ReputationDistribution = _disciplineReputation,
+                SystemContributions = _systemContributions,
+                ActiveSynergies = _activeSynergies.Count,
+                ProgressionEfficiency = CalculateProgressionEfficiency()
+            };
+        }
+        
+        #endregion
+        
+        #region Event Handlers
+        
+        private void HandleSkillUnlockedEvent(object eventData)
+        {
+            if (eventData is SkillUnlockedData skillData)
+            {
+                ProcessSkillUnlockEffects(skillData);
+            }
+        }
+        
+        private void HandleAchievementEarnedEvent(object eventData)
+        {
+            if (eventData is AchievementEarnedData achievementData)
+            {
+                ProcessAchievementEffects(achievementData);
+            }
+        }
+        
+        private void HandleMilestoneReachedEvent(object eventData)
+        {
+            if (eventData is MilestoneData milestoneData)
+            {
+                ProcessMilestoneEffects(milestoneData);
+            }
+        }
+        
+        private void HandleExperienceGain(ExperienceType experienceType, float amount)
+        {
+            ProcessExperienceGainEffects(experienceType, amount);
+        }
+        
+        private void HandleLevelUp(ExperienceType experienceType, ExperienceLevel newLevel)
+        {
+            ProcessLevelUpEffects(experienceType, newLevel);
+        }
+        
+        private void HandleReputationChange(float reputationChange)
+        {
+            // ProcessReputationChangeEffects(ScientificDiscipline.General, reputationChange);
+        }
+        
+        #endregion
+        
+        #region Utility Methods
+        
+        private SkillTree CreateSkillTree(SkillTreeData skillTreeData)
+        {
+            return new SkillTree(skillTreeData);
+        }
+        
+        private ScientificAchievement GetAchievementData(string achievementId)
+        {
+            return _achievementDatabase?.GetAchievement(achievementId);
+        }
+        
+        private float CalculateExpertiseGain(SkillCategory category, string skillNodeId)
+        {
+            var baseGain = _progressionConfig?.BaseExpertiseGain ?? 1.0f;
+            var categoryMultiplier = _progressionConfig?.GetCategoryMultiplier(category) ?? 1.0f;
+            
+            return baseGain * categoryMultiplier * GlobalExperienceMultiplier;
+        }
+        
+        private float CalculateReputationGain(ScientificDiscipline discipline, ReputationContribution contribution)
+        {
+            var baseGain = contribution.BaseReputationValue;
+            var disciplineMultiplier = _progressionConfig?.GetDisciplineMultiplier(discipline) ?? 1.0f;
+            var qualityMultiplier = contribution.QualityMultiplier;
+            
+            return baseGain * disciplineMultiplier * qualityMultiplier * GlobalExperienceMultiplier;
+        }
+        
+        private float CalculateOverallExpertise()
+        {
+            return _categoryExpertiseLevel.Values.Average();
+        }
+        
+        private float CalculateOverallReputation()
+        {
+            return _disciplineReputation.Values.Average();
+        }
+        
+        private float CalculateProgressionEfficiency()
+        {
+            var sessionTime = Time.time - _currentProgressionState.SessionStartTime;
+            if (sessionTime <= 0f) return 0f;
+            
+            var progressionScore = (_skillNodesUnlocked * 10f) + (_achievementsEarned * 25f) + (_milestonesReached * 50f);
+            return progressionScore / sessionTime;
+        }
+        
+        private float CalculateSystemBalance()
+        {
+            if (_systemContributions.Count == 0) return 0f;
+            
+            var totalContribution = _systemContributions.Values.Sum();
+            if (totalContribution == 0f) return 0f;
+            
+            var averageContribution = totalContribution / _systemContributions.Count;
+            var variance = _systemContributions.Values.Select(x => Mathf.Pow(x - averageContribution, 2)).Average();
+            
+            return Mathf.Max(0f, 1f - (variance / (averageContribution * averageContribution)));
+        }
+        
+        private float CalculateCrossSystemBonus(CrossSystemSynergyData synergyData)
+        {
+            return synergyData.BalanceScore * CrossSystemProgressionBonus;
+        }
+        
+        // Additional utility methods for processing various progression events
+        private void ProcessSkillUnlockEffects(SkillUnlockedData skillData) { /* Implementation */ }
+        private void ProcessAchievementEffects(AchievementEarnedData achievementData) { /* Implementation */ }
+        private void ProcessMilestoneEffects(MilestoneData milestoneData) { /* Implementation */ }
+        private void ProcessExperienceGainEffects(ExperienceType experienceType, float amount) { /* Implementation */ }
+        private void ProcessLevelUpEffects(ExperienceType experienceType, ExperienceLevel newLevel) { /* Implementation */ }
+        private void ProcessReputationChangeEffects(ScientificDiscipline discipline, float reputationChange) { /* Implementation */ }
+        private void SetupSkillTreeSynergies() { /* Implementation */ }
+        private void SetupCrossSystemAchievement(ScientificAchievement achievement) { /* Implementation */ }
+        private void TrackAchievementProgress(ScientificAchievement achievement) { /* Implementation */ }
+        private void InitializeMilestoneSystem() { /* Implementation */ }
+        private void InitializeSeasonalProgression() { /* Implementation */ }
+        private void SetupProgressionIntegration() { /* Implementation */ }
+        private void ActivateSkillSynergy(SkillSynergy synergy) { /* Implementation */ }
+        private void ProcessSkillUnlockRewards(SkillCategory category, string skillNodeId, SkillUnlockMethod unlockMethod) { /* Implementation */ }
+        private void CheckExpertiseMilestones(SkillCategory category) { /* Implementation */ }
+        private void UpdateOverallExpertise() { /* Implementation */ }
+        private void UnlockCrossSystemAchievement(CrossSystemProgress crossSystemProgress) { /* Implementation */ }
+        private void ProcessAchievementRewards(ScientificAchievement achievement) { /* Implementation */ }
+        private void UpdateReputationFromAchievement(ScientificAchievement achievement) { /* Implementation */ }
+        private void CheckAchievementMilestones() { /* Implementation */ }
+        private void CheckReputationMilestones(ScientificDiscipline discipline) { /* Implementation */ }
+        private void CheckRankProgression() { /* Implementation */ }
+        private void ProcessLegacyAchievement(ExpertiseRecognitionData recognitionData) { /* Implementation */ }
+        private void CheckExperienceMilestones(float experienceAmount) { /* Implementation */ }
+        private void ApplySynergyBonus(CrossSystemSynergy synergy) { /* Implementation */ }
+        private void RegisterGeneticsEvents() { /* Implementation */ }
+        private void RegisterAromaticEvents() { /* Implementation */ }
+        private void RegisterCompetitionEvents() { /* Implementation */ }
+        private void RegisterCommunityEvents() { /* Implementation */ }
+        private ProgressionIntegrationMetrics CalculateIntegrationMetrics() { return new ProgressionIntegrationMetrics(); }
+        private List<ProgressionMilestone> CalculateCurrentMilestones() { return new List<ProgressionMilestone>(); }
+        private void ProcessMilestone(ProgressionMilestone milestone) { /* Implementation */ }
+        
+        #endregion
+        
+        #region Update System
+        
+        /// <summary>
+        /// Update method for scientific progression system
+        /// </summary>
+        public void Update(float deltaTime)
+        {
+            if (!_isInitialized) return;
+            
+            // Update progression tracking
+            UpdateProgressionTracking(deltaTime);
+            
+            // Check for synergy activations
+            CheckCrossSystemSynergies();
+            
+            // Process reputation decay
+            ProcessReputationDecay(deltaTime);
+            
+            // Update seasonal progression
+            UpdateSeasonalProgression(deltaTime);
+        }
+        
+        private void UpdateProgressionTracking(float deltaTime)
+        {
+            // Update session metrics
+            _currentProgressionState.SessionDuration += deltaTime;
+            
+            // Process pending milestones
+            ProcessPendingMilestones();
+        }
+        
+        private void ProcessReputationDecay(float deltaTime)
+        {
+            if (ReputationDecayRate <= 0f) return;
+            
+            var decayAmount = ReputationDecayRate * deltaTime;
+            var disciplinesToUpdate = new List<ScientificDiscipline>(_disciplineReputation.Keys);
+            
+            foreach (var discipline in disciplinesToUpdate)
+            {
+                _disciplineReputation[discipline] = Mathf.Max(0f, _disciplineReputation[discipline] - decayAmount);
+            }
+        }
+        
+        private void UpdateSeasonalProgression(float deltaTime)
+        {
+            if (_seasonalBonus != null)
+            {
+                _seasonalBonus.Update(deltaTime);
+            }
+        }
+        
+        private void ProcessPendingMilestones()
+        {
+            // Process any pending milestone achievements
+            foreach (var milestone in _sessionMilestones.ToArray())
+            {
+                if (milestone.IsCompleted)
+                {
+                    ProcessMilestone(milestone);
+                    _sessionMilestones.Remove(milestone);
+                }
+            }
+        }
+        
+        #endregion
+    }
+    
+    #region Data Structures
+    
+    [System.Serializable]
+    public class ScientificProgressionState
+    {
+        public float SessionStartTime;
+        public float SessionDuration;
+        public float TotalExperience;
+        public float OverallRank;
+        public int ActiveSkillTrees;
+        public int UnlockedAchievements;
+        public float ExpertiseLevel;
+        public float ReputationLevel;
+        public float ProgressionEfficiency;
+    }
+    
+    [System.Serializable]
+    public class ProgressionIntegrationState
+    {
+        public Dictionary<ScientificGamingSystem, bool> SystemConnections;
+        public List<CrossSystemSynergy> ActiveSynergies;
+        public float IntegrationScore;
+        public bool IsFullyIntegrated;
+    }
+    
+    [System.Serializable]
+    public class ProgressionIntegrationStatus
+    {
+        public float GeneticsIntegration;
+        public float AromaticIntegration;
+        public float CompetitiveIntegration;
+        public float CommunityIntegration;
+        public float OverallIntegration;
+        public int SynergyActivations;
+    }
+    
+    [System.Serializable]
+    public class ProgressionIntegrationMetrics
+    {
+        public float GeneticsContribution;
+        public float AromaticContribution;
+        public float CompetitiveContribution;
+        public float CommunityContribution;
+        public float OverallIntegration;
+    }
+    
+    [System.Serializable]
+    public class ProgressionAnalytics
+    {
+        public float SessionDuration;
+        public float TotalExperience;
+        public int SkillsUnlocked;
+        public int AchievementsEarned;
+        public int MilestonesReached;
+        public float OverallRank;
+        public Dictionary<SkillCategory, float> ExpertiseDistribution;
+        public Dictionary<ScientificDiscipline, float> ReputationDistribution;
+        public Dictionary<ScientificGamingSystem, float> SystemContributions;
+        public int ActiveSynergies;
+        public float ProgressionEfficiency;
+    }
+    
+    #endregion
+    
+    #region Local Enums
+    
+    // Note: Core enums (SkillCategory, ScientificDiscipline, ScientificGamingSystem, ExperienceType, ExperienceLevel) 
+    // are defined in ProjectChimera.Data.ScientificGamingEnums
+    
+    public enum ScientificRank
+    {
+        Novice,
+        Apprentice,
+        Researcher,
+        Specialist,
+        Expert,
+        Authority,
+        Master,
+        Grandmaster,
+        Legend,
+        Pioneer
+    }
+    
+    public enum SkillUnlockResult
+    {
+        Successful,
+        Failed,
+        InsufficientExperience,
+        PrerequisitesNotMet,
+        AlreadyUnlocked,
+        InvalidSkill
+    }
+    
+    public enum SkillUnlockMethod
+    {
+        ExperienceSpending,
+        AchievementUnlock,
+        MilestoneReward,
+        MentorshipGrant,
+        CompetitionPrize,
+        CommunityContribution
+    }
+    
+    public enum AchievementResult
+    {
+        Unlocked,
+        ProgressUpdated,
+        AlreadyUnlocked,
+        NotFound,
+        Failed
+    }
+    
+    public enum AchievementProgressResult
+    {
+        Updated,
+        Completed,
+        Failed,
+        NotFound
+    }
+    
+    [System.Serializable]
+    public class CrossSystemSynergy
+    {
+        public string SynergyId;
+        public CrossSystemSynergyType SynergyType;
+        public float SynergyBonus;
+        public List<ScientificGamingSystem> InvolvedSystems;
+        public DateTime ActivationTime;
+        public bool IsActive;
+        
+        public CrossSystemSynergy(CrossSystemSynergyData data, float bonus)
+        {
+            SynergyId = System.Guid.NewGuid().ToString();
+            SynergyType = data.SynergyType;
+            SynergyBonus = bonus;
+            InvolvedSystems = data.InvolvedSystems ?? new List<ScientificGamingSystem>();
+            ActivationTime = DateTime.Now;
+            IsActive = true;
+        }
+    }
+    
+    [System.Serializable]
+    public class CrossSystemSynergyData
+    {
+        public CrossSystemSynergyType SynergyType;
+        public List<ScientificGamingSystem> InvolvedSystems;
+        public float ExpectedBonus;
+        public Dictionary<string, float> Parameters;
+        public float BalanceScore;
+        
+        public CrossSystemSynergyData()
+        {
+            InvolvedSystems = new List<ScientificGamingSystem>();
+            Parameters = new Dictionary<string, float>();
+            BalanceScore = 1.0f;
+        }
+    }
+    
+    [System.Serializable]
+    public class ReputationContribution
+    {
+        public string ContributionId;
+        public string ContributionType;
+        public float Value;
+        public DateTime Timestamp;
+        public string Source;
+    }
+    
+    [System.Serializable]
+    public class SkillNode
+    {
+        public string NodeId;
+        public string NodeName;
+        public SkillCategory Category;
+        public List<string> Prerequisites;
+        public float UnlockCost;
+        public bool IsUnlocked;
+        public string Description;
+    }
+    
+    [System.Serializable]
+    public class AchievementTriggerData
+    {
+        public string TriggerId;
+        public string TriggerType;
+        public Dictionary<string, object> Parameters;
+        public DateTime TriggerTime;
+    }
+    
+    [System.Serializable]
+    public class CrossSystemAchievementData
+    {
+        public string AchievementId;
+        public List<ScientificGamingSystem> RequiredSystems;
+        public Dictionary<ScientificGamingSystem, float> SystemContributions;
+        public float CompletionPercentage;
+    }
+    
+    [System.Serializable]
+    public class ExpertiseRecognitionData
+    {
+        public string RecognitionId;
+        public SkillCategory Category;
+        public float ExpertiseLevel;
+        public string RecognitionType;
+        public DateTime RecognitionDate;
+    }
+    
+    [System.Serializable]
+    public class ExperienceAwardData
+    {
+        public ExperienceType Type;
+        public float Amount;
+        public string Source;
+        public Dictionary<string, object> Context;
+    }
+    
+    [System.Serializable]
+    public class SkillTree
+    {
+        public string TreeId;
+        public SkillCategory Category;
+        public List<SkillNode> Nodes;
+        public Dictionary<string, List<string>> NodeConnections;
+        public float CompletionPercentage;
+    }
+    
+    [System.Serializable]
+    public class SkillUnlockedData
+    {
+        public string SkillId;
+        public SkillCategory Category;
+        public SkillUnlockMethod UnlockMethod;
+        public float CostPaid;
+        public DateTime UnlockTime;
+    }
+    
+    [System.Serializable]
+    public class SkillSynergy
+    {
+        public string SynergyId;
+        public List<string> RequiredSkills;
+        public float SynergyBonus;
+        public SkillSynergyType Type;
+        public bool IsActive;
+    }
+    
+    [System.Serializable]
+    public class CrossSystemProgress
+    {
+        public Dictionary<ScientificGamingSystem, float> SystemProgress;
+        public List<CrossSystemSynergy> ActiveSynergies;
+        public float OverallIntegration;
+    }
+    
+    public enum CrossSystemSynergyType
+    {
+        ExperienceBonus,
+        EfficiencyBoost,
+        QualityImprovement,
+        AccessUnlock,
+        FeatureEnhancement
+    }
+    
+    [System.Serializable]
+    public class AchievementEarnedData
+    {
+        public string AchievementId;
+        public string AchievementName;
+        public AchievementCategory Category;
+        public float ReputationReward;
+        public DateTime EarnedTime;
+    }
+    
+    [System.Serializable]
+    public class MilestoneData
+    {
+        public string MilestoneId;
+        public string MilestoneName;
+        public MilestoneType Type;
+        public float RewardValue;
+        public bool IsCompleted;
+        public DateTime CompletionTime;
+    }
+    
+    [System.Serializable]
+    public class ProgressionMilestone
+    {
+        public string MilestoneId;
+        public string Name;
+        public string Description;
+        public MilestoneType Type;
+        public float TargetValue;
+        public float CurrentValue;
+        public bool IsCompleted;
+        public List<string> Rewards;
+        
+        public float CompletionPercentage => TargetValue > 0 ? Mathf.Clamp01(CurrentValue / TargetValue) : 0f;
+    }
+    
+    #endregion
+}

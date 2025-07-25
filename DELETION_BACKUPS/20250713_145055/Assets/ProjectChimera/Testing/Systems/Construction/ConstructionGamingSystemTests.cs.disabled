@@ -1,0 +1,577 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Construction;
+using ProjectChimera.Systems.Construction;
+// Using aliases to resolve ambiguous references
+using ConstructionChallengeParameters = ProjectChimera.Data.Construction.ChallengeParameters;
+using ConstructionProjectType = ProjectChimera.Data.Construction.ProjectType;
+using ConstructionChallengeType = ProjectChimera.Data.Construction.ChallengeType;
+using ConstructionDifficultyLevel = ProjectChimera.Data.Construction.DifficultyLevel;
+using ConstructionParticipantInfo = ProjectChimera.Data.Construction.ParticipantInfo;
+using ConstructionCollaborativeProjectConfig = ProjectChimera.Data.Construction.CollaborativeProjectConfig;
+using ConstructionCollaborativeAction = ProjectChimera.Data.Construction.CollaborativeAction;
+using ConstructionActionType = ProjectChimera.Data.Construction.ActionType;
+using DataConstructionGamingMetrics = ProjectChimera.Data.Construction.ConstructionGamingMetrics;
+using SystemsConstructionChallengeParameters = ProjectChimera.Systems.Construction.ChallengeParameters;
+using ConstructionParticipantRole = ProjectChimera.Data.Construction.ParticipantRole;
+using CoreParticipantInfo = ProjectChimera.Core.ParticipantInfo;
+using CoreCollaborationRole = ProjectChimera.Core.CollaborationRole;
+
+namespace ProjectChimera.Testing.Systems.Construction
+{
+    /// <summary>
+    /// Comprehensive tests for the Enhanced Construction Gaming System v2.0
+    /// 
+    /// Tests core functionality including:
+    /// - Challenge generation and evaluation
+    /// - Collaborative construction features
+    /// - Architectural design validation
+    /// - Educational certification integration
+    /// - Performance analytics and metrics
+    /// </summary>
+    public class ConstructionGamingSystemTests : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool _runTestsOnStart = false;
+        [SerializeField] private bool _enableDetailedLogging = true;
+        [SerializeField] private float _testTimeout = 30f;
+        
+        // Test Results
+        private List<TestResult> _testResults = new List<TestResult>();
+        private int _passedTests = 0;
+        private int _failedTests = 0;
+        private int _totalTests = 0;
+        
+        // Test Systems
+        private EnhancedConstructionGamingManager _gamingManager;
+        private ProjectChimera.Systems.Construction.ConstructionChallengeEngine _challengeEngine;
+        private ProjectChimera.Systems.Construction.CollaborativeConstructionSystem _collaborationSystem;
+        private ProjectChimera.Systems.Construction.ArchitecturalDesignEngine _designEngine;
+        
+        private void Start()
+        {
+            if (_runTestsOnStart)
+            {
+                RunAllTests();
+            }
+        }
+        
+        /// <summary>
+        /// Run comprehensive tests for all construction gaming systems
+        /// </summary>
+        public void RunAllTests()
+        {
+            Debug.Log("=== Enhanced Construction Gaming System Tests v2.0 ===");
+            Debug.Log("Starting comprehensive test suite...");
+            
+            _testResults.Clear();
+            _passedTests = 0;
+            _failedTests = 0;
+            _totalTests = 0;
+            
+            try
+            {
+                // Initialize test systems
+                InitializeTestSystems();
+                
+                // Run core system tests
+                TestManagerInitialization();
+                TestChallengeSystemBasics();
+                TestCollaborativeFeatures();
+                TestArchitecturalDesignEngine();
+                TestDataStructures();
+                TestIntegrationFeatures();
+                
+                // Run performance tests
+                TestPerformanceMetrics();
+                
+                // Generate test report
+                GenerateTestReport();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Test suite failed with exception: {ex.Message}");
+            }
+        }
+        
+        #region Core System Tests
+        
+        private void InitializeTestSystems()
+        {
+            LogInfo("Initializing test systems...");
+            
+            // Create test gaming manager
+            var gameObject = new GameObject("TestGamingManager");
+            _gamingManager = gameObject.AddComponent<EnhancedConstructionGamingManager>();
+            
+            // Initialize subsystems
+            _challengeEngine = new ProjectChimera.Systems.Construction.ConstructionChallengeEngine();
+            _collaborationSystem = new ProjectChimera.Systems.Construction.CollaborativeConstructionSystem();
+            _designEngine = new ProjectChimera.Systems.Construction.ArchitecturalDesignEngine();
+            
+            // Initialize all systems
+            _challengeEngine.Initialize();
+            _collaborationSystem.Initialize();
+            _designEngine.Initialize();
+            
+            LogInfo("Test systems initialized successfully");
+        }
+        
+        private void TestManagerInitialization()
+        {
+            StartTest("Manager Initialization");
+            
+            try
+            {
+                // Test manager properties
+                Assert(_gamingManager != null, "Gaming manager should be created");
+                Assert(_gamingManager.IsConstructionGamingEnabled, "Construction gaming should be enabled by default");
+                Assert(_gamingManager.IsCollaborativeBuildingEnabled, "Collaborative building should be enabled");
+                Assert(_gamingManager.IsArchitecturalChallengesEnabled, "Architectural challenges should be enabled");
+                
+                // Test initial metrics
+                var metrics = _gamingManager.GamingMetrics;
+                Assert(metrics != null, "Gaming metrics should be available");
+                Assert(metrics.ActiveChallenges >= 0, "Active challenges count should be valid");
+                Assert(metrics.TotalPlayers >= 0, "Total players count should be valid");
+                
+                PassTest("Manager initialization successful");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Manager initialization failed: {ex.Message}");
+            }
+        }
+        
+        private void TestChallengeSystemBasics()
+        {
+            StartTest("Challenge System Basics");
+            
+            try
+            {
+                // Test challenge creation - use Systems.Construction version
+                var parameters = new SystemsConstructionChallengeParameters
+                {
+                    ProjectType = ConstructionProjectType.GrowRoom,
+                    SiteSize = new Vector3(20f, 3f, 15f),
+                    BudgetLimit = 100000f,
+                    RequiredFeatures = new List<string> { "HVAC", "Electrical", "Plumbing" }
+                };
+                
+                var challenge = _challengeEngine.GenerateChallenge(
+                    ConstructionChallengeType.SpaceOptimization, 
+                    ConstructionDifficultyLevel.Medium, 
+                    parameters
+                );
+                
+                Assert(challenge != null, "Challenge should be generated");
+                Assert(!string.IsNullOrEmpty(challenge.ChallengeId), "Challenge should have valid ID");
+                Assert(!string.IsNullOrEmpty(challenge.Title), "Challenge should have title");
+                Assert(challenge.Type == ConstructionChallengeType.SpaceOptimization, "Challenge type should match");
+                Assert(challenge.Difficulty == ConstructionDifficultyLevel.Medium, "Challenge difficulty should match");
+                Assert(challenge.Constraints != null && challenge.Constraints.Count > 0, "Challenge should have constraints");
+                Assert(challenge.Objectives != null && challenge.Objectives.Count > 0, "Challenge should have objectives");
+                
+                // Test challenge evaluation
+                var solution = CreateTestDesignSolution();
+                var result = _challengeEngine.EvaluateChallengeSolution(challenge, solution);
+                
+                Assert(result != null, "Challenge result should be generated");
+                Assert(result.OverallScore >= 0 && result.OverallScore <= 100, "Score should be in valid range");
+                Assert(result.ObjectiveScores != null, "Objective scores should be available");
+                
+                PassTest("Challenge system basics working correctly");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Challenge system test failed: {ex.Message}");
+            }
+        }
+        
+        private void TestCollaborativeFeatures()
+        {
+            StartTest("Collaborative Features");
+            
+            try
+            {
+                // Test collaborative session creation
+                var config = new ConstructionCollaborativeProjectConfig
+                {
+                    ProjectName = "Test Collaboration Project",
+                    Description = "Test project for collaborative features",
+                    Participants = new List<ConstructionParticipantInfo>
+                    {
+                        new ConstructionParticipantInfo { PlayerId = "player1", PlayerName = "Test Player 1" },
+                        new ConstructionParticipantInfo { PlayerId = "player2", PlayerName = "Test Player 2" }
+                    }
+                };
+                
+                var session = _collaborationSystem.StartCollaborativeProject(config);
+                
+                Assert(session != null, "Collaborative session should be created");
+                Assert(!string.IsNullOrEmpty(session.SessionId), "Session should have valid ID");
+                Assert(session.Participants.Count == 2, "Session should have correct participant count");
+                Assert(session.Status == SessionStatus.Waiting || session.Status == SessionStatus.Active, 
+                       "Session should be in valid initial state");
+                
+                // Test participant addition - use Core.ParticipantInfo (what AddParticipant expects)
+                var newParticipant = new CoreParticipantInfo 
+                { 
+                    PlayerId = "player3", 
+                    PlayerName = "Test Player 3",
+                    Role = CoreCollaborationRole.Architect,
+                    JoinTime = System.DateTime.Now,
+                    IsActive = true
+                };
+                
+                bool addResult = _collaborationSystem.AddParticipant(session.SessionId, newParticipant);
+                Assert(addResult, "Should be able to add new participant");
+                
+                // Test collaborative action
+                var action = new ConstructionCollaborativeAction
+                {
+                    ActionId = Guid.NewGuid().ToString(),
+                    ActionType = ConstructionActionType.PlaceComponent,
+                    PerformedBy = "player1",
+                    Description = "Test component placement",
+                    Timestamp = DateTime.Now
+                };
+                
+                // This should not throw an exception
+                _collaborationSystem.ProcessCollaborativeAction("player1", action);
+                
+                PassTest("Collaborative features working correctly");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Collaborative features test failed: {ex.Message}");
+            }
+        }
+        
+        private void TestArchitecturalDesignEngine()
+        {
+            StartTest("Architectural Design Engine");
+            
+            try
+            {
+                // Test blueprint creation
+                var parameters = new DesignParameters
+                {
+                    Name = "Test Blueprint",
+                    Description = "Test architectural blueprint",
+                    PlotSize = new Vector3(25f, 4f, 20f),
+                    ProjectType = ConstructionProjectType.Greenhouse,
+                    Constraints = new List<DesignConstraint>(),
+                    RequiredSystems = new List<RequiredSystem>()
+                };
+                
+                var blueprint = _designEngine.CreateBlueprint(parameters);
+                
+                Assert(blueprint != null, "Blueprint should be created");
+                Assert(!string.IsNullOrEmpty(blueprint.BlueprintId), "Blueprint should have valid ID");
+                Assert(blueprint.TotalArea > 0, "Blueprint should have valid area");
+                Assert(blueprint.Components != null, "Blueprint should have components collection");
+                Assert(blueprint.Rooms != null, "Blueprint should have rooms collection");
+                Assert(blueprint.Systems != null, "Blueprint should have systems collection");
+                
+                // Test design validation
+                var validation = _designEngine.ValidateDesign(blueprint);
+                
+                Assert(validation != null, "Design validation should be performed");
+                Assert(validation.CostImpact != null, "Cost impact should be calculated");
+                Assert(validation.Optimizations != null, "Optimizations should be provided");
+                Assert(validation.Warnings != null, "Warnings collection should exist");
+                
+                // Test optimization
+                var goals = new OptimizationGoals
+                {
+                    MinimizeCost = true,
+                    MaximizeEfficiency = true,
+                    OptimizeWorkflow = false
+                };
+                
+                var optimization = _designEngine.OptimizeLayout(blueprint, goals);
+                
+                Assert(optimization != null, "Optimization suggestion should be generated");
+                Assert(optimization.ImpactScore >= 0, "Impact score should be valid");
+                
+                PassTest("Architectural design engine working correctly");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Architectural design engine test failed: {ex.Message}");
+            }
+        }
+        
+        private void TestDataStructures()
+        {
+            StartTest("Data Structures");
+            
+            try
+            {
+                // Test challenge data structure
+                var challenge = new ArchitecturalChallenge
+                {
+                    ChallengeId = Guid.NewGuid().ToString(),
+                    Title = "Test Challenge",
+                    Type = ConstructionChallengeType.Efficiency,
+                    Difficulty = ConstructionDifficultyLevel.Expert,
+                    Status = ChallengeStatus.Active,
+                    Constraints = new List<ChallengeConstraint>(),
+                    Objectives = new List<ChallengeObjective>()
+                };
+                
+                Assert(challenge != null, "Challenge data structure should be valid");
+                Assert(!string.IsNullOrEmpty(challenge.ChallengeId), "Challenge ID should be set");
+                
+                // Test collaboration data structure
+                var session = new CollaborativeSession
+                {
+                    SessionId = Guid.NewGuid().ToString(),
+                    SessionName = "Test Session",
+                    Status = SessionStatus.Active,
+                    Participants = new List<SessionParticipant>(),
+                    EventHistory = new List<CollaborationEvent>()
+                };
+                
+                Assert(session != null, "Session data structure should be valid");
+                Assert(!string.IsNullOrEmpty(session.SessionId), "Session ID should be set");
+                
+                // Test gaming metrics
+                var metrics = new DataConstructionGamingMetrics
+                {
+                    ActiveChallenges = 5,
+                    TotalChallengesCompleted = 20,
+                    TotalPlayers = 100,
+                    LastUpdated = DateTime.Now
+                };
+                
+                Assert(metrics.ActiveChallenges >= 0, "Metrics should have valid values");
+                Assert(metrics.TotalPlayers >= 0, "Player count should be valid");
+                
+                PassTest("Data structures are properly defined");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Data structures test failed: {ex.Message}");
+            }
+        }
+        
+        private void TestIntegrationFeatures()
+        {
+            StartTest("Integration Features");
+            
+            try
+            {
+                // Test interface implementation
+                Assert(_gamingManager is IConstructionGamingSystem, 
+                       "Gaming manager should implement IConstructionGamingSystem");
+                
+                // Test interface methods
+                var interfaceManager = _gamingManager as IConstructionGamingSystem;
+                
+                Assert(interfaceManager.IsConstructionGamingEnabled, 
+                       "Interface should report gaming as enabled");
+                Assert(interfaceManager.ActiveChallengesCount >= 0, 
+                       "Interface should provide valid challenges count");
+                Assert(interfaceManager.ActiveCollaborationsCount >= 0, 
+                       "Interface should provide valid collaborations count");
+                
+                // Test challenge interface methods
+                bool challengeStarted = interfaceManager.StartConstructionChallenge("test_challenge");
+                // Note: This may return false if challenge engine is not fully initialized
+                
+                PassTest("Integration features working correctly");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Integration features test failed: {ex.Message}");
+            }
+        }
+        
+        private void TestPerformanceMetrics()
+        {
+            StartTest("Performance Metrics");
+            
+            try
+            {
+                // Test metrics initialization
+                var metrics = new DataConstructionGamingMetrics();
+                Assert(metrics != null, "Metrics should be creatable");
+                
+                // Test player profile
+                var profile = new PlayerProgressProfile
+                {
+                    PlayerId = "test_player",
+                    PlayerName = "Test Player",
+                    SkillLevel = SkillLevel.Intermediate,
+                    ExperiencePoints = 1500,
+                    CompletedChallenges = new List<string>(),
+                    Achievements = new List<Achievement>()
+                };
+                
+                Assert(profile != null, "Player profile should be valid");
+                Assert(profile.ExperiencePoints >= 0, "Experience points should be valid");
+                Assert(profile.CompletedChallenges != null, "Completed challenges list should exist");
+                
+                // Test achievement system
+                var achievement = new Achievement
+                {
+                    AchievementId = "test_achievement",
+                    Title = "Test Achievement",
+                    Category = "Challenge",
+                    Description = "Common test achievement",
+                    UnlockedDate = DateTime.Now
+                };
+                
+                Assert(achievement != null, "Achievement should be valid");
+                Assert(!string.IsNullOrEmpty(achievement.Title), "Achievement should have title");
+                
+                PassTest("Performance metrics system working correctly");
+            }
+            catch (Exception ex)
+            {
+                FailTest($"Performance metrics test failed: {ex.Message}");
+            }
+        }
+        
+        #endregion
+        
+        #region Test Utilities
+        
+        private DesignSolution CreateTestDesignSolution()
+        {
+            return new DesignSolution
+            {
+                SolutionId = Guid.NewGuid().ToString(),
+                Name = "Test Solution",
+                Description = "Test design solution for unit testing",
+                Blueprint = new Blueprint3D
+                {
+                    BlueprintId = Guid.NewGuid().ToString(),
+                    Name = "Test Blueprint",
+                    Dimensions = new Vector3(20f, 3f, 15f),
+                    Components = new List<BuildingComponent>(),
+                    Rooms = new List<Room>(),
+                    Systems = new List<SystemLayout>()
+                },
+                EstimatedCost = 50000f,
+                ConstructionTime = 30f,
+                IsValid = true,
+                ValidationErrors = new List<string>()
+            };
+        }
+        
+        private void StartTest(string testName)
+        {
+            _totalTests++;
+            LogInfo($"Starting test: {testName}");
+        }
+        
+        private void PassTest(string message)
+        {
+            _passedTests++;
+            var result = new TestResult
+            {
+                TestName = GetCurrentTestName(),
+                Passed = true,
+                Message = message,
+                Timestamp = DateTime.Now
+            };
+            _testResults.Add(result);
+            
+            if (_enableDetailedLogging)
+            {
+                LogInfo($"✓ PASS: {message}");
+            }
+        }
+        
+        private void FailTest(string message)
+        {
+            _failedTests++;
+            var result = new TestResult
+            {
+                TestName = GetCurrentTestName(),
+                Passed = false,
+                Message = message,
+                Timestamp = DateTime.Now
+            };
+            _testResults.Add(result);
+            
+            LogError($"✗ FAIL: {message}");
+        }
+        
+        private void Assert(bool condition, string message)
+        {
+            if (!condition)
+            {
+                throw new AssertionException(message);
+            }
+        }
+        
+        private string GetCurrentTestName()
+        {
+            // Simple implementation - in a real system this would use stack trace
+            return $"Test_{_totalTests}";
+        }
+        
+        private void GenerateTestReport()
+        {
+            Debug.Log("\n=== Construction Gaming System Test Report ===");
+            Debug.Log($"Total Tests: {_totalTests}");
+            Debug.Log($"Passed: {_passedTests}");
+            Debug.Log($"Failed: {_failedTests}");
+            Debug.Log($"Success Rate: {(_totalTests > 0 ? (_passedTests * 100.0f / _totalTests) : 0):F1}%");
+            
+            if (_failedTests > 0)
+            {
+                Debug.Log("\nFailed Tests:");
+                foreach (var result in _testResults.Where(r => !r.Passed))
+                {
+                    Debug.LogError($"- {result.TestName}: {result.Message}");
+                }
+            }
+            
+            Debug.Log("\n=== Test Suite Complete ===");
+            
+            // Update test status in todo list if all tests pass
+            if (_failedTests == 0)
+            {
+                Debug.Log("🎉 All tests passed! Construction Gaming System v2.0 is ready!");
+            }
+        }
+        
+        private void LogInfo(string message)
+        {
+            Debug.Log($"[ConstructionGamingTests] {message}");
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[ConstructionGamingTests] {message}");
+        }
+        
+        #endregion
+        
+        #region Test Data Structures
+        
+        [Serializable]
+        public class TestResult
+        {
+            public string TestName;
+            public bool Passed;
+            public string Message;
+            public DateTime Timestamp;
+        }
+        
+        public class AssertionException : Exception
+        {
+            public AssertionException(string message) : base(message) { }
+        }
+        
+        #endregion
+    }
+}

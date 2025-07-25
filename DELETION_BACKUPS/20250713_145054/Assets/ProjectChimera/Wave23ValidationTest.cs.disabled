@@ -1,0 +1,333 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics; // This should now work with the assembly reference fix
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Environment;
+using System.Collections.Generic;
+using System;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 23 - Assembly reference resolution for Genetics namespace.
+    /// Tests that the ProjectChimera.Systems.Genetics namespace is accessible from Cultivation assembly.
+    /// </summary>
+    public class Wave23ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool _runTestsOnStart = true;
+        [SerializeField] private bool _enableDetailedLogging = true;
+        
+        [Header("Test Results")]
+        [SerializeField] private bool _allTestsPassed = false;
+        [SerializeField] private int _testsRun = 0;
+        [SerializeField] private int _testsPassed = 0;
+        [SerializeField] private int _testsFailed = 0;
+        
+        private void Start()
+        {
+            if (_runTestsOnStart)
+            {
+                RunAllTests();
+            }
+        }
+        
+        [ContextMenu("Run Wave 23 Validation Tests")]
+        public void RunAllTests()
+        {
+            Debug.Log("=== Starting Error Wave 23 Validation Tests ===");
+            
+            _testsRun = 0;
+            _testsPassed = 0;
+            _testsFailed = 0;
+            
+            // Test 1: Namespace accessibility
+            TestGeneticsNamespaceAccessibility();
+            
+            // Test 2: TraitExpressionResult class access
+            TestTraitExpressionResultAccess();
+            
+            // Test 3: TraitExpressionEngine class access
+            TestTraitExpressionEngineAccess();
+            
+            // Test 4: Assembly reference validation
+            TestAssemblyReferenceValidation();
+            
+            // Test 5: PlantInstance genetics integration
+            TestPlantInstanceGeneticsIntegration();
+            
+            _allTestsPassed = (_testsFailed == 0);
+            
+            Debug.Log($"=== Error Wave 23 Validation Complete ===");
+            Debug.Log($"Tests Run: {_testsRun}, Passed: {_testsPassed}, Failed: {_testsFailed}");
+            Debug.Log($"Overall Result: {(_allTestsPassed ? "PASS" : "FAIL")}");
+        }
+        
+        private void TestGeneticsNamespaceAccessibility()
+        {
+            string testName = "Genetics Namespace Accessibility";
+            _testsRun++;
+            
+            try
+            {
+                // Try to access classes from the ProjectChimera.Systems.Genetics namespace
+                var engineType = typeof(TraitExpressionEngine);
+                var resultType = typeof(TraitExpressionResult);
+                var genotypeType = typeof(PlantGenotype);
+                
+                if (engineType != null && resultType != null && genotypeType != null)
+                {
+                    LogInfo($"{testName}: All Genetics namespace types accessible ✓");
+                    LogInfo($"{testName}: TraitExpressionEngine: {engineType.FullName}");
+                    LogInfo($"{testName}: TraitExpressionResult: {resultType.FullName}");
+                    LogInfo($"{testName}: PlantGenotype: {genotypeType.FullName}");
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception("One or more Genetics namespace types are not accessible");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestTraitExpressionResultAccess()
+        {
+            string testName = "TraitExpressionResult Access";
+            _testsRun++;
+            
+            try
+            {
+                // Create an instance of TraitExpressionResult
+                var traitResult = new TraitExpressionResult();
+                
+                // Test property access
+                traitResult.GenotypeID = "TEST_GENOTYPE_001";
+                traitResult.HeightExpression = 1.2f;
+                traitResult.THCExpression = 0.85f;
+                traitResult.CBDExpression = 0.15f;
+                traitResult.YieldExpression = 1.1f;
+                traitResult.OverallFitness = 0.92f;
+                
+                // Verify values were set correctly
+                if (traitResult.GenotypeID == "TEST_GENOTYPE_001" && 
+                    traitResult.HeightExpression == 1.2f &&
+                    traitResult.THCExpression == 0.85f)
+                {
+                    LogInfo($"{testName}: TraitExpressionResult creation and property access working ✓");
+                    LogInfo($"{testName}: GenotypeID: {traitResult.GenotypeID}");
+                    LogInfo($"{testName}: HeightExpression: {traitResult.HeightExpression}");
+                    LogInfo($"{testName}: THCExpression: {traitResult.THCExpression}");
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception("TraitExpressionResult property values not set correctly");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestTraitExpressionEngineAccess()
+        {
+            string testName = "TraitExpressionEngine Access";
+            _testsRun++;
+            
+            try
+            {
+                // Create an instance of TraitExpressionEngine
+                var traitEngine = new TraitExpressionEngine(true, true, false); // Disable GPU for testing
+                
+                if (traitEngine != null)
+                {
+                    LogInfo($"{testName}: TraitExpressionEngine creation successful ✓");
+                    
+                    // Test that we can access performance metrics
+                    var metrics = traitEngine.GetPerformanceMetrics();
+                    if (metrics != null)
+                    {
+                        LogInfo($"{testName}: Performance metrics accessible ✓");
+                    }
+                    
+                    // Clean up
+                    traitEngine.Dispose();
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception("TraitExpressionEngine could not be created");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestAssemblyReferenceValidation()
+        {
+            string testName = "Assembly Reference Validation";
+            _testsRun++;
+            
+            try
+            {
+                // Check that we can access both Cultivation and Genetics assemblies
+                var plantInstanceType = typeof(PlantInstance);
+                var traitEngineType = typeof(TraitExpressionEngine);
+                
+                var cultivationAssembly = plantInstanceType.Assembly;
+                var geneticsAssembly = traitEngineType.Assembly;
+                
+                LogInfo($"{testName}: Cultivation Assembly: {cultivationAssembly.GetName().Name}");
+                LogInfo($"{testName}: Genetics Assembly: {geneticsAssembly.GetName().Name}");
+                
+                // Verify that the assemblies are different but both accessible
+                if (cultivationAssembly != null && geneticsAssembly != null)
+                {
+                    LogInfo($"{testName}: Both assemblies accessible ✓");
+                    
+                    // Check that PlantInstance can reference TraitExpressionResult
+                    var plantInstance = CreateTestPlantInstance();
+                    var mockTraitResult = CreateMockTraitExpressionResult();
+                    
+                    // This should work without compilation errors
+                    plantInstance.SetLastTraitExpression(mockTraitResult);
+                    
+                    if (plantInstance.LastTraitExpression != null)
+                    {
+                        LogInfo($"{testName}: Cross-assembly type usage working ✓");
+                        _testsPassed++;
+                    }
+                    else
+                    {
+                        throw new Exception("Cross-assembly type usage failed");
+                    }
+                }
+                else
+                {
+                    throw new Exception("One or both assemblies not accessible");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestPlantInstanceGeneticsIntegration()
+        {
+            string testName = "PlantInstance Genetics Integration";
+            _testsRun++;
+            
+            try
+            {
+                var testPlant = CreateTestPlantInstance();
+                
+                // Test that all genetics-related methods work
+                var mockTraitResult = CreateMockTraitExpressionResult();
+                testPlant.SetLastTraitExpression(mockTraitResult);
+                
+                // Test that the genetics namespace import is working
+                if (testPlant.LastTraitExpression != null && 
+                    testPlant.LastTraitExpression.GenotypeID == "TEST_GENOTYPE_001")
+                {
+                    LogInfo($"{testName}: PlantInstance genetics integration working ✓");
+                    LogInfo($"{testName}: Last trait expression GenotypeID: {testPlant.LastTraitExpression.GenotypeID}");
+                    
+                    // Test creating a PlantGenotype
+                    var mockGenotype = CreateMockPlantGenotype();
+                    testPlant.Genotype = mockGenotype;
+                    
+                    if (testPlant.Genotype != null && testPlant.Genotype.GenotypeID == "MOCK_GENOTYPE_001")
+                    {
+                        LogInfo($"{testName}: PlantGenotype assignment working ✓");
+                        _testsPassed++;
+                    }
+                    else
+                    {
+                        throw new Exception("PlantGenotype assignment failed");
+                    }
+                }
+                else
+                {
+                    throw new Exception("PlantInstance genetics integration failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private PlantInstance CreateTestPlantInstance()
+        {
+            var testObject = new GameObject("TestPlant_Wave23");
+            var plantInstance = testObject.AddComponent<PlantInstance>();
+            
+            // Initialize with basic values
+            plantInstance.PlantedDate = DateTime.Now;
+            
+            return plantInstance;
+        }
+        
+        private TraitExpressionResult CreateMockTraitExpressionResult()
+        {
+            var result = new TraitExpressionResult();
+            result.GenotypeID = "TEST_GENOTYPE_001";
+            result.HeightExpression = 1.2f;
+            result.THCExpression = 0.85f;
+            result.CBDExpression = 0.15f;
+            result.YieldExpression = 1.1f;
+            result.OverallFitness = 0.92f;
+            result.StressResponse = new StressResponse
+            {
+                OverallStressLevel = 0.1f,
+                AdaptiveCapacity = 0.8f,
+                ActiveStresses = new List<StressFactor>()
+            };
+            
+            return result;
+        }
+        
+        private PlantGenotype CreateMockPlantGenotype()
+        {
+            return new PlantGenotype
+            {
+                GenotypeID = "MOCK_GENOTYPE_001",
+                StrainOrigin = null,
+                Generation = 1,
+                IsFounder = true,
+                CreationDate = DateTime.Now,
+                ParentIDs = new List<string>(),
+                Genotype = new Dictionary<string, AlleleCouple>(),
+                OverallFitness = 1.0f,
+                InbreedingCoefficient = 0.0f,
+                Mutations = new List<GeneticMutation>()
+            };
+        }
+        
+        private void LogInfo(string message)
+        {
+            if (_enableDetailedLogging)
+            {
+                Debug.Log($"[Wave23Test] {message}");
+            }
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[Wave23Test] {message}");
+        }
+    }
+} 

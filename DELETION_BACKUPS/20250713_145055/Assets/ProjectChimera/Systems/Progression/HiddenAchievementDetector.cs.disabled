@@ -1,0 +1,1027 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Achievements;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Advanced hidden achievement detection system for Project Chimera.
+    /// Implements sophisticated pattern recognition, behavioral analysis, and complex trigger combinations
+    /// to discover secret achievements based on player actions, cultivation patterns, facility design choices,
+    /// and environmental management decisions. Features machine learning-inspired detection algorithms
+    /// and contextual awareness for meaningful achievement discovery.
+    /// 
+    /// Hidden Achievement Categories:
+    /// - Serendipitous Discoveries: Unexpected cultivation outcomes leading to breakthroughs
+    /// - Master Craftsman: Perfect execution sequences in facility construction or plant care
+    /// - Innovation Pioneer: Creative solutions using unconventional methods
+    /// - Efficiency Guru: Optimal resource utilization patterns
+    /// - Environmental Harmony: Perfect balance between multiple environmental factors
+    /// - Economic Savant: Strategic business decisions with long-term benefits
+    /// - Cultural Celebration: Actions aligning with cannabis culture and history
+    /// - Scientific Excellence: Methodical experimentation and data-driven decisions
+    /// </summary>
+    public class HiddenAchievementDetector : IHiddenAchievementDetector, IDisposable
+    {
+        [Header("Detection Configuration")]
+        [SerializeField] private AchievementLibrarySO _achievementLibrary;
+        [SerializeField] private AchievementConfigSO _achievementConfig;
+        [SerializeField] private HiddenAchievementConfigSO _hiddenConfig;
+        
+        [Header("Pattern Recognition Settings")]
+        [SerializeField] private bool _enablePatternRecognition = true;
+        [SerializeField] private bool _enableBehavioralAnalysis = true;
+        [SerializeField] private bool _enableContextualDetection = true;
+        [SerializeField] private bool _enableSequenceDetection = true;
+        [SerializeField] private int _maxTriggerHistorySize = 1000;
+        
+        [Header("Detection Thresholds")]
+        [SerializeField] private float _patternConfidenceThreshold = 0.75f;
+        [SerializeField] private float _behaviorConsistencyThreshold = 0.8f;
+        [SerializeField] private int _minimumSequenceLength = 3;
+        [SerializeField] private int _maximumSequenceLength = 10;
+        [SerializeField] private TimeSpan _sequenceTimeWindow = TimeSpan.FromHours(24);
+        
+        [Header("Performance Settings")]
+        [SerializeField] private bool _enablePerformanceOptimization = true;
+        [SerializeField] private int _maxDetectionsPerUpdate = 5;
+        [SerializeField] private float _detectionUpdateInterval = 30f; // 30 seconds
+        [SerializeField] private bool _enablePredictiveCaching = true;
+        
+        // Core Detection Systems
+        private PatternRecognitionEngine _patternEngine;
+        private BehavioralAnalysisEngine _behaviorEngine;
+        private ContextualDetectionEngine _contextEngine;
+        private SequenceDetectionEngine _sequenceEngine;
+        private ComplexTriggerEvaluator _complexEvaluator;
+        
+        // Hidden Achievement Databases
+        private Dictionary<string, HiddenAchievementDefinition> _hiddenAchievements = new Dictionary<string, HiddenAchievementDefinition>();
+        private Dictionary<string, SecretConditionSet> _secretConditions = new Dictionary<string, SecretConditionSet>();
+        private Dictionary<AchievementTriggerType, List<string>> _triggerTypeMapping = new Dictionary<AchievementTriggerType, List<string>>();
+        
+        // Detection State Management
+        private Queue<AchievementTrigger> _triggerHistory = new Queue<AchievementTrigger>();
+        private Dictionary<string, PatternState> _activePatterns = new Dictionary<string, PatternState>();
+        private Dictionary<string, BehaviorProfile> _playerBehaviorProfiles = new Dictionary<string, BehaviorProfile>();
+        private Dictionary<string, DateTime> _lastDetectionAttempt = new Dictionary<string, DateTime>();
+        
+        // Performance & Analytics
+        private HiddenAchievementMetrics _metrics = new HiddenAchievementMetrics();
+        private DetectionCache _detectionCache;
+        private PerformanceProfiler _profiler;
+        
+        // Events
+        public event Action<string, HiddenAchievementDiscovery> OnHiddenAchievementDiscovered;
+        public event Action<string, PatternMatchData> OnPatternDetected;
+        public event Action<string, BehaviorAnalysisResult> OnBehaviorAnalyzed;
+        
+        #region Initialization
+        
+        public void Initialize(AchievementLibrarySO achievementLibrary, AchievementConfigSO achievementConfig)
+        {
+            _achievementLibrary = achievementLibrary;
+            _achievementConfig = achievementConfig;
+            
+            InitializeDetectionEngines();
+            LoadHiddenAchievementDefinitions();
+            InitializePerformanceOptimization();
+            InitializeTriggerTypeMapping();
+            
+            Debug.Log("Hidden Achievement Detector initialized successfully");
+        }
+        
+        private void InitializeDetectionEngines()
+        {
+            // Initialize pattern recognition engine
+            if (_enablePatternRecognition)
+            {
+                _patternEngine = new PatternRecognitionEngine();
+                _patternEngine.Initialize(_hiddenConfig, _patternConfidenceThreshold);
+            }
+            
+            // Initialize behavioral analysis engine
+            if (_enableBehavioralAnalysis)
+            {
+                _behaviorEngine = new BehavioralAnalysisEngine();
+                _behaviorEngine.Initialize(_hiddenConfig, _behaviorConsistencyThreshold);
+            }
+            
+            // Initialize contextual detection engine
+            if (_enableContextualDetection)
+            {
+                _contextEngine = new ContextualDetectionEngine();
+                _contextEngine.Initialize(_hiddenConfig);
+            }
+            
+            // Initialize sequence detection engine
+            if (_enableSequenceDetection)
+            {
+                _sequenceEngine = new SequenceDetectionEngine();
+                _sequenceEngine.Initialize(_hiddenConfig, _minimumSequenceLength, _maximumSequenceLength, _sequenceTimeWindow);
+            }
+            
+            // Initialize complex trigger evaluator
+            _complexEvaluator = new ComplexTriggerEvaluator();
+            _complexEvaluator.Initialize(_hiddenConfig);
+        }
+        
+        private void LoadHiddenAchievementDefinitions()
+        {
+            var hiddenAchievements = _achievementLibrary.GetHiddenAchievements();
+            
+            foreach (var achievement in hiddenAchievements)
+            {
+                var definition = new HiddenAchievementDefinition
+                {
+                    AchievementId = achievement.AchievementId,
+                    Achievement = achievement,
+                    DetectionMethod = achievement.HiddenDetectionMethod,
+                    RequiredPatterns = achievement.RequiredPatterns,
+                    RequiredBehaviors = achievement.RequiredBehaviors,
+                    RequiredSequences = achievement.RequiredSequences,
+                    ComplexConditions = achievement.ComplexConditions,
+                    DiscoveryHints = achievement.DiscoveryHints,
+                    MinimumPlayerLevel = achievement.MinimumPlayerLevel,
+                    RequiredAchievements = achievement.Dependencies,
+                    CooldownPeriod = achievement.DiscoveryCooldown
+                };
+                
+                _hiddenAchievements[achievement.AchievementId] = definition;
+                
+                // Map trigger types for efficient lookup
+                if (achievement.HiddenTriggerTypes != null)
+                {
+                    foreach (var triggerType in achievement.HiddenTriggerTypes)
+                    {
+                        if (!_triggerTypeMapping.ContainsKey(triggerType))
+                        {
+                            _triggerTypeMapping[triggerType] = new List<string>();
+                        }
+                        _triggerTypeMapping[triggerType].Add(achievement.AchievementId);
+                    }
+                }
+            }
+            
+            Debug.Log($"Loaded {_hiddenAchievements.Count} hidden achievement definitions");
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            if (_enablePerformanceOptimization)
+            {
+                _profiler = new PerformanceProfiler();
+                _profiler.Initialize();
+                
+                if (_enablePredictiveCaching)
+                {
+                    _detectionCache = new DetectionCache();
+                    _detectionCache.Initialize(_achievementConfig.MaxCachedDetections);
+                }
+            }
+        }
+        
+        private void InitializeTriggerTypeMapping()
+        {
+            // Ensure all trigger types have empty lists
+            foreach (AchievementTriggerType triggerType in Enum.GetValues(typeof(AchievementTriggerType)))
+            {
+                if (!_triggerTypeMapping.ContainsKey(triggerType))
+                {
+                    _triggerTypeMapping[triggerType] = new List<string>();
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region IHiddenAchievementDetector Implementation
+        
+        public List<string> DetectHiddenTriggers(GameplayStateData gameplayData, PlayerAchievementProfile playerProfile)
+        {
+            var discoveredAchievements = new List<string>();
+            
+            try
+            {
+                using var _ = _profiler?.StartOperation("DetectHiddenTriggers");
+                
+                // Pattern-based detection
+                if (_enablePatternRecognition && _patternEngine != null)
+                {
+                    var patternMatches = _patternEngine.DetectPatterns(gameplayData, playerProfile);
+                    discoveredAchievements.AddRange(ProcessPatternMatches(patternMatches));
+                }
+                
+                // Behavioral analysis detection
+                if (_enableBehavioralAnalysis && _behaviorEngine != null)
+                {
+                    var behaviorAnalysis = _behaviorEngine.AnalyzeBehavior(gameplayData, playerProfile);
+                    discoveredAchievements.AddRange(ProcessBehaviorAnalysis(behaviorAnalysis));
+                }
+                
+                // Contextual detection
+                if (_enableContextualDetection && _contextEngine != null)
+                {
+                    var contextualMatches = _contextEngine.DetectContextualAchievements(gameplayData, playerProfile);
+                    discoveredAchievements.AddRange(contextualMatches);
+                }
+                
+                _metrics.DetectionAttempts++;
+                _metrics.DiscoveredAchievements += discoveredAchievements.Count;
+                
+                return discoveredAchievements.Distinct().ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in hidden achievement detection: {ex.Message}");
+                _metrics.DetectionErrors++;
+                return new List<string>();
+            }
+        }
+        
+        public List<string> EvaluateComplexTriggers(List<AchievementTrigger> triggerHistory, PlayerAchievementProfile playerProfile)
+        {
+            var discoveredAchievements = new List<string>();
+            
+            try
+            {
+                using var _ = _profiler?.StartOperation("EvaluateComplexTriggers");
+                
+                // Update trigger history
+                UpdateTriggerHistory(triggerHistory);
+                
+                // Sequence-based detection
+                if (_enableSequenceDetection && _sequenceEngine != null)
+                {
+                    var sequenceMatches = _sequenceEngine.DetectSequences(_triggerHistory.ToList(), playerProfile);
+                    discoveredAchievements.AddRange(ProcessSequenceMatches(sequenceMatches));
+                }
+                
+                // Complex condition evaluation
+                if (_complexEvaluator != null)
+                {
+                    var complexMatches = _complexEvaluator.EvaluateComplexConditions(_triggerHistory.ToList(), playerProfile);
+                    discoveredAchievements.AddRange(complexMatches);
+                }
+                
+                // Cross-system correlation detection
+                var correlationMatches = DetectCrossSystemCorrelations(triggerHistory, playerProfile);
+                discoveredAchievements.AddRange(correlationMatches);
+                
+                _metrics.ComplexEvaluations++;
+                
+                return discoveredAchievements.Distinct().ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in complex trigger evaluation: {ex.Message}");
+                _metrics.EvaluationErrors++;
+                return new List<string>();
+            }
+        }
+        
+        public List<string> CheckSecretConditions(PlayerAchievementProfile playerProfile)
+        {
+            var discoveredAchievements = new List<string>();
+            
+            try
+            {
+                using var _ = _profiler?.StartOperation("CheckSecretConditions");
+                
+                foreach (var hiddenAchievement in _hiddenAchievements.Values)
+                {
+                    // Skip if on cooldown
+                    if (IsOnCooldown(hiddenAchievement.AchievementId))
+                        continue;
+                    
+                    // Check prerequisites
+                    if (!CheckPrerequisites(hiddenAchievement, playerProfile))
+                        continue;
+                    
+                    // Evaluate secret conditions
+                    if (EvaluateSecretConditions(hiddenAchievement, playerProfile))
+                    {
+                        discoveredAchievements.Add(hiddenAchievement.AchievementId);
+                        OnHiddenAchievementDiscovered?.Invoke(hiddenAchievement.AchievementId, CreateDiscoveryData(hiddenAchievement));
+                        _lastDetectionAttempt[hiddenAchievement.AchievementId] = DateTime.Now;
+                    }
+                }
+                
+                _metrics.SecretConditionChecks++;
+                
+                return discoveredAchievements;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error checking secret conditions: {ex.Message}");
+                _metrics.ConditionCheckErrors++;
+                return new List<string>();
+            }
+        }
+        
+        #endregion
+        
+        #region Public Interface
+        
+        public void ProcessTrigger(AchievementTrigger trigger)
+        {
+            try
+            {
+                // Add to trigger history
+                _triggerHistory.Enqueue(trigger);
+                
+                // Maintain history size
+                while (_triggerHistory.Count > _maxTriggerHistorySize)
+                {
+                    _triggerHistory.Dequeue();
+                }
+                
+                // Update active patterns
+                UpdateActivePatterns(trigger);
+                
+                // Check for immediate hidden achievement triggers
+                CheckImmediateHiddenTriggers(trigger);
+                
+                _metrics.TriggersProcessed++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing trigger: {ex.Message}");
+                _metrics.TriggerProcessingErrors++;
+            }
+        }
+        
+        public void UpdateDetection(PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                // Create current gameplay state
+                var gameplayState = CreateCurrentGameplayState();
+                
+                // Run detection algorithms
+                var discoveries = DetectHiddenTriggers(gameplayState, playerProfile);
+                
+                // Process discoveries
+                foreach (var achievementId in discoveries)
+                {
+                    if (_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                    {
+                        OnHiddenAchievementDiscovered?.Invoke(achievementId, CreateDiscoveryData(definition));
+                    }
+                }
+                
+                // Update behavior profiles
+                UpdateBehaviorProfile(playerProfile);
+                
+                // Cleanup expired patterns and cache
+                CleanupExpiredData();
+                
+                _metrics.UpdateCycles++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in detection update: {ex.Message}");
+                _metrics.UpdateErrors++;
+            }
+        }
+        
+        public HiddenAchievementMetrics GetMetrics()
+        {
+            return _metrics;
+        }
+        
+        public List<HiddenAchievementHint> GetDiscoveryHints(PlayerAchievementProfile playerProfile)
+        {
+            var hints = new List<HiddenAchievementHint>();
+            
+            try
+            {
+                foreach (var hiddenAchievement in _hiddenAchievements.Values)
+                {
+                    if (ShouldProvideHint(hiddenAchievement, playerProfile))
+                    {
+                        var hint = GenerateHint(hiddenAchievement, playerProfile);
+                        if (hint != null)
+                        {
+                            hints.Add(hint);
+                        }
+                    }
+                }
+                
+                // Sort by relevance/proximity to completion
+                hints = hints.OrderByDescending(h => h.RelevanceScore).Take(5).ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error generating discovery hints: {ex.Message}");
+            }
+            
+            return hints;
+        }
+        
+        #endregion
+        
+        #region Pattern Processing
+        
+        private List<string> ProcessPatternMatches(List<PatternMatchData> patternMatches)
+        {
+            var discoveries = new List<string>();
+            
+            foreach (var match in patternMatches)
+            {
+                OnPatternDetected?.Invoke(match.PatternId, match);
+                
+                // Find associated hidden achievements
+                var associatedAchievements = FindAchievementsByPattern(match.PatternId);
+                
+                foreach (var achievementId in associatedAchievements)
+                {
+                    if (_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                    {
+                        if (ValidatePatternMatch(definition, match))
+                        {
+                            discoveries.Add(achievementId);
+                        }
+                    }
+                }
+            }
+            
+            return discoveries;
+        }
+        
+        private List<string> ProcessBehaviorAnalysis(List<BehaviorAnalysisResult> behaviorResults)
+        {
+            var discoveries = new List<string>();
+            
+            foreach (var result in behaviorResults)
+            {
+                OnBehaviorAnalyzed?.Invoke(result.BehaviorType, result);
+                
+                // Find achievements associated with this behavior
+                var associatedAchievements = FindAchievementsByBehavior(result.BehaviorType);
+                
+                foreach (var achievementId in associatedAchievements)
+                {
+                    if (_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                    {
+                        if (ValidateBehaviorMatch(definition, result))
+                        {
+                            discoveries.Add(achievementId);
+                        }
+                    }
+                }
+            }
+            
+            return discoveries;
+        }
+        
+        private List<string> ProcessSequenceMatches(List<SequenceMatchData> sequenceMatches)
+        {
+            var discoveries = new List<string>();
+            
+            foreach (var match in sequenceMatches)
+            {
+                // Find achievements associated with this sequence
+                var associatedAchievements = FindAchievementsBySequence(match.SequenceId);
+                
+                foreach (var achievementId in associatedAchievements)
+                {
+                    if (_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                    {
+                        if (ValidateSequenceMatch(definition, match))
+                        {
+                            discoveries.Add(achievementId);
+                        }
+                    }
+                }
+            }
+            
+            return discoveries;
+        }
+        
+        #endregion
+        
+        #region Complex Detection Logic
+        
+        private List<string> DetectCrossSystemCorrelations(List<AchievementTrigger> triggerHistory, PlayerAchievementProfile playerProfile)
+        {
+            var discoveries = new List<string>();
+            
+            try
+            {
+                // Group triggers by system type
+                var systemGroups = triggerHistory
+                    .GroupBy(t => t.TriggerType)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                
+                // Look for cross-system patterns
+                foreach (var hiddenAchievement in _hiddenAchievements.Values)
+                {
+                    if (hiddenAchievement.RequiredBehaviors?.Any(b => b.RequiresCrossSystemCorrelation) == true)
+                    {
+                        if (EvaluateCrossSystemCorrelation(hiddenAchievement, systemGroups, playerProfile))
+                        {
+                            discoveries.Add(hiddenAchievement.AchievementId);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in cross-system correlation detection: {ex.Message}");
+            }
+            
+            return discoveries;
+        }
+        
+        private bool EvaluateCrossSystemCorrelation(HiddenAchievementDefinition definition, 
+            Dictionary<AchievementTriggerType, List<AchievementTrigger>> systemGroups, 
+            PlayerAchievementProfile playerProfile)
+        {
+            var requiredCorrelations = definition.RequiredBehaviors?
+                .Where(b => b.RequiresCrossSystemCorrelation)
+                .ToList();
+            
+            if (requiredCorrelations == null || !requiredCorrelations.Any())
+                return false;
+            
+            foreach (var correlation in requiredCorrelations)
+            {
+                if (!EvaluateSingleCorrelation(correlation, systemGroups, playerProfile))
+                    return false;
+            }
+            
+            return true;
+        }
+        
+        private bool EvaluateSingleCorrelation(RequiredBehavior behavior, 
+            Dictionary<AchievementTriggerType, List<AchievementTrigger>> systemGroups, 
+            PlayerAchievementProfile playerProfile)
+        {
+            // This would implement specific correlation logic based on behavior requirements
+            // For example: cultivation efficiency correlating with economic success
+            
+            var cultivationTriggers = systemGroups.GetValueOrDefault(AchievementTriggerType.Cultivation, new List<AchievementTrigger>());
+            var economicTriggers = systemGroups.GetValueOrDefault(AchievementTriggerType.Economic, new List<AchievementTrigger>());
+            var environmentalTriggers = systemGroups.GetValueOrDefault(AchievementTriggerType.Environmental, new List<AchievementTrigger>());
+            
+            // Evaluate based on behavior type
+            return behavior.BehaviorType switch
+            {
+                BehaviorType.OptimizationMaster => EvaluateOptimizationCorrelation(cultivationTriggers, economicTriggers, environmentalTriggers),
+                BehaviorType.SystemsSynergy => EvaluateSystemsSynergy(systemGroups),
+                BehaviorType.InnovativeProblemSolving => EvaluateInnovationCorrelation(systemGroups, playerProfile),
+                BehaviorType.ConsistentExcellence => EvaluateConsistencyCorrelation(systemGroups, playerProfile),
+                _ => false
+            };
+        }
+        
+        private void CheckImmediateHiddenTriggers(AchievementTrigger trigger)
+        {
+            // Check if this trigger type has associated hidden achievements
+            if (_triggerTypeMapping.TryGetValue(trigger.TriggerType, out var associatedAchievements))
+            {
+                foreach (var achievementId in associatedAchievements)
+                {
+                    if (_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                    {
+                        if (EvaluateImmediateTrigger(definition, trigger))
+                        {
+                            OnHiddenAchievementDiscovered?.Invoke(achievementId, CreateDiscoveryData(definition));
+                        }
+                    }
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Validation and Evaluation
+        
+        private bool ValidatePatternMatch(HiddenAchievementDefinition definition, PatternMatchData match)
+        {
+            if (definition.RequiredPatterns == null) return false;
+            
+            var requiredPattern = definition.RequiredPatterns.FirstOrDefault(p => p.PatternId == match.PatternId);
+            if (requiredPattern == null) return false;
+            
+            // Check confidence threshold
+            if (match.ConfidenceScore < requiredPattern.MinimumConfidence)
+                return false;
+            
+            // Check pattern duration
+            if (match.Duration < requiredPattern.MinimumDuration)
+                return false;
+            
+            // Check pattern frequency
+            if (match.Frequency < requiredPattern.MinimumFrequency)
+                return false;
+            
+            return true;
+        }
+        
+        private bool ValidateBehaviorMatch(HiddenAchievementDefinition definition, BehaviorAnalysisResult result)
+        {
+            if (definition.RequiredBehaviors == null) return false;
+            
+            var requiredBehavior = definition.RequiredBehaviors.FirstOrDefault(b => b.BehaviorType == result.BehaviorType);
+            if (requiredBehavior == null) return false;
+            
+            // Check consistency threshold
+            if (result.ConsistencyScore < requiredBehavior.MinimumConsistency)
+                return false;
+            
+            // Check behavior duration
+            if (result.ObservationPeriod < requiredBehavior.MinimumObservationPeriod)
+                return false;
+            
+            return true;
+        }
+        
+        private bool ValidateSequenceMatch(HiddenAchievementDefinition definition, SequenceMatchData match)
+        {
+            if (definition.RequiredSequences == null) return false;
+            
+            var requiredSequence = definition.RequiredSequences.FirstOrDefault(s => s.SequenceId == match.SequenceId);
+            if (requiredSequence == null) return false;
+            
+            // Check sequence completeness
+            if (match.CompletionPercentage < requiredSequence.MinimumCompletion)
+                return false;
+            
+            // Check timing requirements
+            if (match.ExecutionTime > requiredSequence.MaximumExecutionTime)
+                return false;
+            
+            return true;
+        }
+        
+        private bool CheckPrerequisites(HiddenAchievementDefinition definition, PlayerAchievementProfile playerProfile)
+        {
+            // Check player level
+            if (playerProfile.Level < definition.MinimumPlayerLevel)
+                return false;
+            
+            // Check required achievements
+            if (definition.RequiredAchievements != null)
+            {
+                foreach (var requiredAchievement in definition.RequiredAchievements)
+                {
+                    if (!playerProfile.UnlockedAchievements.Contains(requiredAchievement))
+                        return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        private bool EvaluateSecretConditions(HiddenAchievementDefinition definition, PlayerAchievementProfile playerProfile)
+        {
+            if (definition.ComplexConditions == null) return false;
+            
+            foreach (var condition in definition.ComplexConditions)
+            {
+                if (!EvaluateComplexCondition(condition, playerProfile))
+                    return false;
+            }
+            
+            return true;
+        }
+        
+        private bool EvaluateComplexCondition(ComplexCondition condition, PlayerAchievementProfile playerProfile)
+        {
+            // This would implement the complex condition evaluation logic
+            // Based on the condition type and parameters
+            return condition.ConditionType switch
+            {
+                ComplexConditionType.StatisticalThreshold => EvaluateStatisticalCondition(condition, playerProfile),
+                ComplexConditionType.TemporalPattern => EvaluateTemporalCondition(condition, playerProfile),
+                ComplexConditionType.BehavioralSignature => EvaluateBehavioralCondition(condition, playerProfile),
+                ComplexConditionType.SystemStateConfiguration => EvaluateSystemStateCondition(condition, playerProfile),
+                _ => false
+            };
+        }
+        
+        private bool EvaluateImmediateTrigger(HiddenAchievementDefinition definition, AchievementTrigger trigger)
+        {
+            // Check if this trigger can immediately unlock the hidden achievement
+            if (definition.DetectionMethod != HiddenDetectionMethod.ImmediateTrigger)
+                return false;
+            
+            // Evaluate trigger-specific conditions
+            return EvaluateTriggerConditions(definition, trigger);
+        }
+        
+        private bool IsOnCooldown(string achievementId)
+        {
+            if (!_lastDetectionAttempt.TryGetValue(achievementId, out var lastAttempt))
+                return false;
+            
+            if (!_hiddenAchievements.TryGetValue(achievementId, out var definition))
+                return false;
+            
+            return DateTime.Now - lastAttempt < definition.CooldownPeriod;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private void UpdateTriggerHistory(List<AchievementTrigger> triggerHistory)
+        {
+            foreach (var trigger in triggerHistory)
+            {
+                ProcessTrigger(trigger);
+            }
+        }
+        
+        private void UpdateActivePatterns(AchievementTrigger trigger)
+        {
+            // Update pattern tracking based on trigger
+            if (_patternEngine != null)
+            {
+                _patternEngine.UpdatePatternTracking(trigger);
+            }
+        }
+        
+        private void UpdateBehaviorProfile(PlayerAchievementProfile playerProfile)
+        {
+            if (_behaviorEngine != null)
+            {
+                var profileId = playerProfile.PlayerId;
+                var currentProfile = _behaviorEngine.GenerateBehaviorProfile(playerProfile, _triggerHistory.ToList());
+                _playerBehaviorProfiles[profileId] = currentProfile;
+            }
+        }
+        
+        private void CleanupExpiredData()
+        {
+            var cutoffTime = DateTime.Now - TimeSpan.FromDays(7); // Keep 7 days of data
+            
+            // Cleanup active patterns
+            var expiredPatterns = _activePatterns.Where(kvp => kvp.Value.LastUpdate < cutoffTime).ToList();
+            foreach (var expired in expiredPatterns)
+            {
+                _activePatterns.Remove(expired.Key);
+            }
+            
+            // Cleanup detection cache
+            _detectionCache?.CleanupExpiredEntries();
+        }
+        
+        private GameplayStateData CreateCurrentGameplayState()
+        {
+            // This would gather current state from all game systems
+            return new GameplayStateData
+            {
+                Timestamp = DateTime.Now,
+                TriggerHistory = _triggerHistory.ToList(),
+                ActivePatterns = _activePatterns.Values.ToList(),
+                // Add other relevant gameplay state data
+            };
+        }
+        
+        private HiddenAchievementDiscovery CreateDiscoveryData(HiddenAchievementDefinition definition)
+        {
+            return new HiddenAchievementDiscovery
+            {
+                AchievementId = definition.AchievementId,
+                DiscoveryTime = DateTime.Now,
+                DetectionMethod = definition.DetectionMethod,
+                DiscoveryContext = CreateDiscoveryContext()
+            };
+        }
+        
+        private DiscoveryContext CreateDiscoveryContext()
+        {
+            return new DiscoveryContext
+            {
+                RecentTriggers = _triggerHistory.TakeLast(10).ToList(),
+                ActivePatterns = _activePatterns.Keys.ToList(),
+                DetectionConfidence = CalculateOverallDetectionConfidence()
+            };
+        }
+        
+        private float CalculateOverallDetectionConfidence()
+        {
+            // Calculate confidence based on recent detection success rate
+            var recentSuccesses = _metrics.DiscoveredAchievements;
+            var recentAttempts = _metrics.DetectionAttempts;
+            
+            return recentAttempts > 0 ? (float)recentSuccesses / recentAttempts : 0f;
+        }
+        
+        // Placeholder evaluation methods for compilation
+        private bool EvaluateOptimizationCorrelation(List<AchievementTrigger> cultivation, List<AchievementTrigger> economic, List<AchievementTrigger> environmental) => false;
+        private bool EvaluateSystemsSynergy(Dictionary<AchievementTriggerType, List<AchievementTrigger>> systemGroups) => false;
+        private bool EvaluateInnovationCorrelation(Dictionary<AchievementTriggerType, List<AchievementTrigger>> systemGroups, PlayerAchievementProfile profile) => false;
+        private bool EvaluateConsistencyCorrelation(Dictionary<AchievementTriggerType, List<AchievementTrigger>> systemGroups, PlayerAchievementProfile profile) => false;
+        private bool EvaluateStatisticalCondition(ComplexCondition condition, PlayerAchievementProfile profile) => false;
+        private bool EvaluateTemporalCondition(ComplexCondition condition, PlayerAchievementProfile profile) => false;
+        private bool EvaluateBehavioralCondition(ComplexCondition condition, PlayerAchievementProfile profile) => false;
+        private bool EvaluateSystemStateCondition(ComplexCondition condition, PlayerAchievementProfile profile) => false;
+        private bool EvaluateTriggerConditions(HiddenAchievementDefinition definition, AchievementTrigger trigger) => false;
+        
+        private List<string> FindAchievementsByPattern(string patternId) => new List<string>();
+        private List<string> FindAchievementsByBehavior(string behaviorType) => new List<string>();
+        private List<string> FindAchievementsBySequence(string sequenceId) => new List<string>();
+        
+        private bool ShouldProvideHint(HiddenAchievementDefinition definition, PlayerAchievementProfile profile) => false;
+        private HiddenAchievementHint GenerateHint(HiddenAchievementDefinition definition, PlayerAchievementProfile profile) => null;
+        
+        #endregion
+        
+        #region IDisposable Implementation
+        
+        public void Dispose()
+        {
+            _patternEngine?.Dispose();
+            _behaviorEngine?.Dispose();
+            _contextEngine?.Dispose();
+            _sequenceEngine?.Dispose();
+            _complexEvaluator?.Dispose();
+            _detectionCache?.Dispose();
+            _profiler?.Dispose();
+            
+            _triggerHistory.Clear();
+            _activePatterns.Clear();
+            _playerBehaviorProfiles.Clear();
+            _hiddenAchievements.Clear();
+            
+            OnHiddenAchievementDiscovered = null;
+            OnPatternDetected = null;
+            OnBehaviorAnalyzed = null;
+        }
+        
+        #endregion
+    }
+    
+    /// <summary>
+    /// Metrics class for tracking hidden achievement detection performance.
+    /// </summary>
+    [Serializable]
+    public class HiddenAchievementMetrics
+    {
+        public int DetectionAttempts;
+        public int DiscoveredAchievements;
+        public int PatternMatches;
+        public int BehaviorAnalyses;
+        public int SequenceDetections;
+        public int ComplexEvaluations;
+        public DateTime LastDetection;
+        public float AverageDetectionTime;
+        public int TotalProcessingTime;
+        public int CacheHits;
+        public int CacheMisses;
+        public int TriggersProcessed;
+        public int DetectionErrors;
+        public int TriggerProcessingErrors;
+        public int UpdateCycles;
+        public int UpdateErrors;
+        public int EvaluationErrors;
+        public int SecretConditionChecks;
+        public int ConditionCheckErrors;
+    }
+    
+    /// <summary>
+    /// Data structure for pattern match results.
+    /// </summary>
+    [Serializable]
+    public class SequenceMatchData
+    {
+        public string SequenceId;
+        public float CompletionPercentage;
+        public TimeSpan ExecutionTime;
+        public List<AchievementTrigger> MatchedTriggers;
+        public float ConfidenceScore;
+        public DateTime MatchTimestamp;
+        public string MatchedPattern;
+    }
+    
+    /// <summary>
+    /// Required behavior specification for hidden achievements.
+    /// </summary>
+    [Serializable]
+    public class RequiredBehavior
+    {
+        public string BehaviorType;
+        public float MinimumConsistency;
+        public TimeSpan MinimumObservationPeriod;
+        public bool RequiresCrossSystemCorrelation;
+        public Dictionary<string, object> Parameters;
+    }
+    
+    /// <summary>
+    /// Context information for discovery events.
+    /// </summary>
+    [Serializable]
+    public class DiscoveryContext
+    {
+        public List<AchievementTrigger> RecentTriggers;
+        public List<string> ActivePatterns;
+        public float DetectionConfidence;
+        public DateTime ContextTimestamp;
+        public Dictionary<string, object> AdditionalData;
+    }
+    
+    /// <summary>
+    /// Enumeration of behavior pattern types.
+    /// </summary>
+    public enum BehaviorPatternType
+    {
+        OptimizationMaster,
+        SystemsSynergy,
+        InnovativeProblemSolving,
+        ConsistentExcellence,
+        EfficientResourceUtilization,
+        EnvironmentalHarmony,
+        EconomicSavant,
+        ScientificMethodology,
+        CreativeExpression,
+        CommunityContribution
+    }
+    
+    /// <summary>
+    /// Enumeration of behavior types for achievement detection.
+    /// </summary>
+    public enum BehaviorType
+    {
+        OptimizationMaster,
+        SystemsSynergy,
+        InnovativeProblemSolving,
+        ConsistentExcellence,
+        EfficientResourceUtilization,
+        EnvironmentalHarmony,
+        EconomicSavant,
+        ScientificMethodology,
+        CreativeExpression,
+        CommunityContribution,
+        DataDrivenDecisionMaking,
+        RiskManagement,
+        QualityControl,
+        Mentorship,
+        Innovation
+    }
+    
+    /// <summary>
+    /// Configuration for hidden achievement detection.
+    /// </summary>
+    [Serializable]
+    public class HiddenAchievementConfigSO : ChimeraDataSO
+    {
+        [Header("Detection Settings")]
+        public float PatternConfidenceThreshold = 0.75f;
+        public float BehaviorConsistencyThreshold = 0.8f;
+        public int MinimumSequenceLength = 3;
+        public int MaximumSequenceLength = 10;
+        
+        [Header("Performance Settings")]
+        public int MaxDetectionsPerUpdate = 5;
+        public float DetectionUpdateInterval = 30f;
+        public int MaxCachedDetections = 1000;
+        
+        [Header("Pattern Recognition")]
+        public bool EnablePatternRecognition = true;
+        public bool EnableBehavioralAnalysis = true;
+        public bool EnableContextualDetection = true;
+        public bool EnableSequenceDetection = true;
+    }
+    
+    /// <summary>
+    /// Pattern recognition engine for hidden achievements.
+    /// </summary>
+    [Serializable]
+    public class PatternRecognitionEngine : IDisposable
+    {
+        private HiddenAchievementConfigSO _config;
+        private float _confidenceThreshold;
+        
+        public void Initialize(HiddenAchievementConfigSO config, float confidenceThreshold)
+        {
+            _config = config;
+            _confidenceThreshold = confidenceThreshold;
+        }
+        
+        public List<PatternMatchData> DetectPatterns(GameplayStateData gameplayData, PlayerAchievementProfile playerProfile)
+        {
+            // Placeholder implementation
+            return new List<PatternMatchData>();
+        }
+        
+        public void UpdatePatternTracking(AchievementTrigger trigger)
+        {
+            // Placeholder implementation
+        }
+        
+        public void Dispose()
+        {
+            // Cleanup pattern recognition resources
+        }
+    }
+}

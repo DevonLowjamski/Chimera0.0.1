@@ -1,0 +1,100 @@
+using UnityEngine;
+using ProjectChimera.Events;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+// Type aliases to resolve ambiguous references
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using CareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+using PlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final PlantCareEventData Validation Test
+    /// Tests both Events namespace and Systems.Cultivation namespace versions
+    /// </summary>
+    public class FinalPlantCareEventDataValidation : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Final PlantCareEventData Validation ===");
+            
+            TestEventsNamespacePlantCareEventData();
+            TestSystemsCultivationPlantCareEventData();
+            
+            Debug.Log("✅ Both PlantCareEventData versions validated successfully!");
+        }
+        
+        private void TestEventsNamespacePlantCareEventData()
+        {
+            Debug.Log("Testing Events namespace PlantCareEventData...");
+            
+            var eventsData = new ProjectChimera.Events.PlantCareEventData
+            {
+                PlantId = "test-plant-events",
+                CareActionString = "Watering",
+                EffectivenessScore = 0.9f,
+                Timestamp = Time.time,
+                PlantInstance = new ProjectChimera.Data.Cultivation.InteractivePlant
+                {
+                    PlantInstanceID = 100,
+                    PlantedTime = System.DateTime.Now
+                },
+                CareAction = new ProjectChimera.Events.CareActionData
+                {
+                    TaskType = CultivationTaskType.Watering,
+                    ToolName = "Advanced Watering System",
+                    PlayerSkillLevel = 8.0f
+                },
+                CareEffects = new ProjectChimera.Events.CareEffects
+                {
+                    HydrationChange = 0.4f,
+                    HealthImprovement = 0.25f
+                },
+                PlayerSkillLevel = 8.0f
+            };
+            
+            Debug.Log($"✓ Events PlantCareEventData: Plant={eventsData.PlantId}, Skill={eventsData.PlayerSkillLevel}");
+        }
+        
+        private void TestSystemsCultivationPlantCareEventData()
+        {
+            Debug.Log("Testing Systems.Cultivation namespace PlantCareEventData...");
+            
+            // Note: This will create an instance using the local PlantCareEventData from EnhancedCultivationGamingManager
+            var systemsData = new PlantCareEventData
+            {
+                PlantId = "test-plant-systems",
+                CareActionType = "Fertilizing",
+                EffectivenessScore = 0.85f,
+                Timestamp = Time.time,
+                PlayerId = "player-123",
+                SkillExperienceGained = 50f,
+                TriggeredAutomationDesire = false,
+                CareQuality = CareQuality.Excellent,
+                PlantInstance = new InteractivePlant
+                {
+                    PlantInstanceID = 200,
+                    PlantedTime = System.DateTime.Now
+                },
+                CareType = CultivationTaskType.Fertilizing,
+                // Test the new properties we added
+                CareAction = new CareAction
+                {
+                    TaskType = CultivationTaskType.Fertilizing,
+                    PlayerSkillLevel = 7.5f,
+                    Duration = 3.0f
+                },
+                CareEffects = new CareEffects
+                {
+                    HealthImprovement = 0.3f,
+                    NutritionImprovement = 0.4f
+                },
+                PlayerSkillLevel = 7.5f,
+                PlantId_Int = 200
+            };
+            
+            Debug.Log($"✓ Systems PlantCareEventData: Plant={systemsData.PlantId}, Type={systemsData.CareType}, Skill={systemsData.PlayerSkillLevel}");
+        }
+    }
+}

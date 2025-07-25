@@ -1,0 +1,160 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Events;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Data.Construction;
+using System.Collections.Generic;
+
+// Type aliases for types that actually exist (only Data and Systems namespaces)
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using SystemsPlayerChoice = ProjectChimera.Systems.Cultivation.PlayerChoice;
+
+using EventsPlayerChoiceType = ProjectChimera.Events.PlayerChoiceType;
+
+using DataInteractivePlant = ProjectChimera.Data.Cultivation.InteractivePlant;
+using CorePlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
+
+using ConstructionParticipantInfo = ProjectChimera.Data.Construction.ParticipantInfo;
+using ConstructionParticipantRole = ProjectChimera.Data.Construction.ParticipantRole;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Comprehensive Wave 6 Validation Test
+    /// Final validation that all compilation errors from Wave 6 are resolved
+    /// Tests all ambiguous type resolutions and validates system integration
+    /// </summary>
+    public class ComprehensiveWave6ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Comprehensive Wave 6 Validation Test ===");
+            
+            TestAllAmbiguousTypeResolutions();
+            TestTypeConversions();
+            TestSystemIntegration();
+            TestConstructionSystemTypes();
+            TestEventDataStructures();
+            TestPropertyMappings();
+            
+            Debug.Log("✅ Comprehensive Wave 6 validation completed - all errors resolved!");
+        }
+        
+        private void TestAllAmbiguousTypeResolutions()
+        {
+            Debug.Log("Testing all ambiguous type resolutions...");
+            
+            // Test CultivationTaskType in existing namespaces
+            var dataTask = DataCultivationTaskType.Watering;
+            
+            // Test CareQuality in existing namespaces
+            var dataCare = DataCareQuality.Excellent;
+            
+            // Test PlayerChoice in existing namespaces
+            var dataChoice = DataPlayerChoice.OptimalCare;
+            var systemsChoice = SystemsPlayerChoice.AutomationLevel;
+            
+            // Test PlayerChoiceType in existing namespaces
+            var eventsChoiceType = EventsPlayerChoiceType.CultivationMethod;
+            
+            Debug.Log($"✓ All ambiguous types resolved:");
+            Debug.Log($"  CultivationTaskType: Data={dataTask}");
+            Debug.Log($"  CareQuality: Data={dataCare}");
+            Debug.Log($"  PlayerChoice: Data={dataChoice}, Systems={systemsChoice}");
+            Debug.Log($"  PlayerChoiceType: Events={eventsChoiceType}");
+        }
+        
+        private void TestTypeConversions()
+        {
+            Debug.Log("Testing type conversions between namespaces...");
+            
+            // Test enum conversions between existing types (Data to Systems only)
+            var dataChoice = DataPlayerChoice.OptimalCare;
+            var systemsChoice = (SystemsPlayerChoice)dataChoice;
+            
+            Debug.Log($"✓ Type conversions successful:");
+            Debug.Log($"  {dataChoice} → Systems: {systemsChoice}");
+        }
+        
+        private void TestSystemIntegration()
+        {
+            Debug.Log("Testing system integration...");
+            
+            // Test that all major systems compile and are accessible
+            var cultivationManager = GetComponent<EnhancedCultivationGamingManager>();
+            var plantCareSystem = GetComponent<InteractivePlantCareSystem>();
+            var automationSystem = GetComponent<EarnedAutomationProgressionSystem>();
+            var skillTreeSystem = GetComponent<TreeSkillProgressionSystem>();
+            var timeSystem = GetComponent<TimeAccelerationGamingSystem>();
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            
+            Debug.Log("✓ All major cultivation systems compile and are accessible");
+        }
+        
+        private void TestConstructionSystemTypes()
+        {
+            Debug.Log("Testing construction system types...");
+            
+            // Test ParticipantInfo type that was causing conversion errors
+            var participantInfo = new ConstructionParticipantInfo
+            {
+                PlayerId = "test-player",
+                PlayerName = "Test Player",
+                Role = ConstructionParticipantRole.Architect
+            };
+            
+            Debug.Log($"✓ ConstructionParticipantInfo: ID={participantInfo.PlayerId}, Role={participantInfo.Role}");
+        }
+        
+        private void TestEventDataStructures()
+        {
+            Debug.Log("Testing event data structures...");
+            
+            // Test Core.Events PlantCareEventData
+            var coreEventData = new CorePlantCareEventData
+            {
+                PlantId = "test-plant-core",
+                TaskType = DataCultivationTaskType.Watering,
+                CareQuality = DataCareQuality.Good,
+                Timestamp = Time.time,
+                PlantInstance = new DataInteractivePlant
+                {
+                    PlantInstanceID = 123,
+                    PlantedTime = System.DateTime.Now
+                }
+            };
+            
+            Debug.Log($"✓ Event data structures:");
+            Debug.Log($"  Core: Plant={coreEventData.PlantId}, Task={coreEventData.TaskType}");
+        }
+        
+        private void TestPropertyMappings()
+        {
+            Debug.Log("Testing property mappings...");
+            
+            // Test InteractivePlant properties
+            var plant = new DataInteractivePlant
+            {
+                PlantInstanceID = 456,
+                PlantedTime = System.DateTime.Now.AddDays(-30),
+                CurrentLightSatisfaction = 85.5f,
+                CurrentHydrationLevel = 0.75f
+            };
+            
+            // Calculate plant age (this was causing DateTime errors)
+            var plantAgeSeconds = (float)(System.DateTime.Now - plant.PlantedTime).TotalSeconds;
+            var plantAgeDays = plantAgeSeconds / 86400f; // Convert to days
+            
+            Debug.Log($"✓ Property mappings:");
+            Debug.Log($"  Plant ID: {plant.PlantInstanceID}");
+            Debug.Log($"  Plant Age: {plantAgeDays:F1} days");
+            Debug.Log($"  Light Satisfaction: {plant.CurrentLightSatisfaction:F1}%");
+            Debug.Log($"  Hydration Level: {plant.CurrentHydrationLevel:F2}");
+        }
+    }
+}

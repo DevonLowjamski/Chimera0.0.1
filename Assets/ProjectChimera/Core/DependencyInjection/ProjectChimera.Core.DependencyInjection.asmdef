@@ -1,0 +1,19 @@
+{
+    "name": "ProjectChimera.Core.DependencyInjection",
+    "rootNamespace": "ProjectChimera.Core.DependencyInjection",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems",
+        "ProjectChimera.Systems.SpeedTree"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

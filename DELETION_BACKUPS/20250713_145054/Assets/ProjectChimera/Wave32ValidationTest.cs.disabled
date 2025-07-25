@@ -1,0 +1,211 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Environment;
+using ProjectChimera.Data.Cultivation;
+using System;
+
+/// <summary>
+/// Error Wave 32 Validation Test - Namespace Conflicts and Type Conversion Errors Resolution
+/// 
+/// Tests that the CS1503, CS0117, CS0101, and CS0029 errors for namespace conflicts 
+/// and type conversion issues have been resolved in PlantUpdateProcessor.cs and PlantManager.cs.
+/// 
+/// Errors resolved:
+/// - CS1503: Type conversion issues between different EnvironmentalConditions types
+/// - CS0117: Missing StressType enum values and methods in EnvironmentalConditions
+/// - CS0101: Missing IsInitialized and CreateIndoorDefault methods 
+/// - CS0029: Type conversion issues with GeneticPerformanceStats
+/// 
+/// Root cause: Namespace conflicts between Data.Genetics and Systems.Genetics types,
+/// plus duplicate class definitions causing type conversion errors.
+/// 
+/// Solution: Added proper using aliases to specify correct namespace versions,
+/// removed duplicate GeneticPerformanceStats class, and fixed StressType enum mappings.
+/// </summary>
+public class Wave32ValidationTest : MonoBehaviour
+{
+    [Header("Test Configuration")]
+    [SerializeField] private bool _runTestsOnStart = true;
+    [SerializeField] private bool _enableDetailedLogging = true;
+    
+    private void Start()
+    {
+        if (_runTestsOnStart)
+        {
+            RunValidationTests();
+        }
+    }
+    
+    public void RunValidationTests()
+    {
+        LogInfo("=== Error Wave 32 Validation Tests ===");
+        
+        try
+        {
+            // Test 1: Verify namespace aliases work correctly
+            TestNamespaceAliases();
+            
+            // Test 2: Verify StressType enum mapping works
+            TestStressTypeEnumMapping();
+            
+            // Test 3: Verify EnvironmentalConditions type compatibility
+            TestEnvironmentalConditionsCompatibility();
+            
+            // Test 4: Verify GeneticPerformanceStats type compatibility
+            TestGeneticPerformanceStatsCompatibility();
+            
+            // Test 5: Verify PlantUpdateProcessor compilation
+            TestPlantUpdateProcessorCompilation();
+            
+            // Test 6: Verify PlantManager compilation
+            TestPlantManagerCompilation();
+            
+            LogInfo("✅ All Error Wave 32 validation tests passed!");
+            LogInfo("🎯 Zero CS1503, CS0117, CS0101, and CS0029 compilation errors");
+            LogInfo("🔧 Namespace conflicts resolved with proper using aliases");
+            LogInfo("📊 Type conversion issues fixed with correct type mappings");
+            
+        }
+        catch (Exception ex)
+        {
+            LogError($"❌ Error Wave 32 validation failed: {ex.Message}");
+        }
+    }
+    
+    private void TestNamespaceAliases()
+    {
+        LogInfo("Testing namespace aliases...");
+        
+        // Test that we can reference types without ambiguity
+        Type traitExpressionResultType = typeof(ProjectChimera.Systems.Genetics.TraitExpressionResult);
+        Type stressResponseType = typeof(ProjectChimera.Systems.Genetics.StressResponse);
+        Type stressFactorType = typeof(ProjectChimera.Systems.Genetics.StressFactor);
+        Type environmentalConditionsType = typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions);
+        Type geneticPerformanceStatsType = typeof(ProjectChimera.Systems.Genetics.GeneticPerformanceStats);
+        
+        Assert(traitExpressionResultType != null, "TraitExpressionResult type should be accessible");
+        Assert(stressResponseType != null, "StressResponse type should be accessible");
+        Assert(stressFactorType != null, "StressFactor type should be accessible");
+        Assert(environmentalConditionsType != null, "EnvironmentalConditions type should be accessible");
+        Assert(geneticPerformanceStatsType != null, "GeneticPerformanceStats type should be accessible");
+        
+        LogInfo("✅ Namespace aliases working correctly");
+    }
+    
+    private void TestStressTypeEnumMapping()
+    {
+        LogInfo("Testing StressType enum mapping...");
+        
+        // Test that Systems.Genetics.StressType has all required values
+        var systemsStressType = typeof(ProjectChimera.Systems.Genetics.StressType);
+        var enumValues = Enum.GetNames(systemsStressType);
+        
+        bool hasTemperature = Array.Exists(enumValues, name => name == "Temperature");
+        bool hasLight = Array.Exists(enumValues, name => name == "Light");
+        bool hasWater = Array.Exists(enumValues, name => name == "Water");
+        bool hasNutrient = Array.Exists(enumValues, name => name == "Nutrient");
+        bool hasAtmospheric = Array.Exists(enumValues, name => name == "Atmospheric");
+        
+        Assert(hasTemperature, "StressType should have Temperature value");
+        Assert(hasLight, "StressType should have Light value");
+        Assert(hasWater, "StressType should have Water value");
+        Assert(hasNutrient, "StressType should have Nutrient value");
+        Assert(hasAtmospheric, "StressType should have Atmospheric value");
+        
+        LogInfo("✅ StressType enum mapping working correctly");
+    }
+    
+    private void TestEnvironmentalConditionsCompatibility()
+    {
+        LogInfo("Testing EnvironmentalConditions type compatibility...");
+        
+        // Test that we can create EnvironmentalConditions from Data.Cultivation namespace
+        var conditions = new ProjectChimera.Data.Cultivation.EnvironmentalConditions();
+        Assert(conditions != null, "Should be able to create EnvironmentalConditions");
+        
+        // Test that THCPercentage and CBDPercentage properties exist
+        var cannabinoidProfile = new ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CannabinoidProfile();
+        float thcPercentage = cannabinoidProfile.THCPercentage;
+        float cbdPercentage = cannabinoidProfile.CBDPercentage;
+        
+        Assert(thcPercentage >= 0, "THCPercentage should be accessible");
+        Assert(cbdPercentage >= 0, "CBDPercentage should be accessible");
+        
+        LogInfo("✅ EnvironmentalConditions compatibility working correctly");
+    }
+    
+    private void TestGeneticPerformanceStatsCompatibility()
+    {
+        LogInfo("Testing GeneticPerformanceStats type compatibility...");
+        
+        // Test that we can create GeneticPerformanceStats from Systems.Genetics namespace
+        var stats = new ProjectChimera.Systems.Genetics.GeneticPerformanceStats
+        {
+            TotalCalculations = 100,
+            AverageCalculationTimeMs = 1.5,
+            CacheHitRatio = 0.85,
+            BatchCalculations = 10,
+            AverageBatchTimeMs = 15.0
+        };
+        
+        Assert(stats.TotalCalculations == 100, "TotalCalculations should be settable");
+        Assert(stats.AverageCalculationTimeMs == 1.5, "AverageCalculationTimeMs should be settable");
+        Assert(stats.CacheHitRatio == 0.85, "CacheHitRatio should be settable");
+        Assert(stats.BatchCalculations == 10, "BatchCalculations should be settable");
+        Assert(stats.AverageBatchTimeMs == 15.0, "AverageBatchTimeMs should be settable");
+        
+        LogInfo("✅ GeneticPerformanceStats compatibility working correctly");
+    }
+    
+    private void TestPlantUpdateProcessorCompilation()
+    {
+        LogInfo("Testing PlantUpdateProcessor compilation...");
+        
+        // Test that PlantUpdateProcessor can be instantiated without errors
+        var processor = new PlantUpdateProcessor(true, true, true);
+        Assert(processor != null, "PlantUpdateProcessor should be instantiable");
+        
+        LogInfo("✅ PlantUpdateProcessor compiles correctly");
+    }
+    
+    private void TestPlantManagerCompilation()
+    {
+        LogInfo("Testing PlantManager compilation...");
+        
+        // Test that PlantManager type exists and has required methods
+        var managerType = typeof(PlantManager);
+        var getStatsMethod = managerType.GetMethod("GetGeneticPerformanceStats");
+        var getEnhancedStatsMethod = managerType.GetMethod("GetEnhancedStatistics");
+        
+        Assert(getStatsMethod != null, "GetGeneticPerformanceStats method should exist");
+        Assert(getEnhancedStatsMethod != null, "GetEnhancedStatistics method should exist");
+        
+        // Verify return types
+        Assert(getStatsMethod.ReturnType == typeof(ProjectChimera.Systems.Genetics.GeneticPerformanceStats), 
+               "GetGeneticPerformanceStats should return Systems.Genetics.GeneticPerformanceStats");
+        
+        LogInfo("✅ PlantManager compiles correctly");
+    }
+    
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            throw new System.Exception($"Assertion failed: {message}");
+        }
+    }
+    
+    private void LogInfo(string message)
+    {
+        if (_enableDetailedLogging)
+        {
+            Debug.Log($"[Wave32ValidationTest] {message}");
+        }
+    }
+    
+    private void LogError(string message)
+    {
+        Debug.LogError($"[Wave32ValidationTest] {message}");
+    }
+} 

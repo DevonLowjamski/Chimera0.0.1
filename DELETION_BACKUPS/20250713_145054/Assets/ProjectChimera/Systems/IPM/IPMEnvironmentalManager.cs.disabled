@@ -1,0 +1,1177 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using IPMGaming = ProjectChimera.Systems.Gaming.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Advanced environmental manipulation and monitoring manager for Project Chimera's Enhanced IPM Gaming System.
+    /// Handles precision environmental control, microclimate creation, environmental warfare tactics,
+    /// predictive environmental modeling, and sophisticated climate manipulation strategies for strategic
+    /// pest management. Features AI-driven environmental optimization and real-time adaptation systems.
+    /// 
+    /// Key Features:
+    /// - Precision microclimate creation and management
+    /// - Environmental warfare tactics and strategies
+    /// - Predictive environmental modeling with machine learning
+    /// - Real-time environmental monitoring and alerts
+    /// - Automated environmental response systems
+    /// - Multi-zone environmental coordination
+    /// - Energy-efficient climate control optimization
+    /// - Environmental stress detection and mitigation
+    /// </summary>
+    public class IPMEnvironmentalManager : IPMEntityManagerBase<EnvironmentalZoneData, EnvironmentalZoneType>, IPMGaming.IIPMEnvironmentalManager
+    {
+        [Header("Environmental Control Configuration")]
+        [SerializeField] private float _environmentalUpdateInterval = 5f;
+        [SerializeField] private float _predictionUpdateInterval = 30f;
+        [SerializeField] private bool _enablePredictiveControl = true;
+        [SerializeField] private bool _enableAutomatedResponse = true;
+        [SerializeField] private bool _enableEnergyOptimization = true;
+        
+        [Header("Zone Management")]
+        [SerializeField] private int _maxEnvironmentalZones = 50;
+        [SerializeField] private float _zoneEffectRadius = 10f;
+        [SerializeField] private float _zoneInteractionRange = 5f;
+        [SerializeField] private bool _enableZoneInteractions = true;
+        [SerializeField] private float _energyEfficiencyFactor = 0.8f;
+        
+        [Header("Environmental Warfare")]
+        [SerializeField] private bool _enableEnvironmentalWarfare = true;
+        [SerializeField] private float _hostileZoneEffectiveness = 1.2f;
+        [SerializeField] private float _defensiveZoneEffectiveness = 0.9f;
+        [SerializeField] private bool _enableCounterMeasures = true;
+        
+        [Header("Predictive Systems")]
+        [SerializeField] private bool _enableWeatherPrediction = true;
+        [SerializeField] private bool _enablePestBehaviorPrediction = true;
+        [SerializeField] private int _predictionHorizonDays = 7;
+        [SerializeField] private float _predictionAccuracy = 0.85f;
+        
+        // Environmental Control Systems
+        private IPMGaming.EnvironmentalPredictor _environmentalPredictor;
+        private IPMGaming.MicroclimateController _microclimateController;
+        private IPMGaming.EnvironmentalWarfareCoordinator _warfareCoordinator;
+        private IPMGaming.AutomatedResponseSystem _automatedResponse;
+        private IPMGaming.EnergyOptimizationEngine _energyOptimizer;
+        
+        // Zone Management
+        private Dictionary<string, IPMGaming.EnvironmentalZoneState> _zoneStates = new Dictionary<string, IPMGaming.EnvironmentalZoneState>();
+        private Dictionary<EnvironmentalZoneType, IPMGaming.ZoneTypeProfile> _zoneProfiles = new Dictionary<EnvironmentalZoneType, IPMGaming.ZoneTypeProfile>();
+        private List<IPMGaming.ZoneInteraction> _activeZoneInteractions = new List<IPMGaming.ZoneInteraction>();
+        
+        // Environmental Monitoring
+        private IPMGaming.EnvironmentalSensorNetwork _sensorNetwork;
+        private IPMGaming.EnvironmentalMetrics _environmentalMetrics = new IPMGaming.EnvironmentalMetrics();
+        private List<IPMGaming.EnvironmentalAlert> _environmentalAlerts = new List<IPMGaming.EnvironmentalAlert>();
+        private Dictionary<string, IPMGaming.EnvironmentalTrend> _environmentalTrends = new Dictionary<string, IPMGaming.EnvironmentalTrend>();
+        
+        // Predictive Analytics
+        private IPMGaming.EnvironmentalPredictionModel _predictionModel;
+        private List<IPMGaming.EnvironmentalPrediction> _activePredictions = new List<IPMGaming.EnvironmentalPrediction>();
+        private Dictionary<string, IPMGaming.PredictionAccuracy> _predictionAccuracies = new Dictionary<string, IPMGaming.PredictionAccuracy>();
+        
+        // Performance Optimization
+        private float _lastEnvironmentalUpdate;
+        private float _lastPredictionUpdate;
+        private IPMGaming.EnvironmentalUpdateScheduler _updateScheduler;
+        
+        // Events
+        public event Action<EnvironmentalZoneData> OnZoneCreated;
+        public event Action<EnvironmentalZoneData> OnZoneModified;
+        public event Action<EnvironmentalZoneData> OnZoneDestroyed;
+        public event Action<IPMGaming.EnvironmentalAlert> OnEnvironmentalAlert;
+        public event Action<IPMGaming.EnvironmentalPrediction> OnPredictionGenerated;
+        public event Action<IPMGaming.EnvironmentalMetrics> OnEnvironmentalMetricsUpdated;
+        
+        #region Initialization
+        
+        protected override void InitializeEntityManagerSpecific()
+        {
+            InitializeZoneProfiles();
+            InitializeEnvironmentalSystems();
+            InitializePredictiveSystems();
+            InitializeMonitoringSystems();
+            InitializePerformanceOptimization();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[IPMEnvironmentalManager] Environmental control system initialized with predictive analytics");
+            }
+        }
+        
+        private void InitializeZoneProfiles()
+        {
+            foreach (EnvironmentalZoneType zoneType in Enum.GetValues(typeof(EnvironmentalZoneType)))
+            {
+                _zoneProfiles[zoneType] = CreateZoneTypeProfile(zoneType);
+            }
+        }
+        
+        private void InitializeEnvironmentalSystems()
+        {
+            _microclimateController = new IPMGaming.MicroclimateController();
+            _microclimateController.ControlParameters["ZoneEffectRadius"] = _zoneEffectRadius;
+            _microclimateController.ControlParameters["EnergyEfficiencyFactor"] = _energyEfficiencyFactor;
+            _sensorNetwork = new IPMGaming.EnvironmentalSensorNetwork();
+            _energyOptimizer = new IPMGaming.EnergyOptimizationEngine();
+            _energyOptimizer.IsOptimizing = _enableEnergyOptimization;
+            
+            if (_enableEnvironmentalWarfare)
+            {
+                _warfareCoordinator = new IPMGaming.EnvironmentalWarfareCoordinator();
+                _warfareCoordinator.TacticEffectiveness["HostileZoneEffectiveness"] = _hostileZoneEffectiveness;
+                _warfareCoordinator.TacticEffectiveness["DefensiveZoneEffectiveness"] = _defensiveZoneEffectiveness;
+                _warfareCoordinator.IsCoordinating = _enableCounterMeasures;
+            }
+            
+            if (_enableAutomatedResponse)
+            {
+                _automatedResponse = new IPMGaming.AutomatedResponseSystem();
+            }
+        }
+        
+        private void InitializePredictiveSystems()
+        {
+            if (_enablePredictiveControl)
+            {
+                _environmentalPredictor = new IPMGaming.EnvironmentalPredictor(
+                    _predictionHorizonDays, 
+                    _predictionAccuracy,
+                    _enableWeatherPrediction,
+                    _enablePestBehaviorPrediction
+                );
+                
+                _predictionModel = new IPMGaming.EnvironmentalPredictionModel();
+            }
+        }
+        
+        private void InitializeMonitoringSystems()
+        {
+            _sensorNetwork.Initialize();
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            _updateScheduler = new EnvironmentalUpdateScheduler(_maxEntitiesPerUpdate);
+        }
+        
+        #endregion
+        
+        #region IIPMEnvironmentalManager Implementation
+        
+        public void CreateEnvironmentalZone(EnvironmentalZoneData zoneData)
+        {
+            var entityId = SpawnEntity(zoneData, zoneData.Type, zoneData.Center);
+            
+            if (!string.IsNullOrEmpty(entityId))
+            {
+                // Initialize zone state
+                _zoneStates[entityId] = new IPMGaming.EnvironmentalZoneState
+                {
+                    ZoneId = entityId,
+                    IsActive = true,
+                    CreationTime = DateTime.Now,
+                    LastUpdate = DateTime.Now,
+                    CurrentEffectiveness = zoneData.Effectiveness,
+                    EnergyConsumption = zoneData.EnergyConsumption,
+                    EnvironmentalImpact = CalculateEnvironmentalImpact(zoneData),
+                    AffectedOrganisms = new List<string>(),
+                    ZoneInteractions = new List<string>()
+                };
+                
+                // Initialize microclimate
+                _microclimateController.CreateMicroclimate(entityId, zoneData);
+                
+                // Check for zone interactions
+                if (_enableZoneInteractions)
+                {
+                    CheckZoneInteractions(entityId, zoneData);
+                }
+                
+                // Update environmental metrics
+                UpdateEnvironmentalMetricsFromCreation(zoneData);
+                
+                OnZoneCreated?.Invoke(zoneData);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMEnvironmentalManager] Environmental zone created: {zoneData.Type} at {zoneData.Center}");
+                }
+            }
+        }
+        
+        public void ModifyZone(string zoneId, Dictionary<string, float> parameters)
+        {
+            var zoneData = GetEntity(zoneId);
+            if (zoneData == null) return;
+            
+            var oldParameters = new Dictionary<string, float>(zoneData.Parameters);
+            
+            // Apply parameter changes
+            foreach (var param in parameters)
+            {
+                zoneData.Parameters[param.Key] = param.Value;
+            }
+            
+            // Update microclimate
+            _microclimateController.UpdateMicroclimate(zoneId, zoneData);
+            
+            // Recalculate effectiveness
+            var newEffectiveness = CalculateZoneEffectiveness(zoneData);
+            zoneData.Effectiveness = newEffectiveness;
+            
+            // Update zone state
+            if (_zoneStates.TryGetValue(zoneId, out var state))
+            {
+                state.CurrentEffectiveness = newEffectiveness;
+                state.LastUpdate = DateTime.Now;
+                state.EnergyConsumption = CalculateEnergyConsumption(zoneData);
+                _zoneStates[zoneId] = state;
+            }
+            
+            // Check for new interactions
+            if (_enableZoneInteractions)
+            {
+                UpdateZoneInteractions(zoneId, zoneData);
+            }
+            
+            OnZoneModified?.Invoke(zoneData);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMEnvironmentalManager] Zone {zoneId} modified - Effectiveness: {newEffectiveness:F2}");
+            }
+        }
+        
+        public void DestroyZone(string zoneId)
+        {
+            var zoneData = GetEntity(zoneId);
+            if (zoneData != null)
+            {
+                // Update environmental metrics
+                UpdateEnvironmentalMetricsFromDestruction(zoneData);
+                
+                // Remove microclimate
+                _microclimateController.RemoveMicroclimate(zoneId);
+                
+                // Remove zone interactions
+                RemoveZoneInteractions(zoneId);
+                
+                // Cleanup state
+                _zoneStates.Remove(zoneId);
+                
+                OnZoneDestroyed?.Invoke(zoneData);
+                
+                // Destroy the entity
+                DestroyEntity(zoneId);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMEnvironmentalManager] Environmental zone destroyed: {zoneData.Type}");
+                }
+            }
+        }
+        
+        public List<EnvironmentalZoneData> GetActiveZones()
+        {
+            return _activeEntities.Values.ToList();
+        }
+        
+        public float CalculateEnvironmentalEffectiveness(Vector3 position, PestType pestType)
+        {
+            var nearbyZones = GetEntityIdsInRadius(position, _zoneEffectRadius);
+            var totalEffectiveness = 0f;
+            var zoneCount = 0;
+            
+            foreach (var zoneId in nearbyZones)
+            {
+                var zoneData = GetEntity(zoneId);
+                if (zoneData?.IsActive == true)
+                {
+                    var distance = Vector3.Distance(position, zoneData.Center);
+                    var effectiveRadius = _zoneEffectRadius * zoneData.Effectiveness;
+                    
+                    if (distance <= effectiveRadius)
+                    {
+                        var effectiveness = CalculateZoneEffectivenessAgainstPest(zoneData, pestType, distance);
+                        totalEffectiveness += effectiveness;
+                        zoneCount++;
+                    }
+                }
+            }
+            
+            // Account for zone interactions
+            if (zoneCount > 1 && _enableZoneInteractions)
+            {
+                totalEffectiveness *= CalculateZoneInteractionMultiplier(nearbyZones);
+            }
+            
+            return zoneCount > 0 ? totalEffectiveness / zoneCount : 0f;
+        }
+        
+        public bool CanCreateZone(EnvironmentalZoneType type, Vector3 position)
+        {
+            // Check zone limits
+            var currentCount = GetEntityCount(type);
+            var maxForType = GetMaxZonesForType(type);
+            
+            if (currentCount >= maxForType)
+                return false;
+            
+            // Check energy capacity
+            if (_enableEnergyOptimization && !HasEnergyCapacity(type))
+                return false;
+            
+            // Check zone conflicts
+            if (HasZoneConflict(type, position))
+                return false;
+            
+            // Check resource requirements
+            if (!HasRequiredResources(type))
+                return false;
+            
+            return true;
+        }
+        
+        #endregion
+        
+        #region Environmental Updates
+        
+        protected override void UpdateSystemSpecific(float deltaTime)
+        {
+            if (Time.time - _lastEnvironmentalUpdate >= _environmentalUpdateInterval)
+            {
+                UpdateEnvironmentalZones(deltaTime);
+                UpdateEnvironmentalMetrics();
+                ProcessEnvironmentalAlerts();
+                _lastEnvironmentalUpdate = Time.time;
+            }
+            
+            if (Time.time - _lastPredictionUpdate >= _predictionUpdateInterval)
+            {
+                UpdatePredictiveSystems();
+                _lastPredictionUpdate = Time.time;
+            }
+        }
+        
+        private void UpdateEnvironmentalZones(float deltaTime)
+        {
+            var zonesToUpdate = _updateScheduler.GetZonesForUpdate(_zoneStates.Keys.ToList());
+            
+            foreach (var zoneId in zonesToUpdate)
+            {
+                UpdateSingleZone(zoneId, deltaTime);
+            }
+            
+            // Update zone interactions
+            if (_enableZoneInteractions)
+            {
+                UpdateZoneInteractions();
+            }
+            
+            // Update energy optimization
+            if (_enableEnergyOptimization)
+            {
+                _energyOptimizer.OptimizeEnergyUsage(_activeEntities.Values.ToList(), _zoneStates);
+            }
+        }
+        
+        private void UpdateSingleZone(string zoneId, float deltaTime)
+        {
+            var zoneData = GetEntity(zoneId);
+            if (zoneData == null) return;
+            
+            if (!_zoneStates.TryGetValue(zoneId, out var state)) return;
+            
+            // Update microclimate
+            _microclimateController.UpdateMicroclimate(zoneId, zoneData);
+            
+            // Update effectiveness based on conditions
+            var newEffectiveness = CalculateZoneEffectiveness(zoneData);
+            var effectivenessChange = newEffectiveness - state.CurrentEffectiveness;
+            
+            state.CurrentEffectiveness = newEffectiveness;
+            state.LastUpdate = DateTime.Now;
+            state.EnergyConsumption = CalculateEnergyConsumption(zoneData);
+            
+            // Update environmental impact
+            state.EnvironmentalImpact = CalculateEnvironmentalImpact(zoneData);
+            
+            // Check for degradation or improvement
+            if (Math.Abs(effectivenessChange) > 0.1f)
+            {
+                ProcessEffectivenessChange(zoneId, zoneData, effectivenessChange);
+            }
+            
+            // Update affected organisms
+            UpdateAffectedOrganisms(zoneId, zoneData, state);
+            
+            _zoneStates[zoneId] = state;
+        }
+        
+        private void UpdateEnvironmentalMetrics()
+        {
+            _environmentalMetrics.TotalZones = _activeEntities.Count;
+            _environmentalMetrics.TotalEnergyConsumption = _zoneStates.Values.Sum(z => z.EnergyConsumption);
+            _environmentalMetrics.AverageEffectiveness = _zoneStates.Values.Average(z => z.CurrentEffectiveness);
+            _environmentalMetrics.EnvironmentalCoverage = CalculateEnvironmentalCoverage();
+            _environmentalMetrics.LastUpdate = DateTime.Now;
+            
+            OnEnvironmentalMetricsUpdated?.Invoke(_environmentalMetrics);
+        }
+        
+        private void ProcessEnvironmentalAlerts()
+        {
+            // Check for system-wide environmental issues
+            CheckEnergyOverload();
+            CheckEffectivenessDecline();
+            CheckZoneConflicts();
+            CheckEnvironmentalStress();
+        }
+        
+        private void UpdatePredictiveSystems()
+        {
+            if (!_enablePredictiveControl || _environmentalPredictor == null) return;
+            
+            // Generate new predictions
+            var newPredictions = _environmentalPredictor.GeneratePredictions(_activeEntities.Values.ToList(), _environmentalMetrics);
+            
+            foreach (var prediction in newPredictions)
+            {
+                _activePredictions.Add(prediction);
+                OnPredictionGenerated?.Invoke(prediction);
+                
+                // Trigger automated responses if enabled
+                if (_enableAutomatedResponse && prediction.ConfidenceLevel > 0.8f)
+                {
+                    _automatedResponse.ProcessPrediction(prediction, this);
+                }
+            }
+            
+            // Update prediction model with actual outcomes
+            UpdatePredictionAccuracies();
+            
+            // Clean up old predictions
+            CleanupOldPredictions();
+        }
+        
+        #endregion
+        
+        #region Zone Interactions
+        
+        private void CheckZoneInteractions(string newZoneId, EnvironmentalZoneData newZone)
+        {
+            var nearbyZones = GetEntityIdsInRadius(newZone.Center, _zoneInteractionRange);
+            
+            foreach (var nearbyZoneId in nearbyZones)
+            {
+                if (nearbyZoneId == newZoneId) continue;
+                
+                var nearbyZone = GetEntity(nearbyZoneId);
+                if (nearbyZone != null)
+                {
+                    var interaction = CreateZoneInteraction(newZoneId, newZone, nearbyZoneId, nearbyZone);
+                    if (interaction != null)
+                    {
+                        _activeZoneInteractions.Add(interaction);
+                        
+                        // Update zone states with interaction info
+                        UpdateZoneStateWithInteraction(newZoneId, interaction);
+                        UpdateZoneStateWithInteraction(nearbyZoneId, interaction);
+                    }
+                }
+            }
+        }
+        
+        private IPMGaming.ZoneInteraction CreateZoneInteraction(string zone1Id, EnvironmentalZoneData zone1, 
+            string zone2Id, EnvironmentalZoneData zone2)
+        {
+            var interactionType = DetermineInteractionType(zone1.Type, zone2.Type);
+            var interactionStrength = CalculateInteractionStrength(zone1, zone2);
+            
+            if (interactionStrength < 0.1f) return null; // No significant interaction
+            
+            return new IPMGaming.ZoneInteraction
+            {
+                InteractionId = Guid.NewGuid().ToString(),
+                Zone1Id = zone1Id,
+                Zone2Id = zone2Id,
+                InteractionType = interactionType,
+                Strength = interactionStrength,
+                EffectMultiplier = CalculateEffectMultiplier(interactionType, interactionStrength),
+                IsActive = true,
+                CreationTime = DateTime.Now
+            };
+        }
+        
+        private IPMGaming.ZoneInteractionType DetermineInteractionType(EnvironmentalZoneType type1, EnvironmentalZoneType type2)
+        {
+            // Define interaction types between different zone types
+            if (type1 == type2) return IPMGaming.ZoneInteractionType.Reinforcement;
+            
+            var conflictingTypes = new List<(EnvironmentalZoneType, EnvironmentalZoneType)>
+            {
+                (EnvironmentalZoneType.TemperatureGradient, EnvironmentalZoneType.HumidityBarrier),
+                (EnvironmentalZoneType.AirflowChannel, EnvironmentalZoneType.PheromoneMask),
+                (EnvironmentalZoneType.SonicField, EnvironmentalZoneType.ElectromagneticField)
+            };
+            
+            var synergisticTypes = new List<(EnvironmentalZoneType, EnvironmentalZoneType)>
+            {
+                (EnvironmentalZoneType.TemperatureGradient, EnvironmentalZoneType.AirflowChannel),
+                (EnvironmentalZoneType.HumidityBarrier, EnvironmentalZoneType.PheromoneMask),
+                (EnvironmentalZoneType.LightSpectrum, EnvironmentalZoneType.CO2Concentration)
+            };
+            
+            if (conflictingTypes.Any(pair => (pair.Item1 == type1 && pair.Item2 == type2) || 
+                                            (pair.Item1 == type2 && pair.Item2 == type1)))
+            {
+                return IPMGaming.ZoneInteractionType.Interference;
+            }
+            
+            if (synergisticTypes.Any(pair => (pair.Item1 == type1 && pair.Item2 == type2) || 
+                                            (pair.Item1 == type2 && pair.Item2 == type1)))
+            {
+                return IPMGaming.ZoneInteractionType.Synergy;
+            }
+            
+            return IPMGaming.ZoneInteractionType.Neutral;
+        }
+        
+        private float CalculateInteractionStrength(EnvironmentalZoneData zone1, EnvironmentalZoneData zone2)
+        {
+            var distance = Vector3.Distance(zone1.Center, zone2.Center);
+            var maxInteractionDistance = _zoneInteractionRange;
+            
+            if (distance > maxInteractionDistance) return 0f;
+            
+            var distanceFactor = 1f - (distance / maxInteractionDistance);
+            var intensityFactor = (zone1.Intensity + zone2.Intensity) / 2f;
+            
+            return distanceFactor * intensityFactor;
+        }
+        
+        private float CalculateEffectMultiplier(IPMGaming.ZoneInteractionType interactionType, float strength)
+        {
+            return interactionType switch
+            {
+                IPMGaming.ZoneInteractionType.Synergy => 1f + (strength * 0.5f),
+                IPMGaming.ZoneInteractionType.Reinforcement => 1f + (strength * 0.3f),
+                IPMGaming.ZoneInteractionType.Interference => 1f - (strength * 0.4f),
+                IPMGaming.ZoneInteractionType.Neutral => 1f,
+                _ => 1f
+            };
+        }
+        
+        private void UpdateZoneInteractions()
+        {
+            for (int i = _activeZoneInteractions.Count - 1; i >= 0; i--)
+            {
+                var interaction = _activeZoneInteractions[i];
+                
+                // Check if zones still exist
+                if (GetEntity(interaction.Zone1Id) == null || GetEntity(interaction.Zone2Id) == null)
+                {
+                    _activeZoneInteractions.RemoveAt(i);
+                    continue;
+                }
+                
+                // Update interaction strength
+                var zone1 = GetEntity(interaction.Zone1Id);
+                var zone2 = GetEntity(interaction.Zone2Id);
+                var newStrength = CalculateInteractionStrength(zone1, zone2);
+                
+                if (newStrength < 0.1f)
+                {
+                    _activeZoneInteractions.RemoveAt(i);
+                    RemoveZoneInteractionFromStates(interaction);
+                }
+                else
+                {
+                    interaction.Strength = newStrength;
+                    interaction.EffectMultiplier = CalculateEffectMultiplier(interaction.InteractionType, newStrength);
+                    _activeZoneInteractions[i] = interaction;
+                }
+            }
+        }
+        
+        private void UpdateZoneInteractions(string zoneId, EnvironmentalZoneData zoneData)
+        {
+            // Remove old interactions
+            RemoveZoneInteractions(zoneId);
+            
+            // Create new interactions
+            CheckZoneInteractions(zoneId, zoneData);
+        }
+        
+        private void RemoveZoneInteractions(string zoneId)
+        {
+            for (int i = _activeZoneInteractions.Count - 1; i >= 0; i--)
+            {
+                var interaction = _activeZoneInteractions[i];
+                if (interaction.Zone1Id == zoneId || interaction.Zone2Id == zoneId)
+                {
+                    _activeZoneInteractions.RemoveAt(i);
+                    RemoveZoneInteractionFromStates(interaction);
+                }
+            }
+        }
+        
+        private void UpdateZoneStateWithInteraction(string zoneId, IPMGaming.ZoneInteraction interaction)
+        {
+            if (_zoneStates.TryGetValue(zoneId, out var state))
+            {
+                if (!state.ZoneInteractions.Contains(interaction.InteractionId))
+                {
+                    state.ZoneInteractions.Add(interaction.InteractionId);
+                    _zoneStates[zoneId] = state;
+                }
+            }
+        }
+        
+        private void RemoveZoneInteractionFromStates(IPMGaming.ZoneInteraction interaction)
+        {
+            if (_zoneStates.TryGetValue(interaction.Zone1Id, out var state1))
+            {
+                state1.ZoneInteractions.Remove(interaction.InteractionId);
+                _zoneStates[interaction.Zone1Id] = state1;
+            }
+            
+            if (_zoneStates.TryGetValue(interaction.Zone2Id, out var state2))
+            {
+                state2.ZoneInteractions.Remove(interaction.InteractionId);
+                _zoneStates[interaction.Zone2Id] = state2;
+            }
+        }
+        
+        #endregion
+        
+        #region Calculations and Helpers
+        
+        private float CalculateZoneEffectiveness(EnvironmentalZoneData zoneData)
+        {
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            if (profile == null) return 0.5f;
+            
+            var baseEffectiveness = zoneData.Effectiveness;
+            var energyEfficiency = CalculateEnergyEfficiency(zoneData);
+            var environmentalFactor = CalculateEnvironmentalSuitability(zoneData);
+            var ageFactor = CalculateAgeFactor(zoneData);
+            
+            var finalEffectiveness = baseEffectiveness * energyEfficiency * environmentalFactor * ageFactor;
+            
+            // Apply zone interactions
+            var interactionMultiplier = CalculateZoneInteractionMultiplier(new List<string> { zoneData.ZoneId });
+            finalEffectiveness *= interactionMultiplier;
+            
+            return Mathf.Clamp01(finalEffectiveness);
+        }
+        
+        private float CalculateZoneEffectivenessAgainstPest(EnvironmentalZoneData zoneData, PestType pestType, float distance)
+        {
+            var baseEffectiveness = zoneData.Effectiveness;
+            var distanceFactor = 1f - (distance / _zoneEffectRadius);
+            var pestSusceptibility = GetPestSusceptibilityToZone(pestType, zoneData.Type);
+            
+            return baseEffectiveness * distanceFactor * pestSusceptibility;
+        }
+        
+        private float CalculateEnergyConsumption(EnvironmentalZoneData zoneData)
+        {
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            if (profile == null) return 100f;
+            
+            var baseConsumption = profile.BaseEnergyConsumption;
+            var intensityFactor = zoneData.Intensity;
+            var sizeFactor = CalculateZoneSizeFactor(zoneData);
+            var efficiencyFactor = _energyEfficiencyFactor;
+            
+            return baseConsumption * intensityFactor * sizeFactor * efficiencyFactor;
+        }
+        
+        private float CalculateEnvironmentalImpact(EnvironmentalZoneData zoneData)
+        {
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            if (profile == null) return 0f;
+            
+            return profile.EnvironmentalImpact * zoneData.Intensity;
+        }
+        
+        private float CalculateEnergyEfficiency(EnvironmentalZoneData zoneData)
+        {
+            var currentConsumption = zoneData.EnergyConsumption;
+            var optimalConsumption = CalculateOptimalEnergyConsumption(zoneData);
+            
+            if (optimalConsumption <= 0) return 1f;
+            
+            return Mathf.Clamp01(optimalConsumption / currentConsumption);
+        }
+        
+        private float CalculateEnvironmentalSuitability(EnvironmentalZoneData zoneData)
+        {
+            // Environmental factors that affect zone performance
+            var temperature = GetCurrentTemperature();
+            var humidity = GetCurrentHumidity();
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            
+            if (profile == null) return 1f;
+            
+            var tempSuitability = CalculateSuitabilityFactor(temperature, profile.OptimalTemperature, profile.TemperatureTolerance);
+            var humiditySuitability = CalculateSuitabilityFactor(humidity, profile.OptimalHumidity, profile.HumidityTolerance);
+            
+            return (tempSuitability + humiditySuitability) / 2f;
+        }
+        
+        private float CalculateAgeFactor(EnvironmentalZoneData zoneData)
+        {
+            if (!_zoneStates.TryGetValue(zoneData.ZoneId, out var state)) return 1f;
+            
+            var age = DateTime.Now - state.CreationTime;
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            
+            if (profile == null) return 1f;
+            
+            // Zones may degrade over time
+            var degradationRate = profile.DegradationRate;
+            var ageFactor = Math.Max(0.1f, 1f - (float)(age.TotalDays * degradationRate));
+            
+            return ageFactor;
+        }
+        
+        private float CalculateZoneInteractionMultiplier(List<string> zoneIds)
+        {
+            var multiplier = 1f;
+            
+            foreach (var zoneId in zoneIds)
+            {
+                if (_zoneStates.TryGetValue(zoneId, out var state))
+                {
+                    foreach (var interactionId in state.ZoneInteractions)
+                    {
+                        var interaction = _activeZoneInteractions.FirstOrDefault(i => i.InteractionId == interactionId);
+                        if (interaction != null)
+                        {
+                            multiplier *= interaction.EffectMultiplier;
+                        }
+                    }
+                }
+            }
+            
+            return multiplier;
+        }
+        
+        private float GetPestSusceptibilityToZone(PestType pestType, EnvironmentalZoneType zoneType)
+        {
+            // Define pest susceptibility to different environmental zones
+            return (pestType, zoneType) switch
+            {
+                (PestType.SpiderMites, EnvironmentalZoneType.HumidityBarrier) => 1.2f,
+                (PestType.Aphids, EnvironmentalZoneType.TemperatureGradient) => 1.1f,
+                (PestType.Thrips, EnvironmentalZoneType.AirflowChannel) => 1.3f,
+                (PestType.Whiteflies, EnvironmentalZoneType.LightSpectrum) => 1.0f,
+                (PestType.Fungusgnats, EnvironmentalZoneType.HumidityBarrier) => 1.4f,
+                _ => 0.8f
+            };
+        }
+        
+        // Environmental getters (would integrate with environmental systems)
+        private float GetCurrentTemperature() => UnityEngine.Random.Range(18f, 28f);
+        private float GetCurrentHumidity() => UnityEngine.Random.Range(0.4f, 0.8f);
+        
+        private float CalculateSuitabilityFactor(float actual, float optimal, float tolerance)
+        {
+            var deviation = Mathf.Abs(actual - optimal);
+            var normalizedDeviation = deviation / tolerance;
+            return Mathf.Max(0.1f, 1f - normalizedDeviation);
+        }
+        
+        private float CalculateZoneSizeFactor(EnvironmentalZoneData zoneData)
+        {
+            var volume = zoneData.Size.x * zoneData.Size.y * zoneData.Size.z;
+            var normalizedVolume = volume / 1000f; // Normalize to 1000 cubic units
+            return Mathf.Max(0.5f, normalizedVolume);
+        }
+        
+        private float CalculateOptimalEnergyConsumption(EnvironmentalZoneData zoneData)
+        {
+            var profile = _zoneProfiles.GetValueOrDefault(zoneData.Type);
+            if (profile == null) return zoneData.EnergyConsumption;
+            
+            return profile.BaseEnergyConsumption * zoneData.Intensity * 0.8f; // 80% of base for optimal
+        }
+        
+        private float CalculateEnvironmentalCoverage()
+        {
+            // Calculate percentage of facility covered by environmental zones
+            var totalFacilityArea = 10000f; // Placeholder
+            var coveredArea = _activeEntities.Values.Sum(z => z.Size.x * z.Size.z);
+            
+            return Mathf.Min(1f, coveredArea / totalFacilityArea);
+        }
+        
+        #endregion
+        
+        #region Entity Manager Implementation
+        
+        protected override EnvironmentalZoneData CreateEntityInstance()
+        {
+            return new EnvironmentalZoneData();
+        }
+        
+        protected override void DestroyEntityInstance(EnvironmentalZoneData entity)
+        {
+            // Cleanup entity-specific resources
+        }
+        
+        protected override void ConfigureEntity(EnvironmentalZoneData entity, EnvironmentalZoneData sourceData, 
+            EnvironmentalZoneType entityType, Vector3 position)
+        {
+            entity.ZoneId = sourceData.ZoneId;
+            entity.Type = sourceData.Type;
+            entity.Center = position;
+            entity.Size = sourceData.Size;
+            entity.Intensity = sourceData.Intensity;
+            entity.Parameters = sourceData.Parameters ?? new Dictionary<string, float>();
+            entity.IsActive = sourceData.IsActive;
+            entity.EnergyConsumption = sourceData.EnergyConsumption;
+            entity.CreationTime = sourceData.CreationTime;
+            entity.AffectedPests = sourceData.AffectedPests ?? new List<PestType>();
+            entity.Effectiveness = sourceData.Effectiveness;
+            entity.PlayerId = sourceData.PlayerId;
+        }
+        
+        protected override void UpdateEntitySpecific(string entityId, EnvironmentalZoneData entity, float deltaTime)
+        {
+            // Entity-specific updates are handled in UpdateSingleZone
+        }
+        
+        protected override EnvironmentalZoneType GetEntityType(string entityId)
+        {
+            var entity = GetEntity(entityId);
+            return entity?.Type ?? EnvironmentalZoneType.TemperatureGradient;
+        }
+        
+        protected override string GenerateEntityId()
+        {
+            return "EnvZone_" + Guid.NewGuid().ToString("N")[..8];
+        }
+        
+        protected override bool ShouldMarkForDestruction(string entityId)
+        {
+            if (_zoneStates.TryGetValue(entityId, out var state))
+            {
+                return !state.IsActive || state.CurrentEffectiveness <= 0.1f;
+            }
+            return false;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private IPMGaming.ZoneTypeProfile CreateZoneTypeProfile(EnvironmentalZoneType zoneType)
+        {
+            return zoneType switch
+            {
+                EnvironmentalZoneType.TemperatureGradient => new IPMGaming.ZoneTypeProfile
+                {
+                    ZoneType = zoneType,
+                    BaseEnergyConsumption = 150f,
+                    EnvironmentalImpact = 0.3f,
+                    OptimalTemperature = 24f,
+                    TemperatureTolerance = 5f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.2f,
+                    DegradationRate = 0.001f,
+                    MaxIntensity = 2f,
+                    EffectiveRange = 15f
+                },
+                EnvironmentalZoneType.HumidityBarrier => new IPMGaming.ZoneTypeProfile
+                {
+                    ZoneType = zoneType,
+                    BaseEnergyConsumption = 120f,
+                    EnvironmentalImpact = 0.2f,
+                    OptimalTemperature = 22f,
+                    TemperatureTolerance = 8f,
+                    OptimalHumidity = 0.7f,
+                    HumidityTolerance = 0.15f,
+                    DegradationRate = 0.0008f,
+                    MaxIntensity = 1.8f,
+                    EffectiveRange = 12f
+                },
+                EnvironmentalZoneType.AirflowChannel => new IPMGaming.ZoneTypeProfile
+                {
+                    ZoneType = zoneType,
+                    BaseEnergyConsumption = 100f,
+                    EnvironmentalImpact = 0.15f,
+                    OptimalTemperature = 23f,
+                    TemperatureTolerance = 10f,
+                    OptimalHumidity = 0.5f,
+                    HumidityTolerance = 0.3f,
+                    DegradationRate = 0.0005f,
+                    MaxIntensity = 2.5f,
+                    EffectiveRange = 20f
+                },
+                _ => new IPMGaming.ZoneTypeProfile
+                {
+                    ZoneType = zoneType,
+                    BaseEnergyConsumption = 130f,
+                    EnvironmentalImpact = 0.25f,
+                    OptimalTemperature = 23f,
+                    TemperatureTolerance = 7f,
+                    OptimalHumidity = 0.6f,
+                    HumidityTolerance = 0.25f,
+                    DegradationRate = 0.0007f,
+                    MaxIntensity = 2f,
+                    EffectiveRange = 10f
+                }
+            };
+        }
+        
+        private int GetMaxZonesForType(EnvironmentalZoneType type)
+        {
+            return type switch
+            {
+                EnvironmentalZoneType.TemperatureGradient => 10,
+                EnvironmentalZoneType.HumidityBarrier => 8,
+                EnvironmentalZoneType.AirflowChannel => 15,
+                EnvironmentalZoneType.LightSpectrum => 12,
+                EnvironmentalZoneType.CO2Concentration => 6,
+                _ => 5
+            };
+        }
+        
+        private bool HasEnergyCapacity(EnvironmentalZoneType type)
+        {
+            var profile = _zoneProfiles.GetValueOrDefault(type);
+            if (profile == null) return true;
+            
+            var totalConsumption = _zoneStates.Values.Sum(z => z.EnergyConsumption);
+            var newConsumption = profile.BaseEnergyConsumption;
+            var maxCapacity = 5000f; // Placeholder energy capacity
+            
+            return (totalConsumption + newConsumption) <= maxCapacity;
+        }
+        
+        private bool HasZoneConflict(EnvironmentalZoneType type, Vector3 position)
+        {
+            var conflictingTypes = GetConflictingZoneTypes(type);
+            var nearbyZones = GetEntityIdsInRadius(position, _zoneInteractionRange);
+            
+            foreach (var zoneId in nearbyZones)
+            {
+                var zone = GetEntity(zoneId);
+                if (zone != null && conflictingTypes.Contains(zone.Type))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        private List<EnvironmentalZoneType> GetConflictingZoneTypes(EnvironmentalZoneType type)
+        {
+            return type switch
+            {
+                EnvironmentalZoneType.TemperatureGradient => new List<EnvironmentalZoneType> { EnvironmentalZoneType.HumidityBarrier },
+                EnvironmentalZoneType.HumidityBarrier => new List<EnvironmentalZoneType> { EnvironmentalZoneType.TemperatureGradient },
+                EnvironmentalZoneType.SonicField => new List<EnvironmentalZoneType> { EnvironmentalZoneType.ElectromagneticField },
+                EnvironmentalZoneType.ElectromagneticField => new List<EnvironmentalZoneType> { EnvironmentalZoneType.SonicField },
+                _ => new List<EnvironmentalZoneType>()
+            };
+        }
+        
+        private bool HasRequiredResources(EnvironmentalZoneType type)
+        {
+            // Check if player has required resources to create this zone type
+            return true; // Placeholder - would integrate with resource system
+        }
+        
+        private void ProcessEffectivenessChange(string zoneId, EnvironmentalZoneData zoneData, float change)
+        {
+            if (change < -0.2f)
+            {
+                CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType.EffectivenessDecline, AlertSeverity.Medium,
+                    $"Zone {zoneId} effectiveness declined by {change:P1}", zoneId);
+            }
+            else if (change > 0.2f)
+            {
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMEnvironmentalManager] Zone {zoneId} effectiveness improved by {change:P1}");
+                }
+            }
+        }
+        
+        private void UpdateAffectedOrganisms(string zoneId, EnvironmentalZoneData zoneData, IPMGaming.EnvironmentalZoneState state)
+        {
+            // Track organisms affected by this zone
+            var affectedOrganisms = new List<string>();
+            
+            // This would integrate with pest and biological managers to track affected entities
+            // For now, create placeholder tracking
+            
+            state.AffectedOrganisms = affectedOrganisms;
+        }
+        
+        private void UpdateEnvironmentalMetricsFromCreation(EnvironmentalZoneData zoneData)
+        {
+            _environmentalMetrics.TotalZones++;
+            _environmentalMetrics.TotalEnergyConsumption += zoneData.EnergyConsumption;
+        }
+        
+        private void UpdateEnvironmentalMetricsFromDestruction(EnvironmentalZoneData zoneData)
+        {
+            _environmentalMetrics.TotalZones--;
+            _environmentalMetrics.TotalEnergyConsumption -= zoneData.EnergyConsumption;
+        }
+        
+        private void CheckEnergyOverload()
+        {
+            var maxCapacity = 5000f; // Placeholder
+            var currentConsumption = _environmentalMetrics.TotalEnergyConsumption;
+            
+            if (currentConsumption > maxCapacity * 0.9f)
+            {
+                CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType.EnergyOverload, AlertSeverity.High,
+                    $"Energy consumption at {currentConsumption / maxCapacity:P1} of capacity", null);
+            }
+        }
+        
+        private void CheckEffectivenessDecline()
+        {
+            var averageEffectiveness = _environmentalMetrics.AverageEffectiveness;
+            
+            if (averageEffectiveness < 0.5f)
+            {
+                CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType.SystemDecline, AlertSeverity.Medium,
+                    $"Average zone effectiveness low: {averageEffectiveness:P1}", null);
+            }
+        }
+        
+        private void CheckZoneConflicts()
+        {
+            var conflictCount = _activeZoneInteractions.Count(i => i.InteractionType == IPMGaming.ZoneInteractionType.Interference);
+            
+            if (conflictCount > 3)
+            {
+                CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType.ZoneConflict, AlertSeverity.Medium,
+                    $"{conflictCount} zone conflicts detected", null);
+            }
+        }
+        
+        private void CheckEnvironmentalStress()
+        {
+            var stressedZones = _zoneStates.Values.Count(z => z.CurrentEffectiveness < 0.6f);
+            var totalZones = _zoneStates.Count;
+            
+            if (totalZones > 0 && (float)stressedZones / totalZones > 0.3f)
+            {
+                CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType.EnvironmentalStress, AlertSeverity.Medium,
+                    $"{stressedZones}/{totalZones} zones under environmental stress", null);
+            }
+        }
+        
+        private void CreateEnvironmentalAlert(IPMGaming.EnvironmentalAlertType alertType, AlertSeverity severity, string message, string zoneId)
+        {
+            var alert = new IPMGaming.EnvironmentalAlert
+            {
+                AlertType = alertType,
+                Severity = severity,
+                Message = message,
+                Timestamp = DateTime.Now,
+                ZoneId = zoneId,
+                IsResolved = false
+            };
+            
+            _environmentalAlerts.Add(alert);
+            OnEnvironmentalAlert?.Invoke(alert);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMEnvironmentalManager] Environmental Alert: {message}");
+            }
+        }
+        
+        private void UpdatePredictionAccuracies()
+        {
+            // Update prediction model accuracy based on actual outcomes
+            var completedPredictions = _activePredictions.Where(p => p.PredictionTime < DateTime.Now).ToList();
+            
+            foreach (var prediction in completedPredictions)
+            {
+                var actualOutcome = MeasureActualOutcome(prediction);
+                var accuracy = CalculatePredictionAccuracy(prediction, actualOutcome);
+                
+                if (_predictionAccuracies.TryGetValue(prediction.PredictionType, out var existingAccuracy))
+                {
+                    existingAccuracy.UpdateAccuracy(accuracy);
+                }
+                else
+                {
+                    _predictionAccuracies[prediction.PredictionType] = new IPMGaming.PredictionAccuracy
+                    {
+                        PredictionType = prediction.PredictionType,
+                        TotalPredictions = 1,
+                        CorrectPredictions = accuracy > 0.7f ? 1 : 0,
+                        AverageAccuracy = accuracy
+                    };
+                }
+                
+                _activePredictions.Remove(prediction);
+            }
+        }
+        
+        private float MeasureActualOutcome(IPMGaming.EnvironmentalPrediction prediction)
+        {
+            // Measure actual environmental conditions against prediction
+            return UnityEngine.Random.Range(0.6f, 0.95f); // Placeholder
+        }
+        
+        private float CalculatePredictionAccuracy(EnvironmentalPrediction prediction, float actualOutcome)
+        {
+            // Get the primary predicted value from the dictionary
+            var predictedValue = prediction.PredictedValues.Values.FirstOrDefault();
+            var deviation = Mathf.Abs(predictedValue - actualOutcome);
+            var maxDeviation = Math.Max(predictedValue, actualOutcome);
+            
+            return maxDeviation > 0 ? 1f - (deviation / maxDeviation) : 1f;
+        }
+        
+        private void CleanupOldPredictions()
+        {
+            var cutoffTime = DateTime.Now.AddDays(-_predictionHorizonDays);
+            _activePredictions.RemoveAll(p => p.CreationTime < cutoffTime);
+        }
+        
+        #endregion
+        
+        #region Cleanup
+        
+        protected override void CleanupSystemSpecific()
+        {
+            _zoneStates.Clear();
+            _activeZoneInteractions.Clear();
+            _environmentalAlerts.Clear();
+            _environmentalTrends.Clear();
+            _activePredictions.Clear();
+            _predictionAccuracies.Clear();
+            
+            _microclimateController?.Dispose();
+            _warfareCoordinator?.Dispose();
+            _automatedResponse?.Dispose();
+            _energyOptimizer?.Dispose();
+            _environmentalPredictor?.Dispose();
+            _sensorNetwork?.Dispose();
+        }
+        
+        #endregion
+    }
+}

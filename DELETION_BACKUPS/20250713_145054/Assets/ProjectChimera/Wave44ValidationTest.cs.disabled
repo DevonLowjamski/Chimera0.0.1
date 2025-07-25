@@ -1,0 +1,275 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+using SystemsEnvironmentalConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Wave 44 Validation Test: Verify namespace conflicts are resolved and type conversions work correctly.
+    /// 
+    /// This test validates:
+    /// 1. Namespace disambiguation between three EnvironmentalConditions classes
+    /// 2. Property access on Data.Cultivation.EnvironmentalConditions
+    /// 3. Type conversion between Systems and Data versions
+    /// 4. PlantUpdateProcessor integration with correct types
+    /// 5. All property assignments work without CS1061 errors
+    /// </summary>
+    public class Wave44ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool enableDebugLogging = true;
+        
+        private void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllValidationTests();
+            }
+        }
+        
+        public void RunAllValidationTests()
+        {
+            LogTest("=== Wave 44 Validation Test Suite ===");
+            
+            bool allTestsPassed = true;
+            
+            allTestsPassed &= TestNamespaceDisambiguation();
+            allTestsPassed &= TestDataCultivationEnvironmentalConditionsAccess();
+            allTestsPassed &= TestSystemsCultivationEnvironmentalConditionsAccess();
+            allTestsPassed &= TestTypeConversionMethods();
+            allTestsPassed &= TestPlantUpdateProcessorIntegration();
+            allTestsPassed &= TestPropertyAssignments();
+            
+            LogTest($"=== Wave 44 Validation Complete: {(allTestsPassed ? "PASSED" : "FAILED")} ===");
+        }
+        
+        private bool TestNamespaceDisambiguation()
+        {
+            LogTest("Testing namespace disambiguation...");
+            
+            try
+            {
+                // Test that we can create all three types without conflicts
+                var dataCultivationConditions = EnvironmentalConditions.CreateIndoorDefault();
+                var systemsCultivationConditions = SystemsEnvironmentalConditions.CreateOptimal();
+                var dataEnvironmentConditions = new ProjectChimera.Data.Environment.EnvironmentalConditions();
+                
+                LogTest("✓ All three EnvironmentalConditions types can be created without namespace conflicts");
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Namespace disambiguation failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestDataCultivationEnvironmentalConditionsAccess()
+        {
+            LogTest("Testing Data.Cultivation.EnvironmentalConditions property access...");
+            
+            try
+            {
+                var conditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test all properties that were causing CS1061 errors
+                float airFlow = conditions.AirFlow;
+                float waterAvailability = conditions.WaterAvailability;
+                float vpd = conditions.VPD;
+                float electricalConductivity = conditions.ElectricalConductivity;
+                
+                // Test method that was causing CS1061 error
+                conditions.CalculateDerivedValues();
+                
+                // Test property assignments
+                conditions.AirFlow = 1.5f;
+                conditions.WaterAvailability = 75f;
+                conditions.VPD = 1.2f;
+                conditions.ElectricalConductivity = 1400f;
+                
+                LogTest("✓ All Data.Cultivation.EnvironmentalConditions properties accessible");
+                LogTest($"  - AirFlow: {conditions.AirFlow}");
+                LogTest($"  - WaterAvailability: {conditions.WaterAvailability}");
+                LogTest($"  - VPD: {conditions.VPD}");
+                LogTest($"  - ElectricalConductivity: {conditions.ElectricalConductivity}");
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Data.Cultivation.EnvironmentalConditions access failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestSystemsCultivationEnvironmentalConditionsAccess()
+        {
+            LogTest("Testing Systems.Cultivation.EnvironmentalConditions property access...");
+            
+            try
+            {
+                var systemsConditions = SystemsEnvironmentalConditions.CreateOptimal();
+                
+                // Test properties used in conversion method
+                float temperature = systemsConditions.Temperature;
+                float humidity = systemsConditions.Humidity;
+                float lightIntensity = systemsConditions.LightIntensity;
+                float co2Level = systemsConditions.CO2Level;
+                float airCirculation = systemsConditions.AirCirculation;
+                float ph = systemsConditions.pH;
+                float photoperiodHours = systemsConditions.PhotoperiodHours;
+                float moistureLevel = systemsConditions.MoisureLevel;
+                float ec = systemsConditions.EC;
+                
+                LogTest("✓ All Systems.Cultivation.EnvironmentalConditions properties accessible");
+                LogTest($"  - Temperature: {temperature}°C");
+                LogTest($"  - Humidity: {humidity}%");
+                LogTest($"  - AirCirculation: {airCirculation}%");
+                LogTest($"  - MoisureLevel: {moistureLevel}%");
+                LogTest($"  - EC: {ec} μS/cm");
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Systems.Cultivation.EnvironmentalConditions access failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestTypeConversionMethods()
+        {
+            LogTest("Testing type conversion between Systems and Data EnvironmentalConditions...");
+            
+            try
+            {
+                // Create a Systems version
+                var systemsConditions = SystemsEnvironmentalConditions.CreateOptimal();
+                systemsConditions.Temperature = 26f;
+                systemsConditions.Humidity = 65f;
+                systemsConditions.AirCirculation = 90f;
+                systemsConditions.MoisureLevel = 80f;
+                systemsConditions.EC = 1500f;
+                
+                // Test VPD calculation method
+                float vpd = EnvironmentalConditions.CalculateVPD(systemsConditions.Temperature, systemsConditions.Humidity);
+                
+                LogTest($"✓ VPD calculation successful: {vpd:F2} kPa");
+                
+                // Test creating Data version and assigning properties
+                var dataConditions = EnvironmentalConditions.CreateIndoorDefault();
+                dataConditions.Temperature = systemsConditions.Temperature;
+                dataConditions.Humidity = systemsConditions.Humidity;
+                dataConditions.AirFlow = systemsConditions.AirCirculation / 100f;
+                dataConditions.WaterAvailability = systemsConditions.MoisureLevel;
+                dataConditions.ElectricalConductivity = systemsConditions.EC;
+                dataConditions.VPD = vpd;
+                
+                // Test CalculateDerivedValues method
+                dataConditions.CalculateDerivedValues();
+                
+                LogTest("✓ Type conversion successful");
+                LogTest($"  - Converted Temperature: {dataConditions.Temperature}°C");
+                LogTest($"  - Converted AirFlow: {dataConditions.AirFlow}");
+                LogTest($"  - Converted VPD: {dataConditions.VPD} kPa");
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Type conversion failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantUpdateProcessorIntegration()
+        {
+            LogTest("Testing PlantUpdateProcessor integration...");
+            
+            try
+            {
+                // Create a PlantUpdateProcessor
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                // Create a mock plant instance
+                var plantGO = new GameObject("TestPlant");
+                var plant = plantGO.AddComponent<PlantInstance>();
+                
+                // Initialize with basic data
+                plant.InitializeFromStrain(null); // Will use defaults
+                
+                // Test update method (this internally calls GetPlantEnvironmentalConditions and ConvertToDataCultivationConditions)
+                processor.UpdatePlant(plant, 0.016f, 1f); // 60 FPS delta time
+                
+                // Clean up
+                DestroyImmediate(plantGO);
+                
+                LogTest("✓ PlantUpdateProcessor integration successful");
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantUpdateProcessor integration failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPropertyAssignments()
+        {
+            LogTest("Testing all property assignments that were causing CS1061 errors...");
+            
+            try
+            {
+                var conditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test all property assignments that were failing in Error Wave 44
+                conditions.AirFlow = 1.2f;
+                conditions.WaterAvailability = 85f;
+                conditions.VPD = 1.1f;
+                conditions.ElectricalConductivity = 1300f;
+                
+                // Test static method access
+                var calculatedVPD = EnvironmentalConditions.CalculateVPD(24f, 60f);
+                
+                // Test instance method access
+                conditions.CalculateDerivedValues();
+                
+                // Test that all values are properly assigned
+                bool allAssignmentsValid = 
+                    conditions.AirFlow == 1.2f &&
+                    conditions.WaterAvailability == 85f &&
+                    conditions.VPD == 1.1f &&
+                    conditions.ElectricalConductivity == 1300f;
+                
+                if (allAssignmentsValid)
+                {
+                    LogTest("✓ All property assignments successful");
+                    return true;
+                }
+                else
+                {
+                    LogTest("✗ Some property assignments failed validation");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Property assignments failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private void LogTest(string message)
+        {
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Wave44Validation] {message}");
+            }
+        }
+    }
+} 

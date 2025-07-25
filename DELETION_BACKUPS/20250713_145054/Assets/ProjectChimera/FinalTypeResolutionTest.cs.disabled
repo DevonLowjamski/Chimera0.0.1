@@ -1,0 +1,44 @@
+using UnityEngine;
+using ProjectChimera.Systems.Narrative;
+using ProjectChimera.Data.Narrative;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Progression;
+using System;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final test to verify all type resolution issues are fixed
+    /// </summary>
+    public class FinalTypeResolutionTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("Final type resolution test started");
+            
+            // Test TreeSkillProgressionSystem with correct ExperienceSource type
+            var treeSkill = GetComponent<TreeSkillProgressionSystem>();
+            if (treeSkill != null)
+            {
+                // This should compile without ambiguity errors
+                var result = treeSkill.AddSkillExperience("test", 10f, ExperienceSource.PlantCare);
+            }
+            
+            // Test StoryCampaignManager with correct types
+            var playerDecision = new PlayerDecision
+            {
+                DecisionId = Guid.NewGuid().ToString(),
+                Choice = new StoryChoice { ChoiceId = "test_choice" },
+                Context = new DecisionContext { ContextId = Guid.NewGuid().ToString() },
+                DecisionTime = DateTime.Now,
+                Timestamp = DateTime.Now
+            };
+            
+            // Test NarrativeContext from Systems.Narrative
+            var narrativeContext = new NarrativeContext();
+            narrativeContext.EnableTutorials = true;
+            
+            Debug.Log("Final type resolution test passed - all type conversion issues resolved");
+        }
+    }
+}

@@ -1,0 +1,457 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Systems.Gaming.IPM;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Data.Events;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Abstract base class for all IPM (Integrated Pest Management) gaming systems.
+    /// Provides common functionality, state management, and event handling for IPM subsystems.
+    /// Implements the foundation for strategic pest management combat systems.
+    /// </summary>
+    public abstract class IPMSystemBase : ChimeraManager, IIPMSystem
+    {
+        [Header("IPM System Configuration")]
+        [SerializeField] protected IPMConfigSO _ipmConfig;
+        [SerializeField] protected string _systemId;
+        [SerializeField] protected bool _enableDebugLogging = false;
+        
+        [Header("System State")]
+        [SerializeField] protected bool _isInitialized = false;
+        [SerializeField] protected bool _isActive = false;
+        [SerializeField] protected bool _enablePerformanceMonitoring = true;
+        
+        // Core System Properties
+        public bool IsInitialized => _isInitialized;
+        public bool IsActive => _isActive;
+        public string SystemId => _systemId;
+        
+        // System State Management
+        protected DateTime _initializationTime;
+        protected DateTime _lastUpdateTime;
+        protected float _totalUpdateTime;
+        protected int _updateCount;
+        
+        // Performance Monitoring
+        protected IPMSystemMetrics _systemMetrics = new IPMSystemMetrics();
+        protected PerformanceProfiler _performanceProfiler;
+        
+        // Event System
+        protected GameEventChannelSO _ipmEventChannel;
+        protected List<IDisposable> _eventSubscriptions = new List<IDisposable>();
+        
+        // Error Handling and Recovery
+        protected Queue<string> _errorHistory = new Queue<string>();
+        protected const int MaxErrorHistorySize = 50;
+        protected bool _hasRecoverableErrors = false;
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            _systemId = _systemId ?? GetType().Name;
+            
+            if (_enablePerformanceMonitoring)
+            {
+                _performanceProfiler = new PerformanceProfiler();
+                _performanceProfiler.Initialize();
+            }
+            
+            InitializeSystemSpecific();
+            _isInitialized = true;
+            _initializationTime = DateTime.Now;
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] IPM System initialized successfully");
+            }
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!_isInitialized || !_isActive) return;
+            
+            try
+            {
+                using var _ = _performanceProfiler?.StartOperation("SystemUpdate");
+                
+                _lastUpdateTime = DateTime.Now;
+                UpdateSystemSpecific(Time.deltaTime);
+                UpdateMetrics();
+                _updateCount++;
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Update error: {ex.Message}", ex);
+            }
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            Deactivate();
+            CleanupSystemSpecific();
+            
+            // Cleanup event subscriptions
+            foreach (var subscription in _eventSubscriptions)
+            {
+                subscription?.Dispose();
+            }
+            _eventSubscriptions.Clear();
+            
+            _performanceProfiler?.Dispose();
+            _isInitialized = false;
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] IPM System shutdown completed");
+            }
+        }
+        
+        #endregion
+        
+        #region IGameSystem Implementation
+        
+        public virtual void Initialize()
+        {
+            if (!_isInitialized)
+            {
+                OnManagerInitialize();
+            }
+        }
+        
+        public virtual void Update(float deltaTime)
+        {
+            OnManagerUpdate();
+        }
+        
+        public virtual void Cleanup()
+        {
+            OnManagerShutdown();
+        }
+        
+        #endregion
+        
+        #region IConfigurableGameSystem Implementation
+        
+        public virtual void Initialize(IPMConfigSO config)
+        {
+            _ipmConfig = config;
+            
+            if (!_isInitialized)
+            {
+                OnManagerInitialize();
+            }
+        }
+        
+        public virtual void UpdateConfiguration(IPMConfigSO config)
+        {
+            _ipmConfig = config;
+            
+            // Validate new configuration
+            if (!ValidateConfiguration())
+            {
+                Debug.LogError($"[{_systemId}] Invalid configuration provided");
+                return;
+            }
+            
+            // Apply configuration changes
+            OnConfigurationUpdated(config);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] Configuration updated successfully");
+            }
+        }
+        
+        #endregion
+        
+        #region System Control Methods
+        
+        public virtual void Activate()
+        {
+            if (!_isInitialized)
+            {
+                Debug.LogError($"[{_systemId}] Cannot activate - system not initialized");
+                return;
+            }
+            
+            _isActive = true;
+            OnSystemActivated();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] IPM System activated");
+            }
+        }
+        
+        public virtual void Deactivate()
+        {
+            _isActive = false;
+            OnSystemDeactivated();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] IPM System deactivated");
+            }
+        }
+        
+        public virtual void Reset()
+        {
+            try
+            {
+                OnSystemReset();
+                _systemMetrics = new IPMSystemMetrics();
+                _totalUpdateTime = 0f;
+                _updateCount = 0;
+                _errorHistory.Clear();
+                _hasRecoverableErrors = false;
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[{_systemId}] IPM System reset completed");
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Reset error: {ex.Message}", ex);
+            }
+        }
+        
+        public virtual IPMSystemMetrics GetMetrics()
+        {
+            _systemMetrics.LastUpdate = _lastUpdateTime;
+            _systemMetrics.NetworkLatency = CalculateNetworkLatency();
+            _systemMetrics.SubSystemPerformance = GetSubSystemPerformance();
+            
+            return _systemMetrics;
+        }
+        
+        #endregion
+        
+        #region Abstract Methods
+        
+        /// <summary>
+        /// System-specific initialization logic. Called during manager initialization.
+        /// </summary>
+        protected abstract void InitializeSystemSpecific();
+        
+        /// <summary>
+        /// System-specific update logic. Called every frame when active.
+        /// </summary>
+        protected abstract void UpdateSystemSpecific(float deltaTime);
+        
+        /// <summary>
+        /// System-specific cleanup logic. Called during shutdown.
+        /// </summary>
+        protected abstract void CleanupSystemSpecific();
+        
+        #endregion
+        
+        #region Virtual Methods
+        
+        /// <summary>
+        /// Called when the system is activated. Override for custom activation logic.
+        /// </summary>
+        protected virtual void OnSystemActivated() { }
+        
+        /// <summary>
+        /// Called when the system is deactivated. Override for custom deactivation logic.
+        /// </summary>
+        protected virtual void OnSystemDeactivated() { }
+        
+        /// <summary>
+        /// Called when the system is reset. Override for custom reset logic.
+        /// </summary>
+        protected virtual void OnSystemReset() { }
+        
+        /// <summary>
+        /// Called when the system configuration is updated. Override for custom configuration handling.
+        /// </summary>
+        protected virtual void OnConfigurationUpdated(IPMConfigSO config) { }
+        
+        /// <summary>
+        /// Validates system configuration. Override for custom validation logic.
+        /// </summary>
+        protected virtual bool ValidateConfiguration()
+        {
+            if (_ipmConfig == null)
+            {
+                Debug.LogError($"[{_systemId}] IPM Configuration is null");
+                return false;
+            }
+            
+            return true;
+        }
+        
+        /// <summary>
+        /// Gets subsystem-specific performance metrics. Override to provide detailed metrics.
+        /// </summary>
+        protected virtual Dictionary<string, float> GetSubSystemPerformance()
+        {
+            return new Dictionary<string, float>
+            {
+                ["UpdateTime"] = _totalUpdateTime / Math.Max(_updateCount, 1),
+                ["UpdateCount"] = _updateCount,
+                ["ErrorRate"] = _errorHistory.Count / (float)Math.Max(_updateCount, 1),
+                ["MemoryUsage"] = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory()
+            };
+        }
+        
+        #endregion
+        
+        #region Performance and Metrics
+        
+        protected virtual void UpdateMetrics()
+        {
+            if (!_enablePerformanceMonitoring) return;
+            
+            _systemMetrics.LastUpdate = DateTime.Now;
+            _systemMetrics.MemoryUsage = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory();
+            _systemMetrics.AverageFrameRate = 1f / Time.deltaTime;
+            
+            // Track performance over time
+            _totalUpdateTime += Time.deltaTime;
+        }
+        
+        protected virtual int CalculateNetworkLatency()
+        {
+            // Default implementation - override in network-dependent systems
+            return 0;
+        }
+        
+        protected IDisposable StartPerformanceOperation(string operationName)
+        {
+            return _performanceProfiler?.StartOperation(operationName) ?? new NullDisposable();
+        }
+        
+        #endregion
+        
+        #region Error Handling and Recovery
+        
+        protected virtual void HandleSystemError(string errorMessage, Exception exception = null)
+        {
+            // Log error
+            if (exception != null)
+            {
+                Debug.LogError($"[{_systemId}] {errorMessage}\nException: {exception}");
+            }
+            else
+            {
+                Debug.LogError($"[{_systemId}] {errorMessage}");
+            }
+            
+            // Track error history
+            _errorHistory.Enqueue($"{DateTime.Now:HH:mm:ss} - {errorMessage}");
+            while (_errorHistory.Count > MaxErrorHistorySize)
+            {
+                _errorHistory.Dequeue();
+            }
+            
+            // Attempt error recovery if applicable
+            if (IsRecoverableError(errorMessage))
+            {
+                _hasRecoverableErrors = true;
+                AttemptErrorRecovery(errorMessage, exception);
+            }
+            
+            // Update metrics
+            _systemMetrics.SubSystemPerformance["ErrorCount"] = _errorHistory.Count;
+        }
+        
+        protected virtual bool IsRecoverableError(string errorMessage)
+        {
+            // Define recoverable error patterns
+            string[] recoverablePatterns = {
+                "temporary network",
+                "resource temporarily unavailable",
+                "connection timeout",
+                "memory pressure"
+            };
+            
+            string lowerMessage = errorMessage.ToLower();
+            foreach (var pattern in recoverablePatterns)
+            {
+                if (lowerMessage.Contains(pattern))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        protected virtual void AttemptErrorRecovery(string errorMessage, Exception exception)
+        {
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[{_systemId}] Attempting error recovery for: {errorMessage}");
+            }
+            
+            // Basic recovery strategies
+            if (errorMessage.Contains("memory"))
+            {
+                System.GC.Collect();
+                System.GC.WaitForPendingFinalizers();
+            }
+            
+            // Allow derived classes to implement specific recovery
+            OnErrorRecoveryAttempt(errorMessage, exception);
+        }
+        
+        protected virtual void OnErrorRecoveryAttempt(string errorMessage, Exception exception) { }
+        
+        #endregion
+        
+        #region Event Management
+        
+        protected virtual void SubscribeToIPMEvents()
+        {
+            if (_ipmEventChannel != null)
+            {
+                // Subscribe to relevant IPM events
+                var subscription = _ipmEventChannel.Subscribe(OnIPMEventReceived);
+                _eventSubscriptions.Add(subscription);
+            }
+        }
+        
+        protected virtual void OnIPMEventReceived(object eventData)
+        {
+            // Handle IPM events - override in derived classes
+        }
+        
+        protected virtual void PublishIPMEvent(string eventType, object eventData)
+        {
+            if (_ipmEventChannel != null)
+            {
+                var ipmEvent = new ProjectChimera.Data.IPM.IPMGameEvent
+                {
+                    EventId = Guid.NewGuid().ToString(),
+                    EventType = eventType,
+                    Timestamp = DateTime.Now,
+                    EventData = new Dictionary<string, object> { ["data"] = eventData },
+                    IsNetworked = false,
+                    Priority = 1
+                };
+                
+                _ipmEventChannel.RaiseEvent(ipmEvent);
+            }
+        }
+        
+        #endregion
+        
+        #region Utility Classes
+        
+        private class NullDisposable : IDisposable
+        {
+            public void Dispose() { }
+        }
+        
+        
+        #endregion
+
+    }
+}

@@ -1,0 +1,119 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Events;
+using ProjectChimera.Core.Events;
+
+// Type aliases for types that actually exist
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using SystemsPlayerChoice = ProjectChimera.Systems.Cultivation.PlayerChoice;
+
+using EventsPlayerChoiceType = ProjectChimera.Events.PlayerChoiceType;
+
+using DataInteractivePlant = ProjectChimera.Data.Cultivation.InteractivePlant;
+
+using CorePlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final Wave 6 Error Resolution Test
+    /// Comprehensive validation of all ambiguous type resolutions
+    /// </summary>
+    public class FinalWave6ErrorResolution : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Final Wave 6 Error Resolution Test ===");
+            
+            TestAllCultivationTaskTypes();
+            TestAllCareQualityTypes();
+            TestAllPlayerChoiceTypes();
+            TestAllPlayerChoiceTypeEnums();
+            TestAllInteractivePlantTypes();
+            TestAllPlantCareEventDataTypes();
+            TestTypeConversions();
+            
+            Debug.Log("✅ Final Wave 6 error resolution completed successfully!");
+        }
+        
+        private void TestAllCultivationTaskTypes()
+        {
+            Debug.Log("Testing all CultivationTaskType variants...");
+            
+            var dataTaskType = DataCultivationTaskType.Watering;
+            
+            Debug.Log($"✓ CultivationTaskType: Data={dataTaskType}");
+        }
+        
+        private void TestAllCareQualityTypes()
+        {
+            Debug.Log("Testing all CareQuality variants...");
+            
+            var dataCareQuality = DataCareQuality.Excellent;
+            
+            Debug.Log($"✓ CareQuality: Data={dataCareQuality}");
+        }
+        
+        private void TestAllPlayerChoiceTypes()
+        {
+            Debug.Log("Testing all PlayerChoice variants...");
+            
+            var dataChoice = DataPlayerChoice.OptimalCare;
+            var systemsChoice = SystemsPlayerChoice.AutomationLevel;
+            
+            Debug.Log($"✓ PlayerChoice: Data={dataChoice}, Systems={systemsChoice}");
+        }
+        
+        private void TestAllPlayerChoiceTypeEnums()
+        {
+            Debug.Log("Testing all PlayerChoiceType variants...");
+            
+            var eventsChoiceType = EventsPlayerChoiceType.CultivationMethod;
+            
+            Debug.Log($"✓ PlayerChoiceType: Events={eventsChoiceType}");
+        }
+        
+        private void TestAllInteractivePlantTypes()
+        {
+            Debug.Log("Testing all InteractivePlant variants...");
+            
+            var dataPlant = new DataInteractivePlant
+            {
+                PlantInstanceID = 1,
+                PlantedTime = System.DateTime.Now
+            };
+            
+            Debug.Log($"✓ InteractivePlant: Data plant created with ID={dataPlant.PlantInstanceID}");
+        }
+        
+        private void TestAllPlantCareEventDataTypes()
+        {
+            Debug.Log("Testing all PlantCareEventData variants...");
+            
+            var coreEventData = new CorePlantCareEventData
+            {
+                PlantId = "test-plant",
+                TaskType = DataCultivationTaskType.Watering,
+                Timestamp = Time.time
+            };
+            
+            Debug.Log($"✓ PlantCareEventData: Core event created for plant {coreEventData.PlantId}");
+        }
+        
+        private void TestTypeConversions()
+        {
+            Debug.Log("Testing type conversions between namespaces...");
+            
+            // Test enum conversions between existing types
+            var dataChoice = DataPlayerChoice.OptimalCare;
+            var systemsChoice = (SystemsPlayerChoice)dataChoice;
+            
+            Debug.Log($"✓ Type conversions successful:");
+            Debug.Log($"  Choice: {dataChoice} → {systemsChoice}");
+        }
+    }
+}

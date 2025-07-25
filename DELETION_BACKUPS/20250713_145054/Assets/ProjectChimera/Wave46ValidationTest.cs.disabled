@@ -1,0 +1,260 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+using SystemsEnvironmentalConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Wave 46 Validation Test: Verify type conversion and property access issues are resolved.
+    /// 
+    /// This test validates:
+    /// 1. PlantInstance.GetCurrentEnvironmentalConditions() returns correct Data.Cultivation type
+    /// 2. PlantUpdateProcessor.GetPlantEnvironmentalConditions() works without conversion errors
+    /// 3. No CS1503, CS1061, or CS0029 type conversion errors
+    /// 4. Property access on EnvironmentalConditions works correctly
+    /// 5. TraitExpressionEngine integration works with correct types
+    /// </summary>
+    public class Wave46ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool enableDebugLogging = true;
+        
+        private void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllValidationTests();
+            }
+        }
+        
+        public void RunAllValidationTests()
+        {
+            LogTest("=== Wave 46 Validation Test Suite ===");
+            
+            bool allTestsPassed = true;
+            
+            allTestsPassed &= TestPlantInstanceEnvironmentalConditionsType();
+            allTestsPassed &= TestPlantUpdateProcessorIntegration();
+            allTestsPassed &= TestNoTypeConversionErrors();
+            allTestsPassed &= TestEnvironmentalConditionsPropertyAccess();
+            allTestsPassed &= TestTraitExpressionEngineIntegration();
+            
+            LogTest($"=== Wave 46 Validation Complete: {(allTestsPassed ? "PASSED" : "FAILED")} ===");
+        }
+        
+        private bool TestPlantInstanceEnvironmentalConditionsType()
+        {
+            LogTest("Testing PlantInstance.GetCurrentEnvironmentalConditions() return type...");
+            
+            try
+            {
+                // Create a test plant instance
+                var plantGO = new GameObject("TestPlant");
+                var plant = plantGO.AddComponent<PlantInstance>();
+                plant.InitializeFromStrain(null); // Use defaults
+                
+                // Test that GetCurrentEnvironmentalConditions returns the correct type
+                var conditions = plant.GetCurrentEnvironmentalConditions();
+                
+                // Verify it's the Data.Cultivation.EnvironmentalConditions type
+                bool isCorrectType = conditions.GetType() == typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions);
+                
+                // Test that we can access Data.Cultivation properties
+                float airFlow = conditions.AirFlow;
+                float waterAvailability = conditions.WaterAvailability;
+                float vpd = conditions.VPD;
+                float electricalConductivity = conditions.ElectricalConductivity;
+                
+                // Test method access
+                conditions.CalculateDerivedValues();
+                
+                LogTest("✓ PlantInstance.GetCurrentEnvironmentalConditions() returns correct type");
+                LogTest($"  - Type: {conditions.GetType().FullName}");
+                LogTest($"  - Is Data.Cultivation type: {isCorrectType}");
+                LogTest($"  - AirFlow accessible: {airFlow}");
+                LogTest($"  - WaterAvailability accessible: {waterAvailability}");
+                LogTest($"  - VPD accessible: {vpd}");
+                LogTest($"  - ElectricalConductivity accessible: {electricalConductivity}");
+                
+                // Clean up
+                DestroyImmediate(plantGO);
+                
+                return isCorrectType;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantInstance environmental conditions type test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantUpdateProcessorIntegration()
+        {
+            LogTest("Testing PlantUpdateProcessor integration without conversion errors...");
+            
+            try
+            {
+                // Create a PlantUpdateProcessor
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                // Create a test plant instance
+                var plantGO = new GameObject("TestPlant");
+                var plant = plantGO.AddComponent<PlantInstance>();
+                plant.InitializeFromStrain(null); // Use defaults
+                
+                // Test UpdatePlant method - this should not cause any type conversion errors
+                processor.UpdatePlant(plant, 0.016f, 1f); // 60 FPS delta time
+                
+                LogTest("✓ PlantUpdateProcessor.UpdatePlant() executed without type conversion errors");
+                
+                // Clean up
+                DestroyImmediate(plantGO);
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantUpdateProcessor integration failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestNoTypeConversionErrors()
+        {
+            LogTest("Testing that no CS1503, CS1061, or CS0029 errors occur...");
+            
+            try
+            {
+                // Test direct usage of Data.Cultivation.EnvironmentalConditions
+                var dataConditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test all the properties that were causing CS1061 errors
+                dataConditions.AirFlow = 1.5f;
+                dataConditions.WaterAvailability = 80f;
+                dataConditions.VPD = 1.2f;
+                dataConditions.ElectricalConductivity = 1400f;
+                
+                // Test the method that was causing CS1061 errors
+                dataConditions.CalculateDerivedValues();
+                
+                // Test that we can assign to variables without CS0029 errors
+                EnvironmentalConditions assignedConditions = dataConditions;
+                
+                // Test static method access
+                float calculatedVPD = EnvironmentalConditions.CalculateVPD(24f, 60f);
+                
+                LogTest("✓ No type conversion errors detected");
+                LogTest($"  - Property assignments successful");
+                LogTest($"  - Method calls successful");
+                LogTest($"  - Variable assignments successful");
+                LogTest($"  - Static method access successful: VPD = {calculatedVPD:F2}");
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Type conversion error test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestEnvironmentalConditionsPropertyAccess()
+        {
+            LogTest("Testing EnvironmentalConditions property access that was causing errors...");
+            
+            try
+            {
+                var conditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test all properties mentioned in the Unity console errors
+                // Line 327: AirFlow
+                float airFlow = conditions.AirFlow;
+                conditions.AirFlow = 1.8f;
+                
+                // Line 333: WaterAvailability  
+                float waterAvailability = conditions.WaterAvailability;
+                conditions.WaterAvailability = 85f;
+                
+                // Line 336: VPD
+                float vpd = conditions.VPD;
+                conditions.VPD = 1.3f;
+                
+                // Line 341: ElectricalConductivity
+                float electricalConductivity = conditions.ElectricalConductivity;
+                conditions.ElectricalConductivity = 1500f;
+                
+                // Line 347: CalculateDerivedValues
+                conditions.CalculateDerivedValues();
+                
+                LogTest("✓ All EnvironmentalConditions properties accessible");
+                LogTest($"  - AirFlow: {conditions.AirFlow}");
+                LogTest($"  - WaterAvailability: {conditions.WaterAvailability}");
+                LogTest($"  - VPD: {conditions.VPD}");
+                LogTest($"  - ElectricalConductivity: {conditions.ElectricalConductivity}");
+                LogTest($"  - CalculateDerivedValues() executed successfully");
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ EnvironmentalConditions property access failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestTraitExpressionEngineIntegration()
+        {
+            LogTest("Testing TraitExpressionEngine integration with correct environmental conditions type...");
+            
+            try
+            {
+                // Create environmental conditions
+                var environmentalConditions = EnvironmentalConditions.CreateIndoorDefault();
+                environmentalConditions.Temperature = 25f;
+                environmentalConditions.Humidity = 65f;
+                environmentalConditions.LightIntensity = 700f;
+                
+                // Verify the type is correct for trait expression
+                bool isCorrectType = environmentalConditions.GetType() == typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions);
+                
+                // Test that we can use this with genetic calculations
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                // Create a plant with genetic data
+                var plantGO = new GameObject("TestPlant");
+                var plant = plantGO.AddComponent<PlantInstance>();
+                plant.InitializeFromStrain(null);
+                
+                // Test the full update process
+                processor.UpdatePlant(plant, 0.016f, 1f);
+                
+                LogTest("✓ TraitExpressionEngine integration successful");
+                LogTest($"  - Environmental conditions type correct: {isCorrectType}");
+                LogTest($"  - Plant update with genetics completed successfully");
+                
+                // Clean up
+                DestroyImmediate(plantGO);
+                
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ TraitExpressionEngine integration failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private void LogTest(string message)
+        {
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Wave46Validation] {message}");
+            }
+        }
+    }
+} 

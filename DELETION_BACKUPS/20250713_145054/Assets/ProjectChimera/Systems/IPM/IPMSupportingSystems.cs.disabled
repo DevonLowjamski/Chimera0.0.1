@@ -1,0 +1,680 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Supporting systems and utility classes for the Enhanced IPM Gaming System.
+    /// Provides specialized functionality for battle sessions, invasion detection,
+    /// AI management, multiplayer coordination, and performance monitoring.
+    /// </summary>
+    
+    #region Battle Session Management
+    
+    /// <summary>
+    /// Manages an individual IPM battle session with state tracking and coordination.
+    /// </summary>
+    public class IPMBattleSession
+    {
+        public string SessionId { get; private set; }
+        public IPMBattleData BattleData { get; private set; }
+        public bool IsActive { get; private set; }
+        public DateTime StartTime { get; private set; }
+        public TimeSpan Duration => DateTime.Now - StartTime;
+        
+        private IPMConfigSO _config;
+        private IPMBattlePhase _currentPhase;
+        private Dictionary<string, object> _sessionState = new Dictionary<string, object>();
+        private List<IPMBattleObjective> _objectives = new List<IPMBattleObjective>();
+        private Dictionary<string, float> _playerScores = new Dictionary<string, float>();
+        
+        public IPMBattleSession(IPMBattleData battleData, IPMConfigSO config)
+        {
+            SessionId = battleData.BattleId;
+            BattleData = battleData;
+            _config = config;
+            _currentPhase = IPMBattlePhase.Preparation;
+            IsActive = false;
+        }
+        
+        public void Start()
+        {
+            IsActive = true;
+            StartTime = DateTime.Now;
+            _currentPhase = IPMBattlePhase.Preparation;
+            InitializeObjectives();
+        }
+        
+        public void Update(float deltaTime)
+        {
+            if (!IsActive) return;
+            
+            UpdatePhase();
+            UpdateObjectives();
+            UpdatePlayerScores();
+            BattleData.BattleProgress = CalculateBattleProgress();
+        }
+        
+        public void End(IPMBattleResult result)
+        {
+            IsActive = false;
+            BattleData.Result = result;
+            BattleData.Duration = Duration;
+            
+            _currentPhase = result.Outcome == IPMBattleOutcome.Victory ? IPMBattlePhase.Victory : IPMBattlePhase.Defeat;
+        }
+        
+        public IPMBattlePhase GetCurrentPhase() => _currentPhase;
+        
+        private void InitializeObjectives()
+        {
+            _objectives.Add(new IPMBattleObjective
+            {
+                ObjectiveId = "eliminate_pests",
+                ObjectiveName = "Eliminate Primary Threat",
+                Description = $"Eliminate {BattleData.PrimaryThreat} population",
+                IsRequired = true,
+                ProgressRequired = 100f,
+                CurrentProgress = 0f,
+                IsCompleted = false
+            });
+        }
+        
+        private void UpdatePhase()
+        {
+            var newPhase = CalculatePhaseFromProgress(BattleData.BattleProgress);
+            if (newPhase != _currentPhase)
+            {
+                _currentPhase = newPhase;
+                BattleData.CurrentPhase = newPhase;
+            }
+        }
+        
+        private void UpdateObjectives()
+        {
+            foreach (var objective in _objectives)
+            {
+                if (!objective.IsCompleted)
+                {
+                    objective.CurrentProgress = CalculateObjectiveProgress(objective);
+                    objective.IsCompleted = objective.CurrentProgress >= objective.ProgressRequired;
+                }
+            }
+        }
+        
+        private void UpdatePlayerScores()
+        {
+            foreach (var participantId in BattleData.ParticipantIds)
+            {
+                _playerScores[participantId] = CalculatePlayerScore(participantId);
+            }
+            BattleData.PlayerScores = new Dictionary<string, float>(_playerScores);
+        }
+        
+        private float CalculateBattleProgress()
+        {
+            var totalObjectives = _objectives.Count;
+            var completedObjectives = _objectives.Count(o => o.IsCompleted);
+            var partialProgress = _objectives.Where(o => !o.IsCompleted).Sum(o => o.CurrentProgress / o.ProgressRequired);
+            
+            return (completedObjectives + partialProgress) / totalObjectives;
+        }
+        
+        private IPMBattlePhase CalculatePhaseFromProgress(float progress)
+        {
+            return progress switch
+            {
+                < 0.1f => IPMBattlePhase.Preparation,
+                < 0.3f => IPMBattlePhase.EarlyInvasion,
+                < 0.7f => IPMBattlePhase.MainAssault,
+                < 0.9f => IPMBattlePhase.FinalWave,
+                >= 1f => IPMBattlePhase.Victory,
+                _ => IPMBattlePhase.Cleanup
+            };
+        }
+        
+        private float CalculateObjectiveProgress(IPMBattleObjective objective)
+        {
+            // Placeholder - would integrate with actual game systems
+            return Math.Min(100f, objective.CurrentProgress + UnityEngine.Random.Range(0f, 5f));
+        }
+        
+        private float CalculatePlayerScore(string participantId)
+        {
+            // Placeholder - would calculate based on player actions and performance
+            return UnityEngine.Random.Range(0f, 1000f);
+        }
+    }
+    
+    #endregion
+    
+    #region Invasion Detection
+    
+    /// <summary>
+    /// Detects and manages real-time pest invasions based on environmental conditions.
+    /// </summary>
+    public class IPMInvasionDetector : IDisposable
+    {
+        public event Action<PestInvasionData> OnInvasionDetected;
+        
+        private IPMConfigSO _config;
+        private bool _isMonitoring;
+        private DateTime _lastInvasionCheck;
+        private Dictionary<PestType, float> _invasionProbabilities = new Dictionary<PestType, float>();
+        private List<string> _activeInvasionIds = new List<string>();
+        
+        public IPMInvasionDetector(IPMConfigSO config)
+        {
+            _config = config;
+            InitializeInvasionProbabilities();
+        }
+        
+        public void StartMonitoring()
+        {
+            _isMonitoring = true;
+            _lastInvasionCheck = DateTime.Now;
+        }
+        
+        public void StopMonitoring()
+        {
+            _isMonitoring = false;
+        }
+        
+        public void CheckForInvasions()
+        {
+            if (!_isMonitoring) return;
+            
+            foreach (var pestType in Enum.GetValues(typeof(PestType)).Cast<PestType>())
+            {
+                if (ShouldTriggerInvasion(pestType))
+                {
+                    var invasionData = CreateInvasionData(pestType);
+                    OnInvasionDetected?.Invoke(invasionData);
+                    _activeInvasionIds.Add(invasionData.InvasionId);
+                }
+            }
+            
+            _lastInvasionCheck = DateTime.Now;
+        }
+        
+        private void InitializeInvasionProbabilities()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _invasionProbabilities[pestType] = UnityEngine.Random.Range(0.01f, 0.1f);
+            }
+        }
+        
+        private bool ShouldTriggerInvasion(PestType pestType)
+        {
+            var probability = _invasionProbabilities[pestType] * _config.InvasionFrequency;
+            var environmentalFactor = GetEnvironmentalFactor(pestType);
+            var timeFactor = GetTimeFactor();
+            
+            var finalProbability = probability * environmentalFactor * timeFactor;
+            return UnityEngine.Random.value < finalProbability;
+        }
+        
+        private float GetEnvironmentalFactor(PestType pestType)
+        {
+            // Placeholder - would integrate with environmental systems
+            return UnityEngine.Random.Range(0.5f, 2f);
+        }
+        
+        private float GetTimeFactor()
+        {
+            var timeSinceLastCheck = (DateTime.Now - _lastInvasionCheck).TotalSeconds;
+            return Mathf.Clamp((float)timeSinceLastCheck / 60f, 0.1f, 2f); // Factor based on time since last check
+        }
+        
+        private PestInvasionData CreateInvasionData(PestType pestType)
+        {
+            return new PestInvasionData
+            {
+                InvasionId = Guid.NewGuid().ToString(),
+                PestType = pestType,
+                PopulationSize = UnityEngine.Random.Range(10, 100),
+                AggressionLevel = UnityEngine.Random.Range(0.3f, 1f),
+                OriginPoint = GetRandomInvasionPoint(),
+                InvasionPaths = GenerateInvasionPaths(),
+                ChemicalResistance = (ResistanceLevel)UnityEngine.Random.Range(0, 4),
+                BiologicalResistance = (ResistanceLevel)UnityEngine.Random.Range(0, 4),
+                EnvironmentalTolerance = UnityEngine.Random.Range(0.2f, 0.8f),
+                PreferredTargets = GetPreferredTargets(pestType),
+                ReproductionRate = UnityEngine.Random.Range(0.1f, 0.5f),
+                InvasionStartTime = DateTime.Now,
+                IsAdaptive = UnityEngine.Random.value > 0.7f,
+                BehaviorModifiers = new Dictionary<string, float>()
+            };
+        }
+        
+        private Vector3 GetRandomInvasionPoint()
+        {
+            return new Vector3(
+                UnityEngine.Random.Range(-50f, 50f),
+                0f,
+                UnityEngine.Random.Range(-50f, 50f)
+            );
+        }
+        
+        private List<Vector3> GenerateInvasionPaths()
+        {
+            var paths = new List<Vector3>();
+            var pathCount = UnityEngine.Random.Range(2, 6);
+            
+            for (int i = 0; i < pathCount; i++)
+            {
+                paths.Add(new Vector3(
+                    UnityEngine.Random.Range(-25f, 25f),
+                    0f,
+                    UnityEngine.Random.Range(-25f, 25f)
+                ));
+            }
+            
+            return paths;
+        }
+        
+        private List<string> GetPreferredTargets(PestType pestType)
+        {
+            // Placeholder - would define pest-specific target preferences
+            return new List<string> { "YoungPlants", "FloweringPlants", "SeedlingStage" };
+        }
+        
+        public void Dispose()
+        {
+            StopMonitoring();
+            OnInvasionDetected = null;
+        }
+    }
+    
+    #endregion
+    
+    #region AI Management
+    
+    /// <summary>
+    /// Manages difficulty scaling based on player performance and skill level.
+    /// </summary>
+    public class IPMDifficultyScaler
+    {
+        private IPMConfigSO _config;
+        private Dictionary<string, PlayerSkillProfile> _playerSkills = new Dictionary<string, PlayerSkillProfile>();
+        
+        public IPMDifficultyScaler(IPMConfigSO config)
+        {
+            _config = config;
+        }
+        
+        public DifficultyLevel CalculateDifficultyForPlayer(string playerId, IPMBattleData battleData)
+        {
+            var skill = GetPlayerSkill(playerId);
+            var baseDifficulty = battleData.Difficulty;
+            
+            var difficultyModifier = CalculateDifficultyModifier(skill, battleData);
+            return AdjustDifficulty(baseDifficulty, difficultyModifier);
+        }
+        
+        private PlayerSkillProfile GetPlayerSkill(string playerId)
+        {
+            if (!_playerSkills.TryGetValue(playerId, out var skill))
+            {
+                skill = new PlayerSkillProfile { PlayerId = playerId, SkillLevel = 0.5f };
+                _playerSkills[playerId] = skill;
+            }
+            return skill;
+        }
+        
+        private float CalculateDifficultyModifier(PlayerSkillProfile skill, IPMBattleData battleData)
+        {
+            var skillFactor = skill.SkillLevel;
+            var experienceFactor = skill.BattlesCompleted / 100f;
+            var recentPerformance = skill.RecentWinRate;
+            
+            return (skillFactor + experienceFactor + recentPerformance) / 3f;
+        }
+        
+        private DifficultyLevel AdjustDifficulty(DifficultyLevel baseDifficulty, float modifier)
+        {
+            var difficultyValue = (int)baseDifficulty;
+            var adjustment = Mathf.RoundToInt(modifier * 2f - 1f); // -1, 0, or +1
+            
+            difficultyValue = Mathf.Clamp(difficultyValue + adjustment, 0, 5);
+            return (DifficultyLevel)difficultyValue;
+        }
+        
+        public void UpdatePlayerSkill(string playerId, IPMBattleData completedBattle)
+        {
+            var skill = GetPlayerSkill(playerId);
+            skill.BattlesCompleted++;
+            
+            if (completedBattle.Result?.Outcome == IPMBattleOutcome.Victory)
+            {
+                skill.RecentWins++;
+                skill.SkillLevel = Mathf.Min(1f, skill.SkillLevel + 0.01f);
+            }
+            else
+            {
+                skill.SkillLevel = Mathf.Max(0f, skill.SkillLevel - 0.005f);
+            }
+            
+            skill.RecentWinRate = skill.RecentWins / (float)Math.Max(skill.BattlesCompleted, 1);
+            _playerSkills[playerId] = skill;
+        }
+    }
+    
+    /// <summary>
+    /// Analyzes player behavior patterns for personalization and AI adaptation.
+    /// </summary>
+    public class IPMPlayerBehaviorAnalyzer
+    {
+        private Dictionary<string, PlayerBehaviorPattern> _behaviorPatterns = new Dictionary<string, PlayerBehaviorPattern>();
+        
+        public PlayerBehaviorPattern AnalyzePlayer(string playerId, List<string> actionHistory)
+        {
+            if (!_behaviorPatterns.TryGetValue(playerId, out var pattern))
+            {
+                pattern = new PlayerBehaviorPattern { PlayerId = playerId };
+                _behaviorPatterns[playerId] = pattern;
+            }
+            
+            AnalyzeActionPatterns(pattern, actionHistory);
+            AnalyzeStrategyPreferences(pattern, actionHistory);
+            AnalyzeTimingPatterns(pattern, actionHistory);
+            
+            return pattern;
+        }
+        
+        private void AnalyzeActionPatterns(PlayerBehaviorPattern pattern, List<string> actions)
+        {
+            pattern.PreferredActions = actions.GroupBy(a => a)
+                .OrderByDescending(g => g.Count())
+                .Take(5)
+                .Select(g => g.Key)
+                .ToList();
+        }
+        
+        private void AnalyzeStrategyPreferences(PlayerBehaviorPattern pattern, List<string> actions)
+        {
+            var biologicalActions = actions.Count(a => a.Contains("Biological"));
+            var chemicalActions = actions.Count(a => a.Contains("Chemical"));
+            var environmentalActions = actions.Count(a => a.Contains("Environmental"));
+            
+            pattern.StrategyPreference = biologicalActions > chemicalActions && biologicalActions > environmentalActions
+                ? IPMStrategyType.Biological
+                : chemicalActions > environmentalActions
+                    ? IPMStrategyType.Chemical
+                    : IPMStrategyType.Environmental;
+        }
+        
+        private void AnalyzeTimingPatterns(PlayerBehaviorPattern pattern, List<string> actions)
+        {
+            // Analyze action timing and response speed
+            pattern.AverageResponseTime = UnityEngine.Random.Range(1f, 5f); // Placeholder
+            pattern.PlanningStyle = UnityEngine.Random.value > 0.5f ? "Reactive" : "Proactive";
+        }
+    }
+    
+    /// <summary>
+    /// Generates intelligent recommendations for IPM strategies and actions.
+    /// </summary>
+    public class IPMRecommendationEngine
+    {
+        private IPMConfigSO _config;
+        
+        public IPMRecommendationEngine(IPMConfigSO config)
+        {
+            _config = config;
+        }
+        
+        public IPMRecommendation GenerateRecommendation(string playerId, IPMBattleData battleData, PlayerBehaviorPattern behavior = null)
+        {
+            var recommendation = new IPMRecommendation
+            {
+                RecommendationId = Guid.NewGuid().ToString(),
+                RecommendationType = DetermineRecommendationType(battleData, behavior),
+                Confidence = CalculateConfidence(battleData, behavior),
+                Generated = DateTime.Now
+            };
+            
+            PopulateRecommendationDetails(recommendation, battleData, behavior);
+            return recommendation;
+        }
+        
+        private string DetermineRecommendationType(IPMBattleData battleData, PlayerBehaviorPattern behavior)
+        {
+            if (behavior?.StrategyPreference == IPMStrategyType.Biological)
+                return "BiologicalControl";
+            
+            return battleData.PrimaryThreat switch
+            {
+                PestType.Aphids => "BiologicalControl",
+                PestType.SpiderMites => "EnvironmentalControl",
+                PestType.Thrips => "ChemicalControl",
+                _ => "IntegratedApproach"
+            };
+        }
+        
+        private float CalculateConfidence(IPMBattleData battleData, PlayerBehaviorPattern behavior)
+        {
+            var baseConfidence = 0.7f;
+            
+            if (behavior != null)
+            {
+                baseConfidence += 0.2f; // Higher confidence with behavior data
+            }
+            
+            return Mathf.Clamp(baseConfidence + UnityEngine.Random.Range(-0.1f, 0.1f), 0.5f, 0.95f);
+        }
+        
+        private void PopulateRecommendationDetails(IPMRecommendation recommendation, IPMBattleData battleData, PlayerBehaviorPattern behavior)
+        {
+            recommendation.Description = $"Recommended strategy for {battleData.PrimaryThreat} invasion";
+            recommendation.Parameters = new Dictionary<string, object>
+            {
+                ["PestType"] = battleData.PrimaryThreat,
+                ["Difficulty"] = battleData.Difficulty,
+                ["Phase"] = battleData.CurrentPhase
+            };
+            recommendation.Prerequisites = new List<string> { "ResourceAvailability", "EquipmentAccess" };
+            recommendation.ExpectedBenefit = UnityEngine.Random.Range(0.6f, 0.9f);
+            recommendation.Reasoning = GenerateReasoning(recommendation.RecommendationType, battleData);
+        }
+        
+        private string GenerateReasoning(string recommendationType, IPMBattleData battleData)
+        {
+            return recommendationType switch
+            {
+                "BiologicalControl" => $"Biological control is highly effective against {battleData.PrimaryThreat} with minimal environmental impact.",
+                "EnvironmentalControl" => $"Environmental manipulation can disrupt {battleData.PrimaryThreat} lifecycle patterns.",
+                "ChemicalControl" => $"Targeted chemical application provides rapid control of {battleData.PrimaryThreat} populations.",
+                _ => "Integrated approach combining multiple strategies for optimal results."
+            };
+        }
+    }
+    
+    #endregion
+    
+    #region Multiplayer Support
+    
+    /// <summary>
+    /// Manages multiplayer IPM sessions and coordination.
+    /// </summary>
+    public class IPMMultiplayerSession
+    {
+        public string SessionId { get; private set; }
+        public List<string> PlayerIds { get; private set; }
+        public int PlayerCount => PlayerIds.Count;
+        public DateTime CreatedAt { get; private set; }
+        public bool IsActive { get; private set; }
+        
+        private Dictionary<string, float> _playerReadyStatus = new Dictionary<string, float>();
+        private TimeSpan _sessionTimeout = TimeSpan.FromMinutes(30);
+        
+        public IPMMultiplayerSession(string sessionId, List<string> playerIds)
+        {
+            SessionId = sessionId;
+            PlayerIds = new List<string>(playerIds);
+            CreatedAt = DateTime.Now;
+            IsActive = true;
+            
+            foreach (var playerId in playerIds)
+            {
+                _playerReadyStatus[playerId] = 0f;
+            }
+        }
+        
+        public void Update(float deltaTime)
+        {
+            // Update session state
+        }
+        
+        public bool IsExpired()
+        {
+            return DateTime.Now - CreatedAt > _sessionTimeout;
+        }
+        
+        public void SetPlayerReady(string playerId, bool ready)
+        {
+            if (PlayerIds.Contains(playerId))
+            {
+                _playerReadyStatus[playerId] = ready ? 1f : 0f;
+            }
+        }
+        
+        public bool AllPlayersReady()
+        {
+            return _playerReadyStatus.Values.All(status => status >= 1f);
+        }
+    }
+    
+    /// <summary>
+    /// Handles matchmaking for multiplayer IPM battles.
+    /// </summary>
+    public class IPMMatchmakingService
+    {
+        private IPMConfigSO _config;
+        private Queue<string> _waitingPlayers = new Queue<string>();
+        private Dictionary<string, DifficultyLevel> _playerSkillLevels = new Dictionary<string, DifficultyLevel>();
+        
+        public IPMMatchmakingService(IPMConfigSO config)
+        {
+            _config = config;
+        }
+        
+        public void AddPlayerToQueue(string playerId, DifficultyLevel skillLevel)
+        {
+            _waitingPlayers.Enqueue(playerId);
+            _playerSkillLevels[playerId] = skillLevel;
+        }
+        
+        public IPMMultiplayerSession TryCreateMatch()
+        {
+            if (_waitingPlayers.Count >= 2)
+            {
+                var players = new List<string>();
+                var maxPlayers = _config.MaxPlayersPerBattle;
+                
+                for (int i = 0; i < maxPlayers && _waitingPlayers.Count > 0; i++)
+                {
+                    players.Add(_waitingPlayers.Dequeue());
+                }
+                
+                if (players.Count >= 2)
+                {
+                    return new IPMMultiplayerSession(Guid.NewGuid().ToString(), players);
+                }
+            }
+            
+            return null;
+        }
+    }
+    
+    #endregion
+    
+    #region Performance Monitoring
+    
+    /// <summary>
+    /// Monitors and tracks IPM system performance metrics.
+    /// </summary>
+    public class IPMPerformanceMonitor : IDisposable
+    {
+        private float _averageFrameRate;
+        private long _memoryUsage;
+        private float _aiProcessingTime;
+        private List<float> _frameTimeHistory = new List<float>();
+        private const int MaxFrameHistory = 60;
+        
+        public void Initialize()
+        {
+            // Initialize performance monitoring
+        }
+        
+        public void Update()
+        {
+            UpdateFrameRate();
+            UpdateMemoryUsage();
+            UpdateAIProcessingTime();
+        }
+        
+        public float GetAverageFrameRate() => _averageFrameRate;
+        public long GetMemoryUsage() => _memoryUsage;
+        public float GetAIProcessingTime() => _aiProcessingTime;
+        
+        private void UpdateFrameRate()
+        {
+            _frameTimeHistory.Add(Time.deltaTime);
+            
+            if (_frameTimeHistory.Count > MaxFrameHistory)
+            {
+                _frameTimeHistory.RemoveAt(0);
+            }
+            
+            _averageFrameRate = 1f / (_frameTimeHistory.Sum() / _frameTimeHistory.Count);
+        }
+        
+        private void UpdateMemoryUsage()
+        {
+            _memoryUsage = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory();
+        }
+        
+        private void UpdateAIProcessingTime()
+        {
+            // Placeholder - would measure actual AI processing time
+            _aiProcessingTime = UnityEngine.Random.Range(0.1f, 2f);
+        }
+        
+        public void Dispose()
+        {
+            _frameTimeHistory.Clear();
+        }
+    }
+    
+    #endregion
+    
+    #region Data Structures
+    
+    [Serializable]
+    public class PlayerSkillProfile
+    {
+        public string PlayerId;
+        public float SkillLevel;
+        public int BattlesCompleted;
+        public int RecentWins;
+        public float RecentWinRate;
+    }
+    
+    [Serializable]
+    public class PlayerBehaviorPattern
+    {
+        public string PlayerId;
+        public List<string> PreferredActions = new List<string>();
+        public IPMStrategyType StrategyPreference;
+        public float AverageResponseTime;
+        public string PlanningStyle;
+    }
+    
+    #endregion
+}

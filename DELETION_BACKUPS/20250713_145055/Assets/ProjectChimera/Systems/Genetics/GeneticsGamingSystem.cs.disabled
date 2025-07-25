@@ -1,0 +1,1197 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Core.Logging;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Genetics Gaming System - Transforms breeding and genetics into engaging puzzle-style gameplay
+    /// Implements breeding challenges, genetic discovery mechanics, and visual genetic manipulation
+    /// Core component of Enhanced Scientific Gaming System v2.0
+    /// </summary>
+    public class GeneticsGamingSystem : MonoBehaviour
+    {
+        [Header("Genetics Gaming Configuration")]
+        [SerializeField] private GeneticsGamingConfigSO _geneticsConfig;
+        [SerializeField] private BreedingChallengeLibrarySO _challengeLibrary;
+        [SerializeField] private GeneticDiscoveryDatabaseSO _discoveryDatabase;
+        
+        [Header("Visual Interface Systems")]
+        [SerializeField] private VisualGeneticInterface _visualInterface;
+        [SerializeField] private GeneticPuzzleRenderer _puzzleRenderer;
+        [SerializeField] private BreedingProgressVisualizer _progressVisualizer;
+        
+        [Header("Challenge Management")]
+        [SerializeField] private BreedingChallengeManager _challengeManager;
+        [SerializeField] private GeneticObjectiveTracker _objectiveTracker;
+        [SerializeField] private BreedingProjectManager _projectManager;
+        
+        [Header("Discovery Systems")]
+        [SerializeField] private GeneticDiscoveryEngine _discoveryEngine;
+        [SerializeField] private NovelTraitDetector _novelTraitDetector;
+        [SerializeField] private GeneticInnovationTracker _innovationTracker;
+        
+        [Header("Gaming Settings")]
+        [Range(0.1f, 2.0f)] public float ChallengeProgressionRate = 1.0f;
+        [Range(0.1f, 3.0f)] public float DiscoveryRewardMultiplier = 1.5f;
+        [Range(0.1f, 1.0f)] public float PuzzleDifficultyScaling = 0.8f;
+        [Range(1.0f, 10.0f)] public float InnovationDetectionThreshold = 3.0f;
+        
+        // System State
+        private bool _isInitialized = false;
+        private Dictionary<string, BreedingChallenge> _activeChallenges = new Dictionary<string, BreedingChallenge>();
+        private Dictionary<string, GeneticProject> _activeProjects = new Dictionary<string, GeneticProject>();
+        private List<GeneticDiscovery> _sessionDiscoveries = new List<GeneticDiscovery>();
+        private GeneticsGamingState _currentGamingState;
+        
+        // Performance Metrics
+        private int _challengesStarted = 0;
+        private int _challengesCompleted = 0;
+        private int _geneticDiscoveriesMade = 0;
+        private int _innovationBreakthroughs = 0;
+        private float _totalGeneticsExperience = 0f;
+        private Dictionary<BreedingChallengeType, int> _challengeCompletionCounts = new Dictionary<BreedingChallengeType, int>();
+        
+        // Events
+        private GameEventChannelSO _onGeneticDiscoveryMade;
+        private GameEventChannelSO _onBreedingChallengeCompleted;
+        private GameEventChannelSO _onGeneticInnovationAchieved;
+        private GameEventChannelSO _onBreedingProjectCompleted;
+        private GameEventChannelSO _onNovelTraitDiscovered;
+        private GameEventChannelSO _onGeneticPuzzleSolved;
+        
+        #region Initialization
+        
+        public void Initialize(GeneticsGamingConfigSO config)
+        {
+            if (_isInitialized)
+            {
+                ChimeraLogger.LogWarning("GeneticsGamingSystem already initialized", this);
+                return;
+            }
+            
+            _geneticsConfig = config ?? _geneticsConfig;
+            
+            if (_geneticsConfig == null)
+            {
+                ChimeraLogger.LogError("GeneticsGamingConfigSO is required for initialization", this);
+                return;
+            }
+            
+            InitializeGeneticsSystems();
+            InitializeVisualInterface();
+            InitializeChallengeManagement();
+            InitializeDiscoverySystems();
+            InitializeGeneticsGamingState();
+            SetupEventChannels();
+            
+            _isInitialized = true;
+            ChimeraLogger.Log("GeneticsGamingSystem initialized successfully", this);
+        }
+        
+        private void InitializeGeneticsSystems()
+        {
+            // Initialize core genetics gaming systems
+            _activeChallenges.Clear();
+            _activeProjects.Clear();
+            _sessionDiscoveries.Clear();
+            
+            // Initialize challenge completion tracking
+            foreach (BreedingChallengeType challengeType in System.Enum.GetValues(typeof(BreedingChallengeType)))
+            {
+                _challengeCompletionCounts[challengeType] = 0;
+            }
+        }
+        
+        private void InitializeVisualInterface()
+        {
+            // Initialize visual genetic interface components
+            if (_visualInterface == null)
+            {
+                _visualInterface = new VisualGeneticInterface();
+            }
+            
+            if (_puzzleRenderer == null)
+            {
+                _puzzleRenderer = new GeneticPuzzleRenderer();
+            }
+            
+            if (_progressVisualizer == null)
+            {
+                _progressVisualizer = new BreedingProgressVisualizer();
+            }
+        }
+        
+        private void InitializeChallengeManagement()
+        {
+            // Initialize breeding challenge management systems
+            if (_challengeManager == null)
+            {
+                _challengeManager = new BreedingChallengeManager();
+            }
+            
+            if (_objectiveTracker == null)
+            {
+                _objectiveTracker = new GeneticObjectiveTracker();
+            }
+            
+            if (_projectManager == null)
+            {
+                _projectManager = new BreedingProjectManager();
+            }
+        }
+        
+        private void InitializeDiscoverySystems()
+        {
+            // Initialize genetic discovery and innovation systems
+            if (_discoveryEngine == null)
+            {
+                _discoveryEngine = new GeneticDiscoveryEngine();
+            }
+            
+            if (_novelTraitDetector == null)
+            {
+                _novelTraitDetector = new NovelTraitDetector();
+            }
+            
+            if (_innovationTracker == null)
+            {
+                _innovationTracker = new GeneticInnovationTracker();
+            }
+        }
+        
+        private void InitializeGeneticsGamingState()
+        {
+            _currentGamingState = new GeneticsGamingState
+            {
+                CurrentSkillLevel = GeneticsSkillLevel.Beginner,
+                ActiveChallenges = 0,
+                CompletedChallenges = 0,
+                GeneticDiscoveries = 0,
+                InnovationBreakthroughs = 0,
+                TotalExperience = 0f,
+                UnlockedChallengeTypes = new List<BreedingChallengeType> { BreedingChallengeType.BasicCross },
+                AvailableParentStrains = new List<string>()
+            };
+        }
+        
+        private void SetupEventChannels()
+        {
+            // Event channels would be assigned in inspector or loaded from configuration
+            if (_onGeneticDiscoveryMade != null)
+                _onGeneticDiscoveryMade.OnEventRaisedWithData.AddListener(OnGeneticDiscoveryMadeEvent);
+                
+            if (_onBreedingChallengeCompleted != null)
+                _onBreedingChallengeCompleted.OnEventRaisedWithData.AddListener(OnBreedingChallengeCompletedEvent);
+                
+            if (_onGeneticInnovationAchieved != null)
+                _onGeneticInnovationAchieved.OnEventRaisedWithData.AddListener(OnGeneticInnovationAchievedEvent);
+        }
+        
+        #endregion
+        
+        #region Public API - Breeding Challenges
+        
+        /// <summary>
+        /// Start a new breeding challenge with specified type and objective
+        /// </summary>
+        public BreedingChallengeResult StartBreedingChallenge(BreedingChallengeType challengeType, BreedingObjective objective)
+        {
+            if (!_isInitialized || !IsEligibleForChallenge(challengeType))
+                return BreedingChallengeResult.Failed;
+            
+            var challenge = CreateBreedingChallenge(challengeType, objective);
+            if (challenge == null)
+                return BreedingChallengeResult.Failed;
+            
+            _activeChallenges[challenge.ChallengeID] = challenge;
+            _challengesStarted++;
+            _currentGamingState.ActiveChallenges++;
+            
+            // Setup visual puzzle interface
+            SetupChallengeVisualInterface(challenge);
+            
+            // Track challenge start
+            TrackChallengeStart(challenge);
+            
+            ChimeraLogger.Log($"Breeding challenge started: {challengeType} - {challenge.ChallengeID}", this);
+            return BreedingChallengeResult.Successful;
+        }
+        
+        /// <summary>
+        /// Submit breeding attempt for active challenge
+        /// </summary>
+        public BreedingAttemptResult SubmitBreedingAttempt(string challengeID, GeneticCombination geneticCombination)
+        {
+            if (!_activeChallenges.TryGetValue(challengeID, out BreedingChallenge challenge))
+                return BreedingAttemptResult.InvalidChallenge;
+            
+            var attemptResult = EvaluateBreedingAttempt(challenge, geneticCombination);
+            
+            // Update challenge progress
+            challenge.AttemptsUsed++;
+            challenge.BestScore = Mathf.Max(challenge.BestScore, attemptResult.Score);
+            
+            // Check for challenge completion
+            if (attemptResult.IsSuccessful || challenge.AttemptsUsed >= challenge.MaxAttempts)
+            {
+                CompleteBreedingChallenge(challenge, attemptResult);
+            }
+            
+            // Update visual feedback
+            UpdateChallengeVisualFeedback(challenge, attemptResult);
+            
+            return attemptResult;
+        }
+        
+        /// <summary>
+        /// Get available breeding challenges for player's current skill level
+        /// </summary>
+        public List<BreedingChallengeInfo> GetAvailableChallenges()
+        {
+            var availableChallenges = new List<BreedingChallengeInfo>();
+            
+            foreach (var challengeType in _currentGamingState.UnlockedChallengeTypes)
+            {
+                var challengeInfo = GetChallengeInfo(challengeType);
+                if (challengeInfo != null && CanStartChallenge(challengeType))
+                {
+                    availableChallenges.Add(challengeInfo);
+                }
+            }
+            
+            return availableChallenges;
+        }
+        
+        /// <summary>
+        /// Get progress information for active breeding challenge
+        /// </summary>
+        public BreedingChallengeProgress GetChallengeProgress(string challengeID)
+        {
+            if (!_activeChallenges.TryGetValue(challengeID, out BreedingChallenge challenge))
+                return null;
+            
+            return new BreedingChallengeProgress
+            {
+                ChallengeID = challenge.ChallengeID,
+                ChallengeType = challenge.ChallengeType,
+                Objective = challenge.Objective,
+                Progress = CalculateChallengeProgress(challenge),
+                AttemptsUsed = challenge.AttemptsUsed,
+                MaxAttempts = challenge.MaxAttempts,
+                BestScore = challenge.BestScore,
+                IsCompleted = challenge.IsCompleted,
+                CompletionTime = challenge.CompletionTime
+            };
+        }
+        
+        #endregion
+        
+        #region Public API - Genetic Discovery
+        
+        /// <summary>
+        /// Analyze genetic combination for novel discoveries
+        /// </summary>
+        public GeneticAnalysisResult AnalyzeGeneticCombination(GeneticCombination combination)
+        {
+            if (!_isInitialized || combination == null)
+                return GeneticAnalysisResult.Invalid;
+            
+            var analysisResult = PerformGeneticAnalysis(combination);
+            
+            // Check for novel trait discoveries
+            var novelTraits = _novelTraitDetector?.DetectNovelTraits(combination);
+            if (novelTraits?.Count > 0)
+            {
+                ProcessNovelTraitDiscovery(novelTraits, combination);
+                analysisResult.NovelTraitsDiscovered = novelTraits;
+            }
+            
+            // Check for innovation breakthroughs
+            var innovationLevel = CalculateInnovationLevel(combination, analysisResult);
+            if (innovationLevel >= InnovationDetectionThreshold)
+            {
+                ProcessInnovationBreakthrough(combination, innovationLevel);
+                analysisResult.InnovationLevel = innovationLevel;
+            }
+            
+            // Update discovery database
+            UpdateDiscoveryDatabase(combination, analysisResult);
+            
+            return analysisResult;
+        }
+        
+        /// <summary>
+        /// Create custom breeding project with long-term objectives
+        /// </summary>
+        public BreedingProjectResult CreateBreedingProject(BreedingProjectSpec projectSpec)
+        {
+            if (!_isInitialized || projectSpec == null)
+                return BreedingProjectResult.Failed;
+            
+            var project = new GeneticProject
+            {
+                ProjectID = System.Guid.NewGuid().ToString(),
+                ProjectName = projectSpec.ProjectName,
+                Objectives = projectSpec.Objectives,
+                TimelineWeeks = projectSpec.TimelineWeeks,
+                DifficultyLevel = projectSpec.DifficultyLevel,
+                StartTime = Time.time,
+                IsActive = true
+            };
+            
+            _activeProjects[project.ProjectID] = project;
+            
+            // Initialize project tracking
+            InitializeProjectTracking(project);
+            
+            ChimeraLogger.Log($"Breeding project created: {project.ProjectName} - {project.ProjectID}", this);
+            return BreedingProjectResult.Successful;
+        }
+        
+        /// <summary>
+        /// Get player's genetic discovery history
+        /// </summary>
+        public List<GeneticDiscovery> GetDiscoveryHistory()
+        {
+            return new List<GeneticDiscovery>(_sessionDiscoveries);
+        }
+        
+        /// <summary>
+        /// Get innovation achievements and breakthroughs
+        /// </summary>
+        public List<GeneticInnovation> GetInnovationAchievements()
+        {
+            return _innovationTracker?.GetInnovationHistory() ?? new List<GeneticInnovation>();
+        }
+        
+        #endregion
+        
+        #region Challenge Processing
+        
+        private BreedingChallenge CreateBreedingChallenge(BreedingChallengeType challengeType, BreedingObjective objective)
+        {
+            var challengeTemplate = _challengeLibrary?.GetChallengeTemplate(challengeType);
+            if (challengeTemplate == null) return null;
+            
+            var challenge = new BreedingChallenge
+            {
+                ChallengeID = System.Guid.NewGuid().ToString(),
+                ChallengeType = challengeType,
+                Objective = objective,
+                DifficultyLevel = CalculateChallengeDifficulty(challengeType),
+                MaxAttempts = challengeTemplate.MaxAttempts,
+                TimeLimit = challengeTemplate.TimeLimit,
+                ParentStrains = SelectParentStrains(challengeType, objective),
+                StartTime = Time.time,
+                IsActive = true
+            };
+            
+            return challenge;
+        }
+        
+        private BreedingAttemptResult EvaluateBreedingAttempt(BreedingChallenge challenge, GeneticCombination combination)
+        {
+            var result = new BreedingAttemptResult
+            {
+                AttemptID = System.Guid.NewGuid().ToString(),
+                ChallengeID = challenge.ChallengeID,
+                GeneticCombination = combination,
+                AttemptTime = Time.time
+            };
+            
+            // Calculate objective achievement score
+            result.Score = CalculateObjectiveScore(challenge.Objective, combination);
+            result.IsSuccessful = result.Score >= GetObjectiveThreshold(challenge.Objective);
+            
+            // Calculate detailed metrics
+            result.TraitAccuracy = CalculateTraitAccuracy(challenge.Objective, combination);
+            result.GeneticStability = CalculateGeneticStability(combination);
+            result.InnovationValue = CalculateInnovationValue(combination);
+            result.EfficiencyRating = CalculateBreedingEfficiency(challenge, result);
+            
+            // Provide feedback for improvement
+            result.ImprovementSuggestions = GenerateImprovementSuggestions(challenge, result);
+            
+            return result;
+        }
+        
+        private void CompleteBreedingChallenge(BreedingChallenge challenge, BreedingAttemptResult finalResult)
+        {
+            challenge.IsCompleted = true;
+            challenge.IsActive = false;
+            challenge.CompletionTime = Time.time;
+            challenge.FinalScore = finalResult.Score;
+            
+            _challengesCompleted++;
+            _currentGamingState.ActiveChallenges--;
+            _currentGamingState.CompletedChallenges++;
+            _challengeCompletionCounts[challenge.ChallengeType]++;
+            
+            // Calculate experience gained
+            var experienceGained = CalculateExperienceGain(challenge, finalResult);
+            _totalGeneticsExperience += experienceGained;
+            _currentGamingState.TotalExperience += experienceGained;
+            
+            // Check for skill level progression
+            CheckSkillLevelProgression();
+            
+            // Check for new challenge unlocks
+            CheckChallengeUnlocks(challenge);
+            
+            // Trigger completion event
+            _onBreedingChallengeCompleted?.RaiseEvent(new BreedingChallengeEventData
+            {
+                Challenge = challenge,
+                FinalResult = finalResult,
+                ExperienceGained = experienceGained,
+                NewSkillLevel = _currentGamingState.CurrentSkillLevel
+            });
+            
+            // Clean up active challenge
+            _activeChallenges.Remove(challenge.ChallengeID);
+        }
+        
+        #endregion
+        
+        #region Genetic Discovery Processing
+        
+        private GeneticAnalysisResult PerformGeneticAnalysis(GeneticCombination combination)
+        {
+            var result = new GeneticAnalysisResult
+            {
+                AnalysisID = System.Guid.NewGuid().ToString(),
+                GeneticCombination = combination,
+                AnalysisTime = Time.time
+            };
+            
+            // Analyze genetic diversity
+            result.GeneticDiversity = CalculateGeneticDiversity(combination);
+            
+            // Analyze trait expression
+            result.TraitExpression = AnalyzeTraitExpression(combination);
+            
+            // Analyze phenotype prediction
+            result.PhenotypePrediction = PredictPhenotype(combination);
+            
+            // Analyze breeding potential
+            result.BreedingPotential = AssessBreedingPotential(combination);
+            
+            // Check for stability markers
+            result.StabilityMarkers = IdentifyStabilityMarkers(combination);
+            
+            return result;
+        }
+        
+        private void ProcessNovelTraitDiscovery(List<NovelTrait> novelTraits, GeneticCombination combination)
+        {
+            foreach (var trait in novelTraits)
+            {
+                var discovery = new GeneticDiscovery
+                {
+                    DiscoveryID = System.Guid.NewGuid().ToString(),
+                    DiscoveryType = GeneticDiscoveryType.NovelTrait,
+                    NovelTrait = trait,
+                    SourceCombination = combination,
+                    DiscoveryTime = Time.time,
+                    DiscoveryValue = CalculateTraitDiscoveryValue(trait)
+                };
+                
+                _sessionDiscoveries.Add(discovery);
+                _geneticDiscoveriesMade++;
+                _currentGamingState.GeneticDiscoveries++;
+                
+                // Add to discovery database
+                _discoveryDatabase?.RegisterDiscovery(discovery);
+                
+                // Trigger discovery event
+                _onNovelTraitDiscovered?.RaiseEvent(new NovelTraitEventData
+                {
+                    NovelTrait = trait,
+                    Discovery = discovery,
+                    GeneticCombination = combination
+                });
+            }
+        }
+        
+        private void ProcessInnovationBreakthrough(GeneticCombination combination, float innovationLevel)
+        {
+            var innovation = new GeneticInnovation
+            {
+                InnovationID = System.Guid.NewGuid().ToString(),
+                InnovationType = DetermineInnovationType(combination, innovationLevel),
+                GeneticCombination = combination,
+                InnovationLevel = innovationLevel,
+                InnovationTime = Time.time,
+                InnovationValue = CalculateInnovationValue(combination)
+            };
+            
+            _innovationBreakthroughs++;
+            _currentGamingState.InnovationBreakthroughs++;
+            
+            // Register innovation
+            _innovationTracker?.RegisterInnovation(innovation);
+            
+            // Trigger innovation event
+            _onGeneticInnovationAchieved?.RaiseEvent(new GeneticInnovationEventData
+            {
+                Innovation = innovation,
+                InnovationLevel = innovationLevel,
+                GeneticCombination = combination
+            });
+            
+            ChimeraLogger.Log($"Genetic innovation breakthrough: {innovation.InnovationType} (Level: {innovationLevel:F2})", this);
+        }
+        
+        #endregion
+        
+        #region Visual Interface Management
+        
+        private void SetupChallengeVisualInterface(BreedingChallenge challenge)
+        {
+            if (_visualInterface == null) return;
+            
+            // Configure visual interface for challenge
+            _visualInterface.SetupChallengeMode(challenge);
+            
+            // Setup puzzle renderer
+            _puzzleRenderer?.RenderGeneticPuzzle(challenge);
+            
+            // Initialize progress visualizer
+            _progressVisualizer?.InitializeChallengeProgress(challenge);
+        }
+        
+        private void UpdateChallengeVisualFeedback(BreedingChallenge challenge, BreedingAttemptResult result)
+        {
+            if (_visualInterface == null) return;
+            
+            // Update visual feedback based on attempt result
+            _visualInterface.UpdateAttemptFeedback(result);
+            
+            // Update progress visualization
+            _progressVisualizer?.UpdateProgress(challenge, result);
+            
+            // Update puzzle visualization if applicable
+            if (result.IsSuccessful)
+            {
+                _puzzleRenderer?.ShowSuccessVisualization(challenge, result);
+            }
+            else
+            {
+                _puzzleRenderer?.ShowImprovementHints(challenge, result);
+            }
+        }
+        
+        #endregion
+        
+        #region Progression and Unlocks
+        
+        private void CheckSkillLevelProgression()
+        {
+            var newSkillLevel = CalculateSkillLevel(_currentGamingState.TotalExperience);
+            
+            if (newSkillLevel != _currentGamingState.CurrentSkillLevel)
+            {
+                var previousLevel = _currentGamingState.CurrentSkillLevel;
+                _currentGamingState.CurrentSkillLevel = newSkillLevel;
+                
+                ChimeraLogger.Log($"Genetics skill level increased: {previousLevel} → {newSkillLevel}", this);
+                
+                // Check for new unlocks
+                CheckSkillLevelUnlocks(newSkillLevel);
+            }
+        }
+        
+        private void CheckChallengeUnlocks(BreedingChallenge completedChallenge)
+        {
+            // Check if completed challenge unlocks new challenge types
+            var unlockedChallenges = EvaluateChallengeUnlocks(completedChallenge);
+            
+            foreach (var challengeType in unlockedChallenges)
+            {
+                if (!_currentGamingState.UnlockedChallengeTypes.Contains(challengeType))
+                {
+                    _currentGamingState.UnlockedChallengeTypes.Add(challengeType);
+                    ChimeraLogger.Log($"New challenge type unlocked: {challengeType}", this);
+                }
+            }
+        }
+        
+        private void CheckSkillLevelUnlocks(GeneticsSkillLevel newSkillLevel)
+        {
+            // Unlock new features based on skill level
+            switch (newSkillLevel)
+            {
+                case GeneticsSkillLevel.Novice:
+                    UnlockAdvancedGeneticAnalysis();
+                    break;
+                case GeneticsSkillLevel.Intermediate:
+                    UnlockMultiTraitChallenges();
+                    break;
+                case GeneticsSkillLevel.Advanced:
+                    UnlockGeneticEngineering();
+                    break;
+                case GeneticsSkillLevel.Expert:
+                    UnlockInnovationChallenges();
+                    break;
+                case GeneticsSkillLevel.Master:
+                    UnlockMasterBreedingTools();
+                    break;
+            }
+        }
+        
+        #endregion
+        
+        #region Calculation Methods
+        
+        private float CalculateChallengeDifficulty(BreedingChallengeType challengeType)
+        {
+            return challengeType switch
+            {
+                BreedingChallengeType.BasicCross => 1.0f,
+                BreedingChallengeType.MultiTrait => 1.5f,
+                BreedingChallengeType.StabilityChallenge => 2.0f,
+                BreedingChallengeType.InnovationChallenge => 2.5f,
+                BreedingChallengeType.SpeedBreeding => 1.8f,
+                _ => 1.0f
+            } * PuzzleDifficultyScaling;
+        }
+        
+        private float CalculateObjectiveScore(BreedingObjective objective, GeneticCombination combination)
+        {
+            float score = 0f;
+            
+            // Score based on trait achievement
+            foreach (var targetTrait in objective.TargetTraits)
+            {
+                var achievement = CalculateTraitAchievement(targetTrait, combination);
+                score += achievement * targetTrait.Weight;
+            }
+            
+            // Apply stability bonus
+            var stabilityBonus = CalculateStabilityBonus(combination);
+            score *= (1.0f + stabilityBonus);
+            
+            return Mathf.Clamp01(score);
+        }
+        
+        private float CalculateTraitAchievement(TargetTrait targetTrait, GeneticCombination combination)
+        {
+            // This would integrate with Project Chimera's genetics system
+            // For now, return a simulated achievement score
+            return Random.Range(0.3f, 1.0f);
+        }
+        
+        private float CalculateStabilityBonus(GeneticCombination combination)
+        {
+            // Calculate genetic stability bonus
+            return Random.Range(0.0f, 0.2f);
+        }
+        
+        private float GetObjectiveThreshold(BreedingObjective objective)
+        {
+            return objective.DifficultyLevel switch
+            {
+                ChallengeDifficulty.Easy => 0.6f,
+                ChallengeDifficulty.Medium => 0.75f,
+                ChallengeDifficulty.Hard => 0.85f,
+                ChallengeDifficulty.Expert => 0.95f,
+                _ => 0.7f
+            };
+        }
+        
+        private float CalculateExperienceGain(BreedingChallenge challenge, BreedingAttemptResult result)
+        {
+            var baseExperience = GetBaseChallengeExperience(challenge.ChallengeType);
+            var difficultyMultiplier = challenge.DifficultyLevel;
+            var performanceMultiplier = Mathf.Clamp(result.Score, 0.1f, 2.0f);
+            var efficiencyBonus = CalculateEfficiencyBonus(challenge);
+            
+            return baseExperience * difficultyMultiplier * performanceMultiplier * (1.0f + efficiencyBonus) * ChallengeProgressionRate;
+        }
+        
+        private float GetBaseChallengeExperience(BreedingChallengeType challengeType)
+        {
+            return challengeType switch
+            {
+                BreedingChallengeType.BasicCross => 25.0f,
+                BreedingChallengeType.MultiTrait => 50.0f,
+                BreedingChallengeType.StabilityChallenge => 75.0f,
+                BreedingChallengeType.InnovationChallenge => 100.0f,
+                BreedingChallengeType.SpeedBreeding => 40.0f,
+                _ => 20.0f
+            };
+        }
+        
+        private float CalculateEfficiencyBonus(BreedingChallenge challenge)
+        {
+            if (challenge.AttemptsUsed <= 1) return 0.5f;
+            if (challenge.AttemptsUsed <= challenge.MaxAttempts / 2) return 0.2f;
+            return 0.0f;
+        }
+        
+        private GeneticsSkillLevel CalculateSkillLevel(float totalExperience)
+        {
+            if (totalExperience >= 2000f) return GeneticsSkillLevel.Master;
+            if (totalExperience >= 1000f) return GeneticsSkillLevel.Expert;
+            if (totalExperience >= 500f) return GeneticsSkillLevel.Advanced;
+            if (totalExperience >= 200f) return GeneticsSkillLevel.Intermediate;
+            if (totalExperience >= 50f) return GeneticsSkillLevel.Novice;
+            return GeneticsSkillLevel.Beginner;
+        }
+        
+        private float CalculateInnovationLevel(GeneticCombination combination, GeneticAnalysisResult analysis)
+        {
+            float innovationScore = 0f;
+            
+            // Base innovation from genetic diversity
+            innovationScore += analysis.GeneticDiversity * 0.3f;
+            
+            // Innovation from novel trait combinations
+            innovationScore += analysis.NovelTraitsDiscovered?.Count ?? 0 * 2.0f;
+            
+            // Innovation from breeding efficiency
+            innovationScore += analysis.BreedingPotential * 0.5f;
+            
+            return innovationScore;
+        }
+        
+        private float CalculateTraitDiscoveryValue(NovelTrait trait)
+        {
+            return trait.Rarity switch
+            {
+                TraitRarity.Common => 10.0f,
+                TraitRarity.Uncommon => 25.0f,
+                TraitRarity.Rare => 50.0f,
+                TraitRarity.Epic => 100.0f,
+                TraitRarity.Legendary => 250.0f,
+                _ => 5.0f
+            } * DiscoveryRewardMultiplier;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private bool IsEligibleForChallenge(BreedingChallengeType challengeType)
+        {
+            return _currentGamingState.UnlockedChallengeTypes.Contains(challengeType);
+        }
+        
+        private bool CanStartChallenge(BreedingChallengeType challengeType)
+        {
+            // Check if player meets requirements for challenge type
+            var requiredLevel = GetRequiredSkillLevel(challengeType);
+            return _currentGamingState.CurrentSkillLevel >= requiredLevel;
+        }
+        
+        private GeneticsSkillLevel GetRequiredSkillLevel(BreedingChallengeType challengeType)
+        {
+            return challengeType switch
+            {
+                BreedingChallengeType.BasicCross => GeneticsSkillLevel.Beginner,
+                BreedingChallengeType.MultiTrait => GeneticsSkillLevel.Novice,
+                BreedingChallengeType.StabilityChallenge => GeneticsSkillLevel.Intermediate,
+                BreedingChallengeType.InnovationChallenge => GeneticsSkillLevel.Advanced,
+                BreedingChallengeType.SpeedBreeding => GeneticsSkillLevel.Expert,
+                _ => GeneticsSkillLevel.Beginner
+            };
+        }
+        
+        private List<string> SelectParentStrains(BreedingChallengeType challengeType, BreedingObjective objective)
+        {
+            // This would integrate with Project Chimera's strain database
+            // For now, return a simulated list
+            return new List<string> { "ParentStrain_A", "ParentStrain_B" };
+        }
+        
+        private float CalculateChallengeProgress(BreedingChallenge challenge)
+        {
+            if (challenge.IsCompleted) return 1.0f;
+            
+            // Calculate progress based on best score and attempts
+            var scoreProgress = challenge.BestScore;
+            var attemptProgress = (float)challenge.AttemptsUsed / challenge.MaxAttempts;
+            
+            return Mathf.Max(scoreProgress, attemptProgress * 0.5f);
+        }
+        
+        private List<BreedingChallengeType> EvaluateChallengeUnlocks(BreedingChallenge completedChallenge)
+        {
+            var unlocks = new List<BreedingChallengeType>();
+            
+            // Unlock progression based on challenge type and performance
+            switch (completedChallenge.ChallengeType)
+            {
+                case BreedingChallengeType.BasicCross:
+                    if (completedChallenge.FinalScore >= 0.8f)
+                        unlocks.Add(BreedingChallengeType.MultiTrait);
+                    break;
+                    
+                case BreedingChallengeType.MultiTrait:
+                    if (completedChallenge.FinalScore >= 0.8f)
+                        unlocks.Add(BreedingChallengeType.StabilityChallenge);
+                    break;
+                    
+                case BreedingChallengeType.StabilityChallenge:
+                    if (completedChallenge.FinalScore >= 0.9f)
+                        unlocks.Add(BreedingChallengeType.InnovationChallenge);
+                    break;
+            }
+            
+            return unlocks;
+        }
+        
+        private void UnlockAdvancedGeneticAnalysis()
+        {
+            ChimeraLogger.Log("Advanced genetic analysis tools unlocked", this);
+        }
+        
+        private void UnlockMultiTraitChallenges()
+        {
+            if (!_currentGamingState.UnlockedChallengeTypes.Contains(BreedingChallengeType.MultiTrait))
+            {
+                _currentGamingState.UnlockedChallengeTypes.Add(BreedingChallengeType.MultiTrait);
+                ChimeraLogger.Log("Multi-trait breeding challenges unlocked", this);
+            }
+        }
+        
+        private void UnlockGeneticEngineering()
+        {
+            ChimeraLogger.Log("Genetic engineering tools unlocked", this);
+        }
+        
+        private void UnlockInnovationChallenges()
+        {
+            if (!_currentGamingState.UnlockedChallengeTypes.Contains(BreedingChallengeType.InnovationChallenge))
+            {
+                _currentGamingState.UnlockedChallengeTypes.Add(BreedingChallengeType.InnovationChallenge);
+                ChimeraLogger.Log("Innovation breeding challenges unlocked", this);
+            }
+        }
+        
+        private void UnlockMasterBreedingTools()
+        {
+            ChimeraLogger.Log("Master breeding tools unlocked", this);
+        }
+        
+        private BreedingChallengeInfo GetChallengeInfo(BreedingChallengeType challengeType)
+        {
+            return _challengeLibrary?.GetChallengeInfo(challengeType);
+        }
+        
+        private void TrackChallengeStart(BreedingChallenge challenge)
+        {
+            // Track challenge analytics
+            ChimeraLogger.Log($"Challenge analytics: Type={challenge.ChallengeType}, Difficulty={challenge.DifficultyLevel:F2}", this);
+        }
+        
+        private void InitializeProjectTracking(GeneticProject project)
+        {
+            // Initialize project tracking systems
+            _objectiveTracker?.InitializeProject(project);
+        }
+        
+        private void UpdateDiscoveryDatabase(GeneticCombination combination, GeneticAnalysisResult result)
+        {
+            // Update discovery database with analysis results
+            _discoveryDatabase?.UpdateAnalysisData(combination, result);
+        }
+        
+        #endregion
+        
+        #region Analysis Methods
+        
+        private float CalculateGeneticDiversity(GeneticCombination combination)
+        {
+            // Calculate genetic diversity score
+            return Random.Range(0.3f, 1.0f);
+        }
+        
+        private TraitExpressionAnalysis AnalyzeTraitExpression(GeneticCombination combination)
+        {
+            // Analyze trait expression patterns
+            return new TraitExpressionAnalysis
+            {
+                DominantTraits = new List<string>(),
+                RecessiveTraits = new List<string>(),
+                IntermediateTraits = new List<string>()
+            };
+        }
+        
+        private PhenotypePrediction PredictPhenotype(GeneticCombination combination)
+        {
+            // Predict phenotype based on genetic combination
+            return new PhenotypePrediction
+            {
+                VisualTraits = new List<string>(),
+                ChemicalProfile = new List<string>(),
+                GrowthCharacteristics = new List<string>(),
+                ConfidenceLevel = Random.Range(0.7f, 0.95f)
+            };
+        }
+        
+        private float AssessBreedingPotential(GeneticCombination combination)
+        {
+            // Assess breeding potential of combination
+            return Random.Range(0.4f, 1.0f);
+        }
+        
+        private List<StabilityMarker> IdentifyStabilityMarkers(GeneticCombination combination)
+        {
+            // Identify genetic stability markers
+            return new List<StabilityMarker>();
+        }
+        
+        private float CalculateTraitAccuracy(BreedingObjective objective, GeneticCombination combination)
+        {
+            return Random.Range(0.5f, 1.0f);
+        }
+        
+        private float CalculateGeneticStability(GeneticCombination combination)
+        {
+            return Random.Range(0.4f, 1.0f);
+        }
+        
+        private float CalculateInnovationValue(GeneticCombination combination)
+        {
+            return Random.Range(0.0f, 2.0f);
+        }
+        
+        private float CalculateBreedingEfficiency(BreedingChallenge challenge, BreedingAttemptResult result)
+        {
+            var attemptEfficiency = 1.0f - ((float)challenge.AttemptsUsed / challenge.MaxAttempts);
+            var scoreEfficiency = result.Score;
+            return (attemptEfficiency + scoreEfficiency) * 0.5f;
+        }
+        
+        private List<string> GenerateImprovementSuggestions(BreedingChallenge challenge, BreedingAttemptResult result)
+        {
+            var suggestions = new List<string>();
+            
+            if (result.TraitAccuracy < 0.7f)
+                suggestions.Add("Focus on trait selection accuracy");
+                
+            if (result.GeneticStability < 0.6f)
+                suggestions.Add("Improve genetic stability through parent selection");
+                
+            if (result.Score < 0.5f)
+                suggestions.Add("Review breeding objective requirements");
+                
+            return suggestions;
+        }
+        
+        private GeneticInnovationType DetermineInnovationType(GeneticCombination combination, float innovationLevel)
+        {
+            if (innovationLevel >= 8.0f) return GeneticInnovationType.Revolutionary;
+            if (innovationLevel >= 6.0f) return GeneticInnovationType.Breakthrough;
+            if (innovationLevel >= 4.0f) return GeneticInnovationType.Significant;
+            return GeneticInnovationType.Incremental;
+        }
+        
+        #endregion
+        
+        #region Event Handlers
+        
+        private void OnGeneticDiscoveryMadeEvent(object eventData)
+        {
+            if (eventData is GeneticDiscoveryEventData discoveryData)
+            {
+                // Handle genetic discovery events
+                ProcessDiscoveryEvent(discoveryData);
+            }
+        }
+        
+        private void OnBreedingChallengeCompletedEvent(object eventData)
+        {
+            if (eventData is BreedingChallengeEventData challengeData)
+            {
+                // Handle breeding challenge completion events
+                ProcessChallengeCompletionEvent(challengeData);
+            }
+        }
+        
+        private void OnGeneticInnovationAchievedEvent(object eventData)
+        {
+            if (eventData is GeneticInnovationEventData innovationData)
+            {
+                // Handle genetic innovation events
+                ProcessInnovationEvent(innovationData);
+            }
+        }
+        
+        private void ProcessDiscoveryEvent(GeneticDiscoveryEventData discoveryData)
+        {
+            // Process discovery-related game events
+            ChimeraLogger.Log($"Genetic discovery processed: {discoveryData.Discovery?.DiscoveryType}", this);
+        }
+        
+        private void ProcessChallengeCompletionEvent(BreedingChallengeEventData challengeData)
+        {
+            // Process challenge completion events
+            ChimeraLogger.Log($"Challenge completion processed: {challengeData.Challenge?.ChallengeType}", this);
+        }
+        
+        private void ProcessInnovationEvent(GeneticInnovationEventData innovationData)
+        {
+            // Process innovation achievement events
+            ChimeraLogger.Log($"Innovation processed: {innovationData.Innovation?.InnovationType}", this);
+        }
+        
+        #endregion
+        
+        #region Public Properties
+        
+        /// <summary>
+        /// Get current genetics gaming state
+        /// </summary>
+        public GeneticsGamingState GetCurrentGamingState()
+        {
+            return _currentGamingState;
+        }
+        
+        /// <summary>
+        /// Get genetics gaming performance metrics
+        /// </summary>
+        public GeneticsGamingMetrics GetGamingMetrics()
+        {
+            return new GeneticsGamingMetrics
+            {
+                ChallengesStarted = _challengesStarted,
+                ChallengesCompleted = _challengesCompleted,
+                GeneticDiscoveriesMade = _geneticDiscoveriesMade,
+                InnovationBreakthroughs = _innovationBreakthroughs,
+                TotalGeneticsExperience = _totalGeneticsExperience,
+                CurrentSkillLevel = _currentGamingState.CurrentSkillLevel,
+                ActiveChallenges = _currentGamingState.ActiveChallenges,
+                ChallengeCompletionRate = _challengesStarted > 0 ? (float)_challengesCompleted / _challengesStarted : 0f
+            };
+        }
+        
+        #endregion
+        
+        #region System Updates
+        
+        public void Update(float deltaTime)
+        {
+            UpdateSystem(deltaTime);
+        }
+        
+        public void UpdateSystem(float deltaTime)
+        {
+            if (!_isInitialized) return;
+            
+            // Update active challenges
+            UpdateActiveChallenges(deltaTime);
+            
+            // Update active projects
+            UpdateActiveProjects(deltaTime);
+            
+            // Update visual interface
+            _visualInterface?.UpdateSystem(deltaTime);
+            
+            // Update discovery systems
+            _discoveryEngine?.UpdateSystem(deltaTime);
+        }
+        
+        private void UpdateActiveChallenges(float deltaTime)
+        {
+            var challengesToRemove = new List<string>();
+            
+            foreach (var challenge in _activeChallenges.Values)
+            {
+                if (challenge.TimeLimit > 0 && (Time.time - challenge.StartTime) > challenge.TimeLimit)
+                {
+                    // Handle challenge timeout
+                    challenge.IsActive = false;
+                    challenge.IsTimedOut = true;
+                    challengesToRemove.Add(challenge.ChallengeID);
+                }
+            }
+            
+            // Remove timed-out challenges
+            foreach (var challengeID in challengesToRemove)
+            {
+                _activeChallenges.Remove(challengeID);
+                _currentGamingState.ActiveChallenges--;
+            }
+        }
+        
+        private void UpdateActiveProjects(float deltaTime)
+        {
+            foreach (var project in _activeProjects.Values)
+            {
+                if (project.IsActive)
+                {
+                    // Update project progress
+                    UpdateProjectProgress(project, deltaTime);
+                }
+            }
+        }
+        
+        private void UpdateProjectProgress(GeneticProject project, float deltaTime)
+        {
+            // Update project progress tracking
+            var elapsed = Time.time - project.StartTime;
+            project.ProgressPercentage = Mathf.Clamp01(elapsed / (project.TimelineWeeks * 604800f)); // weeks to seconds
+        }
+        
+        #endregion
+        
+        #region Unity Lifecycle
+        
+        private void OnDestroy()
+        {
+            if (_onGeneticDiscoveryMade != null)
+                _onGeneticDiscoveryMade.OnEventRaisedWithData.RemoveListener(OnGeneticDiscoveryMadeEvent);
+                
+            if (_onBreedingChallengeCompleted != null)
+                _onBreedingChallengeCompleted.OnEventRaisedWithData.RemoveListener(OnBreedingChallengeCompletedEvent);
+                
+            if (_onGeneticInnovationAchieved != null)
+                _onGeneticInnovationAchieved.OnEventRaisedWithData.RemoveListener(OnGeneticInnovationAchievedEvent);
+        }
+        
+        #endregion
+    }
+    
+    #region Data Structures
+    
+    [System.Serializable]
+    public class GeneticsGamingState
+    {
+        public GeneticsSkillLevel CurrentSkillLevel;
+        public int ActiveChallenges;
+        public int CompletedChallenges;
+        public int GeneticDiscoveries;
+        public int InnovationBreakthroughs;
+        public float TotalExperience;
+        public List<BreedingChallengeType> UnlockedChallengeTypes;
+        public List<string> AvailableParentStrains;
+    }
+    
+    [System.Serializable]
+    public class GeneticsGamingMetrics
+    {
+        public int ChallengesStarted;
+        public int ChallengesCompleted;
+        public int GeneticDiscoveriesMade;
+        public int InnovationBreakthroughs;
+        public float TotalGeneticsExperience;
+        public GeneticsSkillLevel CurrentSkillLevel;
+        public int ActiveChallenges;
+        public float ChallengeCompletionRate;
+    }
+    
+    // Additional data structures would be defined here
+    
+    #endregion
+}

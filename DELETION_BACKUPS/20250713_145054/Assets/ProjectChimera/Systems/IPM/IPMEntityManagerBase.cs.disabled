@@ -1,0 +1,598 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Abstract base class for IPM entity management systems.
+    /// Provides common functionality for managing collections of IPM entities like pests,
+    /// beneficial organisms, defense structures, and environmental zones.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity this manager handles</typeparam>
+    /// <typeparam name="TEntityType">The enum type for entity classification</typeparam>
+    public abstract class IPMEntityManagerBase<TEntity, TEntityType> : IPMSystemBase
+        where TEntity : class
+        where TEntityType : Enum
+    {
+        [Header("Entity Management Configuration")]
+        [SerializeField] protected int _maxEntities = 1000;
+        [SerializeField] protected float _entityUpdateInterval = 0.1f;
+        [SerializeField] protected bool _enableEntityPooling = true;
+        [SerializeField] protected bool _enableSpatialOptimization = true;
+        
+        [Header("Performance Settings")]
+        [SerializeField] protected int _maxEntitiesPerUpdate = 50;
+        [SerializeField] protected bool _enableBatchProcessing = true;
+        [SerializeField] protected float _cullingDistance = 100f;
+        
+        // Entity Collections
+        protected Dictionary<string, TEntity> _activeEntities = new Dictionary<string, TEntity>();
+        protected Dictionary<TEntityType, List<string>> _entitiesByType = new Dictionary<TEntityType, List<string>>();
+        protected Dictionary<string, Vector3> _entityPositions = new Dictionary<string, Vector3>();
+        protected Queue<string> _entityUpdateQueue = new Queue<string>();
+        
+        // Entity Lifecycle Management
+        protected HashSet<string> _entitiesToRemove = new HashSet<string>();
+        protected Queue<TEntity> _entitySpawnQueue = new Queue<TEntity>();
+        protected Dictionary<string, DateTime> _entityCreationTimes = new Dictionary<string, DateTime>();
+        protected Dictionary<string, EntityLifecycleState> _entityStates = new Dictionary<string, EntityLifecycleState>();
+        
+        // Performance Optimization
+        protected ObjectPool<TEntity> _entityPool;
+        protected SpatialGrid<string> _spatialGrid;
+        protected float _lastEntityUpdate;
+        protected int _currentUpdateIndex;
+        
+        // Entity Metrics
+        protected EntityManagerMetrics _entityMetrics = new EntityManagerMetrics();
+        
+        // Events
+        public event Action<string, TEntity> OnEntitySpawned;
+        public event Action<string, TEntity> OnEntityDestroyed;
+        public event Action<string, TEntity> OnEntityUpdated;
+        public event Action<TEntityType, int> OnEntityCountChanged;
+        
+        #region Initialization
+        
+        protected override void InitializeSystemSpecific()
+        {
+            InitializeEntityTypes();
+            
+            if (_enableEntityPooling)
+            {
+                _entityPool = new ObjectPool<TEntity>(CreateEntityInstance, ResetEntityInstance, _maxEntities / 4);
+            }
+            
+            if (_enableSpatialOptimization)
+            {
+                _spatialGrid = new SpatialGrid<string>(100f, 100f, 10); // 100x100 units, 10x10 grid
+            }
+            
+            InitializeEntityManagerSpecific();
+        }
+        
+        protected virtual void InitializeEntityTypes()
+        {
+            foreach (TEntityType entityType in Enum.GetValues(typeof(TEntityType)))
+            {
+                _entitiesByType[entityType] = new List<string>();
+            }
+        }
+        
+        protected abstract void InitializeEntityManagerSpecific();
+        
+        #endregion
+        
+        #region Entity Management
+        
+        public virtual string SpawnEntity(TEntity entityData, TEntityType entityType, Vector3 position)
+        {
+            try
+            {
+                if (_activeEntities.Count >= _maxEntities)
+                {
+                    if (_enableDebugLogging)
+                    {
+                        Debug.LogWarning($"[{_systemId}] Cannot spawn entity - maximum limit reached: {_maxEntities}");
+                    }
+                    return null;
+                }
+                
+                string entityId = GenerateEntityId();
+                
+                // Initialize entity
+                var entity = _enableEntityPooling ? _entityPool.Get() : CreateEntityInstance();
+                ConfigureEntity(entity, entityData, entityType, position);
+                
+                // Register entity
+                _activeEntities[entityId] = entity;
+                _entitiesByType[entityType].Add(entityId);
+                _entityPositions[entityId] = position;
+                _entityCreationTimes[entityId] = DateTime.Now;
+                _entityStates[entityId] = EntityLifecycleState.Active;
+                
+                // Spatial optimization
+                if (_enableSpatialOptimization)
+                {
+                    _spatialGrid.Insert(entityId, position);
+                }
+                
+                OnEntitySpawnedInternal(entityId, entity, entityType, position);
+                OnEntitySpawned?.Invoke(entityId, entity);
+                OnEntityCountChanged?.Invoke(entityType, _entitiesByType[entityType].Count);
+                
+                _entityMetrics.TotalSpawned++;
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[{_systemId}] Entity spawned: {entityId} ({entityType}) at {position}");
+                }
+                
+                return entityId;
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Failed to spawn entity: {ex.Message}", ex);
+                return null;
+            }
+        }
+        
+        public virtual bool DestroyEntity(string entityId)
+        {
+            try
+            {
+                if (!_activeEntities.TryGetValue(entityId, out var entity))
+                {
+                    return false;
+                }
+                
+                var entityType = GetEntityType(entityId);
+                
+                OnEntityDestroyedInternal(entityId, entity, entityType);
+                OnEntityDestroyed?.Invoke(entityId, entity);
+                
+                // Cleanup entity
+                _activeEntities.Remove(entityId);
+                _entitiesByType[entityType].Remove(entityId);
+                _entityPositions.Remove(entityId);
+                _entityCreationTimes.Remove(entityId);
+                _entityStates.Remove(entityId);
+                
+                // Spatial optimization cleanup
+                if (_enableSpatialOptimization)
+                {
+                    _spatialGrid.Remove(entityId);
+                }
+                
+                // Return to pool or destroy
+                if (_enableEntityPooling)
+                {
+                    _entityPool.Return(entity);
+                }
+                else
+                {
+                    DestroyEntityInstance(entity);
+                }
+                
+                OnEntityCountChanged?.Invoke(entityType, _entitiesByType[entityType].Count);
+                _entityMetrics.TotalDestroyed++;
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[{_systemId}] Entity destroyed: {entityId} ({entityType})");
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                HandleSystemError($"Failed to destroy entity {entityId}: {ex.Message}", ex);
+                return false;
+            }
+        }
+        
+        public virtual TEntity GetEntity(string entityId)
+        {
+            return _activeEntities.GetValueOrDefault(entityId);
+        }
+        
+        public virtual List<TEntity> GetEntitiesByType(TEntityType entityType)
+        {
+            if (!_entitiesByType.TryGetValue(entityType, out var entityIds))
+            {
+                return new List<TEntity>();
+            }
+            
+            return entityIds.Select(id => _activeEntities.GetValueOrDefault(id))
+                           .Where(entity => entity != null)
+                           .ToList();
+        }
+        
+        public virtual List<string> GetEntityIdsInRadius(Vector3 center, float radius)
+        {
+            if (_enableSpatialOptimization)
+            {
+                return _spatialGrid.QueryRadius(center, radius);
+            }
+            
+            // Fallback to brute force search
+            return _entityPositions.Where(kvp => Vector3.Distance(kvp.Value, center) <= radius)
+                                   .Select(kvp => kvp.Key)
+                                   .ToList();
+        }
+        
+        public virtual int GetEntityCount(TEntityType entityType)
+        {
+            return _entitiesByType.GetValueOrDefault(entityType)?.Count ?? 0;
+        }
+        
+        public virtual int GetTotalEntityCount()
+        {
+            return _activeEntities.Count;
+        }
+        
+        public virtual Vector3 GetEntityPosition(string entityId)
+        {
+            return _entityPositions.GetValueOrDefault(entityId);
+        }
+        
+        public virtual bool UpdateEntityPosition(string entityId, Vector3 newPosition)
+        {
+            if (!_activeEntities.ContainsKey(entityId))
+                return false;
+            
+            var oldPosition = _entityPositions.GetValueOrDefault(entityId);
+            _entityPositions[entityId] = newPosition;
+            
+            // Update spatial grid
+            if (_enableSpatialOptimization)
+            {
+                _spatialGrid.Update(entityId, oldPosition, newPosition);
+            }
+            
+            OnEntityPositionUpdated(entityId, oldPosition, newPosition);
+            return true;
+        }
+        
+        #endregion
+        
+        #region Entity Updates
+        
+        protected override void UpdateSystemSpecific(float deltaTime)
+        {
+            if (Time.time - _lastEntityUpdate >= _entityUpdateInterval)
+            {
+                UpdateEntities(deltaTime);
+                ProcessEntityLifecycles();
+                CleanupDestroyedEntities();
+                UpdateEntityMetrics();
+                _lastEntityUpdate = Time.time;
+            }
+        }
+        
+        protected virtual void UpdateEntities(float deltaTime)
+        {
+            if (!_activeEntities.Any()) return;
+            
+            var entityIds = _activeEntities.Keys.ToList();
+            int entitiesToUpdate = Math.Min(_maxEntitiesPerUpdate, entityIds.Count);
+            
+            for (int i = 0; i < entitiesToUpdate; i++)
+            {
+                int index = (_currentUpdateIndex + i) % entityIds.Count;
+                string entityId = entityIds[index];
+                
+                if (_activeEntities.TryGetValue(entityId, out var entity))
+                {
+                    if (ShouldUpdateEntity(entityId, entity))
+                    {
+                        try
+                        {
+                            UpdateEntitySpecific(entityId, entity, deltaTime);
+                            OnEntityUpdated?.Invoke(entityId, entity);
+                            _entityMetrics.TotalUpdates++;
+                        }
+                        catch (Exception ex)
+                        {
+                            HandleSystemError($"Failed to update entity {entityId}: {ex.Message}", ex);
+                        }
+                    }
+                }
+            }
+            
+            _currentUpdateIndex = (_currentUpdateIndex + entitiesToUpdate) % Math.Max(entityIds.Count, 1);
+        }
+        
+        protected virtual bool ShouldUpdateEntity(string entityId, TEntity entity)
+        {
+            // Default: update all active entities
+            var state = _entityStates.GetValueOrDefault(entityId, EntityLifecycleState.Active);
+            return state == EntityLifecycleState.Active;
+        }
+        
+        protected virtual void ProcessEntityLifecycles()
+        {
+            var expiredEntities = new List<string>();
+            
+            foreach (var kvp in _entityStates.ToList())
+            {
+                string entityId = kvp.Key;
+                var state = kvp.Value;
+                
+                if (state == EntityLifecycleState.Destroying)
+                {
+                    expiredEntities.Add(entityId);
+                }
+                else if (ShouldMarkForDestruction(entityId))
+                {
+                    _entityStates[entityId] = EntityLifecycleState.Destroying;
+                }
+            }
+            
+            foreach (var entityId in expiredEntities)
+            {
+                _entitiesToRemove.Add(entityId);
+            }
+        }
+        
+        protected virtual void CleanupDestroyedEntities()
+        {
+            foreach (var entityId in _entitiesToRemove.ToList())
+            {
+                DestroyEntity(entityId);
+                _entitiesToRemove.Remove(entityId);
+            }
+        }
+        
+        protected virtual void UpdateEntityMetrics()
+        {
+            _entityMetrics.ActiveEntities = _activeEntities.Count;
+            _entityMetrics.LastUpdate = DateTime.Now;
+            _entityMetrics.UpdatesPerSecond = _entityMetrics.TotalUpdates / Math.Max(1f, (float)(DateTime.Now - _initializationTime).TotalSeconds);
+        }
+        
+        #endregion
+        
+        #region Abstract Methods
+        
+        protected abstract TEntity CreateEntityInstance();
+        protected abstract void DestroyEntityInstance(TEntity entity);
+        protected abstract void ConfigureEntity(TEntity entity, TEntity sourceData, TEntityType entityType, Vector3 position);
+        protected abstract void UpdateEntitySpecific(string entityId, TEntity entity, float deltaTime);
+        protected abstract TEntityType GetEntityType(string entityId);
+        protected abstract string GenerateEntityId();
+        
+        #endregion
+        
+        #region Virtual Methods
+        
+        protected virtual void ResetEntityInstance(TEntity entity)
+        {
+            // Default implementation - override for specific reset logic
+        }
+        
+        protected virtual void OnEntitySpawnedInternal(string entityId, TEntity entity, TEntityType entityType, Vector3 position)
+        {
+            // Override for custom spawn logic
+        }
+        
+        protected virtual void OnEntityDestroyedInternal(string entityId, TEntity entity, TEntityType entityType)
+        {
+            // Override for custom destruction logic
+        }
+        
+        protected virtual void OnEntityPositionUpdated(string entityId, Vector3 oldPosition, Vector3 newPosition)
+        {
+            // Override for custom position update logic
+        }
+        
+        protected virtual bool ShouldMarkForDestruction(string entityId)
+        {
+            // Default: no automatic destruction
+            return false;
+        }
+        
+        #endregion
+        
+        #region Cleanup
+        
+        protected override void CleanupSystemSpecific()
+        {
+            // Destroy all entities
+            var entityIds = _activeEntities.Keys.ToList();
+            foreach (var entityId in entityIds)
+            {
+                DestroyEntity(entityId);
+            }
+            
+            _activeEntities.Clear();
+            _entitiesByType.Clear();
+            _entityPositions.Clear();
+            _entityUpdateQueue.Clear();
+            _entitiesToRemove.Clear();
+            _entitySpawnQueue.Clear();
+            _entityCreationTimes.Clear();
+            _entityStates.Clear();
+            
+            _entityPool?.Dispose();
+            _spatialGrid?.Clear();
+        }
+        
+        #endregion
+        
+        #region Performance Optimization
+        
+        protected override Dictionary<string, float> GetSubSystemPerformance()
+        {
+            var baseMetrics = base.GetSubSystemPerformance();
+            
+            baseMetrics["ActiveEntities"] = _activeEntities.Count;
+            baseMetrics["EntitiesPerUpdate"] = _maxEntitiesPerUpdate;
+            baseMetrics["UpdateInterval"] = _entityUpdateInterval;
+            baseMetrics["PooledEntities"] = _entityPool?.AvailableCount ?? 0;
+            baseMetrics["SpatialGridCells"] = _spatialGrid?.CellCount ?? 0;
+            baseMetrics["UpdatesPerSecond"] = _entityMetrics.UpdatesPerSecond;
+            
+            return baseMetrics;
+        }
+        
+        #endregion
+    }
+    
+    #region Supporting Classes
+    
+    public enum EntityLifecycleState
+    {
+        Spawning,
+        Active,
+        Destroying,
+        Destroyed
+    }
+    
+    [Serializable]
+    public class EntityManagerMetrics
+    {
+        public int ActiveEntities;
+        public int TotalSpawned;
+        public int TotalDestroyed;
+        public int TotalUpdates;
+        public float UpdatesPerSecond;
+        public DateTime LastUpdate;
+    }
+    
+    public class ObjectPool<T> : IDisposable where T : class
+    {
+        private readonly Queue<T> _pool = new Queue<T>();
+        private readonly Func<T> _createFunc;
+        private readonly Action<T> _resetAction;
+        private readonly int _maxSize;
+        
+        public int AvailableCount => _pool.Count;
+        
+        public ObjectPool(Func<T> createFunc, Action<T> resetAction, int maxSize = 100)
+        {
+            _createFunc = createFunc;
+            _resetAction = resetAction;
+            _maxSize = maxSize;
+        }
+        
+        public T Get()
+        {
+            if (_pool.Count > 0)
+            {
+                var item = _pool.Dequeue();
+                _resetAction?.Invoke(item);
+                return item;
+            }
+            
+            return _createFunc();
+        }
+        
+        public void Return(T item)
+        {
+            if (item != null && _pool.Count < _maxSize)
+            {
+                _pool.Enqueue(item);
+            }
+        }
+        
+        public void Dispose()
+        {
+            _pool.Clear();
+        }
+    }
+    
+    public class SpatialGrid<T>
+    {
+        private readonly Dictionary<Vector2Int, List<T>> _grid = new Dictionary<Vector2Int, List<T>>();
+        private readonly Dictionary<T, Vector2Int> _itemCells = new Dictionary<T, Vector2Int>();
+        private readonly float _cellSize;
+        private readonly float _worldWidth;
+        private readonly float _worldHeight;
+        private readonly int _gridWidth;
+        private readonly int _gridHeight;
+        
+        public int CellCount => _grid.Count;
+        
+        public SpatialGrid(float worldWidth, float worldHeight, int gridResolution)
+        {
+            _worldWidth = worldWidth;
+            _worldHeight = worldHeight;
+            _gridWidth = gridResolution;
+            _gridHeight = gridResolution;
+            _cellSize = worldWidth / gridResolution;
+        }
+        
+        public void Insert(T item, Vector3 position)
+        {
+            var cell = GetCell(position);
+            
+            if (!_grid.ContainsKey(cell))
+            {
+                _grid[cell] = new List<T>();
+            }
+            
+            _grid[cell].Add(item);
+            _itemCells[item] = cell;
+        }
+        
+        public void Remove(T item)
+        {
+            if (_itemCells.TryGetValue(item, out var cell))
+            {
+                _grid[cell]?.Remove(item);
+                _itemCells.Remove(item);
+                
+                if (_grid[cell]?.Count == 0)
+                {
+                    _grid.Remove(cell);
+                }
+            }
+        }
+        
+        public void Update(T item, Vector3 oldPosition, Vector3 newPosition)
+        {
+            Remove(item);
+            Insert(item, newPosition);
+        }
+        
+        public List<T> QueryRadius(Vector3 center, float radius)
+        {
+            var results = new List<T>();
+            var centerCell = GetCell(center);
+            int cellRadius = Mathf.CeilToInt(radius / _cellSize);
+            
+            for (int x = -cellRadius; x <= cellRadius; x++)
+            {
+                for (int y = -cellRadius; y <= cellRadius; y++)
+                {
+                    var cell = new Vector2Int(centerCell.x + x, centerCell.y + y);
+                    if (_grid.TryGetValue(cell, out var items))
+                    {
+                        results.AddRange(items);
+                    }
+                }
+            }
+            
+            return results;
+        }
+        
+        public void Clear()
+        {
+            _grid.Clear();
+            _itemCells.Clear();
+        }
+        
+        private Vector2Int GetCell(Vector3 position)
+        {
+            int x = Mathf.Clamp(Mathf.FloorToInt((position.x + _worldWidth * 0.5f) / _cellSize), 0, _gridWidth - 1);
+            int y = Mathf.Clamp(Mathf.FloorToInt((position.z + _worldHeight * 0.5f) / _cellSize), 0, _gridHeight - 1);
+            return new Vector2Int(x, y);
+        }
+    }
+    
+    #endregion
+}

@@ -1,0 +1,17 @@
+{
+    "name": "ProjectChimera.Events",
+    "rootNamespace": "ProjectChimera.Events",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

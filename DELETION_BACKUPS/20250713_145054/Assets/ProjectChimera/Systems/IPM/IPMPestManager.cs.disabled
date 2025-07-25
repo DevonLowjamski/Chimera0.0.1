@@ -1,0 +1,866 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Advanced pest management system for Project Chimera's Enhanced IPM Gaming System.
+    /// Handles dynamic pest behavior simulation, adaptive AI opponents, population dynamics,
+    /// resistance development, and realistic pest lifecycle modeling. Features sophisticated
+    /// AI-driven pest behavior that adapts to player strategies and environmental conditions.
+    /// 
+    /// Key Features:
+    /// - Realistic pest population dynamics with breeding cycles
+    /// - Adaptive AI behavior that learns from player actions
+    /// - Dynamic resistance development to treatments
+    /// - Environmental condition-based behavior modification
+    /// - Multi-species interaction and competition modeling
+    /// - Seasonal and temporal behavior patterns
+    /// - Stress response and dispersal mechanics
+    /// - Genetic diversity and mutation systems
+    /// </summary>
+    public class IPMPestManager : IPMEntityManagerBase<PestInvasionData, PestType>, IIPMPestManager
+    {
+        [Header("Pest Simulation Configuration")]
+        [SerializeField] private float _populationUpdateInterval = 5f;
+        [SerializeField] private float _behaviorUpdateInterval = 10f;
+        [SerializeField] private bool _enableAdaptiveAI = true;
+        [SerializeField] private bool _enableResistanceDevelopment = true;
+        [SerializeField] private bool _enablePopulationDynamics = true;
+        
+        [Header("Population Dynamics")]
+        [SerializeField] private float _baseReproductionRate = 0.1f;
+        [SerializeField] private float _mortalityRate = 0.05f;
+        [SerializeField] private int _maxPopulationPerInvasion = 1000;
+        [SerializeField] private float _carryingCapacityFactor = 0.8f;
+        
+        [Header("AI Behavior Settings")]
+        [SerializeField] private float _learningRate = 0.1f;
+        [SerializeField] private float _adaptationThreshold = 0.7f;
+        [SerializeField] private bool _enableCrossSpeciesLearning = true;
+        [SerializeField] private float _memoryDecayRate = 0.02f;
+        
+        [Header("Resistance Development")]
+        [SerializeField] private float _baseResistanceRate = 0.01f;
+        [SerializeField] private float _maxResistanceLevel = 0.95f;
+        [SerializeField] private bool _enableResistanceMutation = true;
+        [SerializeField] private float _mutationRate = 0.001f;
+        
+        // Pest Behavior Management
+        private Dictionary<string, PestAIBehavior> _pestBehaviors = new Dictionary<string, PestAIBehavior>();
+        private Dictionary<PestType, PestSpeciesProfile> _speciesProfiles = new Dictionary<PestType, PestSpeciesProfile>();
+        private Dictionary<string, PestPopulationState> _populationStates = new Dictionary<string, PestPopulationState>();
+        
+        // AI Learning and Adaptation
+        private PestLearningEngine _learningEngine;
+        private BehaviorAdaptationSystem _adaptationSystem;
+        private Dictionary<string, List<PlayerAction>> _playerActionHistory = new Dictionary<string, List<PlayerAction>>();
+        private Dictionary<PestType, ResistanceProfile> _resistanceProfiles = new Dictionary<PestType, ResistanceProfile>();
+        
+        // Environmental Integration
+        private EnvironmentalFactorProcessor _environmentProcessor;
+        private SeasonalBehaviorManager _seasonalManager;
+        private StressResponseSystem _stressSystem;
+        
+        // Performance Optimization
+        private PestSimulationScheduler _simulationScheduler;
+        private float _lastPopulationUpdate;
+        private float _lastBehaviorUpdate;
+        
+        // Events
+        public event Action<PestInvasionData> OnInvasionStarted;
+        public event Action<PestInvasionData> OnInvasionEnded;
+        public event Action<PestType, int> OnPestPopulationChanged;
+        public event Action<PestType, float> OnResistanceDeveloped;
+        public event Action<string, PestAIBehavior> OnBehaviorAdapted;
+        
+        #region Initialization
+        
+        protected override void InitializeEntityManagerSpecific()
+        {
+            InitializePestSpecies();
+            InitializeAISystems();
+            InitializeEnvironmentalSystems();
+            InitializeResistanceProfiles();
+            InitializePerformanceOptimization();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[IPMPestManager] Pest management system initialized with adaptive AI");
+            }
+        }
+        
+        private void InitializePestSpecies()
+        {
+            foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+            {
+                _speciesProfiles[pestType] = CreateSpeciesProfile(pestType);
+                _resistanceProfiles[pestType] = new ResistanceProfile
+                {
+                    PestType = pestType,
+                    ChemicalResistance = new Dictionary<string, float>(),
+                    BiologicalResistance = new Dictionary<string, float>(),
+                    LastUpdate = DateTime.Now
+                };
+            }
+        }
+        
+        private void InitializeAISystems()
+        {
+            if (_enableAdaptiveAI)
+            {
+                _learningEngine = new PestLearningEngine(_learningRate, _memoryDecayRate);
+                _adaptationSystem = new BehaviorAdaptationSystem(_adaptationThreshold, _enableCrossSpeciesLearning);
+                
+                foreach (PestType pestType in Enum.GetValues(typeof(PestType)))
+                {
+                    var behavior = CreateDefaultBehavior(pestType);
+                    _pestBehaviors[pestType.ToString()] = behavior;
+                }
+            }
+        }
+        
+        private void InitializeEnvironmentalSystems()
+        {
+            _environmentProcessor = new EnvironmentalFactorProcessor();
+            _seasonalManager = new SeasonalBehaviorManager();
+            _stressSystem = new StressResponseSystem();
+        }
+        
+        private void InitializeResistanceProfiles()
+        {
+            if (_enableResistanceDevelopment)
+            {
+                foreach (var pestType in _resistanceProfiles.Keys.ToList())
+                {
+                    var profile = _resistanceProfiles[pestType];
+                    InitializeBaseResistances(profile);
+                    _resistanceProfiles[pestType] = profile;
+                }
+            }
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            _simulationScheduler = new PestSimulationScheduler(_maxEntitiesPerUpdate);
+        }
+        
+        #endregion
+        
+        #region IIPMPestManager Implementation
+        
+        public void SpawnInvasion(PestInvasionData invasionData)
+        {
+            var entityId = SpawnEntity(invasionData, invasionData.PestType, invasionData.OriginPoint);
+            
+            if (!string.IsNullOrEmpty(entityId))
+            {
+                // Initialize population state
+                _populationStates[entityId] = new PestPopulationState
+                {
+                    InvasionId = entityId,
+                    CurrentPopulation = invasionData.PopulationSize,
+                    MaxPopulation = _maxPopulationPerInvasion,
+                    ReproductionRate = invasionData.ReproductionRate,
+                    MortalityRate = _mortalityRate,
+                    LastUpdate = DateTime.Now,
+                    GrowthPhase = PopulationGrowthPhase.Establishment
+                };
+                
+                // Initialize behavior for this invasion
+                InitializeInvasionBehavior(entityId, invasionData);
+                
+                OnInvasionStarted?.Invoke(invasionData);
+                OnPestPopulationChanged?.Invoke(invasionData.PestType, invasionData.PopulationSize);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMPestManager] Invasion spawned: {invasionData.PestType} with {invasionData.PopulationSize} individuals");
+                }
+            }
+        }
+        
+        public void UpdateInvasion(string invasionId, float deltaTime)
+        {
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            // Update population dynamics
+            if (_enablePopulationDynamics)
+            {
+                UpdatePopulationDynamics(invasionId, deltaTime);
+            }
+            
+            // Update AI behavior
+            if (_enableAdaptiveAI)
+            {
+                UpdateAdaptiveBehavior(invasionId, deltaTime);
+            }
+            
+            // Update resistance development
+            if (_enableResistanceDevelopment)
+            {
+                UpdateResistanceDevelopment(invasionId, deltaTime);
+            }
+            
+            // Update environmental responses
+            UpdateEnvironmentalResponse(invasionId, deltaTime);
+        }
+        
+        public void EndInvasion(string invasionId)
+        {
+            var invasionData = GetEntity(invasionId);
+            if (invasionData != null)
+            {
+                // Process invasion ending
+                ProcessInvasionCompletion(invasionData);
+                
+                // Cleanup state
+                _populationStates.Remove(invasionId);
+                
+                OnInvasionEnded?.Invoke(invasionData);
+                OnPestPopulationChanged?.Invoke(invasionData.PestType, 0);
+                
+                // Destroy the entity
+                DestroyEntity(invasionId);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMPestManager] Invasion ended: {invasionData.PestType}");
+                }
+            }
+        }
+        
+        public List<PestInvasionData> GetActiveInvasions()
+        {
+            return _activeEntities.Values.ToList();
+        }
+        
+        public int GetPestPopulation(PestType pestType)
+        {
+            return _activeEntities.Values
+                .Where(invasion => invasion.PestType == pestType)
+                .Sum(invasion => invasion.PopulationSize);
+        }
+        
+        public void ApplyPestControl(string invasionId, IPMStrategyType strategy, float effectiveness)
+        {
+            if (!_populationStates.TryGetValue(invasionId, out var populationState)) return;
+            
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            // Calculate control effectiveness
+            var actualEffectiveness = CalculateControlEffectiveness(invasionData, strategy, effectiveness);
+            
+            // Apply population reduction
+            var populationReduction = Mathf.RoundToInt(populationState.CurrentPopulation * actualEffectiveness);
+            populationState.CurrentPopulation = Mathf.Max(0, populationState.CurrentPopulation - populationReduction);
+            
+            // Update resistance development
+            if (_enableResistanceDevelopment)
+            {
+                DevelopResistance(invasionData.PestType, strategy, effectiveness);
+            }
+            
+            // Record player action for AI learning
+            if (_enableAdaptiveAI)
+            {
+                RecordPlayerAction(invasionId, strategy, effectiveness, actualEffectiveness);
+            }
+            
+            // Update invasion data
+            invasionData.PopulationSize = populationState.CurrentPopulation;
+            _populationStates[invasionId] = populationState;
+            
+            OnPestPopulationChanged?.Invoke(invasionData.PestType, populationState.CurrentPopulation);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMPestManager] Applied {strategy} control to {invasionData.PestType} - Effectiveness: {actualEffectiveness:P2}");
+            }
+        }
+        
+        #endregion
+        
+        #region Population Dynamics
+        
+        private void UpdatePopulationDynamics(string invasionId, float deltaTime)
+        {
+            if (!_populationStates.TryGetValue(invasionId, out var state)) return;
+            
+            var timeSinceUpdate = DateTime.Now - state.LastUpdate;
+            if (timeSinceUpdate.TotalSeconds < _populationUpdateInterval) return;
+            
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            // Calculate population growth
+            var growthRate = CalculateGrowthRate(state, invasionData);
+            var carryingCapacity = CalculateCarryingCapacity(invasionData);
+            
+            // Apply logistic growth model
+            var newPopulation = CalculateLogisticGrowth(
+                state.CurrentPopulation, 
+                growthRate, 
+                carryingCapacity, 
+                (float)timeSinceUpdate.TotalSeconds
+            );
+            
+            // Apply mortality
+            var mortality = CalculateMortality(state, invasionData);
+            newPopulation = Mathf.Max(0, newPopulation - mortality);
+            
+            // Update population state
+            state.CurrentPopulation = Mathf.RoundToInt(newPopulation);
+            state.LastUpdate = DateTime.Now;
+            state.GrowthPhase = DetermineGrowthPhase(state, carryingCapacity);
+            
+            // Update invasion data
+            invasionData.PopulationSize = state.CurrentPopulation;
+            _populationStates[invasionId] = state;
+            
+            OnPestPopulationChanged?.Invoke(invasionData.PestType, state.CurrentPopulation);
+        }
+        
+        private float CalculateGrowthRate(PestPopulationState state, PestInvasionData invasion)
+        {
+            var baseRate = invasion.ReproductionRate;
+            var environmentalFactor = _environmentProcessor.GetGrowthModifier(invasion.PestType);
+            var seasonalFactor = _seasonalManager.GetSeasonalModifier(invasion.PestType);
+            var stressFactor = _stressSystem.GetStressModifier(invasion.InvasionId);
+            
+            return baseRate * environmentalFactor * seasonalFactor * stressFactor;
+        }
+        
+        private int CalculateCarryingCapacity(PestInvasionData invasion)
+        {
+            var baseCapacity = _maxPopulationPerInvasion;
+            var environmentalCapacity = _environmentProcessor.GetCapacityModifier(invasion.PestType);
+            var resourceCompetition = CalculateResourceCompetition(invasion);
+            
+            return Mathf.RoundToInt(baseCapacity * environmentalCapacity * resourceCompetition * _carryingCapacityFactor);
+        }
+        
+        private float CalculateLogisticGrowth(float currentPop, float growthRate, float carryingCapacity, float deltaTime)
+        {
+            if (carryingCapacity <= 0) return currentPop;
+            
+            var growthFactor = growthRate * (1f - currentPop / carryingCapacity) * deltaTime;
+            return currentPop + (currentPop * growthFactor);
+        }
+        
+        private int CalculateMortality(PestPopulationState state, PestInvasionData invasion)
+        {
+            var baseMortality = state.CurrentPopulation * state.MortalityRate;
+            var environmentalMortality = _environmentProcessor.GetMortalityModifier(invasion.PestType);
+            var ageMortality = CalculateAgeMortality(state);
+            
+            return Mathf.RoundToInt(baseMortality * environmentalMortality + ageMortality);
+        }
+        
+        private float CalculateResourceCompetition(PestInvasionData invasion)
+        {
+            var competingInvasions = _activeEntities.Values
+                .Where(i => i.PestType == invasion.PestType && i.InvasionId != invasion.InvasionId)
+                .Count();
+            
+            return Mathf.Max(0.1f, 1f - (competingInvasions * 0.1f));
+        }
+        
+        private int CalculateAgeMortality(PestPopulationState state)
+        {
+            var invasionAge = DateTime.Now - state.LastUpdate;
+            var ageFactor = Mathf.Min(1f, (float)invasionAge.TotalDays / 30f); // 30 day lifecycle
+            return Mathf.RoundToInt(state.CurrentPopulation * ageFactor * 0.05f);
+        }
+        
+        private PopulationGrowthPhase DetermineGrowthPhase(PestPopulationState state, int carryingCapacity)
+        {
+            var populationRatio = (float)state.CurrentPopulation / carryingCapacity;
+            
+            return populationRatio switch
+            {
+                < 0.1f => PopulationGrowthPhase.Establishment,
+                < 0.5f => PopulationGrowthPhase.Exponential,
+                < 0.8f => PopulationGrowthPhase.Deceleration,
+                < 0.95f => PopulationGrowthPhase.Equilibrium,
+                _ => PopulationGrowthPhase.Decline
+            };
+        }
+        
+        #endregion
+        
+        #region Adaptive AI Behavior
+        
+        private void UpdateAdaptiveBehavior(string invasionId, float deltaTime)
+        {
+            var timeSinceUpdate = Time.time - _lastBehaviorUpdate;
+            if (timeSinceUpdate < _behaviorUpdateInterval) return;
+            
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            var behaviorKey = invasionData.PestType.ToString();
+            if (!_pestBehaviors.TryGetValue(behaviorKey, out var behavior)) return;
+            
+            // Learn from recent player actions
+            var recentActions = GetRecentPlayerActions(invasionId);
+            if (recentActions.Any())
+            {
+                _learningEngine.ProcessPlayerActions(behavior, recentActions);
+            }
+            
+            // Adapt behavior based on success/failure
+            var adaptationResult = _adaptationSystem.AdaptBehavior(behavior, invasionData);
+            if (adaptationResult.HasAdapted)
+            {
+                _pestBehaviors[behaviorKey] = adaptationResult.UpdatedBehavior;
+                OnBehaviorAdapted?.Invoke(invasionId, adaptationResult.UpdatedBehavior);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[IPMPestManager] {invasionData.PestType} behavior adapted - Intelligence: {adaptationResult.UpdatedBehavior.Intelligence:F2}");
+                }
+            }
+            
+            // Update behavior modifiers based on environmental conditions
+            UpdateBehaviorModifiers(invasionData, behavior);
+            
+            _lastBehaviorUpdate = Time.time;
+        }
+        
+        private void InitializeInvasionBehavior(string invasionId, PestInvasionData invasionData)
+        {
+            var behaviorKey = invasionData.PestType.ToString();
+            if (_pestBehaviors.TryGetValue(behaviorKey, out var baseBehavior))
+            {
+                // Create instance-specific behavior modifiers
+                invasionData.BehaviorModifiers = new Dictionary<string, float>
+                {
+                    ["Aggressiveness"] = baseBehavior.Aggressiveness + UnityEngine.Random.Range(-0.1f, 0.1f),
+                    ["Intelligence"] = baseBehavior.Intelligence + UnityEngine.Random.Range(-0.05f, 0.05f),
+                    ["Adaptability"] = baseBehavior.Adaptability + UnityEngine.Random.Range(-0.1f, 0.1f)
+                };
+            }
+        }
+        
+        private void UpdateBehaviorModifiers(PestInvasionData invasionData, PestAIBehavior behavior)
+        {
+            // Environmental stress affects behavior
+            var stressLevel = _stressSystem.CalculateStressLevel(invasionData.InvasionId);
+            invasionData.BehaviorModifiers["StressResponse"] = stressLevel;
+            
+            // Population density affects aggressiveness
+            var densityFactor = CalculatePopulationDensity(invasionData);
+            invasionData.BehaviorModifiers["DensityAggression"] = densityFactor;
+            
+            // Resource availability affects exploration behavior
+            var resourceAvailability = CalculateResourceAvailability(invasionData);
+            invasionData.BehaviorModifiers["ExplorationDrive"] = 1f - resourceAvailability;
+        }
+        
+        private void RecordPlayerAction(string invasionId, IPMStrategyType strategy, float effectiveness, float actualEffectiveness)
+        {
+            if (!_playerActionHistory.ContainsKey(invasionId))
+            {
+                _playerActionHistory[invasionId] = new List<PlayerAction>();
+            }
+            
+            var action = new PlayerAction
+            {
+                Strategy = strategy,
+                PlannedEffectiveness = effectiveness,
+                ActualEffectiveness = actualEffectiveness,
+                Timestamp = DateTime.Now,
+                InvasionId = invasionId
+            };
+            
+            _playerActionHistory[invasionId].Add(action);
+            
+            // Limit history size
+            if (_playerActionHistory[invasionId].Count > 50)
+            {
+                _playerActionHistory[invasionId].RemoveAt(0);
+            }
+        }
+        
+        private List<PlayerAction> GetRecentPlayerActions(string invasionId)
+        {
+            if (!_playerActionHistory.TryGetValue(invasionId, out var actions))
+                return new List<PlayerAction>();
+            
+            var cutoffTime = DateTime.Now.AddMinutes(-10); // Last 10 minutes
+            return actions.Where(a => a.Timestamp > cutoffTime).ToList();
+        }
+        
+        #endregion
+        
+        #region Resistance Development
+        
+        private void UpdateResistanceDevelopment(string invasionId, float deltaTime)
+        {
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            if (!_resistanceProfiles.TryGetValue(invasionData.PestType, out var profile))
+                return;
+            
+            // Natural resistance decay over time
+            DecayResistance(profile, deltaTime);
+            
+            // Mutation-based resistance development
+            if (_enableResistanceMutation)
+            {
+                ProcessResistanceMutations(profile, invasionData);
+            }
+            
+            _resistanceProfiles[invasionData.PestType] = profile;
+        }
+        
+        private void DevelopResistance(PestType pestType, IPMStrategyType strategy, float treatmentIntensity)
+        {
+            if (!_resistanceProfiles.TryGetValue(pestType, out var profile))
+                return;
+            
+            var treatmentKey = strategy.ToString();
+            
+            // Get current resistance level
+            var currentResistance = GetResistanceLevel(profile, treatmentKey);
+            
+            // Calculate resistance development
+            var resistanceDevelopment = CalculateResistanceDevelopment(currentResistance, treatmentIntensity);
+            
+            // Apply resistance increase
+            var newResistance = Mathf.Min(_maxResistanceLevel, currentResistance + resistanceDevelopment);
+            SetResistanceLevel(profile, treatmentKey, newResistance);
+            
+            // Update profile
+            profile.LastUpdate = DateTime.Now;
+            _resistanceProfiles[pestType] = profile;
+            
+            OnResistanceDeveloped?.Invoke(pestType, newResistance);
+            
+            if (_enableDebugLogging && resistanceDevelopment > 0.01f)
+            {
+                Debug.Log($"[IPMPestManager] {pestType} developed resistance to {strategy} - Level: {newResistance:P2}");
+            }
+        }
+        
+        private float CalculateResistanceDevelopment(float currentResistance, float treatmentIntensity)
+        {
+            // Higher treatment intensity leads to faster resistance development
+            var intensityFactor = treatmentIntensity * 2f;
+            
+            // Diminishing returns as resistance increases
+            var diminishingFactor = 1f - currentResistance;
+            
+            // Base development rate
+            var developmentRate = _baseResistanceRate * intensityFactor * diminishingFactor;
+            
+            return developmentRate * UnityEngine.Random.Range(0.5f, 1.5f); // Add variability
+        }
+        
+        private void DecayResistance(ResistanceProfile profile, float deltaTime)
+        {
+            var decayRate = 0.001f * deltaTime; // Slow natural decay
+            
+            DecayResistanceInDictionary(profile.ChemicalResistance, decayRate);
+            DecayResistanceInDictionary(profile.BiologicalResistance, decayRate);
+        }
+        
+        private void DecayResistanceInDictionary(Dictionary<string, float> resistanceDict, float decayRate)
+        {
+            var keys = resistanceDict.Keys.ToList();
+            foreach (var key in keys)
+            {
+                resistanceDict[key] = Mathf.Max(0f, resistanceDict[key] - decayRate);
+            }
+        }
+        
+        private void ProcessResistanceMutations(ResistanceProfile profile, PestInvasionData invasionData)
+        {
+            if (UnityEngine.Random.value < _mutationRate)
+            {
+                // Random resistance mutation
+                var strategies = Enum.GetValues(typeof(IPMStrategyType)).Cast<IPMStrategyType>().ToList();
+                var randomStrategy = strategies[UnityEngine.Random.Range(0, strategies.Count)];
+                
+                var currentResistance = GetResistanceLevel(profile, randomStrategy.ToString());
+                var mutationEffect = UnityEngine.Random.Range(-0.05f, 0.1f); // Slight bias toward resistance
+                var newResistance = Mathf.Clamp01(currentResistance + mutationEffect);
+                
+                SetResistanceLevel(profile, randomStrategy.ToString(), newResistance);
+                
+                if (_enableDebugLogging && Math.Abs(mutationEffect) > 0.02f)
+                {
+                    Debug.Log($"[IPMPestManager] {invasionData.PestType} mutation: {randomStrategy} resistance {(mutationEffect > 0 ? "increased" : "decreased")}");
+                }
+            }
+        }
+        
+        private float GetResistanceLevel(ResistanceProfile profile, string treatmentKey)
+        {
+            return treatmentKey.Contains("Chemical") 
+                ? profile.ChemicalResistance.GetValueOrDefault(treatmentKey, 0f)
+                : profile.BiologicalResistance.GetValueOrDefault(treatmentKey, 0f);
+        }
+        
+        private void SetResistanceLevel(ResistanceProfile profile, string treatmentKey, float level)
+        {
+            if (treatmentKey.Contains("Chemical"))
+            {
+                profile.ChemicalResistance[treatmentKey] = level;
+            }
+            else
+            {
+                profile.BiologicalResistance[treatmentKey] = level;
+            }
+        }
+        
+        #endregion
+        
+        #region Environmental Response
+        
+        private void UpdateEnvironmentalResponse(string invasionId, float deltaTime)
+        {
+            var invasionData = GetEntity(invasionId);
+            if (invasionData == null) return;
+            
+            // Update environmental tolerance based on current conditions
+            var currentTolerance = invasionData.EnvironmentalTolerance;
+            var environmentalStress = _environmentProcessor.CalculateEnvironmentalStress(invasionData.PestType);
+            
+            // Adaptation to environmental stress over time
+            if (environmentalStress > currentTolerance)
+            {
+                var adaptationRate = 0.001f * deltaTime; // Slow adaptation
+                invasionData.EnvironmentalTolerance = Mathf.Min(1f, currentTolerance + adaptationRate);
+            }
+            
+            // Stress response affects behavior
+            _stressSystem.UpdateStressLevel(invasionId, environmentalStress);
+        }
+        
+        private float CalculatePopulationDensity(PestInvasionData invasionData)
+        {
+            // Simplified density calculation - would integrate with spatial systems
+            return Mathf.Clamp01(invasionData.PopulationSize / 500f);
+        }
+        
+        private float CalculateResourceAvailability(PestInvasionData invasionData)
+        {
+            // Simplified resource calculation - would integrate with cultivation systems
+            return UnityEngine.Random.Range(0.3f, 1f); // Placeholder
+        }
+        
+        #endregion
+        
+        #region Control Effectiveness
+        
+        private float CalculateControlEffectiveness(PestInvasionData invasionData, IPMStrategyType strategy, float baseEffectiveness)
+        {
+            var effectiveness = baseEffectiveness;
+            
+            // Apply resistance modifier
+            if (_enableResistanceDevelopment && _resistanceProfiles.TryGetValue(invasionData.PestType, out var profile))
+            {
+                var resistance = GetResistanceLevel(profile, strategy.ToString());
+                effectiveness *= (1f - resistance);
+            }
+            
+            // Environmental factors
+            var environmentalModifier = _environmentProcessor.GetControlModifier(invasionData.PestType, strategy);
+            effectiveness *= environmentalModifier;
+            
+            // Population density effects (higher density = harder to control)
+            var densityModifier = 1f - (CalculatePopulationDensity(invasionData) * 0.3f);
+            effectiveness *= densityModifier;
+            
+            // Adaptive behavior resistance
+            if (_enableAdaptiveAI && _pestBehaviors.TryGetValue(invasionData.PestType.ToString(), out var behavior))
+            {
+                var behaviorResistance = GetBehaviorResistance(behavior, strategy);
+                effectiveness *= (1f - behaviorResistance);
+            }
+            
+            return Mathf.Clamp01(effectiveness);
+        }
+        
+        private float GetBehaviorResistance(PestAIBehavior behavior, IPMStrategyType strategy)
+        {
+            // AI behavior affects resistance to different strategies
+            return strategy switch
+            {
+                IPMStrategyType.Chemical => behavior.ChemicalResistance.GetValueOrDefault("General", 0f),
+                IPMStrategyType.Biological => behavior.DefenseAvoidance.GetValueOrDefault(DefenseStructureType.BiologicalReleaseStation, 0f),
+                IPMStrategyType.Environmental => behavior.Adaptability * 0.3f,
+                _ => 0f
+            };
+        }
+        
+        #endregion
+        
+        #region Entity Manager Implementation
+        
+        protected override PestInvasionData CreateEntityInstance()
+        {
+            return new PestInvasionData();
+        }
+        
+        protected override void DestroyEntityInstance(PestInvasionData entity)
+        {
+            // Cleanup entity-specific resources
+        }
+        
+        protected override void ConfigureEntity(PestInvasionData entity, PestInvasionData sourceData, PestType entityType, Vector3 position)
+        {
+            // Copy all data from source
+            entity.InvasionId = sourceData.InvasionId;
+            entity.PestType = sourceData.PestType;
+            entity.PopulationSize = sourceData.PopulationSize;
+            entity.AggressionLevel = sourceData.AggressionLevel;
+            entity.OriginPoint = position;
+            entity.InvasionPaths = sourceData.InvasionPaths ?? new List<Vector3>();
+            entity.ChemicalResistance = sourceData.ChemicalResistance;
+            entity.BiologicalResistance = sourceData.BiologicalResistance;
+            entity.EnvironmentalTolerance = sourceData.EnvironmentalTolerance;
+            entity.PreferredTargets = sourceData.PreferredTargets ?? new List<string>();
+            entity.ReproductionRate = sourceData.ReproductionRate;
+            entity.InvasionStartTime = sourceData.InvasionStartTime;
+            entity.IsAdaptive = sourceData.IsAdaptive;
+            entity.BehaviorModifiers = sourceData.BehaviorModifiers ?? new Dictionary<string, float>();
+        }
+        
+        protected override void UpdateEntitySpecific(string entityId, PestInvasionData entity, float deltaTime)
+        {
+            UpdateInvasion(entityId, deltaTime);
+        }
+        
+        protected override PestType GetEntityType(string entityId)
+        {
+            var entity = GetEntity(entityId);
+            return entity?.PestType ?? PestType.Aphids;
+        }
+        
+        protected override string GenerateEntityId()
+        {
+            return "Invasion_" + Guid.NewGuid().ToString("N")[..8];
+        }
+        
+        protected override bool ShouldMarkForDestruction(string entityId)
+        {
+            if (_populationStates.TryGetValue(entityId, out var state))
+            {
+                return state.CurrentPopulation <= 0;
+            }
+            return false;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private PestSpeciesProfile CreateSpeciesProfile(PestType pestType)
+        {
+            return new PestSpeciesProfile
+            {
+                PestType = pestType,
+                BaseReproductionRate = _baseReproductionRate + UnityEngine.Random.Range(-0.02f, 0.02f),
+                BaseMortalityRate = _mortalityRate + UnityEngine.Random.Range(-0.01f, 0.01f),
+                EnvironmentalPreferences = GenerateEnvironmentalPreferences(pestType),
+                SeasonalActivity = GenerateSeasonalActivity(pestType),
+                PreferredHosts = GetPreferredHosts(pestType)
+            };
+        }
+        
+        private PestAIBehavior CreateDefaultBehavior(PestType pestType)
+        {
+            return new PestAIBehavior
+            {
+                PestType = pestType,
+                Aggressiveness = UnityEngine.Random.Range(0.3f, 0.8f),
+                Intelligence = UnityEngine.Random.Range(0.2f, 0.7f),
+                Adaptability = UnityEngine.Random.Range(0.1f, 0.6f),
+                DefenseAvoidance = new Dictionary<DefenseStructureType, float>(),
+                PredatorAvoidance = new Dictionary<BeneficialOrganismType, float>(),
+                ChemicalResistance = new Dictionary<string, float>(),
+                PreferredPaths = new List<Vector3>(),
+                LearningRate = _learningRate + UnityEngine.Random.Range(-0.02f, 0.02f),
+                PlayerCounters = new Dictionary<string, float>()
+            };
+        }
+        
+        private void InitializeBaseResistances(ResistanceProfile profile)
+        {
+            foreach (IPMStrategyType strategy in Enum.GetValues(typeof(IPMStrategyType)))
+            {
+                var baseResistance = UnityEngine.Random.Range(0f, 0.1f);
+                
+                if (strategy.ToString().Contains("Chemical"))
+                {
+                    profile.ChemicalResistance[strategy.ToString()] = baseResistance;
+                }
+                else
+                {
+                    profile.BiologicalResistance[strategy.ToString()] = baseResistance;
+                }
+            }
+        }
+        
+        private Dictionary<string, float> GenerateEnvironmentalPreferences(PestType pestType)
+        {
+            return new Dictionary<string, float>
+            {
+                ["Temperature"] = UnityEngine.Random.Range(18f, 28f),
+                ["Humidity"] = UnityEngine.Random.Range(0.4f, 0.8f),
+                ["LightLevel"] = UnityEngine.Random.Range(0.2f, 0.9f)
+            };
+        }
+        
+        private Dictionary<string, float> GenerateSeasonalActivity(PestType pestType)
+        {
+            return new Dictionary<string, float>
+            {
+                ["Spring"] = UnityEngine.Random.Range(0.6f, 1f),
+                ["Summer"] = UnityEngine.Random.Range(0.8f, 1f),
+                ["Fall"] = UnityEngine.Random.Range(0.3f, 0.8f),
+                ["Winter"] = UnityEngine.Random.Range(0.1f, 0.4f)
+            };
+        }
+        
+        private List<string> GetPreferredHosts(PestType pestType)
+        {
+            return pestType switch
+            {
+                PestType.Aphids => new List<string> { "YoungLeaves", "NewGrowth", "FloweringTips" },
+                PestType.SpiderMites => new List<string> { "UndersideLeaves", "StressedPlants" },
+                PestType.Thrips => new List<string> { "Flowers", "YoungLeaves", "FruitingSites" },
+                PestType.Whiteflies => new List<string> { "UndersideLeaves", "YoungPlants" },
+                _ => new List<string> { "GeneralPlantMatter" }
+            };
+        }
+        
+        private void ProcessInvasionCompletion(PestInvasionData invasionData)
+        {
+            // Update species-wide learning
+            if (_enableAdaptiveAI && _pestBehaviors.TryGetValue(invasionData.PestType.ToString(), out var behavior))
+            {
+                _learningEngine.ProcessInvasionCompletion(behavior, invasionData);
+            }
+            
+            // Update resistance profiles based on final state
+            if (_enableResistanceDevelopment)
+            {
+                // Process any final resistance developments
+            }
+        }
+        
+        #endregion
+    }
+}

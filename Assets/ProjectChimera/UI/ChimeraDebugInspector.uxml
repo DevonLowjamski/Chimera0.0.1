@@ -1,0 +1,79 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="debug-inspector-root" style="background-color: rgba(0, 0, 0, 0.8); position: absolute; left: 20px; top: 20px; width: 400px; height: 600px; border-radius: 10px; padding: 10px; display: none;">
+        <ui:Label text="Chimera Debug Inspector" style="font-size: 18px; -unity-font-style: bold; color: rgb(255, 255, 255); text-align: center; margin-bottom: 10px;"/>
+        
+        <!-- Time Controls -->
+        <ui:VisualElement name="time-controls" style="flex-direction: row; justify-content: space-around; margin-bottom: 15px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+            <ui:Button text="Pause" name="pause-btn" style="width: 60px; height: 30px; background-color: rgb(80, 80, 80); color: white; border-radius: 3px;"/>
+            <ui:Button text="Play" name="play-btn" style="width: 60px; height: 30px; background-color: rgb(60, 120, 60); color: white; border-radius: 3px;"/>
+            <ui:Button text="Fast" name="fast-btn" style="width: 60px; height: 30px; background-color: rgb(120, 80, 60); color: white; border-radius: 3px;"/>
+        </ui:VisualElement>
+        
+        <!-- Plant Selection -->
+        <ui:VisualElement name="plant-selector" style="margin-bottom: 15px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+            <ui:Label text="Plant Selection" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+            <ui:DropdownField label="Selected Plant:" name="plant-dropdown" style="color: white;"/>
+            <ui:Button text="Refresh Plants" name="refresh-plants-btn" style="height: 25px; background-color: rgb(60, 80, 120); color: white; border-radius: 3px; margin-top: 5px;"/>
+        </ui:VisualElement>
+        
+        <!-- Plant Data Display -->
+        <ui:ScrollView name="plant-data-scroll" style="flex-grow: 1;">
+            <!-- Basic Info -->
+            <ui:VisualElement name="basic-info" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="Basic Information" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="ID: None" name="plant-id-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Strain: None" name="plant-strain-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Age: 0 days" name="plant-age-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Stage: None" name="plant-stage-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+            
+            <!-- Health & Status -->
+            <ui:VisualElement name="health-status" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="Health and Status" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="Health: 100%" name="plant-health-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Stress: 0%" name="plant-stress-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Water: 100%" name="plant-water-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Nutrients: 100%" name="plant-nutrients-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+            
+            <!-- Phenotype Data -->
+            <ui:VisualElement name="phenotype-data" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="Expressed Phenotype" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="Height: 0.0m" name="phenotype-height-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="THC: 0.0%" name="phenotype-thc-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="CBD: 0.0%" name="phenotype-cbd-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Yield: 0.0g" name="phenotype-yield-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Flowering: 0 days" name="phenotype-flowering-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+            
+            <!-- Genotype Data -->
+            <ui:VisualElement name="genotype-data" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="Genotype Information" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="Genetic Profile: None" name="genotype-profile-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Dominant Traits: None" name="genotype-dominant-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Recessive Traits: None" name="genotype-recessive-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+            
+            <!-- Environmental Conditions -->
+            <ui:VisualElement name="environmental-data" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="Environmental Conditions" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="Temperature: 22.0°C" name="env-temperature-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Humidity: 60.0%" name="env-humidity-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Light: 400 μmol/m²/s" name="env-light-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="CO2: 400 ppm" name="env-co2-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Airflow: 0.5 m/s" name="env-airflow-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+            
+            <!-- GxE Interactions -->
+            <ui:VisualElement name="gxe-data" style="margin-bottom: 10px; background-color: rgba(40, 40, 40, 0.8); padding: 8px; border-radius: 5px;">
+                <ui:Label text="GxE Interactions" style="color: rgb(200, 255, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 5px;"/>
+                <ui:Label text="Expression Modifier: 1.0x" name="gxe-expression-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Stress Response: None" name="gxe-stress-label" style="color: white; font-size: 12px;"/>
+                <ui:Label text="Adaptation Level: 0%" name="gxe-adaptation-label" style="color: white; font-size: 12px;"/>
+            </ui:VisualElement>
+        </ui:ScrollView>
+        
+        <!-- Close Button -->
+        <ui:Button text="Close Inspector" name="close-btn" style="height: 30px; background-color: rgb(120, 60, 60); color: white; border-radius: 3px; margin-top: 10px;"/>
+    </ui:VisualElement>
+</ui:UXML>

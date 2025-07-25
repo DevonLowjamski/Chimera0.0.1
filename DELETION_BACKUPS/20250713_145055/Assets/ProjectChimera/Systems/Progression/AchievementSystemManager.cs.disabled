@@ -1,0 +1,1647 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Progression;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Comprehensive achievement and milestone management system for Project Chimera's cannabis cultivation simulation.
+    /// Integrates with all cultivation systems (plant lifecycle, environmental control, facility construction,
+    /// irrigation/fertigation, IPM, harvesting, post-harvest processing) to provide meaningful recognition
+    /// and progression tracking with intelligent reward distribution and social recognition features.
+    /// 
+    /// Gameplay Integration Features:
+    /// - Plant Lifecycle Recognition: Achievements for successful plant training, topping, LST, trellising
+    /// - Environmental Mastery: Awards for optimal temperature, humidity, lighting, and VPD management
+    /// - Facility Construction: Recognition for efficient layout, utility routing, and zone optimization
+    /// - Cultivation Excellence: Achievements for irrigation strategies, nutrient management, pest control
+    /// - Harvest & Processing: Rewards for optimal harvest timing, drying, curing protocols
+    /// - Data Analysis: Recognition for effective use of sensors, data interpretation, optimization
+    /// - Economic Success: Achievements for financial management, resource optimization, profit margins
+    /// </summary>
+    public class AchievementSystemManager : ChimeraManager, IChimeraManager
+    {
+        [Header("Achievement System Configuration")]
+        [SerializeField] private AchievementConfigSO _achievementConfig;
+        [SerializeField] private AchievementLibrarySO _achievementLibrary;
+        [SerializeField] private ProgressionConfigSO _progressionConfig;
+        [SerializeField] private ResearchDatabaseSO _researchDatabase;
+        [SerializeField] private SkillTreeLibrarySO _skillTreeLibrary;
+        
+        [Header("Cultivation Integration Settings")]
+        [SerializeField] private bool _enableCultivationAchievements = true;
+        [SerializeField] private bool _enableEnvironmentalAchievements = true;
+        [SerializeField] private bool _enableFacilityAchievements = true;
+        [SerializeField] private bool _enableEconomicAchievements = true;
+        [SerializeField] private bool _enableEducationalAchievements = true;
+        
+        [Header("Advanced Achievement Features")]
+        [SerializeField] private bool _enableHiddenAchievements = true;
+        [SerializeField] private bool _enableProgressiveAchievements = true;
+        [SerializeField] private bool _enableCommunityAchievements = true;
+        [SerializeField] private bool _enableSeasonalAchievements = true;
+        [SerializeField] private bool _enableChallengeAchievements = true;
+        [SerializeField] private bool _enableMasteryAchievements = true;
+        
+        [Header("Social Recognition System")]
+        [SerializeField] private bool _enableSocialRecognition = true;
+        [SerializeField] private bool _enableAchievementSharing = true;
+        [SerializeField] private bool _enableLeaderboards = true;
+        [SerializeField] private bool _enablePeerRecognition = true;
+        [SerializeField] private bool _enableMentorshipPrograms = true;
+        
+        [Header("Performance Optimization")]
+        [SerializeField] private bool _enablePerformanceOptimization = true;
+        [SerializeField] private int _maxAchievementUpdatesPerFrame = 10;
+        [SerializeField] private float _achievementUpdateInterval = 1f;
+        [SerializeField] private bool _enableAchievementCaching = true;
+        [SerializeField] private int _maxCachedAchievements = 1000;
+        
+        [Header("Analytics & Intelligence")]
+        [SerializeField] private bool _enableAchievementAnalytics = true;
+        [SerializeField] private bool _enablePersonalizedRecommendations = true;
+        [SerializeField] private bool _enableDifficultyScaling = true;
+        [SerializeField] private bool _enablePredictiveAchievements = true;
+        [SerializeField] private float _analyticsUpdateInterval = 60f;
+        
+        [Header("Event Channels")]
+        [SerializeField] private TypedGameEventChannelSO<AchievementEventData> _onAchievementUnlocked;
+        [SerializeField] private TypedGameEventChannelSO<MilestoneEventData> _onMilestoneReached;
+        [SerializeField] private TypedGameEventChannelSO<ProgressionEventData> _onProgressionUpdated;
+        [SerializeField] private TypedGameEventChannelSO<RewardEventData> _onRewardDistributed;
+        [SerializeField] private SimpleGameEventSO _onAchievementSystemInitialized;
+        [SerializeField] private SimpleGameEventSO _onPlayerLevelUp;
+        
+        // Core Achievement Systems
+        private AchievementTracker _achievementTracker;
+        private MilestoneManager _milestoneManager;
+        private ProgressionCalculator _progressionCalculator;
+        private RewardDistributor _rewardDistributor;
+        private HiddenAchievementDetector _hiddenDetector;
+        
+        // Cultivation Integration Systems
+        private CultivationAchievementMonitor _cultivationMonitor;
+        private EnvironmentalAchievementTracker _environmentalTracker;
+        private FacilityAchievementValidator _facilityValidator;
+        private EconomicAchievementAnalyzer _economicAnalyzer;
+        private EducationalProgressTracker _educationalTracker;
+        
+        // Advanced Feature Systems
+        private ProgressiveAchievementEngine _progressiveEngine;
+        private CommunityAchievementCoordinator _communityCoordinator;
+        private SeasonalAchievementManager _seasonalManager;
+        private ChallengeAchievementOrchestrator _challengeOrchestrator;
+        private MasteryAchievementEvaluator _masteryEvaluator;
+        
+        // Social Recognition Systems
+        private SocialRecognitionEngine _socialEngine;
+        private LeaderboardManager _leaderboardManager;
+        private PeerRecognitionSystem _peerSystem;
+        private MentorshipCoordinator _mentorshipCoordinator;
+        
+        // Intelligence & Analytics
+        private AchievementAnalyticsEngine _analyticsEngine;
+        private PersonalizationEngine _personalizationEngine;
+        private DifficultyScalingSystem _difficultySystem;
+        private PredictiveAchievementSystem _predictiveSystem;
+        
+        // Performance & Optimization
+        private AchievementCache _achievementCache;
+        private PerformanceMonitor _performanceMonitor;
+        private MemoryOptimizer _memoryOptimizer;
+        private BatchProcessor _batchProcessor;
+        
+        // Player State & Progress
+        private PlayerAchievementProfile _playerProfile;
+        private Dictionary<string, AchievementProgress> _achievementProgress = new Dictionary<string, AchievementProgress>();
+        private Dictionary<string, MilestoneProgress> _milestoneProgress = new Dictionary<string, MilestoneProgress>();
+        private Queue<AchievementUpdate> _pendingUpdates = new Queue<AchievementUpdate>();
+        private List<UnlockedAchievement> _unlockedAchievements = new List<UnlockedAchievement>();
+        
+        // System State & Monitoring
+        private AchievementSystemMetrics _systemMetrics = new AchievementSystemMetrics();
+        private DateTime _lastAnalyticsUpdate;
+        private DateTime _lastPerformanceCheck;
+        private bool _isSystemActive = false;
+        
+        // Coroutine Management
+        private Coroutine _achievementUpdateCoroutine;
+        private Coroutine _analyticsUpdateCoroutine;
+        private Coroutine _performanceMonitoringCoroutine;
+        private Coroutine _socialRecognitionCoroutine;
+        
+        #region ChimeraManager Implementation
+        
+        public override ManagerPriority Priority => ManagerPriority.High;
+        
+        protected override void OnManagerInitialize()
+        {
+            LogInfo("Initializing Achievement System Manager...");
+            
+            if (!ValidateConfiguration())
+            {
+                LogError("Achievement System Manager configuration validation failed");
+                return;
+            }
+            
+            InitializeCoreAchievementSystems();
+            InitializeCultivationIntegration();
+            InitializeAdvancedFeatures();
+            InitializeSocialRecognition();
+            InitializeIntelligenceAndAnalytics();
+            InitializePerformanceOptimization();
+            
+            LoadPlayerAchievementProfile();
+            SubscribeToGameplayEvents();
+            StartAchievementSystems();
+            
+            _isSystemActive = true;
+            
+            LogInfo("Achievement System Manager initialized successfully");
+            _onAchievementSystemInitialized?.Raise();
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            LogInfo("Shutting down Achievement System Manager...");
+            
+            _isSystemActive = false;
+            
+            StopAchievementCoroutines();
+            SavePlayerAchievementProfile();
+            UnsubscribeFromGameplayEvents();
+            DisposeAchievementResources();
+            SaveAnalyticsData();
+            
+            LogInfo("Achievement System Manager shutdown complete");
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!IsInitialized || !_isSystemActive)
+                return;
+            
+            // Process immediate achievement updates
+            ProcessPendingAchievementUpdates();
+            
+            // Update social recognition features
+            UpdateSocialRecognitionSystems();
+            
+            // Update system metrics
+            UpdateSystemMetrics();
+        }
+        
+        private bool ValidateConfiguration()
+        {
+            var isValid = true;
+            var validationErrors = new List<string>();
+            
+            // Validate core configuration
+            if (_achievementConfig == null)
+            {
+                validationErrors.Add("Achievement Config SO is not assigned");
+                isValid = false;
+            }
+            
+            if (_achievementLibrary == null)
+            {
+                validationErrors.Add("Achievement Library SO is not assigned");
+                isValid = false;
+            }
+            
+            if (_progressionConfig == null)
+            {
+                validationErrors.Add("Progression Config SO is not assigned");
+                isValid = false;
+            }
+            
+            // Validate event channels
+            if (_onAchievementUnlocked == null)
+            {
+                validationErrors.Add("Achievement Unlocked event channel is not assigned");
+                isValid = false;
+            }
+            
+            if (_onMilestoneReached == null)
+            {
+                validationErrors.Add("Milestone Reached event channel is not assigned");
+                isValid = false;
+            }
+            
+            // Validate feature consistency
+            if (_enableCommunityAchievements && !_enableSocialRecognition)
+            {
+                validationErrors.Add("Community achievements require social recognition to be enabled");
+                isValid = false;
+            }
+            
+            if (_enablePersonalizedRecommendations && !_enableAchievementAnalytics)
+            {
+                validationErrors.Add("Personalized recommendations require analytics to be enabled");
+                isValid = false;
+            }
+            
+            // Log validation results
+            if (!isValid)
+            {
+                LogError($"Achievement System validation failed: {string.Join(", ", validationErrors)}");
+            }
+            else
+            {
+                LogInfo("Achievement System validation passed");
+            }
+            
+            return isValid;
+        }
+        
+        #endregion
+        
+        #region Initialization Methods
+        
+        private void InitializeCoreAchievementSystems()
+        {
+            // Initialize achievement tracker
+            _achievementTracker = new AchievementTracker();
+            _achievementTracker.Initialize(_achievementLibrary, _achievementConfig);
+            
+            // Initialize milestone manager
+            _milestoneManager = new MilestoneManager();
+            _milestoneManager.Initialize(_achievementLibrary, _achievementConfig);
+            
+            // Initialize progression calculator
+            _progressionCalculator = new ProgressionCalculator();
+            _progressionCalculator.Initialize(_progressionConfig, _achievementConfig);
+            
+            // Initialize reward distributor
+            _rewardDistributor = new RewardDistributor();
+            _rewardDistributor.Initialize(_achievementConfig, _progressionConfig);
+            
+            // Initialize hidden achievement detector
+            if (_enableHiddenAchievements)
+            {
+                _hiddenDetector = new HiddenAchievementDetector();
+                _hiddenDetector.Initialize(_achievementLibrary, _achievementConfig);
+            }
+            
+            LogInfo("Core achievement systems initialized");
+        }
+        
+        private void InitializeCultivationIntegration()
+        {
+            // Initialize cultivation achievement monitor
+            if (_enableCultivationAchievements)
+            {
+                _cultivationMonitor = new CultivationAchievementMonitor();
+                _cultivationMonitor.Initialize(_achievementLibrary, _achievementConfig);
+                _cultivationMonitor.OnCultivationAchievement += HandleCultivationAchievement;
+            }
+            
+            // Initialize environmental achievement tracker
+            if (_enableEnvironmentalAchievements)
+            {
+                _environmentalTracker = new EnvironmentalAchievementTracker();
+                _environmentalTracker.Initialize(_achievementLibrary, _achievementConfig);
+                _environmentalTracker.OnEnvironmentalAchievement += HandleEnvironmentalAchievement;
+            }
+            
+            // Initialize facility achievement validator
+            if (_enableFacilityAchievements)
+            {
+                _facilityValidator = new FacilityAchievementValidator();
+                _facilityValidator.Initialize(_achievementLibrary, _achievementConfig);
+                _facilityValidator.OnFacilityAchievement += HandleFacilityAchievement;
+            }
+            
+            // Initialize economic achievement analyzer
+            if (_enableEconomicAchievements)
+            {
+                _economicAnalyzer = new EconomicAchievementAnalyzer();
+                _economicAnalyzer.Initialize(_achievementLibrary, _achievementConfig);
+                _economicAnalyzer.OnEconomicAchievement += HandleEconomicAchievement;
+            }
+            
+            // Initialize educational progress tracker
+            if (_enableEducationalAchievements)
+            {
+                _educationalTracker = new EducationalProgressTracker();
+                _educationalTracker.Initialize(_achievementLibrary, _achievementConfig);
+                _educationalTracker.OnEducationalAchievement += HandleEducationalAchievement;
+            }
+            
+            LogInfo("Cultivation integration systems initialized");
+        }
+        
+        private void InitializeAdvancedFeatures()
+        {
+            // Initialize progressive achievement engine
+            if (_enableProgressiveAchievements)
+            {
+                _progressiveEngine = new ProgressiveAchievementEngine();
+                _progressiveEngine.Initialize(_achievementLibrary, _achievementConfig);
+                _progressiveEngine.OnProgressiveAchievement += HandleProgressiveAchievement;
+            }
+            
+            // Initialize community achievement coordinator
+            if (_enableCommunityAchievements)
+            {
+                _communityCoordinator = new CommunityAchievementCoordinator();
+                _communityCoordinator.Initialize(_achievementLibrary, _achievementConfig);
+                _communityCoordinator.OnCommunityAchievement += HandleCommunityAchievement;
+            }
+            
+            // Initialize seasonal achievement manager
+            if (_enableSeasonalAchievements)
+            {
+                _seasonalManager = new SeasonalAchievementManager();
+                _seasonalManager.Initialize(_achievementLibrary, _achievementConfig);
+                _seasonalManager.OnSeasonalAchievement += HandleSeasonalAchievement;
+            }
+            
+            // Initialize challenge achievement orchestrator
+            if (_enableChallengeAchievements)
+            {
+                _challengeOrchestrator = new ChallengeAchievementOrchestrator();
+                _challengeOrchestrator.Initialize(_achievementLibrary, _achievementConfig);
+                _challengeOrchestrator.OnChallengeAchievement += HandleChallengeAchievement;
+            }
+            
+            // Initialize mastery achievement evaluator
+            if (_enableMasteryAchievements)
+            {
+                _masteryEvaluator = new MasteryAchievementEvaluator();
+                _masteryEvaluator.Initialize(_achievementLibrary, _achievementConfig);
+                _masteryEvaluator.OnMasteryAchievement += HandleMasteryAchievement;
+            }
+            
+            LogInfo("Advanced achievement features initialized");
+        }
+        
+        private void InitializeSocialRecognition()
+        {
+            if (!_enableSocialRecognition) return;
+            
+            // Initialize social recognition engine
+            _socialEngine = new SocialRecognitionEngine();
+            _socialEngine.Initialize(_achievementConfig);
+            
+            // Initialize leaderboard manager
+            if (_enableLeaderboards)
+            {
+                _leaderboardManager = new LeaderboardManager();
+                _leaderboardManager.Initialize(_achievementConfig);
+            }
+            
+            // Initialize peer recognition system
+            if (_enablePeerRecognition)
+            {
+                _peerSystem = new PeerRecognitionSystem();
+                _peerSystem.Initialize(_achievementConfig);
+            }
+            
+            // Initialize mentorship coordinator
+            if (_enableMentorshipPrograms)
+            {
+                _mentorshipCoordinator = new MentorshipCoordinator();
+                _mentorshipCoordinator.Initialize(_achievementConfig);
+            }
+            
+            LogInfo("Social recognition systems initialized");
+        }
+        
+        private void InitializeIntelligenceAndAnalytics()
+        {
+            if (!_enableAchievementAnalytics) return;
+            
+            // Initialize analytics engine
+            _analyticsEngine = new AchievementAnalyticsEngine();
+            _analyticsEngine.Initialize(_achievementConfig);
+            
+            // Initialize personalization engine
+            if (_enablePersonalizedRecommendations)
+            {
+                _personalizationEngine = new PersonalizationEngine();
+                _personalizationEngine.Initialize(_achievementConfig, _analyticsEngine);
+            }
+            
+            // Initialize difficulty scaling system
+            if (_enableDifficultyScaling)
+            {
+                _difficultySystem = new DifficultyScalingSystem();
+                _difficultySystem.Initialize(_achievementConfig, _analyticsEngine);
+            }
+            
+            // Initialize predictive achievement system
+            if (_enablePredictiveAchievements)
+            {
+                _predictiveSystem = new PredictiveAchievementSystem();
+                _predictiveSystem.Initialize(_achievementConfig, _analyticsEngine);
+            }
+            
+            LogInfo("Intelligence and analytics systems initialized");
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            if (!_enablePerformanceOptimization) return;
+            
+            // Initialize achievement cache
+            if (_enableAchievementCaching)
+            {
+                _achievementCache = new AchievementCache();
+                _achievementCache.Initialize(_maxCachedAchievements);
+            }
+            
+            // Initialize performance monitor
+            _performanceMonitor = new PerformanceMonitor();
+            _performanceMonitor.Initialize(_achievementConfig);
+            
+            // Initialize memory optimizer
+            _memoryOptimizer = new MemoryOptimizer();
+            _memoryOptimizer.Initialize(_achievementConfig);
+            
+            // Initialize batch processor
+            _batchProcessor = new BatchProcessor();
+            _batchProcessor.Initialize(_maxAchievementUpdatesPerFrame);
+            
+            LogInfo("Performance optimization systems initialized");
+        }
+        
+        private void LoadPlayerAchievementProfile()
+        {
+            // Load player achievement profile from save system
+            _playerProfile = LoadOrCreatePlayerProfile();
+            
+            // Load achievement progress
+            LoadAchievementProgress();
+            
+            // Load milestone progress
+            LoadMilestoneProgress();
+            
+            LogInfo($"Loaded player achievement profile with {_unlockedAchievements.Count} unlocked achievements");
+        }
+        
+        private void SubscribeToGameplayEvents()
+        {
+            // Subscribe to cultivation system events
+            SubscribeToCultivationEvents();
+            
+            // Subscribe to environmental system events
+            SubscribeToEnvironmentalEvents();
+            
+            // Subscribe to facility construction events
+            SubscribeToFacilityEvents();
+            
+            // Subscribe to economic system events
+            SubscribeToEconomicEvents();
+            
+            // Subscribe to progression system events
+            SubscribeToProgressionEvents();
+            
+            LogInfo("Subscribed to gameplay events for achievement tracking");
+        }
+        
+        private void StartAchievementSystems()
+        {
+            // Start achievement update loop
+            if (_achievementUpdateCoroutine == null)
+            {
+                _achievementUpdateCoroutine = StartCoroutine(AchievementUpdateLoop());
+            }
+            
+            // Start analytics update loop
+            if (_enableAchievementAnalytics && _analyticsUpdateCoroutine == null)
+            {
+                _analyticsUpdateCoroutine = StartCoroutine(AnalyticsUpdateLoop());
+            }
+            
+            // Start performance monitoring loop
+            if (_enablePerformanceOptimization && _performanceMonitoringCoroutine == null)
+            {
+                _performanceMonitoringCoroutine = StartCoroutine(PerformanceMonitoringLoop());
+            }
+            
+            // Start social recognition loop
+            if (_enableSocialRecognition && _socialRecognitionCoroutine == null)
+            {
+                _socialRecognitionCoroutine = StartCoroutine(SocialRecognitionLoop());
+            }
+            
+            LogInfo("Achievement system coroutines started");
+        }
+        
+        #endregion
+        
+        #region Core Achievement Processing
+        
+        public void ProcessAchievementTrigger(AchievementTrigger trigger)
+        {
+            if (!_isSystemActive || trigger == null) return;
+            
+            try
+            {
+                // Queue the update for batch processing
+                var update = new AchievementUpdate
+                {
+                    Trigger = trigger,
+                    Timestamp = DateTime.Now,
+                    PlayerId = _playerProfile.PlayerId
+                };
+                
+                _pendingUpdates.Enqueue(update);
+                
+                // Track analytics
+                if (_analyticsEngine != null)
+                {
+                    _analyticsEngine.TrackAchievementTrigger(trigger);
+                }
+                
+                // Update system metrics
+                _systemMetrics.TriggersProcessed++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error processing achievement trigger: {ex.Message}");
+                _systemMetrics.ProcessingErrors++;
+            }
+        }
+        
+        public bool UnlockAchievement(string achievementId, AchievementContext context = null)
+        {
+            try
+            {
+                var achievement = _achievementLibrary.GetAchievementById(achievementId);
+                if (achievement == null)
+                {
+                    LogWarning($"Achievement not found: {achievementId}");
+                    return false;
+                }
+                
+                // Check if already unlocked
+                if (IsAchievementUnlocked(achievementId))
+                {
+                    LogInfo($"Achievement already unlocked: {achievementId}");
+                    return false;
+                }
+                
+                // Validate unlock conditions
+                if (!ValidateAchievementUnlock(achievement, context))
+                {
+                    LogInfo($"Achievement unlock conditions not met: {achievementId}");
+                    return false;
+                }
+                
+                // Create unlocked achievement record
+                var unlockedAchievement = new UnlockedAchievement
+                {
+                    AchievementId = achievementId,
+                    Achievement = achievement,
+                    UnlockTime = DateTime.Now,
+                    Context = context ?? new AchievementContext(),
+                    PlayerId = _playerProfile.PlayerId
+                };
+                
+                // Add to unlocked achievements
+                _unlockedAchievements.Add(unlockedAchievement);
+                _playerProfile.UnlockedAchievements.Add(achievementId);
+                
+                // Distribute rewards
+                DistributeAchievementRewards(achievement, context);
+                
+                // Update player progression
+                UpdatePlayerProgression(achievement);
+                
+                // Trigger social recognition
+                TriggerSocialRecognition(unlockedAchievement);
+                
+                // Raise achievement unlocked event
+                _onAchievementUnlocked?.Raise(new AchievementEventData
+                {
+                    AchievementId = achievementId,
+                    Achievement = achievement,
+                    PlayerId = _playerProfile.PlayerId,
+                    UnlockTime = DateTime.Now,
+                    Context = context
+                });
+                
+                // Update analytics
+                if (_analyticsEngine != null)
+                {
+                    _analyticsEngine.TrackAchievementUnlock(unlockedAchievement);
+                }
+                
+                // Update system metrics
+                _systemMetrics.AchievementsUnlocked++;
+                
+                LogInfo($"Achievement unlocked: {achievement.AchievementName} ({achievementId})");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error unlocking achievement {achievementId}: {ex.Message}");
+                _systemMetrics.UnlockErrors++;
+                return false;
+            }
+        }
+        
+        public void UpdateAchievementProgress(string achievementId, float progress, AchievementContext context = null)
+        {
+            try
+            {
+                if (!_achievementProgress.TryGetValue(achievementId, out var achievementProgress))
+                {
+                    var achievement = _achievementLibrary.GetAchievementById(achievementId);
+                    if (achievement == null) return;
+                    
+                    achievementProgress = new AchievementProgress
+                    {
+                        AchievementId = achievementId,
+                        Achievement = achievement,
+                        CurrentProgress = 0f,
+                        LastUpdate = DateTime.Now
+                    };
+                    
+                    _achievementProgress[achievementId] = achievementProgress;
+                }
+                
+                // Update progress
+                var previousProgress = achievementProgress.CurrentProgress;
+                achievementProgress.CurrentProgress = Mathf.Max(achievementProgress.CurrentProgress, progress);
+                achievementProgress.LastUpdate = DateTime.Now;
+                
+                // Check for completion
+                if (achievementProgress.CurrentProgress >= 1f && previousProgress < 1f)
+                {
+                    UnlockAchievement(achievementId, context);
+                }
+                
+                // Raise progress updated event
+                _onProgressionUpdated?.Raise(new ProgressionEventData
+                {
+                    Type = ProgressionType.Achievement,
+                    Id = achievementId,
+                    PreviousProgress = previousProgress,
+                    CurrentProgress = achievementProgress.CurrentProgress,
+                    IsCompleted = achievementProgress.CurrentProgress >= 1f,
+                    Context = context
+                });
+                
+                // Update system metrics
+                _systemMetrics.ProgressUpdates++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error updating achievement progress for {achievementId}: {ex.Message}");
+                _systemMetrics.UpdateErrors++;
+            }
+        }
+        
+        public bool IsAchievementUnlocked(string achievementId)
+        {
+            return _playerProfile.UnlockedAchievements.Contains(achievementId);
+        }
+        
+        public float GetAchievementProgress(string achievementId)
+        {
+            if (_achievementProgress.TryGetValue(achievementId, out var progress))
+            {
+                return progress.CurrentProgress;
+            }
+            
+            return IsAchievementUnlocked(achievementId) ? 1f : 0f;
+        }
+        
+        public List<UnlockedAchievement> GetUnlockedAchievements()
+        {
+            return _unlockedAchievements.ToList();
+        }
+        
+        public List<AchievementProgress> GetProgressingAchievements()
+        {
+            return _achievementProgress.Values
+                .Where(p => p.CurrentProgress > 0f && p.CurrentProgress < 1f)
+                .OrderByDescending(p => p.CurrentProgress)
+                .ToList();
+        }
+        
+        public List<AchievementSO> GetRecommendedAchievements()
+        {
+            if (_personalizationEngine != null)
+            {
+                return _personalizationEngine.GetPersonalizedRecommendations(_playerProfile);
+            }
+            
+            // Fallback to basic recommendation logic
+            return _achievementLibrary.GetAvailableAchievements(_playerProfile)
+                .Where(a => !IsAchievementUnlocked(a.AchievementId))
+                .Take(10)
+                .ToList();
+        }
+        
+        #endregion
+        
+        #region Milestone Management
+        
+        public void UpdateMilestoneProgress(string milestoneId, float progress, MilestoneContext context = null)
+        {
+            try
+            {
+                if (!_milestoneProgress.TryGetValue(milestoneId, out var milestoneProgress))
+                {
+                    var milestone = _achievementLibrary.GetMilestoneById(milestoneId);
+                    if (milestone == null) return;
+                    
+                    milestoneProgress = new MilestoneProgress
+                    {
+                        MilestoneId = milestoneId,
+                        Milestone = milestone,
+                        CurrentProgress = 0f,
+                        LastUpdate = DateTime.Now
+                    };
+                    
+                    _milestoneProgress[milestoneId] = milestoneProgress;
+                }
+                
+                // Update progress
+                var previousProgress = milestoneProgress.CurrentProgress;
+                milestoneProgress.CurrentProgress = Mathf.Max(milestoneProgress.CurrentProgress, progress);
+                milestoneProgress.LastUpdate = DateTime.Now;
+                
+                // Check for completion
+                if (milestoneProgress.CurrentProgress >= 1f && previousProgress < 1f)
+                {
+                    CompleteMilestone(milestoneId, context);
+                }
+                
+                // Update system metrics
+                _systemMetrics.MilestoneUpdates++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error updating milestone progress for {milestoneId}: {ex.Message}");
+                _systemMetrics.UpdateErrors++;
+            }
+        }
+        
+        private void CompleteMilestone(string milestoneId, MilestoneContext context)
+        {
+            try
+            {
+                var milestone = _achievementLibrary.GetMilestoneById(milestoneId);
+                if (milestone == null) return;
+                
+                // Add to completed milestones
+                _playerProfile.CompletedMilestones.Add(milestoneId);
+                
+                // Distribute milestone rewards
+                DistributeMilestoneRewards(milestone, context);
+                
+                // Unlock related achievements
+                UnlockMilestoneAchievements(milestone);
+                
+                // Raise milestone reached event
+                _onMilestoneReached?.Raise(new MilestoneEventData
+                {
+                    MilestoneId = milestoneId,
+                    Milestone = milestone,
+                    PlayerId = _playerProfile.PlayerId,
+                    CompletionTime = DateTime.Now,
+                    Context = context
+                });
+                
+                // Update analytics
+                if (_analyticsEngine != null)
+                {
+                    _analyticsEngine.TrackMilestoneCompletion(milestoneId, milestone);
+                }
+                
+                // Update system metrics
+                _systemMetrics.MilestonesCompleted++;
+                
+                LogInfo($"Milestone completed: {milestone.MilestoneName} ({milestoneId})");
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error completing milestone {milestoneId}: {ex.Message}");
+                _systemMetrics.ProcessingErrors++;
+            }
+        }
+        
+        #endregion
+        
+        #region Update Loops
+        
+        private IEnumerator AchievementUpdateLoop()
+        {
+            while (_isSystemActive)
+            {
+                yield return new WaitForSeconds(_achievementUpdateInterval);
+                
+                try
+                {
+                    ProcessPendingAchievementUpdates();
+                    UpdateProgressiveAchievements();
+                    UpdateHiddenAchievementDetection();
+                    UpdateCommunityAchievements();
+                    UpdateSeasonalAchievements();
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Error in achievement update loop: {ex.Message}");
+                    _systemMetrics.UpdateLoopErrors++;
+                }
+            }
+        }
+        
+        private IEnumerator AnalyticsUpdateLoop()
+        {
+            while (_isSystemActive)
+            {
+                yield return new WaitForSeconds(_analyticsUpdateInterval);
+                
+                try
+                {
+                    if (_analyticsEngine != null)
+                    {
+                        _analyticsEngine.UpdateAnalytics();
+                        _lastAnalyticsUpdate = DateTime.Now;
+                    }
+                    
+                    if (_personalizationEngine != null)
+                    {
+                        _personalizationEngine.UpdatePersonalization(_playerProfile);
+                    }
+                    
+                    if (_predictiveSystem != null)
+                    {
+                        _predictiveSystem.UpdatePredictions(_playerProfile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Error in analytics update loop: {ex.Message}");
+                    _systemMetrics.AnalyticsErrors++;
+                }
+            }
+        }
+        
+        private IEnumerator PerformanceMonitoringLoop()
+        {
+            while (_isSystemActive)
+            {
+                yield return new WaitForSeconds(60f); // Monitor every minute
+                
+                try
+                {
+                    if (_performanceMonitor != null)
+                    {
+                        _performanceMonitor.UpdateMetrics();
+                        _lastPerformanceCheck = DateTime.Now;
+                    }
+                    
+                    if (_memoryOptimizer != null)
+                    {
+                        _memoryOptimizer.OptimizeMemory();
+                    }
+                    
+                    // Check for performance issues
+                    CheckPerformanceHealth();
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Error in performance monitoring loop: {ex.Message}");
+                    _systemMetrics.PerformanceErrors++;
+                }
+            }
+        }
+        
+        private IEnumerator SocialRecognitionLoop()
+        {
+            while (_isSystemActive)
+            {
+                yield return new WaitForSeconds(300f); // Update every 5 minutes
+                
+                try
+                {
+                    if (_socialEngine != null)
+                    {
+                        _socialEngine.UpdateSocialRecognition();
+                    }
+                    
+                    if (_leaderboardManager != null)
+                    {
+                        _leaderboardManager.UpdateLeaderboards();
+                    }
+                    
+                    if (_peerSystem != null)
+                    {
+                        _peerSystem.UpdatePeerRecognition();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Error in social recognition loop: {ex.Message}");
+                    _systemMetrics.SocialErrors++;
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Helper Methods - Cultivation Integration
+        
+        private void SubscribeToCultivationEvents()
+        {
+            // These would subscribe to actual cultivation system events
+            // For now, placeholder method signatures based on Gameplay Mechanics 1.1.md
+            
+            // Plant Lifecycle Events
+            // OnPlantingCompleted, OnTransplantingCompleted, OnToppingCompleted
+            // OnLSTCompleted, OnTrellisingCompleted, OnPruningCompleted
+            
+            // Irrigation & Fertigation Events  
+            // OnWateringCycleCompleted, OnNutrientApplicationCompleted
+            // OnCropSteeringAchieved, OnECManagementMastered
+            
+            // Environmental Control Events
+            // OnOptimalTemperatureAchieved, OnVPDMastered, OnLightingOptimized
+            // OnCO2EnrichmentSuccessful, OnAirflowOptimized
+            
+            // IPM Events
+            // OnPestIdentified, OnTreatmentApplied, OnBeneficialsIntroduced
+            // OnPreventativeMeasuresImplemented
+            
+            // Harvesting Events
+            // OnOptimalHarvestTiming, OnDryingCompleted, OnCuringCompleted
+            // OnPostHarvestQualityAchieved
+        }
+        
+        private void SubscribeToEnvironmentalEvents()
+        {
+            // Temperature Management
+            // OnTemperatureStabilityAchieved, OnDayNightCycleOptimized
+            
+            // Humidity Management
+            // OnHumidityControlMastered, OnMicroclimateMaintained
+            
+            // Lighting Management
+            // OnPPFDTargetsAchieved, OnPhotoperiodMastered, OnSpectrumOptimized
+            
+            // Atmospheric Management
+            // OnVentilationOptimized, OnCO2LevelsStabilized
+        }
+        
+        private void SubscribeToFacilityEvents()
+        {
+            // Structural Construction
+            // OnWallConstructionCompleted, OnRoomLayoutOptimized
+            
+            // Equipment Placement
+            // OnBenchInstallationCompleted, OnEquipmentLayoutOptimized
+            
+            // Utility Systems
+            // OnPlumbingSystemCompleted, OnHVACInstallationCompleted
+            // OnElectricalSystemCompleted, OnUtilityEfficiencyAchieved
+            
+            // Zoning & Layout
+            // OnZoneDesignationCompleted, OnWorkflowOptimized
+        }
+        
+        private void SubscribeToEconomicEvents()
+        {
+            // Financial Management
+            // OnBudgetTargetAchieved, OnProfitMarginReached, OnROITargetMet
+            
+            // Resource Management
+            // OnResourceEfficiencyAchieved, OnWasteReductionTargetMet
+            // OnEnergyEfficiencyImproved
+            
+            // Market Performance
+            // OnSalesTargetAchieved, OnMarketShareGained, OnCustomerSatisfactionHigh
+        }
+        
+        private void SubscribeToProgressionEvents()
+        {
+            // Skill Development
+            // OnSkillLevelUp, OnSkillTreeNodeUnlocked, OnMasteryAchieved
+            
+            // Research Progress
+            // OnResearchProjectCompleted, OnTechniquesUnlocked, OnInnovationAchieved
+            
+            // Educational Milestones
+            // OnLearningModuleCompleted, OnCertificationEarned, OnKnowledgeTestPassed
+        }
+        
+        #endregion
+        
+        #region Helper Methods - Core Processing
+        
+        private void ProcessPendingAchievementUpdates()
+        {
+            if (_batchProcessor != null)
+            {
+                _batchProcessor.ProcessUpdates(_pendingUpdates, ProcessSingleAchievementUpdate);
+            }
+            else
+            {
+                // Process updates without batch processor
+                var processedCount = 0;
+                while (_pendingUpdates.Count > 0 && processedCount < _maxAchievementUpdatesPerFrame)
+                {
+                    var update = _pendingUpdates.Dequeue();
+                    ProcessSingleAchievementUpdate(update);
+                    processedCount++;
+                }
+            }
+        }
+        
+        private void ProcessSingleAchievementUpdate(AchievementUpdate update)
+        {
+            try
+            {
+                // Process the trigger through various achievement systems
+                _achievementTracker?.ProcessTrigger(update.Trigger);
+                _cultivationMonitor?.ProcessTrigger(update.Trigger);
+                _environmentalTracker?.ProcessTrigger(update.Trigger);
+                _facilityValidator?.ProcessTrigger(update.Trigger);
+                _economicAnalyzer?.ProcessTrigger(update.Trigger);
+                _educationalTracker?.ProcessTrigger(update.Trigger);
+                
+                // Process through advanced systems
+                _progressiveEngine?.ProcessTrigger(update.Trigger);
+                _hiddenDetector?.ProcessTrigger(update.Trigger);
+                _masteryEvaluator?.ProcessTrigger(update.Trigger);
+                
+                _systemMetrics.UpdatesProcessed++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error processing single achievement update: {ex.Message}");
+                _systemMetrics.ProcessingErrors++;
+            }
+        }
+        
+        private bool ValidateAchievementUnlock(AchievementSO achievement, AchievementContext context)
+        {
+            // Validate dependencies
+            if (achievement.Dependencies != null)
+            {
+                foreach (var dependency in achievement.Dependencies)
+                {
+                    if (!IsAchievementUnlocked(dependency))
+                        return false;
+                }
+            }
+            
+            // Validate conditions
+            if (achievement.UnlockConditions != null)
+            {
+                return achievement.UnlockConditions.EvaluateConditions(context, _playerProfile);
+            }
+            
+            return true;
+        }
+        
+        private void DistributeAchievementRewards(AchievementSO achievement, AchievementContext context)
+        {
+            if (_rewardDistributor != null && achievement.Rewards != null)
+            {
+                var rewards = _rewardDistributor.CalculateRewards(achievement, context, _playerProfile);
+                _rewardDistributor.DistributeRewards(rewards, _playerProfile);
+                
+                // Raise reward distributed event
+                _onRewardDistributed?.Raise(new RewardEventData
+                {
+                    AchievementId = achievement.AchievementId,
+                    Rewards = rewards,
+                    PlayerId = _playerProfile.PlayerId,
+                    DistributionTime = DateTime.Now
+                });
+            }
+        }
+        
+        private void DistributeMilestoneRewards(MilestoneSO milestone, MilestoneContext context)
+        {
+            if (_rewardDistributor != null && milestone.Rewards != null)
+            {
+                var rewards = _rewardDistributor.CalculateMilestoneRewards(milestone, context, _playerProfile);
+                _rewardDistributor.DistributeRewards(rewards, _playerProfile);
+            }
+        }
+        
+        private void UpdatePlayerProgression(AchievementSO achievement)
+        {
+            // Update player level and experience
+            _playerProfile.TotalExperience += achievement.ExperienceReward;
+            
+            var newLevel = _progressionCalculator.CalculateLevel(_playerProfile.TotalExperience);
+            if (newLevel > _playerProfile.Level)
+            {
+                _playerProfile.Level = newLevel;
+                _onPlayerLevelUp?.Raise();
+                LogInfo($"Player leveled up to level {newLevel}");
+            }
+            
+            // Update achievement points
+            _playerProfile.AchievementPoints += achievement.PointValue;
+            
+            // Update category progress
+            if (!_playerProfile.CategoryProgress.ContainsKey(achievement.Category))
+            {
+                _playerProfile.CategoryProgress[achievement.Category] = 0;
+            }
+            _playerProfile.CategoryProgress[achievement.Category]++;
+        }
+        
+        private void UnlockMilestoneAchievements(MilestoneSO milestone)
+        {
+            if (milestone.UnlockedAchievements != null)
+            {
+                foreach (var achievementId in milestone.UnlockedAchievements)
+                {
+                    if (!IsAchievementUnlocked(achievementId))
+                    {
+                        UnlockAchievement(achievementId, new AchievementContext
+                        {
+                            Source = AchievementSource.Milestone,
+                            MilestoneId = milestone.MilestoneId
+                        });
+                    }
+                }
+            }
+        }
+        
+        private void TriggerSocialRecognition(UnlockedAchievement unlockedAchievement)
+        {
+            if (_socialEngine != null && _enableSocialRecognition)
+            {
+                _socialEngine.ProcessAchievementUnlock(unlockedAchievement);
+            }
+        }
+        
+        #endregion
+        
+        #region Helper Methods - Event Handlers
+        
+        private void HandleCultivationAchievement(CultivationAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Cultivation,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleEnvironmentalAchievement(EnvironmentalAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Environmental,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleFacilityAchievement(FacilityAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Facility,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleEconomicAchievement(EconomicAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Economic,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleEducationalAchievement(EducationalAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Educational,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleProgressiveAchievement(ProgressiveAchievementData data)
+        {
+            UpdateAchievementProgress(data.AchievementId, data.Progress, data.Context);
+        }
+        
+        private void HandleCommunityAchievement(CommunityAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Community,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleSeasonalAchievement(SeasonalAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Seasonal,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleChallengeAchievement(ChallengeAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Challenge,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        private void HandleMasteryAchievement(MasteryAchievementData data)
+        {
+            ProcessAchievementTrigger(new AchievementTrigger
+            {
+                TriggerType = AchievementTriggerType.Mastery,
+                Data = data,
+                Timestamp = DateTime.Now
+            });
+        }
+        
+        #endregion
+        
+        #region Helper Methods - Advanced Features
+        
+        private void UpdateProgressiveAchievements()
+        {
+            if (_progressiveEngine != null)
+            {
+                _progressiveEngine.UpdateProgressiveAchievements(_playerProfile);
+            }
+        }
+        
+        private void UpdateHiddenAchievementDetection()
+        {
+            if (_hiddenDetector != null)
+            {
+                _hiddenDetector.UpdateDetection(_playerProfile);
+            }
+        }
+        
+        private void UpdateCommunityAchievements()
+        {
+            if (_communityCoordinator != null)
+            {
+                _communityCoordinator.UpdateCommunityProgress();
+            }
+        }
+        
+        private void UpdateSeasonalAchievements()
+        {
+            if (_seasonalManager != null)
+            {
+                _seasonalManager.UpdateSeasonalContent(DateTime.Now);
+            }
+        }
+        
+        private void UpdateSocialRecognitionSystems()
+        {
+            // Social recognition updates are handled in the dedicated coroutine
+            // This method is for immediate updates needed in the main update loop
+        }
+        
+        private void UpdateSystemMetrics()
+        {
+            _systemMetrics.LastUpdate = DateTime.Now;
+            _systemMetrics.ActiveAchievements = _achievementProgress.Count;
+            _systemMetrics.TotalUnlockedAchievements = _unlockedAchievements.Count;
+            _systemMetrics.PendingUpdates = _pendingUpdates.Count;
+        }
+        
+        private void CheckPerformanceHealth()
+        {
+            if (_performanceMonitor != null)
+            {
+                var metrics = _performanceMonitor.GetCurrentMetrics();
+                
+                // Check for performance warnings
+                if (metrics.AverageProcessingTime > 16.67f) // 60 FPS target
+                {
+                    LogWarning($"Achievement processing time exceeding 60 FPS target: {metrics.AverageProcessingTime:F2}ms");
+                }
+                
+                if (metrics.MemoryUsage > 100 * 1024 * 1024) // 100MB threshold
+                {
+                    LogWarning($"High achievement system memory usage: {metrics.MemoryUsage / (1024 * 1024)}MB");
+                    
+                    if (_memoryOptimizer != null)
+                    {
+                        _memoryOptimizer.ForceCleanup();
+                    }
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Helper Methods - Persistence
+        
+        private PlayerAchievementProfile LoadOrCreatePlayerProfile()
+        {
+            // This would integrate with Project Chimera's save system
+            // For now, create a new profile
+            return new PlayerAchievementProfile
+            {
+                PlayerId = SystemInfo.deviceUniqueIdentifier, // Placeholder
+                Level = 1,
+                TotalExperience = 0,
+                AchievementPoints = 0,
+                UnlockedAchievements = new List<string>(),
+                CompletedMilestones = new List<string>(),
+                CategoryProgress = new Dictionary<AchievementCategory, int>(),
+                CreationTime = DateTime.Now,
+                LastPlayTime = DateTime.Now
+            };
+        }
+        
+        private void LoadAchievementProgress()
+        {
+            // Load from save system
+            // For now, initialize empty
+            _achievementProgress.Clear();
+        }
+        
+        private void LoadMilestoneProgress()
+        {
+            // Load from save system
+            // For now, initialize empty
+            _milestoneProgress.Clear();
+        }
+        
+        private void SavePlayerAchievementProfile()
+        {
+            try
+            {
+                // Save to Project Chimera's save system
+                _playerProfile.LastPlayTime = DateTime.Now;
+                
+                LogInfo("Player achievement profile saved");
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to save player achievement profile: {ex.Message}");
+            }
+        }
+        
+        private void SaveAnalyticsData()
+        {
+            try
+            {
+                if (_analyticsEngine != null)
+                {
+                    _analyticsEngine.SaveAnalyticsData();
+                }
+                
+                LogInfo("Achievement analytics data saved");
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to save analytics data: {ex.Message}");
+            }
+        }
+        
+        #endregion
+        
+        #region Cleanup Methods
+        
+        private void StopAchievementCoroutines()
+        {
+            if (_achievementUpdateCoroutine != null)
+            {
+                StopCoroutine(_achievementUpdateCoroutine);
+                _achievementUpdateCoroutine = null;
+            }
+            
+            if (_analyticsUpdateCoroutine != null)
+            {
+                StopCoroutine(_analyticsUpdateCoroutine);
+                _analyticsUpdateCoroutine = null;
+            }
+            
+            if (_performanceMonitoringCoroutine != null)
+            {
+                StopCoroutine(_performanceMonitoringCoroutine);
+                _performanceMonitoringCoroutine = null;
+            }
+            
+            if (_socialRecognitionCoroutine != null)
+            {
+                StopCoroutine(_socialRecognitionCoroutine);
+                _socialRecognitionCoroutine = null;
+            }
+        }
+        
+        private void UnsubscribeFromGameplayEvents()
+        {
+            // Unsubscribe from all cultivation, environmental, facility, and economic events
+            UnsubscribeFromCultivationEvents();
+            UnsubscribeFromEnvironmentalEvents();
+            UnsubscribeFromFacilityEvents();
+            UnsubscribeFromEconomicEvents();
+            UnsubscribeFromProgressionEvents();
+        }
+        
+        private void DisposeAchievementResources()
+        {
+            _achievementCache?.Dispose();
+            _performanceMonitor?.Dispose();
+            _memoryOptimizer?.Dispose();
+            _analyticsEngine?.Dispose();
+        }
+        
+        // Placeholder unsubscribe methods
+        private void UnsubscribeFromCultivationEvents() { }
+        private void UnsubscribeFromEnvironmentalEvents() { }
+        private void UnsubscribeFromFacilityEvents() { }
+        private void UnsubscribeFromEconomicEvents() { }
+        private void UnsubscribeFromProgressionEvents() { }
+        
+        #endregion
+        
+        #region Public API
+        
+        public AchievementSystemMetrics GetSystemMetrics()
+        {
+            return _systemMetrics;
+        }
+        
+        public PlayerAchievementProfile GetPlayerProfile()
+        {
+            return _playerProfile;
+        }
+        
+        public AchievementSystemStatistics GetStatistics()
+        {
+            return new AchievementSystemStatistics
+            {
+                TotalAchievements = _achievementLibrary.GetTotalAchievementCount(),
+                UnlockedAchievements = _unlockedAchievements.Count,
+                InProgressAchievements = _achievementProgress.Count,
+                CompletedMilestones = _playerProfile.CompletedMilestones.Count,
+                TotalExperience = _playerProfile.TotalExperience,
+                AchievementPoints = _playerProfile.AchievementPoints,
+                PlayerLevel = _playerProfile.Level,
+                LastUpdate = _systemMetrics.LastUpdate,
+                SystemUptime = DateTime.Now - _playerProfile.LastPlayTime
+            };
+        }
+        
+        #endregion
+    }
+    
+    /// <summary>
+    /// Achievement update data for system updates.
+    /// </summary>
+    [Serializable]
+    public class AchievementUpdate
+    {
+        public string AchievementId;
+        public string PlayerId;
+        public float Progress;
+        public bool IsCompleted;
+        public DateTime UpdateTime;
+        public Dictionary<string, object> UpdateData;
+        public string UpdateSource;
+        public string UpdateContext;
+    }
+    
+    /// <summary>
+    /// Environmental achievement data for environmental system integration.
+    /// </summary>
+    [Serializable]
+    public class EnvironmentalAchievementData
+    {
+        public string DataId;
+        public Dictionary<string, float> EnvironmentalMetrics;
+        public Dictionary<string, float> OptimalRanges;
+        public DateTime MeasurementTime;
+        public float EfficiencyScore;
+        public List<string> AchievedTargets;
+        public string FacilityId;
+    }
+    
+    /// <summary>
+    /// Facility achievement data for facility management integration.
+    /// </summary>
+    [Serializable]
+    public class FacilityAchievementData
+    {
+        public string FacilityId;
+        public string FacilityType;
+        public Dictionary<string, float> PerformanceMetrics;
+        public Dictionary<string, bool> CompletedMilestones;
+        public DateTime ConstructionDate;
+        public DateTime LastUpgrade;
+        public float EfficiencyRating;
+        public List<string> InstalledEquipment;
+    }
+    
+    /// <summary>
+    /// Challenge achievement data for tracking challenge-based achievements.
+    /// </summary>
+    [Serializable]
+    public class ChallengeAchievementData
+    {
+        public string ChallengeId;
+        public string ChallengeName;
+        public string ChallengeType;
+        public Dictionary<string, float> ChallengeMetrics;
+        public DateTime StartDate;
+        public DateTime EndDate;
+        public float CompletionPercentage;
+        public bool IsCompleted;
+        public List<string> Participants;
+        public Dictionary<string, object> RewardData;
+    }
+    
+    /// <summary>
+    /// Mastery achievement data for tracking mastery progression.
+    /// </summary>
+    [Serializable]
+    public class MasteryAchievementData
+    {
+        public string MasteryId;
+        public string MasteryCategory;
+        public int MasteryLevel;
+        public float MasteryProgress;
+        public Dictionary<string, float> SkillContributions;
+        public DateTime LastLevelUp;
+        public List<string> UnlockedFeatures;
+        public float MasteryMultiplier;
+        public Dictionary<string, object> MasteryBonuses;
+    }
+    
+    /// <summary>
+    /// Achievement system metrics for tracking system performance.
+    /// </summary>
+    [Serializable]
+    public class AchievementSystemMetrics
+    {
+        public int TotalAchievementsUnlocked;
+        public int ActivePlayers;
+        public float AverageCompletionRate;
+        public Dictionary<string, int> CategoryCompletions;
+        public DateTime LastMetricsUpdate;
+        public float SystemEfficiency;
+        public int DailyActiveUsers;
+        public Dictionary<string, float> EngagementMetrics;
+    }
+    
+    /// <summary>
+    /// Achievement system statistics for comprehensive tracking.
+    /// </summary>
+    [Serializable]
+    public class AchievementSystemStatistics
+    {
+        public int TotalAchievements;
+        public int CompletedAchievements;
+        public float OverallProgress;
+        public Dictionary<string, float> CategoryProgress;
+        public DateTime StatisticsDate;
+        public List<string> RecentAchievements;
+        public Dictionary<string, int> DifficultyDistribution;
+        public float AverageTimeToComplete;
+    }
+    
+    /// <summary>
+    /// Progression configuration for achievement systems.
+    /// </summary>
+    [Serializable]
+    public class ProgressionConfigSO : ChimeraDataSO
+    {
+        [Header("Progression Settings")]
+        public float BaseExperienceMultiplier = 1.0f;
+        public int MaxLevel = 100;
+        public bool EnableDynamicDifficulty = true;
+        
+        [Header("Achievement Settings")]
+        public int MaxAchievementsPerCategory = 50;
+        public bool EnableRareAchievements = true;
+        public float RareAchievementChance = 0.1f;
+    }
+}

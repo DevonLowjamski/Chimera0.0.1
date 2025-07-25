@@ -1,0 +1,155 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Construction;
+
+// Only use type aliases for types that actually exist and cause ambiguity
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+using DataPlayerChoice = ProjectChimera.Data.Cultivation.PlayerChoice;
+using SystemsPlayerChoice = ProjectChimera.Systems.Cultivation.PlayerChoice;
+using EventsPlayerChoiceType = ProjectChimera.Events.PlayerChoiceType;
+
+using DataInteractivePlant = ProjectChimera.Data.Cultivation.InteractivePlant;
+using CorePlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
+
+// Construction types that work
+using DataConstructionParticipantInfo = ProjectChimera.Data.Construction.ParticipantInfo;
+using CoreParticipantInfo = ProjectChimera.Core.ParticipantInfo;
+using DataConstructionParticipantRole = ProjectChimera.Data.Construction.ParticipantRole;
+using CoreCollaborationRole = ProjectChimera.Core.CollaborationRole;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final Error Resolution Test
+    /// Only tests types that are confirmed to exist in the actual assemblies
+    /// Avoids all CS0234 "type does not exist" errors
+    /// </summary>
+    public class FinalErrorResolutionTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Final Error Resolution Test ===");
+            
+            TestConfirmedExistingTypes();
+            TestConstructionTypeConversion();
+            TestSystemIntegration();
+            TestCoreDataStructures();
+            
+            Debug.Log("✅ Final error resolution completed - all types confirmed to exist!");
+        }
+        
+        private void TestConfirmedExistingTypes()
+        {
+            Debug.Log("Testing confirmed existing types...");
+            
+            // Test Data.Cultivation types (confirmed to exist)
+            var dataTask = DataCultivationTaskType.Watering;
+            var dataCare = DataCareQuality.Expert;
+            // Test PlayerChoice as a class (not enum)
+            var dataChoice = new DataPlayerChoice
+            {
+                ChoiceId = "test-choice",
+                Description = "Test cultivation choice",
+                Type = EventsPlayerChoiceType.CultivationMethod
+            };
+            var eventsChoiceType = EventsPlayerChoiceType.CultivationMethod;
+            
+            // Test Systems.Cultivation types (confirmed to exist) 
+            var systemsChoice = new SystemsPlayerChoice
+            {
+                ChoiceId = "systems-choice",
+                Description = "Test systems choice",
+                Type = EventsPlayerChoiceType.ResourceAllocation
+            };
+            
+            Debug.Log($"✓ Confirmed existing types validated:");
+            Debug.Log($"  Data.Cultivation: Task={dataTask}, Care={dataCare}, Choice={dataChoice.ChoiceId}");
+            Debug.Log($"  Systems.Cultivation: Choice={systemsChoice.ChoiceId}");
+            Debug.Log($"  Events: ChoiceType={eventsChoiceType}");
+        }
+        
+        private void TestConstructionTypeConversion()
+        {
+            Debug.Log("Testing construction type conversion...");
+            
+            // Test Data.Construction.ParticipantInfo (for data storage)
+            var dataParticipant = new DataConstructionParticipantInfo
+            {
+                PlayerId = "data-player",
+                PlayerName = "Data Player",
+                Role = DataConstructionParticipantRole.Architect
+            };
+            
+            // Test Core.ParticipantInfo (for interface contracts)
+            var coreParticipant = new CoreParticipantInfo
+            {
+                PlayerId = "core-player",
+                PlayerName = "Core Player",
+                Role = CoreCollaborationRole.Architect,
+                JoinTime = System.DateTime.Now,
+                IsActive = true
+            };
+            
+            Debug.Log($"✓ Construction type conversion validated:");
+            Debug.Log($"  Data.Construction.ParticipantInfo: ID={dataParticipant.PlayerId}, Role={dataParticipant.Role}");
+            Debug.Log($"  Core.ParticipantInfo: ID={coreParticipant.PlayerId}, Role={coreParticipant.Role}");
+        }
+        
+        private void TestSystemIntegration()
+        {
+            Debug.Log("Testing system integration...");
+            
+            // Test that all major systems compile and are accessible
+            var cultivationManager = GetComponent<EnhancedCultivationGamingManager>();
+            var plantCareSystem = GetComponent<InteractivePlantCareSystem>();
+            var automationSystem = GetComponent<EarnedAutomationProgressionSystem>();
+            var skillTreeSystem = GetComponent<TreeSkillProgressionSystem>();
+            var timeSystem = GetComponent<TimeAccelerationGamingSystem>();
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            
+            // Test basic Unity systems
+            var gameObject = new GameObject("TestObject");
+            var manager = GetComponent<ChimeraManager>();
+            
+            Debug.Log("✓ All major systems compile and are accessible");
+        }
+        
+        private void TestCoreDataStructures()
+        {
+            Debug.Log("Testing core data structures...");
+            
+            // Test InteractivePlant properties
+            var plant = new DataInteractivePlant
+            {
+                PlantInstanceID = 456,
+                PlantedTime = System.DateTime.Now.AddDays(-30),
+                CurrentLightSatisfaction = 85.5f,
+                CurrentHydrationLevel = 0.75f
+            };
+            
+            // Calculate plant age (this was causing DateTime errors)
+            var plantAgeSeconds = (float)(System.DateTime.Now - plant.PlantedTime).TotalSeconds;
+            var plantAgeDays = plantAgeSeconds / 86400f; // Convert to days
+            
+            // Test event data with Core.Events types (confirmed to exist)
+            var eventData = new CorePlantCareEventData
+            {
+                PlantId = "validation-plant",
+                TaskType = DataCultivationTaskType.Fertilizing,
+                CareQuality = DataCareQuality.High,
+                Timestamp = Time.time,
+                PlantInstance = plant,
+                PlayerSkillLevel = 8.5f
+            };
+            
+            Debug.Log($"✓ Core data structures validated:");
+            Debug.Log($"  Plant ID: {plant.PlantInstanceID}");
+            Debug.Log($"  Plant Age: {plantAgeDays:F1} days");
+            Debug.Log($"  Light Satisfaction: {plant.CurrentLightSatisfaction:F1}%");
+            Debug.Log($"  Event: {eventData.TaskType} at {eventData.CareQuality} quality");
+        }
+    }
+}

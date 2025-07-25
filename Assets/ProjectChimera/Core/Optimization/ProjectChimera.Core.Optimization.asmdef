@@ -1,0 +1,20 @@
+{
+    "name": "ProjectChimera.Core.Optimization",
+    "rootNamespace": "ProjectChimera.Core.Optimization",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems",
+        "ProjectChimera.Systems.SpeedTree",
+        "ProjectChimera.Systems.Cultivation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,370 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Environment;
+using System.Collections.Generic;
+using System;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 22 - Plant trait expression and stress system integration.
+    /// Tests the newly added methods and properties for genetic trait application and stress handling.
+    /// </summary>
+    public class Wave22ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool _runTestsOnStart = true;
+        [SerializeField] private bool _enableDetailedLogging = true;
+        
+        [Header("Test Results")]
+        [SerializeField] private bool _allTestsPassed = false;
+        [SerializeField] private int _testsRun = 0;
+        [SerializeField] private int _testsPassed = 0;
+        [SerializeField] private int _testsFailed = 0;
+        
+        private void Start()
+        {
+            if (_runTestsOnStart)
+            {
+                RunAllTests();
+            }
+        }
+        
+        [ContextMenu("Run Wave 22 Validation Tests")]
+        public void RunAllTests()
+        {
+            Debug.Log("=== Starting Error Wave 22 Validation Tests ===");
+            
+            _testsRun = 0;
+            _testsPassed = 0;
+            _testsFailed = 0;
+            
+            // Test 1: PlantInstance genetic properties
+            TestPlantInstanceGeneticProperties();
+            
+            // Test 2: Trait expression methods
+            TestTraitExpressionMethods();
+            
+            // Test 3: Stress application methods
+            TestStressApplicationMethods();
+            
+            // Test 4: Environmental conditions access
+            TestEnvironmentalConditionsAccess();
+            
+            // Test 5: TraitExpressionEngine batch processing
+            TestTraitExpressionEngineBatchProcessing();
+            
+            // Test 6: GeneticPerformanceMonitor integration
+            TestGeneticPerformanceMonitorIntegration();
+            
+            _allTestsPassed = (_testsFailed == 0);
+            
+            Debug.Log($"=== Error Wave 22 Validation Complete ===");
+            Debug.Log($"Tests Run: {_testsRun}, Passed: {_testsPassed}, Failed: {_testsFailed}");
+            Debug.Log($"Overall Result: {(_allTestsPassed ? "PASS" : "FAIL")}");
+        }
+        
+        private void TestPlantInstanceGeneticProperties()
+        {
+            string testName = "PlantInstance Genetic Properties";
+            _testsRun++;
+            
+            try
+            {
+                // Create a test plant instance
+                var testPlant = CreateTestPlantInstance();
+                
+                // Test Genotype property access
+                if (testPlant.Genotype == null)
+                {
+                    LogInfo($"{testName}: Genotype property accessible (null by default) ✓");
+                }
+                
+                // Test LastTraitExpression property access
+                if (testPlant.LastTraitExpression == null)
+                {
+                    LogInfo($"{testName}: LastTraitExpression property accessible (null by default) ✓");
+                }
+                
+                // Test SetLastTraitExpression method
+                var mockTraitExpression = CreateMockTraitExpression();
+                testPlant.SetLastTraitExpression(mockTraitExpression);
+                
+                if (testPlant.LastTraitExpression != null)
+                {
+                    LogInfo($"{testName}: SetLastTraitExpression method working ✓");
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception("SetLastTraitExpression failed to set trait expression");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestTraitExpressionMethods()
+        {
+            string testName = "Trait Expression Methods";
+            _testsRun++;
+            
+            try
+            {
+                var testPlant = CreateTestPlantInstance();
+                
+                // Test ApplyHeightGrowthModifier
+                testPlant.ApplyHeightGrowthModifier(1.2f, 0.1f);
+                LogInfo($"{testName}: ApplyHeightGrowthModifier method accessible ✓");
+                
+                // Test ApplyPotencyModifier
+                testPlant.ApplyPotencyModifier(1.1f);
+                LogInfo($"{testName}: ApplyPotencyModifier method accessible ✓");
+                
+                // Test ApplyCBDModifier
+                testPlant.ApplyCBDModifier(0.9f);
+                LogInfo($"{testName}: ApplyCBDModifier method accessible ✓");
+                
+                // Test ApplyYieldModifier
+                testPlant.ApplyYieldModifier(1.3f);
+                LogInfo($"{testName}: ApplyYieldModifier method accessible ✓");
+                
+                // Test ApplyGeneticFitnessModifier
+                testPlant.ApplyGeneticFitnessModifier(1.15f);
+                LogInfo($"{testName}: ApplyGeneticFitnessModifier method accessible ✓");
+                
+                _testsPassed++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestStressApplicationMethods()
+        {
+            string testName = "Stress Application Methods";
+            _testsRun++;
+            
+            try
+            {
+                var testPlant = CreateTestPlantInstance();
+                
+                // Test ApplyHealthChange
+                testPlant.ApplyHealthChange(-0.1f);
+                LogInfo($"{testName}: ApplyHealthChange method accessible ✓");
+                
+                // Test ApplyTemperatureStress
+                testPlant.ApplyTemperatureStress(0.5f, 0.1f);
+                LogInfo($"{testName}: ApplyTemperatureStress method accessible ✓");
+                
+                // Test ApplyLightStress
+                testPlant.ApplyLightStress(0.3f, 0.1f);
+                LogInfo($"{testName}: ApplyLightStress method accessible ✓");
+                
+                // Test ApplyWaterStress
+                testPlant.ApplyWaterStress(0.4f, 0.1f);
+                LogInfo($"{testName}: ApplyWaterStress method accessible ✓");
+                
+                // Test ApplyNutrientStress
+                testPlant.ApplyNutrientStress(0.2f, 0.1f);
+                LogInfo($"{testName}: ApplyNutrientStress method accessible ✓");
+                
+                // Test ApplyAtmosphericStress
+                testPlant.ApplyAtmosphericStress(0.1f, 0.1f);
+                LogInfo($"{testName}: ApplyAtmosphericStress method accessible ✓");
+                
+                _testsPassed++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestEnvironmentalConditionsAccess()
+        {
+            string testName = "Environmental Conditions Access";
+            _testsRun++;
+            
+            try
+            {
+                var testPlant = CreateTestPlantInstance();
+                
+                // Test GetCurrentEnvironmentalConditions method
+                var conditions = testPlant.GetCurrentEnvironmentalConditions();
+                
+                if (conditions != null)
+                {
+                    LogInfo($"{testName}: GetCurrentEnvironmentalConditions method working ✓");
+                    LogInfo($"{testName}: Returned conditions type: {conditions.GetType().Name}");
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception("GetCurrentEnvironmentalConditions returned null");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestTraitExpressionEngineBatchProcessing()
+        {
+            string testName = "TraitExpressionEngine Batch Processing";
+            _testsRun++;
+            
+            try
+            {
+                // Create TraitExpressionEngine
+                var engine = new TraitExpressionEngine(true, true, false); // Disable GPU for testing
+                
+                // Create test batch data
+                var batchData = new List<(PlantGenotype, EnvironmentalConditions)>();
+                var testGenotype = CreateMockPlantGenotype();
+                var testEnvironment = EnvironmentalConditions.CreateIndoorDefault();
+                
+                batchData.Add((testGenotype, testEnvironment));
+                batchData.Add((testGenotype, testEnvironment));
+                
+                // Test CalculateExpressionBatch method (without enableGPUAcceleration parameter)
+                var results = engine.CalculateExpressionBatch(batchData);
+                
+                if (results != null && results.Count == 2)
+                {
+                    LogInfo($"{testName}: CalculateExpressionBatch method working ✓");
+                    LogInfo($"{testName}: Returned {results.Count} results for {batchData.Count} inputs");
+                    _testsPassed++;
+                }
+                else
+                {
+                    throw new Exception($"CalculateExpressionBatch returned unexpected results: {results?.Count ?? 0}");
+                }
+                
+                engine.Dispose();
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private void TestGeneticPerformanceMonitorIntegration()
+        {
+            string testName = "GeneticPerformanceMonitor Integration";
+            _testsRun++;
+            
+            try
+            {
+                // Create GeneticPerformanceMonitor
+                var monitor = new GeneticPerformanceMonitor();
+                
+                // Create mock performance stats
+                var mockStats = new GeneticPerformanceStats
+                {
+                    TotalCalculations = 100,
+                    AverageCalculationTimeMs = 5.0,
+                    CacheHitRatio = 0.75,
+                    BatchCalculations = 10,
+                    AverageBatchTimeMs = 25.0
+                };
+                
+                // Test RecordBatchUpdate method
+                monitor.RecordBatchUpdate(50, mockStats);
+                LogInfo($"{testName}: RecordBatchUpdate method accessible ✓");
+                
+                // Test GetPerformanceData method
+                var performanceData = monitor.GetPerformanceData();
+                if (performanceData.TotalSamples > 0)
+                {
+                    LogInfo($"{testName}: GetPerformanceData method working ✓");
+                }
+                
+                // Test GetAnalytics method
+                var analytics = monitor.GetAnalytics();
+                if (analytics.RecommendedOptimizations != null)
+                {
+                    LogInfo($"{testName}: GetAnalytics method working ✓");
+                }
+                
+                _testsPassed++;
+            }
+            catch (Exception ex)
+            {
+                LogError($"{testName} FAILED: {ex.Message}");
+                _testsFailed++;
+            }
+        }
+        
+        private PlantInstance CreateTestPlantInstance()
+        {
+            var testObject = new GameObject("TestPlant_Wave22");
+            var plantInstance = testObject.AddComponent<PlantInstance>();
+            
+            // Initialize with basic values
+            plantInstance.PlantedDate = DateTime.Now;
+            
+            return plantInstance;
+        }
+        
+        private TraitExpressionResult CreateMockTraitExpression()
+        {
+            var result = new TraitExpressionResult();
+            result.GenotypeID = "TEST_GENOTYPE_001";
+            result.HeightExpression = 1.2f;
+            result.THCExpression = 0.85f;
+            result.CBDExpression = 0.15f;
+            result.YieldExpression = 1.1f;
+            result.OverallFitness = 0.92f;
+            result.StressResponse = new StressResponse
+            {
+                OverallStressLevel = 0.1f,
+                AdaptiveCapacity = 0.8f,
+                ActiveStresses = new List<StressFactor>()
+            };
+            
+            return result;
+        }
+        
+        private PlantGenotype CreateMockPlantGenotype()
+        {
+            return new PlantGenotype
+            {
+                GenotypeID = "MOCK_GENOTYPE_001",
+                StrainOrigin = null,
+                Generation = 1,
+                IsFounder = true,
+                CreationDate = DateTime.Now,
+                ParentIDs = new List<string>(),
+                Genotype = new Dictionary<string, AlleleCouple>(),
+                OverallFitness = 1.0f,
+                InbreedingCoefficient = 0.0f,
+                Mutations = new List<GeneticMutation>()
+            };
+        }
+        
+        private void LogInfo(string message)
+        {
+            if (_enableDetailedLogging)
+            {
+                Debug.Log($"[Wave22Test] {message}");
+            }
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[Wave22Test] {message}");
+        }
+    }
+} 

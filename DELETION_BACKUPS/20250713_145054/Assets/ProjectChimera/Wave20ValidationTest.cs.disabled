@@ -1,0 +1,92 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using System.Reflection;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Wave 20 Validation Test - Read-Only Property Assignment Fixes
+    /// Tests that GenotypeDataSO fields can be set via reflection
+    /// </summary>
+    public class Wave20ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 20 Read-Only Property Assignment Validation ===");
+            
+            TestGenotypeDataSOReflection();
+            TestReadOnlyPropertyAccess();
+            
+            Debug.Log("✅ Wave 20 read-only property assignment fixes validated successfully!");
+        }
+        
+        private void TestGenotypeDataSOReflection()
+        {
+            Debug.Log("Testing GenotypeDataSO field assignment via reflection...");
+            
+            // Create GenotypeDataSO instance
+            var genotypeData = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            Debug.Log($"✓ GenotypeDataSO created: {genotypeData != null}");
+            
+            if (genotypeData != null)
+            {
+                // Test setting IndividualID via reflection
+                var individualIDField = typeof(GenotypeDataSO).GetField("_individualID", 
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                
+                if (individualIDField != null)
+                {
+                    individualIDField.SetValue(genotypeData, "WAVE20_TEST_ID");
+                    Debug.Log($"✓ IndividualID field set via reflection: {genotypeData.IndividualID}");
+                }
+                else
+                {
+                    Debug.LogError("✗ Could not find _individualID field");
+                }
+                
+                // Test setting generation via reflection
+                var generationField = typeof(GenotypeDataSO).GetField("_generation", 
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                
+                if (generationField != null)
+                {
+                    generationField.SetValue(genotypeData, 5);
+                    Debug.Log($"✓ Generation field set via reflection: {genotypeData.Generation}");
+                }
+                else
+                {
+                    Debug.LogError("✗ Could not find _generation field");
+                }
+                
+                // Clean up
+                DestroyImmediate(genotypeData);
+                Debug.Log("✓ GenotypeDataSO cleanup completed");
+            }
+        }
+        
+        private void TestReadOnlyPropertyAccess()
+        {
+            Debug.Log("Testing read-only property access patterns...");
+            
+            var genotypeData = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            
+            if (genotypeData != null)
+            {
+                // Test that read-only properties can be accessed
+                var id = genotypeData.IndividualID;
+                var generation = genotypeData.Generation;
+                var isViable = genotypeData.IsViable;
+                var fitness = genotypeData.OverallFitness;
+                
+                Debug.Log($"✓ Read-only properties accessible:");
+                Debug.Log($"  - IndividualID: {id ?? "null"}");
+                Debug.Log($"  - Generation: {generation}");
+                Debug.Log($"  - IsViable: {isViable}");
+                Debug.Log($"  - OverallFitness: {fitness}");
+                
+                // Clean up
+                DestroyImmediate(genotypeData);
+            }
+        }
+    }
+} 

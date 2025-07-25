@@ -1,0 +1,30 @@
+Unity Refresh Instructions:
+
+The compilation errors should now be fixed. If Unity is still showing CS0246 errors, try these steps in order:
+
+1. **Close Unity completely**
+2. **Delete these folders from the project root:**
+   - Library/
+   - Temp/
+   - obj/
+   - Any .csproj or .sln files
+
+3. **Reopen Unity** - this forces complete project regeneration
+
+4. **In Unity, go to:**
+   - Assets → Refresh (Ctrl+R / Cmd+R)
+   - Assets → Reimport All
+
+5. **If errors persist:**
+   - Edit → Project Settings → Script Compilation → Clear Cache
+   - Window → General → Console → Clear Console
+   - Check if the errors still show
+
+**What was fixed:**
+- Created missing GeneDefinitionSO.cs with all required properties
+- Fixed assembly references (ProjectChimera.Systems.Environment → ProjectChimera.Environment)
+- Added Unity.ugui package references to all assemblies
+- Fixed type qualifications (OfType<CannabisGeneticsEngine.Allele>())
+- Fixed property references (gene.GeneId → gene.GeneCode)
+
+The fixes are complete and should resolve the CS0246 errors once Unity refreshes properly.

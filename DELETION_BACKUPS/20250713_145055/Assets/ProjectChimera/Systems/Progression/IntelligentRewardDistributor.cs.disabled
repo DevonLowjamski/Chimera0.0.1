@@ -1,0 +1,1249 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Progression;
+
+// Resolve ambiguous type references
+using DataRewardType = ProjectChimera.Data.Events.RewardType;
+using ProgressionRewardType = ProjectChimera.Data.Progression.RewardType;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Advanced intelligent reward distribution system for Project Chimera's achievement framework.
+    /// Features AI-driven reward scaling, dynamic rarity adjustment, contextual bonus calculation,
+    /// and sophisticated player behavior analysis to provide meaningful, personalized rewards
+    /// that enhance long-term engagement and recognize true player accomplishment.
+    /// 
+    /// Key Intelligence Features:
+    /// - Contextual Reward Scaling: Rewards adapt based on player skill level and game context
+    /// - Dynamic Rarity System: Achievement rarity adjusts based on completion rates
+    /// - Behavioral Bonus Engine: Additional rewards for consistent excellence and innovation
+    /// - Economic Balance AI: Maintains game economy stability while maximizing satisfaction
+    /// - Streak Recognition: Escalating rewards for sustained performance
+    /// - Milestone Synergy Bonuses: Enhanced rewards for interconnected achievements
+    /// </summary>
+    public class IntelligentRewardDistributor : IRewardCalculator, IDisposable
+    {
+        [Header("Reward Distribution Configuration")]
+        [SerializeField] private AchievementConfigSO _achievementConfig;
+        [SerializeField] private RewardConfigSO _rewardConfig;
+        [SerializeField] private EconomicBalanceConfigSO _economicConfig;
+        
+        [Header("Intelligence Settings")]
+        [SerializeField] private bool _enableAIScaling = true;
+        [SerializeField] private bool _enableDynamicRarity = true;
+        [SerializeField] private bool _enableBehavioralBonuses = true;
+        [SerializeField] private bool _enableEconomicBalancing = true;
+        [SerializeField] private bool _enableStreakRecognition = true;
+        [SerializeField] private bool _enableContextualRewards = true;
+        
+        [Header("Scaling Parameters")]
+        [SerializeField] private float _difficultyScalingFactor = 1.5f;
+        [SerializeField] private float _rarityScalingFactor = 2f;
+        [SerializeField] private float _streakMultiplierCap = 5f;
+        [SerializeField] private float _behaviorBonusCap = 3f;
+        [SerializeField] private float _economicStabilityThreshold = 0.8f;
+        
+        [Header("Performance Optimization")]
+        [SerializeField] private bool _enableRewardCaching = true;
+        [SerializeField] private bool _enableBatchProcessing = true;
+        [SerializeField] private int _maxRewardCalculationsPerFrame = 20;
+        [SerializeField] private float _cacheExpirationTime = 300f; // 5 minutes
+        
+        // Core Reward Systems
+        private RewardCalculationEngine _calculationEngine;
+        private DynamicRarityAdjuster _rarityAdjuster;
+        private BehavioralBonusEngine _behaviorEngine;
+        private EconomicBalanceManager _economicManager;
+        private StreakRecognitionSystem _streakSystem;
+        private ContextualRewardAnalyzer _contextAnalyzer;
+        
+        // AI and Intelligence Components
+        private RewardIntelligenceEngine _intelligenceEngine;
+        private PlayerRewardProfiler _playerProfiler;
+        private RewardPredictionSystem _predictionSystem;
+        private AdaptiveRewardScaler _adaptiveScaler;
+        private RewardSatisfactionAnalyzer _satisfactionAnalyzer;
+        
+        // Reward State Management
+        private Dictionary<string, RewardCalculationResult> _rewardCache = new Dictionary<string, RewardCalculationResult>();
+        private Dictionary<string, PlayerRewardProfile> _playerRewardProfiles = new Dictionary<string, PlayerRewardProfile>();
+        private Dictionary<string, RewardStreakData> _activeStreaks = new Dictionary<string, RewardStreakData>();
+        private Queue<RewardDistributionRequest> _pendingDistributions = new Queue<RewardDistributionRequest>();
+        
+        // Economic and Balance Tracking
+        private EconomicRewardMetrics _economicMetrics = new EconomicRewardMetrics();
+        private RewardInflationTracker _inflationTracker;
+        private EconomicStabilityMonitor _stabilityMonitor;
+        private ResourceAvailabilityAnalyzer _resourceAnalyzer;
+        
+        // Performance and Analytics
+        private RewardPerformanceMonitor _performanceMonitor;
+        private RewardAnalyticsEngine _analyticsEngine;
+        private RewardDistributionCache _distributionCache;
+        private BatchRewardProcessor _batchProcessor;
+        
+        // System Metrics
+        private RewardSystemMetrics _systemMetrics = new RewardSystemMetrics();
+        
+        // Events
+        public event Action<string, List<AchievementReward>> OnRewardsCalculated;
+        public event Action<string, List<AchievementReward>> OnRewardsDistributed;
+        public event Action<string, RewardStreakData> OnStreakAchieved;
+        public event Action<string, BehavioralBonus> OnBehavioralBonusAwarded;
+        public event Action<EconomicRewardMetrics> OnEconomicMetricsUpdated;
+        
+        #region Initialization
+        
+        public void Initialize(AchievementConfigSO achievementConfig, RewardConfigSO rewardConfig, EconomicBalanceConfigSO economicConfig = null)
+        {
+            _achievementConfig = achievementConfig;
+            _rewardConfig = rewardConfig;
+            _economicConfig = economicConfig;
+            
+            InitializeCoreRewardSystems();
+            InitializeIntelligenceComponents();
+            InitializeEconomicSystems();
+            InitializePerformanceOptimization();
+            
+            Debug.Log("Intelligent Reward Distributor initialized successfully");
+        }
+        
+        private void InitializeCoreRewardSystems()
+        {
+            // Initialize reward calculation engine
+            _calculationEngine = new RewardCalculationEngine();
+            _calculationEngine.Initialize(_rewardConfig, _difficultyScalingFactor, _rarityScalingFactor);
+            
+            // Initialize dynamic rarity adjuster
+            if (_enableDynamicRarity)
+            {
+                _rarityAdjuster = new DynamicRarityAdjuster();
+                _rarityAdjuster.Initialize(_rewardConfig);
+            }
+            
+            // Initialize behavioral bonus engine
+            if (_enableBehavioralBonuses)
+            {
+                _behaviorEngine = new BehavioralBonusEngine();
+                _behaviorEngine.Initialize(_rewardConfig, _behaviorBonusCap);
+            }
+            
+            // Initialize streak recognition system
+            if (_enableStreakRecognition)
+            {
+                _streakSystem = new StreakRecognitionSystem();
+                _streakSystem.Initialize(_rewardConfig, _streakMultiplierCap);
+            }
+            
+            // Initialize contextual reward analyzer
+            if (_enableContextualRewards)
+            {
+                _contextAnalyzer = new ContextualRewardAnalyzer();
+                _contextAnalyzer.Initialize(_rewardConfig);
+            }
+        }
+        
+        private void InitializeIntelligenceComponents()
+        {
+            if (!_enableAIScaling) return;
+            
+            // Initialize reward intelligence engine
+            _intelligenceEngine = new RewardIntelligenceEngine();
+            _intelligenceEngine.Initialize(_rewardConfig);
+            
+            // Initialize player reward profiler
+            _playerProfiler = new PlayerRewardProfiler();
+            _playerProfiler.Initialize(_rewardConfig);
+            
+            // Initialize reward prediction system
+            _predictionSystem = new RewardPredictionSystem();
+            _predictionSystem.Initialize(_rewardConfig);
+            
+            // Initialize adaptive reward scaler
+            _adaptiveScaler = new AdaptiveRewardScaler();
+            _adaptiveScaler.Initialize(_rewardConfig);
+            
+            // Initialize reward satisfaction analyzer
+            _satisfactionAnalyzer = new RewardSatisfactionAnalyzer();
+            _satisfactionAnalyzer.Initialize(_rewardConfig);
+        }
+        
+        private void InitializeEconomicSystems()
+        {
+            if (!_enableEconomicBalancing || _economicConfig == null) return;
+            
+            // Initialize economic balance manager
+            _economicManager = new EconomicBalanceManager();
+            _economicManager.Initialize(_economicConfig, _economicStabilityThreshold);
+            
+            // Initialize inflation tracker
+            _inflationTracker = new RewardInflationTracker();
+            _inflationTracker.Initialize(_economicConfig);
+            
+            // Initialize stability monitor
+            _stabilityMonitor = new EconomicStabilityMonitor();
+            _stabilityMonitor.Initialize(_economicConfig);
+            
+            // Initialize resource availability analyzer
+            _resourceAnalyzer = new ResourceAvailabilityAnalyzer();
+            _resourceAnalyzer.Initialize(_economicConfig);
+        }
+        
+        private void InitializePerformanceOptimization()
+        {
+            // Initialize performance monitor
+            _performanceMonitor = new RewardPerformanceMonitor();
+            _performanceMonitor.Initialize(_rewardConfig);
+            
+            // Initialize analytics engine
+            _analyticsEngine = new RewardAnalyticsEngine();
+            _analyticsEngine.Initialize(_rewardConfig);
+            
+            // Initialize distribution cache
+            if (_enableRewardCaching)
+            {
+                _distributionCache = new RewardDistributionCache();
+                _distributionCache.Initialize(_rewardConfig.MaxCachedRewards, _cacheExpirationTime);
+            }
+            
+            // Initialize batch processor
+            if (_enableBatchProcessing)
+            {
+                _batchProcessor = new BatchRewardProcessor();
+                _batchProcessor.Initialize(_maxRewardCalculationsPerFrame);
+            }
+        }
+        
+        #endregion
+        
+        #region IRewardCalculator Implementation
+        
+        public List<AchievementReward> CalculateAchievementRewards(AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                using var _ = _performanceMonitor?.StartOperation("CalculateAchievementRewards");
+                
+                // Check cache first
+                var cacheKey = GenerateCacheKey(achievement.AchievementId, context, playerProfile.PlayerId);
+                if (_enableRewardCaching && _rewardCache.TryGetValue(cacheKey, out var cachedResult) && !cachedResult.IsExpired)
+                {
+                    _systemMetrics.CacheHits++;
+                    return cachedResult.Rewards;
+                }
+                
+                // Calculate base rewards
+                var baseRewards = CalculateBaseRewards(achievement);
+                
+                // Apply intelligence scaling
+                var scaledRewards = ApplyIntelligenceScaling(baseRewards, achievement, context, playerProfile);
+                
+                // Apply contextual bonuses
+                var contextualRewards = ApplyContextualBonuses(scaledRewards, achievement, context, playerProfile);
+                
+                // Apply behavioral bonuses
+                var behavioralRewards = ApplyBehavioralBonuses(contextualRewards, achievement, context, playerProfile);
+                
+                // Apply streak bonuses
+                var streakRewards = ApplyStreakBonuses(behavioralRewards, achievement, context, playerProfile);
+                
+                // Apply economic balancing
+                var balancedRewards = ApplyEconomicBalancing(streakRewards, achievement, context, playerProfile);
+                
+                // Apply final validation and clamping
+                var finalRewards = ValidateAndClampRewards(balancedRewards, achievement, playerProfile);
+                
+                // Cache the result
+                if (_enableRewardCaching)
+                {
+                    var calculationResult = new RewardCalculationResult
+                    {
+                        Rewards = finalRewards,
+                        CalculationTime = DateTime.Now,
+                        CacheKey = cacheKey,
+                        ExpirationTime = DateTime.Now.AddSeconds(_cacheExpirationTime)
+                    };
+                    _rewardCache[cacheKey] = calculationResult;
+                }
+                
+                // Update analytics
+                _analyticsEngine?.TrackRewardCalculation(achievement, finalRewards, context);
+                
+                // Trigger events
+                OnRewardsCalculated?.Invoke(achievement.AchievementId, finalRewards);
+                
+                _systemMetrics.RewardsCalculated++;
+                _systemMetrics.CacheMisses++;
+                
+                return finalRewards;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error calculating achievement rewards for {achievement.AchievementId}: {ex.Message}");
+                _systemMetrics.CalculationErrors++;
+                return GetFallbackRewards(achievement);
+            }
+        }
+        
+        public List<AchievementReward> CalculateMilestoneRewards(MilestoneSO milestone, MilestoneContext context, PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                using var _ = _performanceMonitor?.StartOperation("CalculateMilestoneRewards");
+                
+                // Calculate base milestone rewards (typically higher than individual achievements)
+                var baseRewards = CalculateBaseMilestoneRewards(milestone);
+                
+                // Apply milestone-specific scaling
+                var scaledRewards = ApplyMilestoneScaling(baseRewards, milestone, context, playerProfile);
+                
+                // Apply synergy bonuses for interconnected milestones
+                var synergyRewards = ApplyMilestoneSynergyBonuses(scaledRewards, milestone, context, playerProfile);
+                
+                // Apply economic balancing
+                var balancedRewards = ApplyEconomicBalancing(synergyRewards, null, null, playerProfile);
+                
+                // Apply final validation
+                var finalRewards = ValidateAndClampRewards(balancedRewards, null, playerProfile);
+                
+                // Update analytics
+                _analyticsEngine?.TrackMilestoneRewardCalculation(milestone, finalRewards, context);
+                
+                _systemMetrics.MilestoneRewardsCalculated++;
+                
+                return finalRewards;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error calculating milestone rewards for {milestone.MilestoneId}: {ex.Message}");
+                _systemMetrics.CalculationErrors++;
+                return GetFallbackMilestoneRewards(milestone);
+            }
+        }
+        
+        public List<AchievementReward> ApplyRewardMultipliers(List<AchievementReward> baseRewards, PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                var multipliedRewards = new List<AchievementReward>();
+                
+                foreach (var reward in baseRewards)
+                {
+                    var multipliedReward = new AchievementReward(reward);
+                    
+                    // Apply player-specific multipliers
+                    var playerMultiplier = CalculatePlayerMultiplier(playerProfile);
+                    multipliedReward.Amount = (int)(multipliedReward.Amount * playerMultiplier);
+                    
+                    // Apply premium status multiplier
+                    if (playerProfile.HasPremiumStatus)
+                    {
+                        multipliedReward.Amount = (int)(multipliedReward.Amount * _rewardConfig.PremiumStatusMultiplier);
+                    }
+                    
+                    // Apply time-based multipliers
+                    var timeMultiplier = CalculateTimeBasedMultiplier();
+                    multipliedReward.Amount = (int)(multipliedReward.Amount * timeMultiplier);
+                    
+                    multipliedRewards.Add(multipliedReward);
+                }
+                
+                return multipliedRewards;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error applying reward multipliers: {ex.Message}");
+                _systemMetrics.MultiplierErrors++;
+                return baseRewards; // Return original rewards on error
+            }
+        }
+        
+        #endregion
+        
+        #region Public Interface
+        
+        public void DistributeRewards(List<AchievementReward> rewards, PlayerAchievementProfile playerProfile)
+        {
+            try
+            {
+                // Queue the distribution for batch processing
+                var distributionRequest = new RewardDistributionRequest
+                {
+                    Rewards = rewards,
+                    PlayerProfile = playerProfile,
+                    RequestTime = DateTime.Now,
+                    Priority = CalculateDistributionPriority(rewards)
+                };
+                
+                _pendingDistributions.Enqueue(distributionRequest);
+                
+                // Process immediately if not batch processing
+                if (!_enableBatchProcessing)
+                {
+                    ProcessDistributionRequest(distributionRequest);
+                }
+                
+                _systemMetrics.DistributionRequests++;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error queueing reward distribution: {ex.Message}");
+                _systemMetrics.DistributionErrors++;
+            }
+        }
+        
+        public void ProcessPendingDistributions()
+        {
+            if (!_enableBatchProcessing) return;
+            
+            try
+            {
+                _batchProcessor?.ProcessDistributions(_pendingDistributions, ProcessDistributionRequest);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing pending distributions: {ex.Message}");
+                _systemMetrics.BatchProcessingErrors++;
+            }
+        }
+        
+        public PlayerRewardProfile GetPlayerRewardProfile(string playerId)
+        {
+            if (_playerRewardProfiles.TryGetValue(playerId, out var profile))
+            {
+                return profile;
+            }
+            
+            // Create new profile
+            var newProfile = CreatePlayerRewardProfile(playerId);
+            _playerRewardProfiles[playerId] = newProfile;
+            return newProfile;
+        }
+        
+        public void UpdateEconomicMetrics()
+        {
+            try
+            {
+                if (_economicManager != null)
+                {
+                    _economicMetrics = _economicManager.GetCurrentMetrics();
+                    OnEconomicMetricsUpdated?.Invoke(_economicMetrics);
+                }
+                
+                if (_inflationTracker != null)
+                {
+                    _inflationTracker.UpdateInflationMetrics();
+                }
+                
+                if (_stabilityMonitor != null)
+                {
+                    _stabilityMonitor.CheckStabilityThresholds();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error updating economic metrics: {ex.Message}");
+                _systemMetrics.EconomicUpdateErrors++;
+            }
+        }
+        
+        public RewardSystemMetrics GetSystemMetrics()
+        {
+            return _systemMetrics;
+        }
+        
+        public List<RewardPrediction> GetRewardPredictions(PlayerAchievementProfile playerProfile)
+        {
+            if (_predictionSystem == null) return new List<RewardPrediction>();
+            
+            return _predictionSystem.PredictFutureRewards(playerProfile, GetPlayerRewardProfile(playerProfile.PlayerId));
+        }
+        
+        #endregion
+        
+        #region Reward Calculation Methods
+        
+        private List<AchievementReward> CalculateBaseRewards(AchievementSO achievement)
+        {
+            var rewards = new List<AchievementReward>();
+            
+            // Add base experience reward
+            if (achievement.ExperienceReward > 0)
+            {
+                rewards.Add(new AchievementReward
+                {
+                    Type = RewardType.Experience,
+                    Amount = achievement.ExperienceReward,
+                    Description = $"{achievement.ExperienceReward} XP",
+                    Source = RewardSource.Achievement
+                });
+            }
+            
+            // Add achievement points
+            if (achievement.PointValue > 0)
+            {
+                rewards.Add(new AchievementReward
+                {
+                    Type = RewardType.AchievementPoints,
+                    Amount = achievement.PointValue,
+                    Description = $"{achievement.PointValue} Achievement Points",
+                    Source = RewardSource.Achievement
+                });
+            }
+            
+            // Add category-specific rewards
+            var categoryRewards = CalculateCategorySpecificRewards(achievement);
+            rewards.AddRange(categoryRewards);
+            
+            // Add rarity-based rewards
+            var rarityRewards = CalculateRarityBasedRewards(achievement);
+            rewards.AddRange(rarityRewards);
+            
+            return rewards;
+        }
+        
+        private List<AchievementReward> CalculateBaseMilestoneRewards(MilestoneSO milestone)
+        {
+            var rewards = new List<AchievementReward>();
+            
+            // Milestones typically have higher base rewards
+            var baseExperience = milestone.BaseExperienceReward * _rewardConfig.MilestoneRewardMultiplier;
+            var basePoints = milestone.BasePointReward * _rewardConfig.MilestoneRewardMultiplier;
+            
+            rewards.Add(new AchievementReward
+            {
+                Type = RewardType.Experience,
+                Amount = (int)baseExperience,
+                Description = $"{baseExperience} XP (Milestone)",
+                Source = RewardSource.Milestone
+            });
+            
+            rewards.Add(new AchievementReward
+            {
+                Type = RewardType.AchievementPoints,
+                Amount = (int)basePoints,
+                Description = $"{basePoints} Milestone Points",
+                Source = RewardSource.Milestone
+            });
+            
+            // Add milestone-specific unlock rewards
+            if (milestone.UnlockRewards != null)
+            {
+                rewards.AddRange(milestone.UnlockRewards);
+            }
+            
+            return rewards;
+        }
+        
+        private List<AchievementReward> ApplyIntelligenceScaling(List<AchievementReward> baseRewards, AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableAIScaling || _intelligenceEngine == null)
+                return baseRewards;
+            
+            var scaledRewards = new List<AchievementReward>();
+            var playerRewardProfile = GetPlayerRewardProfile(playerProfile.PlayerId);
+            
+            foreach (var reward in baseRewards)
+            {
+                var scaledReward = new AchievementReward(reward);
+                
+                // Apply AI-driven scaling based on player skill level
+                var skillScaling = _intelligenceEngine.CalculateSkillBasedScaling(achievement, playerProfile, playerRewardProfile);
+                scaledReward.Amount = (int)(scaledReward.Amount * skillScaling);
+                
+                // Apply difficulty scaling based on actual player performance
+                var difficultyScaling = _intelligenceEngine.CalculateDynamicDifficultyScaling(achievement, context, playerProfile);
+                scaledReward.Amount = (int)(scaledReward.Amount * difficultyScaling);
+                
+                // Apply adaptive scaling based on player engagement
+                if (_adaptiveScaler != null)
+                {
+                    var adaptiveScaling = _adaptiveScaler.CalculateAdaptiveScaling(playerProfile, playerRewardProfile);
+                    scaledReward.Amount = (int)(scaledReward.Amount * adaptiveScaling);
+                }
+                
+                scaledRewards.Add(scaledReward);
+            }
+            
+            return scaledRewards;
+        }
+        
+        private List<AchievementReward> ApplyContextualBonuses(List<AchievementReward> baseRewards, AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableContextualRewards || _contextAnalyzer == null)
+                return baseRewards;
+            
+            var contextualRewards = new List<AchievementReward>(baseRewards);
+            var contextualBonuses = _contextAnalyzer.CalculateContextualBonuses(achievement, context, playerProfile);
+            
+            foreach (var bonus in contextualBonuses)
+            {
+                contextualRewards.Add(new AchievementReward
+                {
+                    Type = bonus.BonusType,
+                    Amount = bonus.Amount,
+                    Description = bonus.Description,
+                    Source = RewardSource.ContextualBonus
+                });
+            }
+            
+            return contextualRewards;
+        }
+        
+        private List<AchievementReward> ApplyBehavioralBonuses(List<AchievementReward> baseRewards, AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableBehavioralBonuses || _behaviorEngine == null)
+                return baseRewards;
+            
+            var behavioralRewards = new List<AchievementReward>(baseRewards);
+            var playerRewardProfile = GetPlayerRewardProfile(playerProfile.PlayerId);
+            
+            var behavioralBonuses = _behaviorEngine.CalculateBehavioralBonuses(achievement, playerProfile, playerRewardProfile);
+            
+            foreach (var bonus in behavioralBonuses)
+            {
+                behavioralRewards.Add(new AchievementReward
+                {
+                    Type = RewardType.BehavioralBonus,
+                    Amount = bonus.Amount,
+                    Description = bonus.Description,
+                    Source = RewardSource.BehavioralBonus
+                });
+                
+                OnBehavioralBonusAwarded?.Invoke(playerProfile.PlayerId, bonus);
+            }
+            
+            return behavioralRewards;
+        }
+        
+        private List<AchievementReward> ApplyStreakBonuses(List<AchievementReward> baseRewards, AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableStreakRecognition || _streakSystem == null)
+                return baseRewards;
+            
+            var streakRewards = new List<AchievementReward>(baseRewards);
+            var playerId = playerProfile.PlayerId;
+            
+            // Update and check streak data
+            var streakData = _streakSystem.UpdateStreak(playerId, achievement, context);
+            if (streakData != null)
+            {
+                _activeStreaks[playerId] = streakData;
+                
+                if (streakData.QualifiesForBonus)
+                {
+                    var streakBonus = _streakSystem.CalculateStreakBonus(streakData, baseRewards);
+                    if (streakBonus != null)
+                    {
+                        streakRewards.Add(streakBonus);
+                        OnStreakAchieved?.Invoke(playerId, streakData);
+                    }
+                }
+            }
+            
+            return streakRewards;
+        }
+        
+        private List<AchievementReward> ApplyEconomicBalancing(List<AchievementReward> baseRewards, AchievementSO achievement, AchievementContext context, PlayerAchievementProfile playerProfile)
+        {
+            if (!_enableEconomicBalancing || _economicManager == null)
+                return baseRewards;
+            
+            var balancedRewards = new List<AchievementReward>();
+            
+            foreach (var reward in baseRewards)
+            {
+                var balancedReward = new AchievementReward(reward);
+                
+                // Apply economic balancing based on current game economy state
+                var economicMultiplier = _economicManager.CalculateEconomicMultiplier(reward.Type, _economicMetrics);
+                balancedReward.Amount = (int)(balancedReward.Amount * economicMultiplier);
+                
+                // Apply inflation adjustment
+                if (_inflationTracker != null)
+                {
+                    var inflationAdjustment = _inflationTracker.GetInflationAdjustment(reward.Type);
+                    balancedReward.Amount = (int)(balancedReward.Amount * inflationAdjustment);
+                }
+                
+                // Check resource availability
+                if (_resourceAnalyzer != null)
+                {
+                    var availability = _resourceAnalyzer.GetResourceAvailability(reward.Type);
+                    if (availability < 1f) // Scarcity adjustment
+                    {
+                        balancedReward.Amount = (int)(balancedReward.Amount * availability);
+                        balancedReward.Description += " (Adjusted for scarcity)";
+                    }
+                }
+                
+                balancedRewards.Add(balancedReward);
+            }
+            
+            return balancedRewards;
+        }
+        
+        private List<AchievementReward> ApplyMilestoneScaling(List<AchievementReward> baseRewards, MilestoneSO milestone, MilestoneContext context, PlayerAchievementProfile playerProfile)
+        {
+            var scaledRewards = new List<AchievementReward>();
+            var milestoneMultiplier = CalculateMilestoneMultiplier(milestone);
+            
+            foreach (var reward in baseRewards)
+            {
+                var scaledReward = new AchievementReward(reward);
+                scaledReward.Amount = (int)(scaledReward.Amount * milestoneMultiplier);
+                scaledRewards.Add(scaledReward);
+            }
+            
+            return scaledRewards;
+        }
+        
+        private List<AchievementReward> ApplyMilestoneSynergyBonuses(List<AchievementReward> baseRewards, MilestoneSO milestone, MilestoneContext context, PlayerAchievementProfile playerProfile)
+        {
+            var synergyRewards = new List<AchievementReward>(baseRewards);
+            
+            // Check for milestone synergies (completing related milestones in sequence)
+            var synergyBonuses = CalculateMilestoneSynergyBonuses(milestone, playerProfile);
+            synergyRewards.AddRange(synergyBonuses);
+            
+            return synergyRewards;
+        }
+        
+        private List<AchievementReward> ValidateAndClampRewards(List<AchievementReward> rewards, AchievementSO achievement, PlayerAchievementProfile playerProfile)
+        {
+            var validatedRewards = new List<AchievementReward>();
+            
+            foreach (var reward in rewards)
+            {
+                if (reward.Amount > 0)
+                {
+                    // Apply maximum limits
+                    var maxAmount = GetMaxRewardAmount(reward.Type, playerProfile);
+                    reward.Amount = Mathf.Min(reward.Amount, maxAmount);
+                    
+                    // Apply minimum guarantees
+                    var minAmount = GetMinRewardAmount(reward.Type, achievement);
+                    reward.Amount = Mathf.Max(reward.Amount, minAmount);
+                    
+                    validatedRewards.Add(reward);
+                }
+            }
+            
+            return validatedRewards;
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private List<AchievementReward> CalculateCategorySpecificRewards(AchievementSO achievement)
+        {
+            var rewards = new List<AchievementReward>();
+            
+            // Different categories provide different types of rewards
+            switch (achievement.Category)
+            {
+                case AchievementCategory.Cultivation:
+                    rewards.Add(new AchievementReward
+                    {
+                        Type = RewardType.CultivationCurrency,
+                        Amount = achievement.PointValue * 10,
+                        Description = "Cultivation Credits"
+                    });
+                    break;
+                case AchievementCategory.Facility:
+                    rewards.Add(new AchievementReward
+                    {
+                        Type = RewardType.ConstructionMaterials,
+                        Amount = achievement.PointValue * 5,
+                        Description = "Construction Materials"
+                    });
+                    break;
+                case AchievementCategory.Economic:
+                    rewards.Add(new AchievementReward
+                    {
+                        Type = RewardType.Currency,
+                        Amount = achievement.PointValue * 25,
+                        Description = "Economic Bonus"
+                    });
+                    break;
+            }
+            
+            return rewards;
+        }
+        
+        private List<AchievementReward> CalculateRarityBasedRewards(AchievementSO achievement)
+        {
+            var rewards = new List<AchievementReward>();
+            
+            // Rare achievements provide additional rewards
+            if (achievement.Rarity >= AchievementRarity.Rare)
+            {
+                var rarityBonus = achievement.Rarity switch
+                {
+                    AchievementRarity.Rare => achievement.PointValue * 2,
+                    AchievementRarity.Epic => achievement.PointValue * 5,
+                    AchievementRarity.Legendary => achievement.PointValue * 10,
+                    AchievementRarity.Mythic => achievement.PointValue * 25,
+                    _ => 0
+                };
+                
+                if (rarityBonus > 0)
+                {
+                    rewards.Add(new AchievementReward
+                    {
+                        Type = RewardType.RarityBonus,
+                        Amount = rarityBonus,
+                        Description = $"{achievement.Rarity} Rarity Bonus"
+                    });
+                }
+            }
+            
+            return rewards;
+        }
+        
+        private float CalculatePlayerMultiplier(PlayerAchievementProfile playerProfile)
+        {
+            var baseMultiplier = 1f;
+            
+            // Level-based multiplier
+            var levelMultiplier = 1f + (playerProfile.Level - 1) * 0.05f; // 5% per level
+            
+            // Achievement count multiplier
+            var achievementMultiplier = 1f + (playerProfile.UnlockedAchievements.Count * 0.01f); // 1% per achievement
+            
+            return baseMultiplier * levelMultiplier * achievementMultiplier;
+        }
+        
+        private float CalculateTimeBasedMultiplier()
+        {
+            // Weekend bonus, event bonuses, etc.
+            var dayOfWeek = DateTime.Now.DayOfWeek;
+            if (dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday)
+            {
+                return 1.25f; // 25% weekend bonus
+            }
+            
+            return 1f;
+        }
+        
+        private float CalculateMilestoneMultiplier(MilestoneSO milestone)
+        {
+            return milestone.Difficulty switch
+            {
+                MilestoneDifficulty.Easy => 1.5f,
+                MilestoneDifficulty.Medium => 2f,
+                MilestoneDifficulty.Hard => 3f,
+                MilestoneDifficulty.Expert => 5f,
+                MilestoneDifficulty.Master => 8f,
+                _ => 1f
+            };
+        }
+        
+        private List<AchievementReward> CalculateMilestoneSynergyBonuses(MilestoneSO milestone, PlayerAchievementProfile playerProfile)
+        {
+            var bonuses = new List<AchievementReward>();
+            
+            // Check for recently completed related milestones
+            var recentMilestones = GetRecentlyCompletedMilestones(playerProfile, TimeSpan.FromDays(7));
+            var relatedMilestones = recentMilestones.Where(m => IsRelatedMilestone(milestone, m)).ToList();
+            
+            if (relatedMilestones.Any())
+            {
+                var synergyBonus = relatedMilestones.Count * milestone.BasePointReward * 0.5f; // 50% bonus per related milestone
+                bonuses.Add(new AchievementReward
+                {
+                    Type = RewardType.SynergyBonus,
+                    Amount = (int)synergyBonus,
+                    Description = $"Milestone Synergy Bonus (x{relatedMilestones.Count})"
+                });
+            }
+            
+            return bonuses;
+        }
+        
+        private int GetMaxRewardAmount(RewardType rewardType, PlayerAchievementProfile playerProfile)
+        {
+            var baseMax = rewardType switch
+            {
+                RewardType.Experience => _rewardConfig.MaxExperienceReward,
+                RewardType.Currency => _rewardConfig.MaxCurrencyReward,
+                RewardType.AchievementPoints => _rewardConfig.MaxAchievementPointsReward,
+                _ => int.MaxValue
+            };
+            
+            // Scale max rewards based on player level
+            var levelScaling = 1f + (playerProfile.Level - 1) * 0.1f;
+            return (int)(baseMax * levelScaling);
+        }
+        
+        private int GetMinRewardAmount(RewardType rewardType, AchievementSO achievement)
+        {
+            // Ensure minimum reward guarantees
+            return rewardType switch
+            {
+                RewardType.Experience => Math.Max(1, achievement?.ExperienceReward / 4 ?? 1),
+                RewardType.AchievementPoints => Math.Max(1, achievement?.PointValue / 2 ?? 1),
+                _ => 1
+            };
+        }
+        
+        private List<AchievementReward> GetFallbackRewards(AchievementSO achievement)
+        {
+            // Provide basic fallback rewards if calculation fails
+            return new List<AchievementReward>
+            {
+                new AchievementReward
+                {
+                    Type = RewardType.Experience,
+                    Amount = Math.Max(1, achievement.ExperienceReward / 2),
+                    Description = "Basic XP (Fallback)"
+                }
+            };
+        }
+        
+        private List<AchievementReward> GetFallbackMilestoneRewards(MilestoneSO milestone)
+        {
+            return new List<AchievementReward>
+            {
+                new AchievementReward
+                {
+                    Type = RewardType.Experience,
+                    Amount = milestone.BaseExperienceReward,
+                    Description = "Milestone XP (Fallback)"
+                }
+            };
+        }
+        
+        private string GenerateCacheKey(string achievementId, AchievementContext context, string playerId)
+        {
+            return $"{achievementId}_{playerId}_{context?.GetHashCode() ?? 0}";
+        }
+        
+        private int CalculateDistributionPriority(List<AchievementReward> rewards)
+        {
+            // Higher value rewards get higher priority
+            return rewards.Sum(r => r.Amount);
+        }
+        
+        private void ProcessDistributionRequest(RewardDistributionRequest request)
+        {
+            try
+            {
+                // Actually distribute the rewards to the player
+                foreach (var reward in request.Rewards)
+                {
+                    DistributeIndividualReward(reward, request.PlayerProfile);
+                }
+                
+                // Update player reward profile
+                UpdatePlayerRewardProfile(request.PlayerProfile.PlayerId, request.Rewards);
+                
+                // Trigger distribution event
+                OnRewardsDistributed?.Invoke(request.PlayerProfile.PlayerId, request.Rewards);
+                
+                _systemMetrics.RewardsDistributed += request.Rewards.Count;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error processing distribution request: {ex.Message}");
+                _systemMetrics.DistributionErrors++;
+            }
+        }
+        
+        private void DistributeIndividualReward(AchievementReward reward, PlayerAchievementProfile playerProfile)
+        {
+            switch (reward.Type)
+            {
+                case RewardType.Experience:
+                    playerProfile.TotalExperience += reward.Amount;
+                    break;
+                case RewardType.Currency:
+                    // Would integrate with economy system
+                    break;
+                case RewardType.AchievementPoints:
+                    playerProfile.AchievementPoints += reward.Amount;
+                    break;
+                // Handle other reward types...
+            }
+        }
+        
+        private PlayerRewardProfile CreatePlayerRewardProfile(string playerId)
+        {
+            return new PlayerRewardProfile
+            {
+                PlayerId = playerId,
+                TotalRewardsReceived = 0,
+                RewardPreferences = new RewardPreferences(),
+                LastRewardTime = DateTime.Now,
+                AverageRewardSatisfaction = 1f,
+                RewardHistory = new List<RewardHistoryEntry>()
+            };
+        }
+        
+        private void UpdatePlayerRewardProfile(string playerId, List<AchievementReward> rewards)
+        {
+            var profile = GetPlayerRewardProfile(playerId);
+            profile.TotalRewardsReceived += rewards.Count;
+            profile.LastRewardTime = DateTime.Now;
+            
+            // Add to reward history
+            foreach (var reward in rewards)
+            {
+                profile.RewardHistory.Add(new RewardHistoryEntry
+                {
+                    Reward = reward,
+                    ReceivedTime = DateTime.Now,
+                    Satisfaction = CalculateRewardSatisfaction(reward, profile)
+                });
+            }
+            
+            // Update average satisfaction
+            UpdateAverageRewardSatisfaction(profile);
+        }
+        
+        private float CalculateRewardSatisfaction(AchievementReward reward, PlayerRewardProfile profile)
+        {
+            // Use satisfaction analyzer if available
+            if (_satisfactionAnalyzer != null)
+            {
+                return _satisfactionAnalyzer.CalculateSatisfaction(reward, profile);
+            }
+            
+            return 1f; // Default satisfaction
+        }
+        
+        private void UpdateAverageRewardSatisfaction(PlayerRewardProfile profile)
+        {
+            if (profile.RewardHistory.Any())
+            {
+                profile.AverageRewardSatisfaction = profile.RewardHistory
+                    .TakeLast(100) // Consider last 100 rewards
+                    .Average(h => h.Satisfaction);
+            }
+        }
+        
+        // Placeholder helper methods
+        private List<string> GetRecentlyCompletedMilestones(PlayerAchievementProfile profile, TimeSpan timespan) => new List<string>();
+        private bool IsRelatedMilestone(MilestoneSO milestone1, string milestone2Id) => false;
+        
+        #endregion
+        
+        #region IDisposable Implementation
+        
+        public void Dispose()
+        {
+            _calculationEngine?.Dispose();
+            _rarityAdjuster?.Dispose();
+            _behaviorEngine?.Dispose();
+            _economicManager?.Dispose();
+            _streakSystem?.Dispose();
+            _contextAnalyzer?.Dispose();
+            _intelligenceEngine?.Dispose();
+            _playerProfiler?.Dispose();
+            _predictionSystem?.Dispose();
+            _adaptiveScaler?.Dispose();
+            _satisfactionAnalyzer?.Dispose();
+            _inflationTracker?.Dispose();
+            _stabilityMonitor?.Dispose();
+            _resourceAnalyzer?.Dispose();
+            _performanceMonitor?.Dispose();
+            _analyticsEngine?.Dispose();
+            _distributionCache?.Dispose();
+            _batchProcessor?.Dispose();
+            
+            _rewardCache.Clear();
+            _playerRewardProfiles.Clear();
+            _activeStreaks.Clear();
+            _pendingDistributions.Clear();
+            
+            OnRewardsCalculated = null;
+            OnRewardsDistributed = null;
+            OnStreakAchieved = null;
+            OnBehavioralBonusAwarded = null;
+            OnEconomicMetricsUpdated = null;
+        }
+        
+        #endregion
+    }
+    
+    /// <summary>
+    /// Behavioral bonus configuration and tracking.
+    /// </summary>
+    [Serializable]
+    public class BehavioralBonus
+    {
+        public string BonusId;
+        public string BonusType;
+        public float BonusMultiplier;
+        public string Description;
+        public List<string> RequiredBehaviors;
+        public DateTime EarnedDate;
+        public bool IsActive;
+        public float Duration;
+    }
+    
+    /// <summary>
+    /// Configuration for achievement systems.
+    /// </summary>
+    [Serializable]
+    public class AchievementConfigSO : ChimeraDataSO
+    {
+        [Header("Achievement Settings")]
+        public int MaxCachedDetections = 1000;
+        public float DefaultDifficulty = 1.0f;
+        public bool EnableDynamicDifficulty = true;
+        
+        [Header("Reward Settings")]
+        public float BaseRewardMultiplier = 1.0f;
+        public bool EnableBehavioralBonuses = true;
+        public float MaxRewardMultiplier = 5.0f;
+    }
+    
+    /// <summary>
+    /// Reward configuration data.
+    /// </summary>
+    [Serializable]
+    public class RewardConfigSO : ChimeraDataSO
+    {
+        [Header("Reward Types")]
+        public List<string> AvailableRewardTypes;
+        public Dictionary<string, float> RewardValues;
+        
+        [Header("Scaling Settings")]
+        public float DifficultyScaling = 1.2f;
+        public float RarityScaling = 1.5f;
+        public bool EnableContextualBonuses = true;
+    }
+    
+    /// <summary>
+    /// Economic balance configuration.
+    /// </summary>
+    [Serializable]
+    public class EconomicBalanceConfigSO : ChimeraDataSO
+    {
+        [Header("Balance Settings")]
+        public float InflationRate = 0.02f;
+        public float MaxCurrencyPool = 1000000f;
+        public bool EnableDynamicBalance = true;
+        
+        [Header("Distribution Limits")]
+        public float MaxDailyRewards = 10000f;
+        public float PlayerRewardCap = 50000f;
+    }
+    
+    /// <summary>
+    /// Player reward profile tracking.
+    /// </summary>
+    [Serializable]
+    public class PlayerRewardProfile
+    {
+        public string PlayerId;
+        public float TotalRewardsEarned;
+        public Dictionary<string, int> RewardCounts;
+        public DateTime LastRewardDate;
+        public float RewardStreak;
+        public List<BehavioralBonus> ActiveBonuses;
+        public float PlayerSkillLevel;
+        public Dictionary<string, float> PreferredRewardTypes;
+    }
+    
+    /// <summary>
+    /// Reward system metrics tracking.
+    /// </summary>
+    [Serializable]
+    public class RewardSystemMetrics
+    {
+        public int TotalRewardsDistributed;
+        public float TotalValueDistributed;
+        public Dictionary<string, int> RewardTypeDistribution;
+        public float AverageRewardValue;
+        public DateTime LastDistribution;
+        public float SystemEfficiency;
+        public int ActivePlayers;
+    }
+    
+    /// <summary>
+    /// Reward prediction data for intelligent distribution.
+    /// </summary>
+    [Serializable]
+    public class RewardPrediction
+    {
+        public string PredictionId;
+        public string PlayerId;
+        public string RewardType;
+        public float PredictedValue;
+        public float Confidence;
+        public DateTime PredictionDate;
+        public Dictionary<string, object> PredictionFactors;
+        public bool IsRealized;
+    }
+    
+    /// <summary>
+    /// Reward distribution request data.
+    /// </summary>
+    [Serializable]
+    public class RewardDistributionRequest
+    {
+        public string RequestId;
+        public string PlayerId;
+        public string AchievementId;
+        public string RewardType;
+        public float BaseValue;
+        public Dictionary<string, float> Modifiers;
+        public DateTime RequestDate;
+        public string Context;
+        public bool IsProcessed;
+    }
+    
+    /// <summary>
+    /// Reward calculation engine for intelligent distribution.
+    /// </summary>
+    [Serializable]
+    public class RewardCalculationEngine
+    {
+        public string EngineId;
+        public Dictionary<string, float> CalculationFactors;
+        public DateTime LastCalculation;
+        
+        public void Initialize() { }
+        public float CalculateReward(RewardDistributionRequest request) { return 0f; }
+        public List<RewardPrediction> GeneratePredictions(string playerId) { return new List<RewardPrediction>(); }
+    }
+    
+    /// <summary>
+    /// Dynamic rarity adjuster for rewards.
+    /// </summary>
+    [Serializable]
+    public class DynamicRarityAdjuster
+    {
+        public string AdjusterId;
+        public Dictionary<string, float> RarityFactors;
+        public DateTime LastAdjustment;
+        
+        public void Initialize() { }
+        public float AdjustRarity(string rewardType, float baseRarity) { return baseRarity; }
+        public void UpdateRarityFactors() { }
+    }
+    
+    /// <summary>
+    /// Behavioral bonus engine for reward enhancement.
+    /// </summary>
+    [Serializable]
+    public class BehavioralBonusEngine
+    {
+        public string EngineId;
+        public List<BehavioralBonus> ActiveBonuses;
+        public DateTime LastUpdate;
+        
+        public void Initialize() { }
+        public float CalculateBehavioralBonus(string playerId, Dictionary<string, object> behaviorData) { return 1f; }
+        public void UpdateBonuses() { }
+    }
+}

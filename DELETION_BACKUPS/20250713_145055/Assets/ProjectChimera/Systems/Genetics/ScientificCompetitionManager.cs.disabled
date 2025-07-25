@@ -1,0 +1,1427 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Core.Logging;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Scientific Competition Manager - Unified tournament and recognition system for genetics and aromatics
+    /// Implements competitive gameplay, skill-based matchmaking, and achievement recognition systems
+    /// Core component of Enhanced Scientific Gaming System v2.0
+    /// </summary>
+    public class ScientificCompetitionManager : MonoBehaviour
+    {
+        [Header("Competition Configuration")]
+        [SerializeField] private ScientificCompetitionConfigSO _competitionConfig;
+        [SerializeField] private TournamentLibrarySO _tournamentLibrary;
+        [SerializeField] private CompetitionRewardsLibrarySO _rewardsLibrary;
+        
+        [Header("Tournament Management")]
+        [SerializeField] private TournamentEventManager _tournamentEventManager;
+        [SerializeField] private CompetitiveMatchmakingSystem _matchmakingSystem;
+        [SerializeField] private TournamentScheduler _tournamentScheduler;
+        [SerializeField] private CompetitionBracketManager _bracketManager;
+        
+        [Header("Recognition Systems")]
+        [SerializeField] private AchievementRecognitionSystem _achievementSystem;
+        [SerializeField] private ReputationManager _reputationManager;
+        [SerializeField] private LegacyTracker _legacyTracker;
+        [SerializeField] private PeerRatingSystem _peerRatingSystem;
+        
+        [Header("Competition Analytics")]
+        [SerializeField] private CompetitiveAnalyticsEngine _analyticsEngine;
+        [SerializeField] private PerformanceTracker _performanceTracker;
+        [SerializeField] private SkillAssessmentSystem _skillAssessment;
+        [SerializeField] private CompetitiveMetricsCollector _metricsCollector;
+        
+        [Header("Competition Settings")]
+        [Range(0.1f, 2.0f)] public float CompetitiveProgressionRate = 1.0f;
+        [Range(0.1f, 3.0f)] public float ReputationGainMultiplier = 1.2f;
+        [Range(1.0f, 10.0f)] public float EliteTierThreshold = 5.0f;
+        [Range(0.1f, 1.0f)] public float MatchmakingTolerance = 0.3f;
+        
+        // System State
+        private bool _isInitialized = false;
+        private Dictionary<string, ProjectChimera.Data.Tournament> _activeTournaments = new Dictionary<string, ProjectChimera.Data.Tournament>();
+        private Dictionary<string, CompetitionEntry> _activeEntries = new Dictionary<string, CompetitionEntry>();
+        private List<CompetitiveAchievement> _sessionAchievements = new List<CompetitiveAchievement>();
+        private CompetitiveGamingState _currentCompetitiveState;
+        
+        // Competition Performance Metrics
+        private int _tournamentsEntered = 0;
+        private int _tournamentsWon = 0;
+        private int _competitionsCompleted = 0;
+        private float _totalReputationGained = 0f;
+        private float _competitiveRating = 0f;
+        private Dictionary<CompetitionCategory, CompetitiveMetrics> _categoryRecords = new Dictionary<CompetitionCategory, CompetitiveMetrics>();
+        
+        // Events
+        private GameEventChannelSO _onCompetitionEntered;
+        private GameEventChannelSO _onTournamentWon;
+        private GameEventChannelSO _onReputationGained;
+        private GameEventChannelSO _onRankingChanged;
+        private GameEventChannelSO _onAchievementEarned;
+        private GameEventChannelSO _onEliteTierUnlocked;
+        private GameEventChannelSO _onLegacyMilestoneReached;
+        
+        #region Initialization
+        
+        public void Initialize(ScientificCompetitionConfigSO config)
+        {
+            if (_isInitialized)
+            {
+                ChimeraLogger.LogWarning("ScientificCompetitionManager already initialized", this);
+                return;
+            }
+            
+            _competitionConfig = config ?? _competitionConfig;
+            
+            if (_competitionConfig == null)
+            {
+                ChimeraLogger.LogError("ScientificCompetitionConfigSO is required for initialization", this);
+                return;
+            }
+            
+            InitializeCompetitionSystems();
+            InitializeTournamentManagement();
+            InitializeRecognitionSystems();
+            InitializeAnalytics();
+            InitializeCompetitiveGamingState();
+            SetupEventChannels();
+            
+            _isInitialized = true;
+            ChimeraLogger.Log("ScientificCompetitionManager initialized successfully", this);
+        }
+        
+        private void InitializeCompetitionSystems()
+        {
+            // Initialize core competition systems
+            _activeTournaments.Clear();
+            _activeEntries.Clear();
+            _sessionAchievements.Clear();
+            
+            // Initialize category records
+            foreach (CompetitionCategory category in System.Enum.GetValues(typeof(CompetitionCategory)))
+            {
+                _categoryRecords[category] = new CompetitiveMetrics
+                {
+                    Wins = 0,
+                    Losses = 0,
+                    TotalMatches = 0,
+                    OverallRating = 1500f
+                };
+            }
+        }
+        
+        private void InitializeTournamentManagement()
+        {
+            // Initialize tournament management components
+            if (_tournamentEventManager == null)
+            {
+                var eventManagerGO = new GameObject("TournamentEventManager");
+                eventManagerGO.transform.SetParent(transform);
+                _tournamentEventManager = eventManagerGO.AddComponent<TournamentEventManager>();
+            }
+            
+            if (_matchmakingSystem == null)
+            {
+                var matchmakingGO = new GameObject("CompetitiveMatchmakingSystem");
+                matchmakingGO.transform.SetParent(transform);
+                _matchmakingSystem = matchmakingGO.AddComponent<CompetitiveMatchmakingSystem>();
+            }
+            
+            if (_tournamentScheduler == null)
+            {
+                _tournamentScheduler = new TournamentScheduler();
+            }
+            
+            if (_bracketManager == null)
+            {
+                _bracketManager = new CompetitionBracketManager();
+            }
+        }
+        
+        private void InitializeRecognitionSystems()
+        {
+            // Initialize recognition and reputation systems
+            if (_achievementSystem == null)
+            {
+                var achievementGO = new GameObject("AchievementRecognitionSystem");
+                achievementGO.transform.SetParent(transform);
+                _achievementSystem = achievementGO.AddComponent<AchievementRecognitionSystem>();
+            }
+            
+            if (_reputationManager == null)
+            {
+                _reputationManager = new ReputationManager();
+            }
+            
+            if (_legacyTracker == null)
+            {
+                _legacyTracker = new LegacyTracker();
+            }
+            
+            if (_peerRatingSystem == null)
+            {
+                var peerRatingGO = new GameObject("PeerRatingSystem");
+                peerRatingGO.transform.SetParent(transform);
+                _peerRatingSystem = peerRatingGO.AddComponent<PeerRatingSystem>();
+            }
+        }
+        
+        private void InitializeAnalytics()
+        {
+            // Initialize analytics and performance tracking
+            if (_analyticsEngine == null)
+            {
+                var analyticsGO = new GameObject("CompetitiveAnalyticsEngine");
+                analyticsGO.transform.SetParent(transform);
+                _analyticsEngine = analyticsGO.AddComponent<CompetitiveAnalyticsEngine>();
+            }
+            
+            if (_performanceTracker == null)
+            {
+                var performanceGO = new GameObject("PerformanceTracker");
+                performanceGO.transform.SetParent(transform);
+                _performanceTracker = performanceGO.AddComponent<PerformanceTracker>();
+            }
+            
+            if (_skillAssessment == null)
+            {
+                var skillGO = new GameObject("SkillAssessmentSystem");
+                skillGO.transform.SetParent(transform);
+                _skillAssessment = skillGO.AddComponent<SkillAssessmentSystem>();
+            }
+            
+            if (_metricsCollector == null)
+            {
+                var metricsGO = new GameObject("CompetitiveMetricsCollector");
+                metricsGO.transform.SetParent(transform);
+                _metricsCollector = metricsGO.AddComponent<CompetitiveMetricsCollector>();
+            }
+        }
+        
+        private void InitializeCompetitiveGamingState()
+        {
+            _currentCompetitiveState = new CompetitiveGamingState
+            {
+                CurrentRanking = CompetitiveRanking.Unranked,
+                CompetitiveRating = 1000f, // Default ELO-style rating
+                TotalReputationPoints = 0f,
+                ActiveTournaments = 0,
+                CompletedTournaments = 0,
+                TournamentVictories = 0,
+                CurrentWinStreak = 0,
+                BestWinStreak = 0,
+                UnlockedCompetitionTiers = new List<CompetitionTier> { CompetitionTier.Beginner },
+                EarnedAchievements = new List<string>(),
+                CompetitiveSpecializations = new List<CompetitionCategory>()
+            };
+        }
+        
+        private void SetupEventChannels()
+        {
+            // Event channels would be assigned in inspector or loaded from configuration
+            if (_onCompetitionEntered != null)
+                _onCompetitionEntered.EventRaised += OnCompetitionEnteredEvent;
+                
+            if (_onTournamentWon != null)
+                _onTournamentWon.EventRaised += OnTournamentWonEvent;
+                
+            if (_onReputationGained != null)
+                _onReputationGained.EventRaised += OnReputationGainedEvent;
+        }
+        
+        #endregion
+        
+        #region Public API - Competition Entry
+        
+        /// <summary>
+        /// Enter a competition with specified category and tier
+        /// </summary>
+        public CompetitionEntryResult EnterCompetition(CompetitionCategory category, CompetitionTier tier)
+        {
+            if (!_isInitialized || !IsEligibleForCompetition(category, tier))
+                return CompetitionEntryResult.Failed;
+            
+            var entry = CreateCompetitionEntry(category, tier);
+            if (entry == null)
+                return CompetitionEntryResult.Failed;
+            
+            // Process entry through matchmaking
+            var matchmakingResult = _matchmakingSystem?.ProcessCompetitionEntry(entry);
+            if (matchmakingResult?.IsSuccessful != true)
+                return CompetitionEntryResult.MatchmakingFailed;
+            
+            _activeEntries[entry.EntryID] = entry;
+            _tournamentsEntered++;
+            _currentCompetitiveState.ActiveTournaments++;
+            
+            // Update category record
+            UpdateCategoryRecord(category, entry);
+            
+            // Trigger entry event
+            _onCompetitionEntered?.RaiseEvent(new CompetitionEntryEventData
+            {
+                Entry = entry,
+                Category = category,
+                Tier = tier,
+                MatchmakingResult = matchmakingResult
+            });
+            
+            ChimeraLogger.Log($"Competition entered: {category} - {tier}", this);
+            return CompetitionEntryResult.Accepted;
+        }
+        
+        /// <summary>
+        /// Submit competition performance for evaluation
+        /// </summary>
+        public CompetitionPerformanceResult SubmitCompetitionPerformance(string entryID, CompetitionPerformance performance)
+        {
+            if (!_activeEntries.TryGetValue(entryID, out CompetitionEntry entry))
+                return CompetitionPerformanceResult.InvalidEntry;
+            
+            var result = EvaluateCompetitionPerformance(entry, performance);
+            
+            // Update entry with performance data
+            entry.Performance = performance;
+            entry.Result = result;
+            entry.IsCompleted = true;
+            entry.CompletionTime = Time.time;
+            
+            // Process competition results
+            ProcessCompetitionResults(entry, result);
+            
+            // Update competitive metrics
+            UpdateCompetitiveMetrics(entry, result);
+            
+            // Check for achievements
+            CheckCompetitiveAchievements(entry, result);
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// Get available competitions for player's current skill level
+        /// </summary>
+        public List<CompetitionInfo> GetAvailableCompetitions()
+        {
+            var availableCompetitions = new List<CompetitionInfo>();
+            
+            foreach (var tier in _currentCompetitiveState.UnlockedCompetitionTiers)
+            {
+                foreach (CompetitionCategory category in System.Enum.GetValues(typeof(CompetitionCategory)))
+                {
+                    if (IsEligibleForCompetition(category, tier))
+                    {
+                        var competitionInfo = GetCompetitionInfo(category, tier);
+                        if (competitionInfo != null)
+                        {
+                            availableCompetitions.Add(competitionInfo);
+                        }
+                    }
+                }
+            }
+            
+            return availableCompetitions;
+        }
+        
+        /// <summary>
+        /// Get scheduled tournaments for specified time period
+        /// </summary>
+        public List<ScheduledTournament> GetScheduledTournaments(float timeRangeHours = 168f)
+        {
+            return _tournamentScheduler?.GetScheduledTournaments(timeRangeHours) ?? new List<ScheduledTournament>();
+        }
+        
+        #endregion
+        
+        #region Public API - Tournament Management
+        
+        /// <summary>
+        /// Create custom tournament with specified parameters
+        /// </summary>
+        public TournamentCreationResult CreateTournament(TournamentSpec tournamentSpec)
+        {
+            if (!_isInitialized || !CanCreateTournament(tournamentSpec))
+                return TournamentCreationResult.Failed;
+            
+            var tournament = CreateTournamentFromSpec(tournamentSpec);
+            if (tournament == null)
+                return TournamentCreationResult.Failed;
+            
+            _activeTournaments[tournament.TournamentID] = tournament;
+            
+            // Schedule tournament
+            _tournamentScheduler?.ScheduleTournament(tournament);
+            
+            // Setup tournament bracket
+            _bracketManager?.CreateTournamentBracket(tournament);
+            
+            ChimeraLogger.Log($"Tournament created: {tournament.TournamentName} - {tournament.TournamentID}", this);
+            return TournamentCreationResult.Successful;
+        }
+        
+        /// <summary>
+        /// Join existing tournament
+        /// </summary>
+        public TournamentJoinResult JoinTournament(string tournamentID)
+        {
+            if (!_activeTournaments.TryGetValue(tournamentID, out Tournament tournament))
+                return TournamentJoinResult.TournamentNotFound;
+            
+            if (!CanJoinTournament(tournament))
+                return TournamentJoinResult.NotEligible;
+            
+            var joinResult = ProcessTournamentJoin(tournament);
+            
+            if (joinResult == TournamentJoinResult.Successful)
+            {
+                // Update tournament participant list
+                UpdateTournamentParticipants(tournament);
+                
+                // Update competitive state
+                _currentCompetitiveState.ActiveTournaments++;
+            }
+            
+            return joinResult;
+        }
+        
+        /// <summary>
+        /// Get tournament bracket and current standings
+        /// </summary>
+        public TournamentBracket GetTournamentBracket(string tournamentID)
+        {
+            return _bracketManager?.GetTournamentBracket(tournamentID);
+        }
+        
+        /// <summary>
+        /// Get tournament leaderboard
+        /// </summary>
+        public TournamentLeaderboard GetTournamentLeaderboard(string tournamentID)
+        {
+            if (!_activeTournaments.TryGetValue(tournamentID, out Tournament tournament))
+                return null;
+            
+            return GenerateTournamentLeaderboard(tournament);
+        }
+        
+        #endregion
+        
+        #region Public API - Recognition and Reputation
+        
+        /// <summary>
+        /// Get player's current competitive reputation
+        /// </summary>
+        public CompetitiveReputation GetCompetitiveReputation()
+        {
+            return new CompetitiveReputation
+            {
+                OverallRating = _competitiveRating,
+                ReputationLevel = CalculateReputationLevel(_totalReputationGained),
+                Ranking = _currentCompetitiveState.CurrentRanking,
+                CategorySpecializations = GetCategorySpecializations(),
+                PeerRating = _peerRatingSystem?.GetCurrentRating() ?? 0f,
+                LegacyAchievements = GetLegacyAchievements(),
+                ReputationTrend = CalculateReputationTrend()
+            };
+        }
+        
+        /// <summary>
+        /// Get competitive achievements and milestones
+        /// </summary>
+        public List<CompetitiveAchievement> GetCompetitiveAchievements()
+        {
+            return new List<CompetitiveAchievement>(_sessionAchievements);
+        }
+        
+        /// <summary>
+        /// Get detailed competitive statistics
+        /// </summary>
+        public CompetitiveStatistics GetCompetitiveStatistics()
+        {
+            return new CompetitiveStatistics
+            {
+                TotalTournamentsEntered = _tournamentsEntered,
+                TotalTournamentsWon = _tournamentsWon,
+                CompetitionsCompleted = _competitionsCompleted,
+                WinRate = CalculateOverallWinRate(),
+                CurrentWinStreak = _currentCompetitiveState.CurrentWinStreak,
+                BestWinStreak = _currentCompetitiveState.BestWinStreak,
+                CategoryRecords = new Dictionary<CompetitionCategory, CompetitiveMetrics>(_categoryRecords),
+                AveragePerformanceRating = CalculateAveragePerformanceRating(),
+                CompetitiveGrowthRate = CalculateCompetitiveGrowthRate()
+            };
+        }
+        
+        /// <summary>
+        /// Submit peer rating for another competitor
+        /// </summary>
+        public PeerRatingResult SubmitPeerRating(string targetPlayerID, PeerRating rating)
+        {
+            return _peerRatingSystem?.SubmitRating(targetPlayerID, rating) ?? PeerRatingResult.Failed;
+        }
+        
+        #endregion
+        
+        #region Competition Processing
+        
+        private CompetitionEntry CreateCompetitionEntry(CompetitionCategory category, CompetitionTier tier)
+        {
+            var entry = new CompetitionEntry
+            {
+                EntryID = System.Guid.NewGuid().ToString(),
+                Category = category,
+                Tier = tier,
+                PlayerRating = _competitiveRating,
+                SkillLevel = GetSkillLevelForCategory(category),
+                EntryTime = Time.time,
+                IsActive = true
+            };
+            
+            return entry;
+        }
+        
+        private CompetitionPerformanceResult EvaluateCompetitionPerformance(CompetitionEntry entry, CompetitionPerformance performance)
+        {
+            var result = new CompetitionPerformanceResult
+            {
+                ResultID = System.Guid.NewGuid().ToString(),
+                EntryID = entry.EntryID,
+                Performance = performance,
+                EvaluationTime = Time.time
+            };
+            
+            // Calculate performance scores
+            result.TechnicalScore = CalculateTechnicalScore(performance, entry.Category);
+            result.CreativityScore = CalculateCreativityScore(performance, entry.Category);
+            result.InnovationScore = CalculateInnovationScore(performance, entry.Category);
+            result.QualityScore = CalculateQualityScore(performance, entry.Category);
+            
+            // Calculate overall competitive score
+            result.OverallScore = CalculateOverallCompetitiveScore(result);
+            
+            // Determine placement and rewards
+            result.Placement = DeterminePlacement(result, entry);
+            result.ReputationGained = CalculateReputationGain(result, entry);
+            result.RatingChange = CalculateRatingChange(result, entry);
+            
+            // Check for victory
+            result.IsVictory = result.Placement <= GetVictoryThreshold(entry.Tier);
+            
+            return result;
+        }
+        
+        private void ProcessCompetitionResults(CompetitionEntry entry, CompetitionPerformanceResult result)
+        {
+            // Update competitive rating
+            _competitiveRating += result.RatingChange;
+            _currentCompetitiveState.CompetitiveRating = _competitiveRating;
+            
+            // Update reputation
+            _totalReputationGained += result.ReputationGained;
+            _currentCompetitiveState.TotalReputationPoints += result.ReputationGained;
+            
+            // Update win/loss records
+            UpdateWinLossRecord(entry, result);
+            
+            // Update ranking
+            UpdateCompetitiveRanking();
+            
+            // Process victory rewards
+            if (result.IsVictory)
+            {
+                ProcessVictoryRewards(entry, result);
+            }
+            
+            // Check for tier progression
+            CheckTierProgression(entry, result);
+        }
+        
+        private void ProcessVictoryRewards(CompetitionEntry entry, CompetitionPerformanceResult result)
+        {
+            _tournamentsWon++;
+            _currentCompetitiveState.TournamentVictories++;
+            _currentCompetitiveState.CurrentWinStreak++;
+            
+            // Update best win streak
+            if (_currentCompetitiveState.CurrentWinStreak > _currentCompetitiveState.BestWinStreak)
+            {
+                _currentCompetitiveState.BestWinStreak = _currentCompetitiveState.CurrentWinStreak;
+            }
+            
+            // Trigger victory event
+            _onTournamentWon?.RaiseEvent(new TournamentVictoryEventData
+            {
+                Entry = entry,
+                Result = result,
+                VictoryMargin = CalculateVictoryMargin(result),
+                CompetitionTier = entry.Tier
+            });
+        }
+        
+        #endregion
+        
+        #region Tournament Management
+        
+        private Tournament CreateTournamentFromSpec(TournamentSpec spec)
+        {
+            var tournament = new Tournament
+            {
+                TournamentID = System.Guid.NewGuid().ToString(),
+                TournamentName = spec.TournamentName,
+                TournamentType = spec.TournamentType,
+                Category = spec.Category,
+                Tier = spec.Tier,
+                MaxParticipants = spec.MaxParticipants,
+                EntryRequirements = spec.EntryRequirements,
+                PrizePool = spec.PrizePool,
+                StartTime = spec.ScheduledStartTime,
+                Duration = spec.DurationHours,
+                CreationTime = Time.time,
+                IsActive = true
+            };
+            
+            return tournament;
+        }
+        
+        private TournamentJoinResult ProcessTournamentJoin(Tournament tournament)
+        {
+            // Check tournament capacity
+            if (tournament.CurrentParticipants >= tournament.MaxParticipants)
+                return TournamentJoinResult.TournamentFull;
+            
+            // Check entry requirements
+            if (!MeetsEntryRequirements(tournament.EntryRequirements))
+                return TournamentJoinResult.RequirementsNotMet;
+            
+            // Add player to tournament
+            tournament.CurrentParticipants++;
+            
+            return TournamentJoinResult.Successful;
+        }
+        
+        private TournamentLeaderboard GenerateTournamentLeaderboard(Tournament tournament)
+        {
+            var leaderboard = new TournamentLeaderboard
+            {
+                TournamentID = tournament.TournamentID,
+                TournamentName = tournament.TournamentName,
+                GenerationTime = Time.time,
+                Participants = new List<TournamentParticipant>()
+            };
+            
+            // This would integrate with actual tournament participation data
+            return leaderboard;
+        }
+        
+        #endregion
+        
+        #region Recognition and Achievements
+        
+        private void CheckCompetitiveAchievements(CompetitionEntry entry, CompetitionPerformanceResult result)
+        {
+            var achievements = new List<CompetitiveAchievement>();
+            
+            // Check for performance-based achievements
+            if (result.OverallScore >= 0.9f)
+            {
+                achievements.Add(CreateAchievement("Excellence_Performance", "Exceptional Performance", result));
+            }
+            
+            // Check for category specialization achievements
+            if (GetCategoryWinRate(entry.Category) >= 0.8f && GetCategoryEntries(entry.Category) >= 10)
+            {
+                achievements.Add(CreateAchievement($"{entry.Category}_Specialist", $"{entry.Category} Specialist", result));
+            }
+            
+            // Check for streak achievements
+            if (_currentCompetitiveState.CurrentWinStreak >= 5)
+            {
+                achievements.Add(CreateAchievement("Win_Streak_5", "Winning Streak", result));
+            }
+            
+            // Process achievements
+            foreach (var achievement in achievements)
+            {
+                ProcessAchievement(achievement);
+            }
+        }
+        
+        private CompetitiveAchievement CreateAchievement(string achievementID, string achievementName, CompetitionPerformanceResult result)
+        {
+            return new CompetitiveAchievement
+            {
+                AchievementID = achievementID,
+                AchievementName = achievementName,
+                Description = $"Earned through exceptional competitive performance",
+                EarnedTime = Time.time,
+                ReputationBonus = CalculateAchievementReputationBonus(achievementID),
+                RelatedPerformance = result
+            };
+        }
+        
+        private void ProcessAchievement(CompetitiveAchievement achievement)
+        {
+            _sessionAchievements.Add(achievement);
+            _currentCompetitiveState.EarnedAchievements.Add(achievement.AchievementID);
+            
+            // Apply reputation bonus
+            _totalReputationGained += achievement.ReputationBonus;
+            _currentCompetitiveState.TotalReputationPoints += achievement.ReputationBonus;
+            
+            // Trigger achievement event
+            _onAchievementEarned?.RaiseEvent(new CompetitiveAchievementEventData
+            {
+                Achievement = achievement,
+                ReputationBonus = achievement.ReputationBonus
+            });
+            
+            ChimeraLogger.Log($"Competitive achievement earned: {achievement.AchievementName}", this);
+        }
+        
+        #endregion
+        
+        #region Calculation Methods
+        
+        private float CalculateTechnicalScore(CompetitionPerformance performance, CompetitionCategory category)
+        {
+            // Calculate technical execution score based on category
+            return category switch
+            {
+                CompetitionCategory.Genetics => CalculateGeneticsTechnicalScore(performance),
+                CompetitionCategory.Aromatics => CalculateAromaticsTechnicalScore(performance),
+                CompetitionCategory.Innovation => CalculateInnovationTechnicalScore(performance),
+                CompetitionCategory.Collaborative => CalculateCollaborativeTechnicalScore(performance),
+                CompetitionCategory.Speed => CalculateSpeedTechnicalScore(performance),
+                _ => 0.5f
+            };
+        }
+        
+        private float CalculateGeneticsTechnicalScore(CompetitionPerformance performance)
+        {
+            // Calculate genetics-specific technical score
+            var breedingAccuracy = performance.BreedingAccuracy ?? 0.5f;
+            var geneticStability = performance.GeneticStability ?? 0.5f;
+            var traitExpression = performance.TraitExpression ?? 0.5f;
+            
+            return (breedingAccuracy * 0.4f) + (geneticStability * 0.3f) + (traitExpression * 0.3f);
+        }
+        
+        private float CalculateAromaticsTechnicalScore(CompetitionPerformance performance)
+        {
+            // Calculate aromatics-specific technical score
+            var sensoryAccuracy = performance.SensoryAccuracy ?? 0.5f;
+            var blendingPrecision = performance.BlendingPrecision ?? 0.5f;
+            var aromaQuality = performance.AromaticQuality ?? 0.5f;
+            
+            return (sensoryAccuracy * 0.35f) + (blendingPrecision * 0.35f) + (aromaQuality * 0.3f);
+        }
+        
+        private float CalculateCreativityScore(CompetitionPerformance performance, CompetitionCategory category)
+        {
+            var baseCreativity = performance.CreativityRating ?? 0.5f;
+            var innovationBonus = performance.InnovationValue ?? 0f;
+            var uniquenessBonus = performance.UniquenessScore ?? 0f;
+            
+            return baseCreativity + (innovationBonus * 0.2f) + (uniquenessBonus * 0.15f);
+        }
+        
+        private float CalculateInnovationScore(CompetitionPerformance performance, CompetitionCategory category)
+        {
+            var novelty = performance.NoveltyScore ?? 0f;
+            var impact = performance.ImpactScore ?? 0f;
+            var feasibility = performance.FeasibilityScore ?? 0.5f;
+            
+            return (novelty * 0.4f) + (impact * 0.35f) + (feasibility * 0.25f);
+        }
+        
+        private float CalculateQualityScore(CompetitionPerformance performance, CompetitionCategory category)
+        {
+            var executionQuality = performance.ExecutionQuality ?? 0.5f;
+            var resultQuality = performance.ResultQuality ?? 0.5f;
+            var consistencyScore = performance.ConsistencyScore ?? 0.5f;
+            
+            return (executionQuality * 0.4f) + (resultQuality * 0.4f) + (consistencyScore * 0.2f);
+        }
+        
+        private float CalculateOverallCompetitiveScore(CompetitionPerformanceResult result)
+        {
+            return (result.TechnicalScore * 0.3f) + 
+                   (result.CreativityScore * 0.25f) + 
+                   (result.InnovationScore * 0.25f) + 
+                   (result.QualityScore * 0.2f);
+        }
+        
+        private int DeterminePlacement(CompetitionPerformanceResult result, CompetitionEntry entry)
+        {
+            // Determine placement based on score and tier
+            var tierMultiplier = GetTierDifficultyMultiplier(entry.Tier);
+            var adjustedScore = result.OverallScore * tierMultiplier;
+            
+            if (adjustedScore >= 0.95f) return 1; // First place
+            if (adjustedScore >= 0.85f) return 2; // Second place
+            if (adjustedScore >= 0.75f) return 3; // Third place
+            if (adjustedScore >= 0.65f) return 4; // Top 25%
+            if (adjustedScore >= 0.5f) return 8;  // Top 50%
+            return 16; // Participation
+        }
+        
+        private float CalculateReputationGain(CompetitionPerformanceResult result, CompetitionEntry entry)
+        {
+            var baseGain = GetBaseReputationGain(entry.Tier);
+            var performanceMultiplier = result.OverallScore;
+            var placementBonus = GetPlacementBonus(result.Placement);
+            
+            return (baseGain * performanceMultiplier + placementBonus) * ReputationGainMultiplier;
+        }
+        
+        private float CalculateRatingChange(CompetitionPerformanceResult result, CompetitionEntry entry)
+        {
+            // ELO-style rating change calculation
+            var expectedScore = CalculateExpectedScore(entry.PlayerRating, GetAverageOpponentRating(entry));
+            var actualScore = Mathf.Clamp01(result.OverallScore);
+            var kFactor = GetKFactor(entry.Tier);
+            
+            return kFactor * (actualScore - expectedScore);
+        }
+        
+        private int GetVictoryThreshold(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 8,   // Top 50%
+                CompetitionTier.Intermediate => 4, // Top 25%
+                CompetitionTier.Advanced => 3,   // Top 3
+                CompetitionTier.Elite => 2,      // Top 2
+                CompetitionTier.Master => 1,     // First place only
+                _ => 8
+            };
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private bool IsEligibleForCompetition(CompetitionCategory category, CompetitionTier tier)
+        {
+            // Check if player meets requirements for competition
+            var hasUnlockedTier = _currentCompetitiveState.UnlockedCompetitionTiers.Contains(tier);
+            var meetsSkillRequirement = GetSkillLevelForCategory(category) >= GetRequiredSkillLevel(category, tier);
+            var meetsRatingRequirement = _competitiveRating >= GetMinimumRating(tier);
+            
+            return hasUnlockedTier && meetsSkillRequirement && meetsRatingRequirement;
+        }
+        
+        private bool CanCreateTournament(TournamentSpec spec)
+        {
+            // Check if player can create tournaments
+            var hasCreationRights = _currentCompetitiveState.CurrentRanking >= CompetitiveRanking.Advanced;
+            var meetsReputationRequirement = _totalReputationGained >= GetTournamentCreationReputationThreshold();
+            
+            return hasCreationRights && meetsReputationRequirement;
+        }
+        
+        private bool CanJoinTournament(Tournament tournament)
+        {
+            return IsEligibleForCompetition(tournament.Category, tournament.Tier) &&
+                   tournament.CurrentParticipants < tournament.MaxParticipants;
+        }
+        
+        private bool MeetsEntryRequirements(TournamentEntryRequirements requirements)
+        {
+            if (requirements == null) return true;
+            
+            var meetsRatingRequirement = _competitiveRating >= requirements.MinimumRating;
+            var meetsReputationRequirement = _totalReputationGained >= requirements.MinimumReputation;
+            var meetsExperienceRequirement = _tournamentsEntered >= requirements.MinimumTournaments;
+            
+            return meetsRatingRequirement && meetsReputationRequirement && meetsExperienceRequirement;
+        }
+        
+        private float GetSkillLevelForCategory(CompetitionCategory category)
+        {
+            // This would integrate with the skill systems
+            return 1.0f; // Placeholder
+        }
+        
+        private float GetRequiredSkillLevel(CompetitionCategory category, CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 0.0f,
+                CompetitionTier.Intermediate => 0.3f,
+                CompetitionTier.Advanced => 0.6f,
+                CompetitionTier.Elite => 0.8f,
+                CompetitionTier.Master => 0.95f,
+                _ => 0.0f
+            };
+        }
+        
+        private float GetMinimumRating(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 800f,
+                CompetitionTier.Intermediate => 1000f,
+                CompetitionTier.Advanced => 1200f,
+                CompetitionTier.Elite => 1500f,
+                CompetitionTier.Master => 1800f,
+                _ => 800f
+            };
+        }
+        
+        private void UpdateCategoryRecord(CompetitionCategory category, CompetitionEntry entry)
+        {
+            if (_categoryRecords.TryGetValue(category, out CompetitiveMetrics record))
+            {
+                record.TotalMatches++;
+            }
+        }
+        
+        private void UpdateWinLossRecord(CompetitionEntry entry, CompetitionPerformanceResult result)
+        {
+            var record = _categoryRecords[entry.Category];
+            
+            if (result.IsVictory)
+            {
+                record.Wins++;
+            }
+            else
+            {
+                record.Losses++;
+                _currentCompetitiveState.CurrentWinStreak = 0; // Reset win streak
+            }
+            
+            record.TotalReputationGained += result.ReputationGained;
+        }
+        
+        private void UpdateCompetitiveRanking()
+        {
+            var newRanking = CalculateCompetitiveRanking(_competitiveRating, _totalReputationGained);
+            
+            if (newRanking != _currentCompetitiveState.CurrentRanking)
+            {
+                var previousRanking = _currentCompetitiveState.CurrentRanking;
+                _currentCompetitiveState.CurrentRanking = newRanking;
+                
+                // Trigger ranking change event
+                _onRankingChanged?.RaiseEvent(new RankingChangeEventData
+                {
+                    PreviousRanking = previousRanking,
+                    NewRanking = newRanking,
+                    Rating = _competitiveRating,
+                    Reputation = _totalReputationGained
+                });
+                
+                ChimeraLogger.Log($"Competitive ranking changed: {previousRanking} → {newRanking}", this);
+            }
+        }
+        
+        private CompetitiveRanking CalculateCompetitiveRanking(float rating, float reputation)
+        {
+            if (rating >= 1800f && reputation >= 2000f) return CompetitiveRanking.Champion;
+            if (rating >= 1500f && reputation >= 1000f) return CompetitiveRanking.Elite;
+            if (rating >= 1200f && reputation >= 500f) return CompetitiveRanking.Advanced;
+            if (rating >= 1000f && reputation >= 200f) return CompetitiveRanking.Intermediate;
+            if (rating >= 800f && reputation >= 50f) return CompetitiveRanking.Novice;
+            return CompetitiveRanking.Unranked;
+        }
+        
+        private void CheckTierProgression(CompetitionEntry entry, CompetitionPerformanceResult result)
+        {
+            // Check if player qualifies for higher tiers
+            var nextTier = GetNextTier(entry.Tier);
+            if (nextTier != entry.Tier && !_currentCompetitiveState.UnlockedCompetitionTiers.Contains(nextTier))
+            {
+                if (QualifiesForTier(nextTier))
+                {
+                    UnlockCompetitionTier(nextTier);
+                }
+            }
+        }
+        
+        private bool QualifiesForTier(CompetitionTier tier)
+        {
+            var ratingRequirement = GetMinimumRating(tier);
+            var reputationRequirement = GetTierReputationRequirement(tier);
+            var performanceRequirement = GetTierPerformanceRequirement(tier);
+            
+            return _competitiveRating >= ratingRequirement &&
+                   _totalReputationGained >= reputationRequirement &&
+                   MeetsPerformanceRequirement(performanceRequirement);
+        }
+        
+        private void UnlockCompetitionTier(CompetitionTier tier)
+        {
+            _currentCompetitiveState.UnlockedCompetitionTiers.Add(tier);
+            
+            if (tier == CompetitionTier.Elite)
+            {
+                _onEliteTierUnlocked?.RaiseEvent(new EliteTierUnlockEventData
+                {
+                    UnlockedTier = tier,
+                    UnlockTime = Time.time,
+                    Rating = _competitiveRating,
+                    Reputation = _totalReputationGained
+                });
+            }
+            
+            ChimeraLogger.Log($"Competition tier unlocked: {tier}", this);
+        }
+        
+        #endregion
+        
+        #region Public Properties
+        
+        /// <summary>
+        /// Get current competitive gaming state
+        /// </summary>
+        public CompetitiveGamingState GetCurrentCompetitiveState()
+        {
+            return _currentCompetitiveState;
+        }
+        
+        /// <summary>
+        /// Get competitive gaming performance metrics
+        /// </summary>
+        public CompetitiveGamingMetrics GetCompetitiveMetrics()
+        {
+            return new CompetitiveGamingMetrics
+            {
+                TournamentsEntered = _tournamentsEntered,
+                TournamentsWon = _tournamentsWon,
+                CompetitionsCompleted = _competitionsCompleted,
+                TotalReputationGained = _totalReputationGained,
+                CompetitiveRating = _competitiveRating,
+                CurrentRanking = _currentCompetitiveState.CurrentRanking,
+                WinRate = CalculateOverallWinRate(),
+                CurrentWinStreak = _currentCompetitiveState.CurrentWinStreak,
+                BestWinStreak = _currentCompetitiveState.BestWinStreak
+            };
+        }
+        
+        #endregion
+        
+        #region System Updates
+        
+        public void Update(float deltaTime)
+        {
+            UpdateSystem(deltaTime);
+        }
+        
+        public void UpdateSystem(float deltaTime)
+        {
+            if (!_isInitialized) return;
+            
+            // Update tournament scheduling
+            _tournamentScheduler?.UpdateSystem(deltaTime);
+            
+            // Update active competitions
+            UpdateActiveCompetitions(deltaTime);
+            
+            // Update analytics
+            _analyticsEngine?.UpdateSystem(deltaTime);
+        }
+        
+        private void UpdateActiveCompetitions(float deltaTime)
+        {
+            var completedEntries = new List<string>();
+            
+            foreach (var entry in _activeEntries.Values)
+            {
+                if (entry.IsCompleted || IsEntryExpired(entry))
+                {
+                    completedEntries.Add(entry.EntryID);
+                }
+            }
+            
+            foreach (var entryID in completedEntries)
+            {
+                _activeEntries.Remove(entryID);
+                _currentCompetitiveState.ActiveTournaments--;
+                _competitionsCompleted++;
+                _currentCompetitiveState.CompletedTournaments++;
+            }
+        }
+        
+        private bool IsEntryExpired(CompetitionEntry entry)
+        {
+            var maxDuration = 86400f; // 24 hours
+            return (Time.time - entry.EntryTime) > maxDuration;
+        }
+        
+        #endregion
+        
+        #region Event Handlers
+        
+        private void OnCompetitionEnteredEvent(object eventData)
+        {
+            if (eventData is CompetitionEntryEventData entryData)
+            {
+                ProcessCompetitionEntryEvent(entryData);
+            }
+        }
+        
+        private void OnTournamentWonEvent(object eventData)
+        {
+            if (eventData is TournamentVictoryEventData victoryData)
+            {
+                ProcessTournamentVictoryEvent(victoryData);
+            }
+        }
+        
+        private void OnReputationGainedEvent(object eventData)
+        {
+            if (eventData is ReputationGainEventData reputationData)
+            {
+                ProcessReputationGainEvent(reputationData);
+            }
+        }
+        
+        private void ProcessCompetitionEntryEvent(CompetitionEntryEventData entryData)
+        {
+            ChimeraLogger.Log($"Competition entry processed: {entryData.Category}", this);
+        }
+        
+        private void ProcessTournamentVictoryEvent(TournamentVictoryEventData victoryData)
+        {
+            ChimeraLogger.Log($"Tournament victory processed: Tier {victoryData.CompetitionTier}", this);
+        }
+        
+        private void ProcessReputationGainEvent(ReputationGainEventData reputationData)
+        {
+            ChimeraLogger.Log($"Reputation gain processed: +{reputationData.ReputationGain:F1}", this);
+        }
+        
+        private float CalculateOverallWinRate()
+        {
+            if (_tournamentsEntered == 0) return 0f;
+            return (float)_tournamentsWon / _tournamentsEntered;
+        }
+
+        private float CalculateAveragePerformanceRating()
+        {
+            if (_categoryRecords.Count == 0) return 0.5f;
+            
+            float totalRating = 0f;
+            int count = 0;
+            
+            foreach (var record in _categoryRecords.Values)
+            {
+                totalRating += record.AveragePerformance;
+                count++;
+            }
+            
+            return count > 0 ? totalRating / count : 0.5f;
+        }
+
+        private float CalculateCompetitiveGrowthRate()
+        {
+            // Calculate growth rate based on recent performance trends
+            // This is a simplified implementation
+            return _totalReputationGained > 0 ? Mathf.Clamp(_totalReputationGained / 1000f, 0f, 5f) : 0f;
+        }
+
+        private List<CompetitionCategory> GetCategorySpecializations()
+        {
+            var specializations = new List<CompetitionCategory>();
+            
+            foreach (var kvp in _categoryRecords)
+            {
+                var category = kvp.Key;
+                var metrics = kvp.Value;
+                
+                // Consider specialized if win rate > 70% and at least 5 matches
+                if (metrics.TotalMatches >= 5 && (float)metrics.Wins / metrics.TotalMatches > 0.7f)
+                {
+                    specializations.Add(category);
+                }
+            }
+            
+            return specializations;
+        }
+
+        private List<string> GetLegacyAchievements()
+        {
+            return _sessionAchievements
+                .Where(a => a.Category == CompetitionCategory.Scientific)
+                .Select(a => a.AchievementID)
+                .ToList();
+        }
+
+        private float CalculateReputationTrend()
+        {
+            // Simplified trend calculation
+            return _totalReputationGained > 0 ? 1f : 0f;
+        }
+
+        private string CalculateReputationLevel(float totalReputation)
+        {
+            if (totalReputation >= 2000f) return "Champion";
+            if (totalReputation >= 1000f) return "Elite";
+            if (totalReputation >= 500f) return "Advanced";
+            if (totalReputation >= 200f) return "Intermediate";
+            if (totalReputation >= 50f) return "Novice";
+            return "Beginner";
+        }
+
+        private void UpdateTournamentParticipants(Tournament tournament)
+        {
+            // Placeholder implementation
+        }
+
+        private TournamentJoinResult ProcessTournamentJoin(Tournament tournament)
+        {
+            // Check tournament capacity
+            if (tournament.CurrentParticipants >= tournament.MaxParticipants)
+                return TournamentJoinResult.TournamentFull;
+            
+            // Check entry requirements
+            if (!MeetsEntryRequirements(tournament.EntryRequirements))
+                return TournamentJoinResult.RequirementsNotMet;
+            
+            // Add player to tournament
+            tournament.CurrentParticipants++;
+            
+            return TournamentJoinResult.Successful;
+        }
+
+        private CompetitionInfo GetCompetitionInfo(CompetitionCategory category, CompetitionTier tier)
+        {
+            return new CompetitionInfo
+            {
+                CompetitionID = System.Guid.NewGuid().ToString(),
+                CompetitionName = $"{category} {tier} Competition",
+                Category = category,
+                Tier = tier,
+                Description = $"Competitive {category} tournament for {tier} tier players",
+                RequiredRating = GetMinimumRating(tier),
+                RequiredReputation = GetTierReputationRequirement(tier),
+                MaxParticipants = 100,
+                CurrentParticipants = UnityEngine.Random.Range(10, 80),
+                PrizePool = GetBasePrizePool(tier),
+                StartTime = System.DateTime.Now.AddHours(UnityEngine.Random.Range(1, 48)),
+                EndTime = System.DateTime.Now.AddDays(UnityEngine.Random.Range(1, 7)),
+                IsActive = true
+            };
+        }
+
+        private float GetBasePrizePool(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 100f,
+                CompetitionTier.Intermediate => 250f,
+                CompetitionTier.Advanced => 500f,
+                CompetitionTier.Elite => 1000f,
+                CompetitionTier.Master => 2500f,
+                _ => 100f
+            };
+        }
+
+        private float GetTierReputationRequirement(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 0f,
+                CompetitionTier.Intermediate => 100f,
+                CompetitionTier.Advanced => 300f,
+                CompetitionTier.Elite => 750f,
+                CompetitionTier.Master => 1500f,
+                _ => 0f
+            };
+        }
+
+        private float GetTierPerformanceRequirement(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 0.5f,
+                CompetitionTier.Intermediate => 0.6f,
+                CompetitionTier.Advanced => 0.7f,
+                CompetitionTier.Elite => 0.8f,
+                CompetitionTier.Master => 0.9f,
+                _ => 0.5f
+            };
+        }
+
+        private bool MeetsPerformanceRequirement(float requirement)
+        {
+            return CalculateAveragePerformanceRating() >= requirement;
+        }
+
+        private CompetitionTier GetNextTier(CompetitionTier currentTier)
+        {
+            return currentTier switch
+            {
+                CompetitionTier.Beginner => CompetitionTier.Intermediate,
+                CompetitionTier.Intermediate => CompetitionTier.Advanced,
+                CompetitionTier.Advanced => CompetitionTier.Elite,
+                CompetitionTier.Elite => CompetitionTier.Master,
+                CompetitionTier.Master => CompetitionTier.Master,
+                _ => CompetitionTier.Beginner
+            };
+        }
+
+        private float GetTournamentCreationReputationThreshold()
+        {
+            return 500f; // Require 500 reputation to create tournaments
+        }
+
+        private float GetCategoryWinRate(CompetitionCategory category)
+        {
+            if (_categoryRecords.TryGetValue(category, out CompetitiveMetrics metrics))
+            {
+                return metrics.TotalMatches > 0 ? (float)metrics.Wins / metrics.TotalMatches : 0f;
+            }
+            return 0f;
+        }
+
+        private int GetCategoryEntries(CompetitionCategory category)
+        {
+            if (_categoryRecords.TryGetValue(category, out CompetitiveMetrics metrics))
+            {
+                return metrics.TotalMatches;
+            }
+            return 0;
+        }
+
+        private float CalculateAchievementReputationBonus(string achievementID)
+        {
+            // Simple bonus calculation based on achievement type
+            if (achievementID.Contains("Streak")) return 50f;
+            if (achievementID.Contains("Specialist")) return 100f;
+            if (achievementID.Contains("Excellence")) return 75f;
+            return 25f;
+        }
+
+        private float CalculateInnovationTechnicalScore(CompetitionPerformance performance)
+        {
+            var novelty = performance.NoveltyScore ?? 0.5f;
+            var feasibility = performance.FeasibilityScore ?? 0.5f;
+            var impact = performance.ImpactScore ?? 0.5f;
+            
+            return (novelty * 0.4f) + (feasibility * 0.3f) + (impact * 0.3f);
+        }
+
+        private float CalculateCollaborativeTechnicalScore(CompetitionPerformance performance)
+        {
+            // For collaborative competitions, focus on teamwork metrics
+            var execution = performance.ExecutionQuality ?? 0.5f;
+            var consistency = performance.ConsistencyScore ?? 0.5f;
+            
+            return (execution * 0.6f) + (consistency * 0.4f);
+        }
+
+        private float CalculateSpeedTechnicalScore(CompetitionPerformance performance)
+        {
+            // For speed competitions, emphasize efficiency and accuracy
+            var accuracy = performance.BreedingAccuracy ?? 0.5f;
+            var consistency = performance.ConsistencyScore ?? 0.5f;
+            
+            return (accuracy * 0.7f) + (consistency * 0.3f);
+        }
+
+        private float GetTierDifficultyMultiplier(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 0.8f,
+                CompetitionTier.Intermediate => 0.9f,
+                CompetitionTier.Advanced => 1.0f,
+                CompetitionTier.Elite => 1.2f,
+                CompetitionTier.Master => 1.5f,
+                _ => 1.0f
+            };
+        }
+
+        private float GetBaseReputationGain(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 10f,
+                CompetitionTier.Intermediate => 25f,
+                CompetitionTier.Advanced => 50f,
+                CompetitionTier.Elite => 100f,
+                CompetitionTier.Master => 200f,
+                _ => 10f
+            };
+        }
+
+        private float GetPlacementBonus(int placement)
+        {
+            return placement switch
+            {
+                1 => 50f,  // First place
+                2 => 30f,  // Second place
+                3 => 20f,  // Third place
+                <= 8 => 10f,  // Top 8
+                _ => 0f
+            };
+        }
+
+        private float CalculateExpectedScore(float playerRating, float averageOpponentRating)
+        {
+            // ELO-style expected score calculation
+            var ratingDifference = averageOpponentRating - playerRating;
+            return 1f / (1f + Mathf.Pow(10f, ratingDifference / 400f));
+        }
+
+        private float GetAverageOpponentRating(CompetitionEntry entry)
+        {
+            // Placeholder - would normally calculate from actual opponents
+            return entry.PlayerRating + UnityEngine.Random.Range(-200f, 200f);
+        }
+
+        private float GetKFactor(CompetitionTier tier)
+        {
+            return tier switch
+            {
+                CompetitionTier.Beginner => 40f,
+                CompetitionTier.Intermediate => 30f,
+                CompetitionTier.Advanced => 20f,
+                CompetitionTier.Elite => 15f,
+                CompetitionTier.Master => 10f,
+                _ => 30f
+            };
+        }
+
+        private float CalculateVictoryMargin(object result)
+        {
+            // Placeholder calculation
+            return UnityEngine.Random.Range(0.1f, 0.5f);
+        }
+
+        private void UpdateCompetitiveMetrics(CompetitionEntry entry, object result)
+        {
+            // Placeholder implementation
+        }
+
+        #endregion
+        
+        #region Unity Lifecycle
+        
+        private void OnDestroy()
+        {
+            if (_onCompetitionEntered != null)
+                _onCompetitionEntered.EventRaised -= OnCompetitionEnteredEvent;
+                
+            if (_onTournamentWon != null)
+                _onTournamentWon.EventRaised -= OnTournamentWonEvent;
+                
+            if (_onReputationGained != null)
+                _onReputationGained.EventRaised -= OnReputationGainedEvent;
+        }
+        
+        #endregion
+    }
+}

@@ -1,0 +1,38 @@
+using UnityEngine;
+using System;
+using ProjectChimera.Core;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Progression;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Unified Experience Manager - Specialized experience management for scientific gaming systems
+    /// </summary>
+    public class UnifiedExperienceManager : MonoBehaviour
+    {
+        private bool _isInitialized = false;
+        private ProjectChimera.Data.ExperienceConfigSO _config;
+        
+        // Events
+        public event Action<ExperienceType, float> OnExperienceGained;
+        public event Action<ExperienceType, ExperienceLevel> OnLevelUp;
+        
+        public void Initialize(ProjectChimera.Data.ExperienceConfigSO config)
+        {
+            if (_isInitialized) return;
+            
+            _config = config;
+            _isInitialized = true;
+            
+            Debug.Log("UnifiedExperienceManager initialized");
+        }
+        
+        public void Update()
+        {
+            if (!_isInitialized) return;
+            // Update logic here
+        }
+    }
+}

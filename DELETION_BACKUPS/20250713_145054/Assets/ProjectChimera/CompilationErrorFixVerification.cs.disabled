@@ -1,0 +1,96 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Environment;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Simple verification test to ensure compilation errors are resolved.
+    /// This test verifies that EnvironmentalConditions type conversions work correctly.
+    /// Updated: Fixed explicit type usage to resolve CS0029 errors.
+    /// </summary>
+    public class CompilationErrorFixVerification : MonoBehaviour
+    {
+        public void TestEnvironmentalConditionsCompatibility()
+        {
+            Debug.Log("=== Testing Environmental Conditions Type Compatibility ===");
+            
+            // Test 1: Create PlantInstance and get environmental conditions
+            var plantObject = new GameObject("TestPlant");
+            var plantInstance = plantObject.AddComponent<PlantInstance>();
+            
+            try
+            {
+                var conditions = plantInstance.GetCurrentEnvironmentalConditions();
+                Debug.Log($"✅ PlantInstance.GetCurrentEnvironmentalConditions() - Success. Type: {conditions.GetType().Name}");
+                Debug.Log($"✅ Temperature: {conditions.Temperature}°C, Humidity: {conditions.Humidity}%");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ PlantInstance.GetCurrentEnvironmentalConditions() - Failed: {e.Message}");
+            }
+            
+            // Test 2: Test PlantUpdateProcessor
+            try
+            {
+                var processor = new PlantUpdateProcessor();
+                processor.UpdatePlant(plantInstance, Time.deltaTime, 1.0f);
+                Debug.Log("✅ PlantUpdateProcessor.UpdatePlant() - Success");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ PlantUpdateProcessor.UpdatePlant() - Failed: {e.Message}");
+            }
+            
+            // Test 3: Test PlantManager compatibility
+            try
+            {
+                var plantManager = FindObjectOfType<PlantManager>();
+                if (plantManager != null)
+                {
+                    var testConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                    plantManager.UpdateEnvironmentalConditions(testConditions);
+                    Debug.Log("✅ PlantManager.UpdateEnvironmentalConditions() - Success");
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ PlantManager not found in scene - skipping test");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ PlantManager.UpdateEnvironmentalConditions() - Failed: {e.Message}");
+            }
+            
+            // Test 4: Verify EnvironmentalManager compatibility
+            var environmentManager = FindObjectOfType<EnvironmentalManager>();
+            if (environmentManager != null)
+            {
+                try
+                {
+                    var envConditions = environmentManager.GetCultivationConditions();
+                    Debug.Log($"✅ EnvironmentalManager.GetCultivationConditions() - Success. Type: {envConditions.GetType().Name}");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"❌ EnvironmentalManager.GetCultivationConditions() - Failed: {e.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ EnvironmentalManager not found in scene - skipping test");
+            }
+            
+            Debug.Log("=== Environmental Conditions Compatibility Test Complete ===");
+            
+            // Cleanup
+            DestroyImmediate(plantObject);
+        }
+        
+        void Start()
+        {
+            // Run test on start
+            TestEnvironmentalConditionsCompatibility();
+        }
+    }
+}

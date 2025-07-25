@@ -1,0 +1,358 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Environment;
+using System.Collections.Generic;
+
+// Explicit aliases to match the fixed files
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+using PlantGenotype = ProjectChimera.Data.Genetics.PlantGenotype;
+using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 38 - Type conversion and namespace conflicts resolution.
+    /// Tests the fixes for CS1503, CS0029, CS0117, and CS1061 errors.
+    /// </summary>
+    public class Wave38ValidationTest : ChimeraMonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool _runTestsOnStart = true;
+        [SerializeField] private bool _enableDetailedLogging = true;
+        
+        [Header("Test Results")]
+        [SerializeField] private bool _allTestsPassed = false;
+        [SerializeField] private int _totalTests = 0;
+        [SerializeField] private int _passedTests = 0;
+        [SerializeField] private int _failedTests = 0;
+        
+        protected override void Start()
+        {
+            base.Start();
+            
+            if (_runTestsOnStart)
+            {
+                RunAllTests();
+            }
+        }
+        
+        [ContextMenu("Run Wave 38 Validation Tests")]
+        public void RunAllTests()
+        {
+            LogInfo("=== Starting Error Wave 38 Validation Tests ===");
+            
+            _totalTests = 0;
+            _passedTests = 0;
+            _failedTests = 0;
+            
+            // Test 1: PlantGenotype List Creation (CS1503 fix)
+            TestPlantGenotypeListCreation();
+            
+            // Test 2: EnvironmentalConditions Type Compatibility (CS0029 fix)
+            TestEnvironmentalConditionsCompatibility();
+            
+            // Test 3: EnvironmentalManager Method Access (CS1061 fix)
+            TestEnvironmentalManagerMethods();
+            
+            // Test 4: PlantUpdateProcessor Batch Processing
+            TestPlantUpdateProcessorBatch();
+            
+            // Test 5: StressType Enum Access (CS0117 fix)
+            TestStressTypeEnumAccess();
+            
+            // Test 6: Type Conversion Between Systems
+            TestTypeConversionBetweenSystems();
+            
+            // Final Results
+            _allTestsPassed = _failedTests == 0;
+            
+            LogInfo($"=== Error Wave 38 Validation Complete ===");
+            LogInfo($"Total Tests: {_totalTests}");
+            LogInfo($"Passed: {_passedTests}");
+            LogInfo($"Failed: {_failedTests}");
+            LogInfo($"Success Rate: {(_passedTests * 100f / _totalTests):F1}%");
+            
+            if (_allTestsPassed)
+            {
+                LogInfo("✓ All Error Wave 38 tests PASSED! Compilation errors resolved.");
+            }
+            else
+            {
+                LogError($"✗ {_failedTests} tests FAILED. Some issues remain.");
+            }
+        }
+        
+        private void TestPlantGenotypeListCreation()
+        {
+            string testName = "PlantGenotype List Creation";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Test the exact line that was causing CS1503 error
+                var batchData = new List<(PlantGenotype, EnvironmentalConditions)>();
+                
+                // Create test data
+                var testGenotype = new PlantGenotype
+                {
+                    GenotypeID = "test_genotype_001",
+                    Generation = 1,
+                    Genotype = new Dictionary<string, AlleleCouple>()
+                };
+                
+                var testConditions = new EnvironmentalConditions
+                {
+                    Temperature = 24f,
+                    Humidity = 60f,
+                    LightIntensity = 600f,
+                    CO2Level = 400f
+                };
+                
+                // Add to batch data (this was failing before)
+                batchData.Add((testGenotype, testConditions));
+                
+                LogInfo($"✓ {testName}: Successfully created List<(PlantGenotype, EnvironmentalConditions)>");
+                LogInfo($"✓ {testName}: Added {batchData.Count} items to batch");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private void TestEnvironmentalConditionsCompatibility()
+        {
+            string testName = "EnvironmentalConditions Type Compatibility";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Test type compatibility between different EnvironmentalConditions
+                var cultivationConditions = new EnvironmentalConditions();
+                
+                // Test that we can call methods that were missing
+                bool isInitialized = cultivationConditions.IsInitialized();
+                var defaultConditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test assignment compatibility (was causing CS0029)
+                EnvironmentalConditions assignedConditions = defaultConditions;
+                
+                LogInfo($"✓ {testName}: IsInitialized() method accessible: {isInitialized}");
+                LogInfo($"✓ {testName}: CreateIndoorDefault() method accessible");
+                LogInfo($"✓ {testName}: Type assignment working");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private void TestEnvironmentalManagerMethods()
+        {
+            string testName = "EnvironmentalManager Method Access";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Find EnvironmentalManager in scene
+                var environmentManager = FindObjectOfType<EnvironmentalManager>();
+                
+                if (environmentManager == null)
+                {
+                    LogWarning($"{testName}: No EnvironmentalManager found in scene, creating test instance");
+                    
+                    // Create a temporary GameObject with EnvironmentalManager for testing
+                    var testObj = new GameObject("TestEnvironmentalManager");
+                    environmentManager = testObj.AddComponent<EnvironmentalManager>();
+                }
+                
+                // Test the methods that were causing CS1061 errors
+                var conditions = environmentManager.GetCultivationConditions();
+                var positionConditions = environmentManager.GetCultivationConditions(Vector3.zero);
+                
+                LogInfo($"✓ {testName}: GetCultivationConditions() accessible");
+                LogInfo($"✓ {testName}: GetCultivationConditions(Vector3) accessible");
+                LogInfo($"✓ {testName}: Returned conditions type: {conditions?.GetType().Name ?? "null"}");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private void TestPlantUpdateProcessorBatch()
+        {
+            string testName = "PlantUpdateProcessor Batch Processing";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Test PlantUpdateProcessor with batch data
+                var processor = new PlantUpdateProcessor(true, true, true);
+                
+                // Create test plants list
+                var testPlants = new List<PlantInstance>();
+                
+                // Create a test plant instance
+                var testPlant = CreateTestPlantInstance();
+                if (testPlant != null)
+                {
+                    testPlants.Add(testPlant);
+                }
+                
+                // Test batch update (this was causing type conversion errors)
+                processor.UpdatePlantsBatch(testPlants, 0.1f, 1.0f);
+                
+                LogInfo($"✓ {testName}: PlantUpdateProcessor created successfully");
+                LogInfo($"✓ {testName}: UpdatePlantsBatch() executed without errors");
+                LogInfo($"✓ {testName}: Processed {testPlants.Count} plants");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private void TestStressTypeEnumAccess()
+        {
+            string testName = "StressType Enum Access";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Test access to StressType enum values that were causing CS0117 errors
+                var temperatureStress = ProjectChimera.Systems.Genetics.StressType.Temperature;
+                var heatStress = ProjectChimera.Systems.Genetics.StressType.Heat;
+                var coldStress = ProjectChimera.Systems.Genetics.StressType.Cold;
+                var lightStress = ProjectChimera.Systems.Genetics.StressType.Light;
+                var waterStress = ProjectChimera.Systems.Genetics.StressType.Water;
+                var droughtStress = ProjectChimera.Systems.Genetics.StressType.Drought;
+                var floodStress = ProjectChimera.Systems.Genetics.StressType.Flood;
+                var nutrientStress = ProjectChimera.Systems.Genetics.StressType.Nutrient;
+                var atmosphericStress = ProjectChimera.Systems.Genetics.StressType.Atmospheric;
+                
+                LogInfo($"✓ {testName}: All StressType enum values accessible");
+                LogInfo($"✓ {testName}: Temperature: {temperatureStress}");
+                LogInfo($"✓ {testName}: Heat: {heatStress}");
+                LogInfo($"✓ {testName}: Cold: {coldStress}");
+                LogInfo($"✓ {testName}: Light: {lightStress}");
+                LogInfo($"✓ {testName}: Water: {waterStress}");
+                LogInfo($"✓ {testName}: Drought: {droughtStress}");
+                LogInfo($"✓ {testName}: Flood: {floodStress}");
+                LogInfo($"✓ {testName}: Nutrient: {nutrientStress}");
+                LogInfo($"✓ {testName}: Atmospheric: {atmosphericStress}");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private void TestTypeConversionBetweenSystems()
+        {
+            string testName = "Type Conversion Between Systems";
+            LogInfo($"Testing: {testName}");
+            _totalTests++;
+            
+            try
+            {
+                // Test that types can be properly converted between systems
+                var cultivationConditions = new EnvironmentalConditions
+                {
+                    Temperature = 25f,
+                    Humidity = 65f,
+                    LightIntensity = 700f,
+                    CO2Level = 450f
+                };
+                
+                // Test PlantGenotype creation and usage
+                var plantGenotype = new PlantGenotype
+                {
+                    GenotypeID = "conversion_test_001",
+                    Generation = 1,
+                    Genotype = new Dictionary<string, AlleleCouple>
+                    {
+                        ["TEST_GENE"] = new AlleleCouple
+                        {
+                            Allele1 = "A",
+                            Allele2 = "a"
+                        }
+                    }
+                };
+                
+                // Test tuple creation (this was the main issue)
+                var tupleData = (plantGenotype, cultivationConditions);
+                
+                // Test list creation with tuple
+                var tupleList = new List<(PlantGenotype, EnvironmentalConditions)> { tupleData };
+                
+                LogInfo($"✓ {testName}: Tuple creation successful");
+                LogInfo($"✓ {testName}: List with tuples created: {tupleList.Count} items");
+                LogInfo($"✓ {testName}: Type conversions working correctly");
+                _passedTests++;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"✗ {testName}: {ex.Message}");
+                _failedTests++;
+            }
+        }
+        
+        private PlantInstance CreateTestPlantInstance()
+        {
+            try
+            {
+                // Create a test GameObject for the plant
+                var plantObj = new GameObject("TestPlant");
+                var plantInstance = plantObj.AddComponent<PlantInstance>();
+                
+                // Initialize with basic data
+                plantInstance.InitializeFromStrain(null);
+                
+                return plantInstance;
+            }
+            catch (System.Exception ex)
+            {
+                LogWarning($"Could not create test PlantInstance: {ex.Message}");
+                return null;
+            }
+        }
+        
+        private void LogInfo(string message)
+        {
+            if (_enableDetailedLogging)
+            {
+                Debug.Log($"[Wave38Test] {message}");
+            }
+        }
+        
+        private void LogWarning(string message)
+        {
+            Debug.LogWarning($"[Wave38Test] {message}");
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[Wave38Test] {message}");
+        }
+    }
+} 

@@ -1,0 +1,504 @@
+# Project Chimera: Code Audit Report
+
+**Generated**: 2025-07-13T14:48:50.540159
+
+## Summary
+
+- **Disabled Files**: 182
+- **Backup Files**: 9
+- **Redundant Manager Groups**: 2
+- **Monolithic Classes**: 280
+- **Namespace Conflicts**: 779
+- **Deletion Targets**: 7
+- **Total Problematic Files**: 198
+
+## Files Marked for Deletion (ADR Decisions)
+
+- `Assets/ProjectChimera/Core/SaveManager.cs` - ADR-001: Superseded by Systems/Save/SaveManager.cs
+- `Assets/ProjectChimera/Systems/Progression/ProgressionManager.cs` - ADR-002: Superseded by ComprehensiveProgressionManager.cs
+- `Assets/ProjectChimera/Systems/Progression/CleanProgressionManager.cs` - ADR-002: Superseded by ComprehensiveProgressionManager.cs
+- `Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs` - ADR-002: Superseded by ComprehensiveProgressionManager.cs
+- `Assets/ProjectChimera/UI/Core/GameUIManager.cs` - ADR-005: Superseded by UIManager.cs
+- `Assets/ProjectChimera/UI/AdvancedUIManager.cs` - ADR-005: Superseded by UIManager.cs
+- `Assets/ProjectChimera/Systems/Progression/AchievementManager.cs` - ADR-004: Superseded by LegacyAchievementManager.cs
+
+## Disabled Files (.cs.disabled)
+
+- `Assets/ProjectChimera/Wave22ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave6ErrorFixTest.cs.disabled`
+- `Assets/ProjectChimera/FinalCompilationCheck.cs.disabled`
+- `Assets/ProjectChimera/Wave48ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CareActionFixTest.cs.disabled`
+- `Assets/ProjectChimera/GeneticsCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/SimpleCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/CleanProgressionTest.cs.disabled`
+- `Assets/ProjectChimera/Wave40ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ResearchCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave37ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CurrentErrorTest.cs.disabled`
+- `Assets/ProjectChimera/Wave19ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/FinalErrorFixTest.cs.disabled`
+- `Assets/ProjectChimera/Wave30ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave47ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave16ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave38ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ChimeraLoggerFixVerification.cs.disabled`
+- `Assets/ProjectChimera/MilestoneSystemValidationTest.cs.disabled`
+- `Assets/ProjectChimera/AdvancedTournamentValidation.cs.disabled`
+- `Assets/ProjectChimera/FinalErrorResolutionTest.cs.disabled`
+- `Assets/ProjectChimera/Wave25ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave20ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/AdvancedIntegrationTest.cs.disabled`
+- `Assets/ProjectChimera/CleanCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/AromaticGamingValidation.cs.disabled`
+- `Assets/ProjectChimera/Wave28ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/EventCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/FinalPlantCareEventDataValidation.cs.disabled`
+- `Assets/ProjectChimera/EventDataPropertiesValidation.cs.disabled`
+- `Assets/ProjectChimera/GeneticResearchValidation.cs.disabled`
+- `Assets/ProjectChimera/FinalGamingSystemsValidation.cs.disabled`
+- `Assets/ProjectChimera/Wave35ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave42ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/PlayerAgencyCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/GeneticsAnalyticsValidation.cs.disabled`
+- `Assets/ProjectChimera/ComprehensiveProgressionValidation.cs.disabled`
+- `Assets/ProjectChimera/Wave45ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave32ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ScientificCompetitionValidation.cs.disabled`
+- `Assets/ProjectChimera/FinalTypeResolutionTest.cs.disabled`
+- `Assets/ProjectChimera/Wave3FixValidationTest.cs.disabled`
+- `Assets/ProjectChimera/PlayerAgencyFixTest.cs.disabled`
+- `Assets/ProjectChimera/EnvironmentalConditionsTypeTest.cs.disabled`
+- `Assets/ProjectChimera/LatestErrorFixTest.cs.disabled`
+- `Assets/ProjectChimera/ComprehensiveWave6ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CleanGeneticsTest.cs.disabled`
+- `Assets/ProjectChimera/Wave27ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ProgressionCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationFixValidation.cs.disabled`
+- `Assets/ProjectChimera/Wave26ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationValidation.cs.disabled`
+- `Assets/ProjectChimera/CompetitiveSystemValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ProjectChimeraValidationTest.cs.disabled`
+- `Assets/ProjectChimera/FinalWorkingCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationResolutionSummary.cs.disabled`
+- `Assets/ProjectChimera/FinalCompilationVerification.cs.disabled`
+- `Assets/ProjectChimera/CultivationCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave44ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/FinalCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave33ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave34ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationErrorFixVerification.cs.disabled`
+- `Assets/ProjectChimera/Wave43ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/FinalAmbiguityResolutionTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationErrorFixSummary.cs.disabled`
+- `Assets/ProjectChimera/NamespaceFixTest.cs.disabled`
+- `Assets/ProjectChimera/Wave29ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave21ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/AssemblyReferenceFixValidation.cs.disabled`
+- `Assets/ProjectChimera/ComprehensiveErrorFixTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave24ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/ScientificGamingDataValidation.cs.disabled`
+- `Assets/ProjectChimera/Wave17ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave39ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/BreedingChallengeValidation.cs.disabled`
+- `Assets/ProjectChimera/FinalCompilationValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave31ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CompetitionCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave7ComprehensiveErrorResolution.cs.disabled`
+- `Assets/ProjectChimera/Wave46ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave41ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave36ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Wave18ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/CompilationStatusVerification.cs.disabled`
+- `Assets/ProjectChimera/FinalWave6ErrorResolution.cs.disabled`
+- `Assets/ProjectChimera/DuplicateFixTest.cs.disabled`
+- `Assets/ProjectChimera/Wave23ValidationTest.cs.disabled`
+- `Assets/ProjectChimera/Testing/GeneticTestingFramework.cs.disabled`
+- `Assets/ProjectChimera/Testing/AssemblyDiagnostic.cs.disabled`
+- `Assets/ProjectChimera/Testing/GeneticInheritanceValidator.cs.disabled`
+- `Assets/ProjectChimera/Testing/SimpleEnvironmentalGamingCompilationTest.cs.disabled`
+- `Assets/ProjectChimera/Testing/NewFeaturesTestRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/TestDataSO.cs.disabled`
+- `Assets/ProjectChimera/Testing/SimpleTestRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/TestHarnessRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/GeneticValidationTestRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/AutomatedTestRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/TestingSummaryGenerator.cs.disabled`
+- `Assets/ProjectChimera/Testing/CultivationAchievementIntegrationTest.cs.disabled`
+- `Assets/ProjectChimera/Testing/TestEventChannels.cs.disabled`
+- `Assets/ProjectChimera/Testing/GeneticTestScene.cs.disabled`
+- `Assets/ProjectChimera/Systems/Cultivation/PlantHealthIndicatorSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Construction/ConstructionGamingSystemStubs.cs.disabled`
+- `Assets/ProjectChimera/Systems/Construction/EnhancedConstructionGamingManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Construction/CollaborativeConstructionSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Construction/ConstructionManager_Complex.cs.disabled`
+- `Assets/ProjectChimera/Systems/Construction/ConstructionChallengeEngine.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMAnalyticsDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMPestManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMSystemBase.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMBiologicalDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMBattleSystemBase.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMStubs.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMEnvironmentalManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMStrategyDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMStrategyManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMGamingManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMBiologicalManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMSupportingSystems.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMEntityManagerBase.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMAnalyticsManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMManagerImplementations.cs.disabled`
+- `Assets/ProjectChimera/Systems/IPM/IPMPestDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/ComprehensiveProgressionManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/ProgressionEventProcessor.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/ProgressionSupportManagers.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/AchievementSystemManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/CompetitiveManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/IntelligentRewardDistributor.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/MilestoneProgressionSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/AchievementAnalyticsEngine.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/HiddenAchievementDetector.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/SocialRecognitionEngine.cs.disabled`
+- `Assets/ProjectChimera/Systems/Progression/ProgressionIntegrator.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/CompetitiveMatchmakingSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/UnifiedExperienceManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/EnhancedScientificGamingManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/TournamentEventManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/BreedingChallengeManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/CommunityCollaborationSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/ScientificAchievementTracker.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/GeneticsGamingSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/ScientificSkillTreeManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/ScientificProgressionSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/ScientificCompetitionManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/SensoryTrainingSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/AromaticGamingSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/GeneticsGamingManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/AchievementRecognitionSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/ScientificReputationManager.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/TerpeneAnalysisGamingSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/GeneticsGamingDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/GeneticDiscoveryEngine.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/AromaticCreationStudio.cs.disabled`
+- `Assets/ProjectChimera/Systems/Genetics/BreedingChallengeSystem.cs.disabled`
+- `Assets/ProjectChimera/Systems/Effects/VisualFeedbackDataStructures.cs.disabled`
+- `Assets/ProjectChimera/Scripts/UI/MainGameUIController.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/UITestRunner.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/UIValidationSuite.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/UIPerformanceProfiler.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/UISystemComponentTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/PlantPanelTestSuite.cs.disabled`
+- `Assets/ProjectChimera/Testing/UI/UITestFramework.cs.disabled`
+- `Assets/ProjectChimera/Testing/Core/ChimeraTestBase.cs.disabled`
+- `Assets/ProjectChimera/Testing/Integration/AssemblyIntegrationTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Integration/IPMIntegrationTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Integration/UIIntegrationTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Performance/PerformanceTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Performance/CultivationPerformanceTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/EnvironmentalGamingSystemTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/ManagerImplementationTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/NewFeaturesTestSuite.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/EconomicGamingSystemTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Data/DataStructureTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/Economy/MarketManagerTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/Economy/TradingManagerTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/Cultivation/CultivationSystemValidator.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/AI/AIAdvisorManagerTests.cs.disabled`
+- `Assets/ProjectChimera/Testing/Systems/Construction/ConstructionGamingSystemTests.cs.disabled`
+
+## Backup Files
+
+- `Assets/ProjectChimera/UI/BreedingUI.cs.backup`
+- `Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup`
+- `Assets/ProjectChimera/Data/UI/UIDataStructures.cs.backup`
+- `Assets/ProjectChimera/Systems/SpeedTree/CannabisGeneticsEngine.cs.backup`
+- `Assets/ProjectChimera/Systems/Cultivation/PlantManager.cs.backup`
+- `Assets/ProjectChimera/Testing/Systems/ProjectChimera.Testing.Systems.asmdef.backup`
+- `Assets/ProjectChimera/UI/Core/GameUIManager.cs.backup`
+- `Assets/ProjectChimera/UI/Dashboard/FacilityDashboardController.cs.backup`
+- `Assets/ProjectChimera/Testing/ProjectChimera.Testing.asmdef.backup2`
+
+## Monolithic Classes (>500 lines)
+
+- `Assets/ProjectChimera/Systems/Gaming/GeneticsGamingDataStructures.cs` - 4865 lines (high priority)
+- `Assets/ProjectChimera/Data/Economy/EconomicDataStructures.cs` - 4408 lines (high priority)
+- `Assets/ProjectChimera/Scripts/SceneGeneration/ProceduralSceneGenerator.cs` - 2998 lines (high priority)
+- `Assets/ProjectChimera/Data/Progression/ProgressionDataStructures.cs` - 2864 lines (high priority)
+- `Assets/ProjectChimera/Data/Construction/ConstructionDataStructures.cs` - 2111 lines (high priority)
+- `Assets/ProjectChimera/Systems/Gaming/IPMGamingDataStructures.cs` - 2035 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/CannabisGeneticsEngine.cs` - 1924 lines (high priority)
+- `Assets/ProjectChimera/Scripts/Cultivation/AdvancedGrowRoomController.cs` - 1880 lines (high priority)
+- `Assets/ProjectChimera/Systems/Competition/CannabisCupManager.cs` - 1874 lines (high priority)
+- `Assets/ProjectChimera/UI/AIAdvisor/AIAdvisorController.cs` - 1838 lines (high priority)
+- `Assets/ProjectChimera/UI/Environmental/EnvironmentalControlController.cs` - 1706 lines (high priority)
+- `Assets/ProjectChimera/Systems/Construction/InteractiveFacilityConstructor.cs` - 1687 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/EnvironmentalResponseVFXController.cs` - 1629 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/SpeedTreeOptimizationSystem.cs` - 1608 lines (high priority)
+- `Assets/ProjectChimera/Data/Environment/HVACDataStructures.cs` - 1545 lines (high priority)
+- `Assets/ProjectChimera/UI/AdvancedUIManager.cs` - 1519 lines (high priority)
+- `Assets/ProjectChimera/Systems/Environment/AdvancedGrowLightSystem.cs` - 1498 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/DynamicGrowthAnimationSystem.cs` - 1487 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/SpeedTreeGrowthSystem.cs` - 1478 lines (high priority)
+- `Assets/ProjectChimera/Systems/Economy/NPCRelationshipManager.cs` - 1455 lines (high priority)
+- `Assets/ProjectChimera/Data/Environment/AtmosphericPhysicsDataStructures.cs` - 1439 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/LiveEventsManager.cs` - 1419 lines (high priority)
+- `Assets/ProjectChimera/Data/Narrative/NarrativeDataStructures.cs` - 1393 lines (high priority)
+- `Assets/ProjectChimera/UI/Settings/SettingsController.cs` - 1323 lines (high priority)
+- `Assets/ProjectChimera/Systems/Narrative/NPCInteractionManager.cs` - 1321 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/SpeedTreeEnvironmentalSystem.cs` - 1318 lines (high priority)
+- `Assets/ProjectChimera/Systems/AI/AIGamingManager.cs` - 1317 lines (high priority)
+- `Assets/ProjectChimera/Systems/Cultivation/InteractivePlantCareSystem.cs` - 1290 lines (high priority)
+- `Assets/ProjectChimera/UI/DataVisualization/DataVisualizationController.cs` - 1281 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/GeneticMorphologyVFXController.cs` - 1273 lines (high priority)
+- `Assets/ProjectChimera/Systems/Community/CommunityGamingManager.cs` - 1270 lines (high priority)
+- `Assets/ProjectChimera/UI/Panels/PlantBreedingPanel.cs` - 1262 lines (high priority)
+- `Assets/ProjectChimera/UI/Panels/PlantManagementPanel.cs` - 1260 lines (high priority)
+- `Assets/ProjectChimera/Systems/AI/AIAdvisorManager.cs` - 1251 lines (high priority)
+- `Assets/ProjectChimera/UI/Research/ResearchProgressionController.cs` - 1229 lines (high priority)
+- `Assets/ProjectChimera/Systems/Automation/AutomationManager.cs` - 1224 lines (high priority)
+- `Assets/ProjectChimera/Systems/Competition/LegacyAchievementManager.cs` - 1224 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/GPUBatchingInstanceSystem.cs` - 1215 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/GrowthDataStructures.cs` - 1210 lines (high priority)
+- `Assets/ProjectChimera/Systems/Narrative/QuestMissionManager.cs` - 1208 lines (high priority)
+- `Assets/ProjectChimera/Systems/Economy/TradingManager.cs` - 1198 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/RandomEventManager.cs` - 1198 lines (high priority)
+- `Assets/ProjectChimera/Systems/Cultivation/EarnedAutomationProgressionSystem.cs` - 1185 lines (high priority)
+- `Assets/ProjectChimera/Data/Progression/ResearchDataStructures.cs` - 1174 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/LargeScaleRenderingSystem.cs` - 1170 lines (high priority)
+- `Assets/ProjectChimera/Systems/Prefabs/PrefabLibraryManager.cs` - 1166 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/AdvancedSpeedTreeManager.cs` - 1165 lines (high priority)
+- `Assets/ProjectChimera/UI/Core/UIAccessibilityManager.cs` - 1164 lines (high priority)
+- `Assets/ProjectChimera/Systems/Progression/ResearchManager.cs` - 1160 lines (high priority)
+- `Assets/ProjectChimera/Systems/Cultivation/PlantManager.cs` - 1151 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/SeasonalAdaptationVFXController.cs` - 1150 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/MemoryStreamingSystem.cs` - 1150 lines (high priority)
+- `Assets/ProjectChimera/UI/Automation/AutomationControlController.cs` - 1149 lines (high priority)
+- `Assets/ProjectChimera/Systems/Genetics/ScientificAchievementManager.cs` - 1144 lines (high priority)
+- `Assets/ProjectChimera/Systems/Genetics/BreedingSimulator.cs` - 1127 lines (high priority)
+- `Assets/ProjectChimera/Testing/AutomatedTestRunner.cs` - 1126 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/PlantHealthVFXController.cs` - 1124 lines (high priority)
+- `Assets/ProjectChimera/Systems/Cultivation/PlayerAgencyGamingSystem.cs` - 1115 lines (high priority)
+- `Assets/ProjectChimera/Systems/Construction/ConstructionGamingManager.cs` - 1114 lines (high priority)
+- `Assets/ProjectChimera/Testing/NewFeaturesTestRunner.cs` - 1110 lines (high priority)
+- `Assets/ProjectChimera/Data/Community/CommunityDataStructures.cs` - 1110 lines (high priority)
+- `Assets/ProjectChimera/Data/Economy/FinanceDataStructures.cs` - 1109 lines (high priority)
+- `Assets/ProjectChimera/UI/Core/GameUIManager.cs` - 1107 lines (high priority)
+- `Assets/ProjectChimera/Systems/IPM/IPMBattleSystem.cs` - 1106 lines (high priority)
+- `Assets/ProjectChimera/Systems/Audio/AdvancedAudioManager.cs` - 1105 lines (high priority)
+- `Assets/ProjectChimera/Systems/Effects/AdvancedEffectsManager.cs` - 1090 lines (high priority)
+- `Assets/ProjectChimera/UI/Financial/FinancialManagementController.cs` - 1085 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/AdvancedLODSystem.cs` - 1070 lines (high priority)
+- `Assets/ProjectChimera/Systems/Narrative/DynamicEventManager.cs` - 1066 lines (high priority)
+- `Assets/ProjectChimera/Systems/Tutorial/EconomicsTutorialManager.cs` - 1057 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/SeasonalContentManager.cs` - 1056 lines (high priority)
+- `Assets/ProjectChimera/Systems/Narrative/BranchingNarrativeEngine.cs` - 1051 lines (high priority)
+- `Assets/ProjectChimera/Systems/IPM/IPMGamingInterfaces.cs` - 1051 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/LiveEventInterfaces.cs` - 1051 lines (high priority)
+- `Assets/ProjectChimera/UI/Panels/CompetitivePanel.cs` - 1051 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/PlantGrowthTransitionController.cs` - 1034 lines (high priority)
+- `Assets/ProjectChimera/Systems/Effects/VisualFeedbackSystem.cs` - 1025 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/SpeedTreeDataStructures.cs` - 1023 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/EventAnalyticsManager.cs` - 1016 lines (high priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/EnvironmentalDataStructures.cs` - 1005 lines (high priority)
+- `Assets/ProjectChimera/Systems/Visuals/AdvancedMaterialPropertyController.cs` - 1003 lines (high priority)
+- `Assets/ProjectChimera/Systems/Narrative/CharacterDialogueManager.cs` - 1002 lines (high priority)
+- `Assets/ProjectChimera/Systems/Prefabs/EffectsPrefabLibrary.cs` - 1001 lines (high priority)
+- `Assets/ProjectChimera/Systems/Events/CommunityChallenge.cs` - 982 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/NarrativeManager.cs` - 979 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/ProgressionManager.cs` - 978 lines (medium priority)
+- `Assets/ProjectChimera/Editor/IPMGamingSystemAudit.cs` - 976 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/FertigationSystemSO.cs` - 976 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/ConsequenceTrackingSystem.cs` - 976 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/FacilityManagementPanel.cs` - 976 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/IPMMonitoringDashboard.cs` - 969 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/SkillTreeManager.cs` - 967 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/PestDetectionSystem.cs` - 964 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/BiologicalControlSystem.cs` - 963 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Save/SaveManager.cs` - 955 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Camera/AdvancedCameraController.cs` - 954 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/AdvancedWindEnvironmentalSystem.cs` - 952 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/SettingsPanel.cs` - 952 lines (medium priority)
+- `Assets/ProjectChimera/Data/Effects/VisualEffectsDataStructures.cs` - 949 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/Testing/TutorialTestingFramework.cs` - 945 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Events/GlobalEventCoordinator.cs` - 944 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Cultivation/PlantUpdateProcessor.cs` - 939 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/StoryCampaignManager.cs` - 931 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/CannabisVFXTemplateManager.cs` - 925 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/SaveLoadPanel.cs` - 925 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/GeneticsTutorialManager.cs` - 924 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/DialogueProcessingEngine.cs` - 924 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Cultivation/PlantInstance.cs` - 920 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/TrichromeVFXController.cs` - 920 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Effects/VisualEffectsManager.cs` - 920 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/IPMSystemSO.cs` - 918 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/IPMFramework.cs` - 914 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/EnhancedTutorialManager.cs` - 913 lines (medium priority)
+- `Assets/ProjectChimera/UI/DebugInspector.cs` - 911 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Equipment/EquipmentDegradationManager.cs` - 905 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/RealtimeGrowthParameterSystem.cs` - 901 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Environment/EnvironmentalSensor.cs` - 901 lines (medium priority)
+- `Assets/ProjectChimera/UI/BreedingUI.cs` - 899 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/AchievementSystemManager.cs` - 899 lines (medium priority)
+- `Assets/ProjectChimera/Data/Tutorial/CultivationTutorialStepDefinitions.cs` - 888 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Economy/CurrencyManager.cs` - 880 lines (medium priority)
+- `Assets/ProjectChimera/Data/Construction/ConstructionCostDataStructures.cs` - 879 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Economy/MarketManager.cs` - 876 lines (medium priority)
+- `Assets/ProjectChimera/Data/Construction/ConstructionGamingDataStructures.cs` - 871 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Construction/RoomCreationManager.cs` - 870 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/DiseaseManagementSystem.cs` - 866 lines (medium priority)
+- `Assets/ProjectChimera/UI/Financial/CurrencyPanel.cs` - 866 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/ObjectiveManager.cs` - 865 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/EnvironmentalManager.cs` - 863 lines (medium priority)
+- `Assets/ProjectChimera/Systems/IPM/EnhancedIPMGamingSystem.cs` - 861 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/ProgressionIntegrator.cs` - 856 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/AromaticGamingSystem.cs` - 856 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/CultivationTutorialManager.cs` - 855 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/BreedingTournamentManager.cs` - 851 lines (medium priority)
+- `Assets/ProjectChimera/Editor/SceneSetup/EnhancedGameSceneBuilder.cs` - 850 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/GeneticMorphologyMappingSystem.cs` - 844 lines (medium priority)
+- `Assets/ProjectChimera/Examples/AutomationSystemDemo.cs` - 842 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Prefabs/UIPrefabLibrary.cs` - 840 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/AdvancedShaderSystem.cs` - 838 lines (medium priority)
+- `Assets/ProjectChimera/UI/Dashboard/FacilityDashboardController.cs` - 838 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/CultivationZoneSO.cs` - 837 lines (medium priority)
+- `Assets/ProjectChimera/Data/Events/MissingEventTypes.cs` - 834 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIRenderOptimizer.cs` - 832 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Economy/ContractManager.cs` - 830 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/StoryEventSystem.cs` - 828 lines (medium priority)
+- `Assets/ProjectChimera/Data/Save/SaveDataStructures.cs` - 822 lines (medium priority)
+- `Assets/ProjectChimera/UI/AdvancedBreedingUI.cs` - 821 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/UITestFramework.cs` - 819 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIPerformanceOptimizer.cs` - 819 lines (medium priority)
+- `Assets/ProjectChimera/Core/AdvancedDataValidationFramework.cs` - 814 lines (medium priority)
+- `Assets/ProjectChimera/Data/Genetics/ScientificGamingEnums.cs` - 808 lines (medium priority)
+- `Assets/ProjectChimera/Data/AI/AIGamingDataStructures.cs` - 807 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/CharacterRelationshipSystem.cs` - 807 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIStateManager.cs` - 804 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Gaming/MiniGameManager.cs` - 803 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/ObjectivesPanel.cs` - 795 lines (medium priority)
+- `Assets/ProjectChimera/Data/Narrative/QuestDatabaseSO.cs` - 792 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Progression/ComprehensiveProgressionManager.cs` - 791 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/SpeedTreeVFXIntegrationManager.cs` - 790 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Environment/LightingController.cs` - 790 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/EnvironmentalAutomationSO.cs` - 789 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/BreedingGoalManager.cs` - 789 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/RandomEventsPanel.cs` - 787 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Facilities/FacilityManager.cs` - 778 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/EnvironmentalChallengeFramework.cs` - 772 lines (medium priority)
+- `Assets/ProjectChimera/Data/Economy/EconomicGamingDataStructures.cs` - 770 lines (medium priority)
+- `Assets/ProjectChimera/Data/Tutorial/GeneticsTutorialStepDefinitions.cs` - 769 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Cultivation/EnhancedCultivationGamingManager.cs` - 769 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Economy/EnhancedEconomicGamingManager.cs` - 767 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Systems/ManagerImplementationTests.cs` - 757 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/EnhancedEnvironmentalGamingManager.cs` - 750 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Systems/NewFeaturesTestSuite.cs` - 749 lines (medium priority)
+- `Assets/ProjectChimera/Core/SaveManager.cs` - 748 lines (medium priority)
+- `Assets/ProjectChimera/Systems/SpeedTree/SpeedTreePlantInstance.cs` - 748 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/TutorialManager.cs` - 748 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Cultivation/SkillTreeVisualizationController.cs` - 744 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/HVACManager.cs` - 743 lines (medium priority)
+- `Assets/ProjectChimera/Data/Community/CommunityGamingDataStructures.cs` - 741 lines (medium priority)
+- `Assets/ProjectChimera/Core/UnifiedPerformanceManagementSystem.cs` - 739 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/BreedingChallengeSystem.cs` - 739 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Prefabs/FacilityPrefabLibrary.cs` - 738 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/AdvancedTournamentSystem.cs` - 736 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Prefabs/EnvironmentalPrefabLibrary.cs` - 735 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/GeneticPerformanceOptimization.cs` - 733 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/PlantInstanceSO.cs` - 722 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Events/LiveEventChannels.cs` - 722 lines (medium priority)
+- `Assets/ProjectChimera/Data/Genetics/CannabisGenotype.cs` - 719 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/UIValidationSuite.cs` - 711 lines (medium priority)
+- `Assets/ProjectChimera/Data/Genetics/ScientificProgressionConfigSO.cs` - 704 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Construction/EquipmentPlacementManager.cs` - 703 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/AtmosphericPhysicsSimulator.cs` - 703 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIKeyboardNavigator.cs` - 703 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIPanel.cs` - 700 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Audio/AudioDataStructures.cs` - 699 lines (medium priority)
+- `Assets/ProjectChimera/Data/IPM/IPMDataStructures.cs` - 696 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Facilities/GrowRoomController.cs` - 694 lines (medium priority)
+- `Assets/ProjectChimera/Data/Tutorial/TutorialDataStructures.cs` - 687 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/UIPerformanceProfiler.cs` - 687 lines (medium priority)
+- `Assets/ProjectChimera/UI/Panels/GameplayHUDPanel.cs` - 682 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/NarrativeInterfaces.cs` - 676 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/GeneticsAnalyticsManager.cs` - 676 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Effects/VisualFeedbackDataStructures.cs` - 675 lines (medium priority)
+- `Assets/ProjectChimera/Core/SettingsManager.cs` - 673 lines (medium priority)
+- `Assets/ProjectChimera/Editor/SceneSetup/GameSceneBuilder.cs` - 671 lines (medium priority)
+- `Assets/ProjectChimera/Data/Progression/SkillNodeSO.cs` - 671 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/UITestRunner.cs` - 671 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Integration/AssemblyIntegrationTests.cs` - 669 lines (medium priority)
+- `Assets/ProjectChimera/Data/Progression/AchievementBaseClasses.cs` - 668 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Narrative/CharacterRelationship.cs` - 668 lines (medium priority)
+- `Assets/ProjectChimera/Data/Tutorial/EconomicsTutorialStepDefinitions.cs` - 665 lines (medium priority)
+- `Assets/ProjectChimera/Data/IPM/IPMGamingArchitectureTypes.cs` - 665 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Environment/IrrigationController.cs` - 651 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/PlantVFXAttachmentManager.cs` - 646 lines (medium priority)
+- `Assets/ProjectChimera/ComprehensiveProgressionValidation.cs` - 645 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/UI/TutorialUIController.cs` - 644 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Environment/HVACController.cs` - 644 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/TraitExpressionEngine.cs` - 638 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Effects/EffectsDataStructures.cs` - 637 lines (medium priority)
+- `Assets/ProjectChimera/Data/Environment/LightingDataStructures.cs` - 635 lines (medium priority)
+- `Assets/ProjectChimera/UI/Components/UIComponents.cs` - 634 lines (medium priority)
+- `Assets/ProjectChimera/Editor/AssemblyReferenceValidator.cs` - 629 lines (medium priority)
+- `Assets/ProjectChimera/Events/Core/EventDataStructures.cs` - 625 lines (medium priority)
+- `Assets/ProjectChimera/Data/Economy/ContractSO.cs` - 624 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIBaseClasses.cs` - 624 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Data/DataStructureTests.cs` - 623 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/UISystemComponentTests.cs` - 615 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIManager.cs` - 615 lines (medium priority)
+- `Assets/ProjectChimera/Editor/UnityEditorDiagnostics.cs` - 613 lines (medium priority)
+- `Assets/ProjectChimera/Data/Construction/EquipmentPlacementDataStructures.cs` - 610 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Environment/LightingManager.cs` - 610 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/UI/MainGameUIController.cs` - 608 lines (medium priority)
+- `Assets/ProjectChimera/AromaticGamingValidation.cs` - 605 lines (medium priority)
+- `Assets/ProjectChimera/Core/AdvancedManagerDependencySystem.cs` - 605 lines (medium priority)
+- `Assets/ProjectChimera/Data/Achievements/AchievementDataStructures.cs` - 604 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Construction/ConstructionCostManager.cs` - 603 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIPrefabManager.cs` - 601 lines (medium priority)
+- `Assets/ProjectChimera/Data/Facilities/FacilityData.cs` - 594 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/VPDManagementSO.cs` - 593 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Professional/ProfessionalPolishManager.cs` - 582 lines (medium priority)
+- `Assets/ProjectChimera/Testing/UI/PlantPanelTestSuite.cs` - 577 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Prefabs/EquipmentPrefabLibrary.cs` - 569 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Integration/IPMIntegrationTests.cs` - 569 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIScreenReader.cs` - 569 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIElementPool.cs` - 569 lines (medium priority)
+- `Assets/ProjectChimera/Data/Events/LiveEventChannelSO.cs` - 567 lines (medium priority)
+- `Assets/ProjectChimera/Data/Events/SeasonalContentLibrarySO.cs` - 566 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Visuals/URPVFXCompatibilityManager.cs` - 564 lines (medium priority)
+- `Assets/ProjectChimera/Editor/IPMGamingAuditReport.cs` - 559 lines (medium priority)
+- `Assets/ProjectChimera/Core/EventManager.cs` - 554 lines (medium priority)
+- `Assets/ProjectChimera/Scripts/Cultivation/PlantInstanceComponent.cs` - 554 lines (medium priority)
+- `Assets/ProjectChimera/Data/Progression/ResearchCategorySO.cs` - 550 lines (medium priority)
+- `Assets/ProjectChimera/Data/Automation/AutomationDataStructures.cs` - 549 lines (medium priority)
+- `Assets/ProjectChimera/Data/AI/AIDataStructures.cs` - 547 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/Editor/TutorialValidationWindow.cs` - 546 lines (medium priority)
+- `Assets/ProjectChimera/Data/Genetics/GenotypeDataSO.cs` - 545 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/ScientificCompetitionManager.cs` - 545 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Cultivation/TreeSkillProgressionSystem.cs` - 541 lines (medium priority)
+- `Assets/ProjectChimera/AdvancedIntegrationTest.cs` - 538 lines (medium priority)
+- `Assets/ProjectChimera/Data/Narrative/StoryArcLibrarySO.cs` - 538 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Genetics/GeneticResearchManager.cs` - 538 lines (medium priority)
+- `Assets/ProjectChimera/Data/Tutorial/TutorialDataAssetManager.cs` - 535 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Professional/ExtensionFramework.cs` - 528 lines (medium priority)
+- `Assets/ProjectChimera/Data/Genetics/PlantStrainSO.cs` - 527 lines (medium priority)
+- `Assets/ProjectChimera/Events/Narrative/CharacterEventChannelSO.cs` - 523 lines (medium priority)
+- `Assets/ProjectChimera/Data/Events/EventDatabaseSO.cs` - 522 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIDesignSystem.cs` - 521 lines (medium priority)
+- `Assets/ProjectChimera/Data/Economy/MarketProductSO.cs` - 520 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Professional/UIAnimationSystem.cs` - 520 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Community/CommunityManager.cs` - 520 lines (medium priority)
+- `Assets/ProjectChimera/Data/Events/SeasonalContentConfigSO.cs` - 519 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/UI/OnboardingUIController.cs` - 518 lines (medium priority)
+- `Assets/ProjectChimera/Data/Progression/ResearchProjectSO.cs` - 513 lines (medium priority)
+- `Assets/ProjectChimera/Testing/Systems/EnvironmentalGamingSystemTests.cs` - 513 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/UI/TutorialHintSystem.cs` - 507 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Professional/AccessibilitySystem.cs` - 506 lines (medium priority)
+- `Assets/ProjectChimera/Core/DataManager.cs` - 503 lines (medium priority)
+- `Assets/ProjectChimera/Data/Cultivation/EnvironmentalConditions.cs` - 503 lines (medium priority)
+- `Assets/ProjectChimera/UI/Core/UIPrefabLibrarySO.cs` - 503 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Save/DataSerializer.cs` - 502 lines (medium priority)
+- `Assets/ProjectChimera/Systems/Tutorial/UI/TutorialOverlayManager.cs` - 501 lines (medium priority)
+

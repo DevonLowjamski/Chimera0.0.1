@@ -1,0 +1,68 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Events;
+using ProjectChimera.Data.Cultivation;
+// Alias to resolve CareAction ambiguity
+using EventsCareAction = ProjectChimera.Events.CareAction;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Comprehensive test for all recent error fixes
+    /// </summary>
+    public class ComprehensiveErrorFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Comprehensive Error Fix Test ===");
+            
+            // Test that all the systems with recent fixes compile and are accessible
+            TestSystemAccess();
+            TestEnumDefinitions();
+            TestTypeAliases();
+            
+            Debug.Log("Comprehensive error fix test completed successfully!");
+        }
+        
+        private void TestSystemAccess()
+        {
+            Debug.Log("Testing system access...");
+            
+            var timeAccelerationSystem = GetComponent<TimeAccelerationGamingSystem>();
+            var automationSystem = GetComponent<EarnedAutomationProgressionSystem>();
+            var careSystem = GetComponent<InteractivePlantCareSystem>();
+            var skillSystem = GetComponent<TreeSkillProgressionSystem>();
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            
+            Debug.Log("✓ All major systems accessible");
+        }
+        
+        private void TestEnumDefinitions()
+        {
+            Debug.Log("Testing enum definitions...");
+            
+            // Test CareAction enum
+            var careAction = EventsCareAction.Watering;
+            Debug.Log($"✓ CareAction enum works: {careAction}");
+            
+            // Test GrowthStage enum  
+            var growthStage = GrowthStage.Vegetative;
+            Debug.Log($"✓ GrowthStage enum works: {growthStage}");
+        }
+        
+        private void TestTypeAliases()
+        {
+            Debug.Log("Testing type alias resolution...");
+            
+            // These should compile without ambiguous reference errors
+            var skillSystem = GetComponent<TreeSkillProgressionSystem>();
+            if (skillSystem != null)
+            {
+                var skillLevel = skillSystem.GetOverallSkillLevel();
+                Debug.Log($"✓ SkillLevel type resolved: {skillLevel}");
+            }
+            
+            Debug.Log("✓ Type aliases working correctly");
+        }
+    }
+}

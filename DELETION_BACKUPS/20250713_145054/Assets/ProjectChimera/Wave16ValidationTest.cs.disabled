@@ -1,0 +1,43 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Cultivation;
+using TraitExpressionEngine = ProjectChimera.Systems.Genetics.TraitExpressionEngine;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Wave 16 Validation Test - Assembly Reference Fix
+    /// Tests that Genetics assembly can properly reference Cultivation namespace
+    /// </summary>
+    public class Wave16ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 16 Assembly Reference Validation ===");
+            
+            TestGeneticsAssemblyReferences();
+            
+            Debug.Log("✅ Wave 16 assembly reference fix validated successfully!");
+        }
+        
+        private void TestGeneticsAssemblyReferences()
+        {
+            Debug.Log("Testing Genetics assembly can access Cultivation namespace...");
+            
+            // Test that BreedingSimulator can be instantiated (uses ProjectChimera.Systems.Cultivation)
+            var breedingSimulator = new BreedingSimulator(false, 0.1f);
+            Debug.Log("✓ BreedingSimulator instantiated successfully");
+            
+            // Test that TraitExpressionEngine can be instantiated (uses ProjectChimera.Systems.Cultivation)
+            var traitEngine = new TraitExpressionEngine(true, true);
+            Debug.Log("✓ TraitExpressionEngine instantiated successfully");
+            
+            // Test PlantGenotype access (from Data.Genetics) - using CreateInstance for ScriptableObject
+            var genotype = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            Debug.Log($"✓ GenotypeDataSO created: {genotype != null}");
+            
+            Debug.Log("All Genetics → Cultivation assembly references working correctly!");
+        }
+    }
+} 

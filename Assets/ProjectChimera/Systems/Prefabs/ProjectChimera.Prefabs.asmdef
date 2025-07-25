@@ -1,0 +1,21 @@
+{
+    "name": "ProjectChimera.Systems.Prefabs",
+    "rootNamespace": "ProjectChimera.Systems.Prefabs",
+    "references": [
+        "ProjectChimera.Core",
+        "ProjectChimera.Data",
+        "ProjectChimera.Systems.Environment",
+        "ProjectChimera.Systems.Cultivation",
+        "ProjectChimera.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

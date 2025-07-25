@@ -1,0 +1,36 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Test to verify namespace structure is correct after CS0116 fix
+    /// </summary>
+    public class NamespaceFixTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Namespace Structure Test ===");
+            
+            // Test that PlayerAgencyGamingSystem compiles correctly
+            var agencySystem = GetComponent<PlayerAgencyGamingSystem>();
+            Debug.Log("✓ PlayerAgencyGamingSystem compiles without CS0116 error");
+            
+            // Test local PlayerChoice class
+            var choice = new PlayerChoice
+            {
+                ChoiceType = PlayerChoiceType.CultivationMethod,
+                ChoiceDescription = "Test choice",
+                ImpactLevel = 0.8f,
+                ChoiceTimestamp = Time.time
+            };
+            Debug.Log($"✓ Local PlayerChoice works: {choice.ChoiceType}");
+            
+            // Test local ConsequenceType enum
+            var consequenceType = ConsequenceType.YieldChange;
+            Debug.Log($"✓ Local ConsequenceType enum works: {consequenceType}");
+            
+            Debug.Log("✓ All namespace structure issues resolved!");
+        }
+    }
+}

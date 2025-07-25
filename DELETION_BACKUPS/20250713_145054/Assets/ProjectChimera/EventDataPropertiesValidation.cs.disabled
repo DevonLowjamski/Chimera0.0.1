@@ -1,0 +1,116 @@
+using UnityEngine;
+using ProjectChimera.Events;
+using ProjectChimera.Core.Events;
+using ProjectChimera.Data.Cultivation;
+// Aliases to resolve ambiguous references
+using EventsCultivationTaskType = ProjectChimera.Events.CultivationTaskType;
+using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using EventsCareQuality = ProjectChimera.Events.CareQuality;
+using DataCareQuality = ProjectChimera.Data.Cultivation.CareQuality;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Event Data Properties Validation Test
+    /// Tests that all event data classes have the required properties for InteractivePlantCareSystem
+    /// </summary>
+    public class EventDataPropertiesValidation : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Event Data Properties Validation ===");
+            
+            TestPlantCareEventDataProperties();
+            TestSkillProgressionEventDataProperties();
+            TestCareActionProperties();
+            
+            Debug.Log("✅ All event data properties validated successfully!");
+        }
+        
+        private void TestPlantCareEventDataProperties()
+        {
+            Debug.Log("Testing PlantCareEventData properties...");
+            
+            var careEventData = new PlantCareEventData
+            {
+                // Original properties
+                PlantId = "test-plant",
+                CareActionString = "Watering",
+                EffectivenessScore = 0.85f,
+                Timestamp = Time.time,
+                
+                // Extended properties for InteractivePlantCareSystem
+                PlantInstance = new ProjectChimera.Data.Cultivation.InteractivePlant
+                {
+                    PlantInstanceID = 123,
+                    PlantedTime = System.DateTime.Now
+                },
+                CareAction = new ProjectChimera.Events.CareActionData
+                {
+                    TaskType = CultivationTaskType.Watering,
+                    ToolName = "Standard Watering Can",
+                    PlayerSkillLevel = 5.0f,
+                    Duration = 2.5f
+                },
+                CareQuality = CareQuality.Good,
+                CareEffects = new ProjectChimera.Events.CareEffects
+                {
+                    HydrationChange = 0.3f,
+                    HealthImprovement = 0.2f
+                },
+                PlayerSkillLevel = 5.0f,
+                TaskType = CultivationTaskType.Watering,
+                PlantId_Int = 123
+            };
+            
+            Debug.Log($"✓ PlantCareEventData: Action={careEventData.CareAction.TaskType}, Quality={careEventData.CareQuality}, Skill={careEventData.PlayerSkillLevel}");
+        }
+        
+        private void TestSkillProgressionEventDataProperties()
+        {
+            Debug.Log("Testing SkillProgressionEventData properties...");
+            
+            var skillEvent = new SkillProgressionEventData
+            {
+                // Original properties
+                TaskType = CultivationTaskType.Pruning,
+                RelatedBranch = SkillTreeBranch.Cultivation,
+                SkillGain = 0.5f,
+                NewSkillLevel = 6.5f,
+                ProgressionMultiplier = 1.2f,
+                ProgressionTrigger = "Care Action Completed",
+                ProgressionTimestamp = Time.time,
+                
+                // Extended properties for InteractivePlantCareSystem
+                Milestone = new SkillMilestone
+                {
+                    MilestoneId = "pruning-expert",
+                    MilestoneName = "Pruning Expert",
+                    RequiredLevel = 6.0f,
+                    IsUnlocked = true
+                },
+                CurrentSkillLevel = 6.5f,
+                Timestamp = Time.time
+            };
+            
+            Debug.Log($"✓ SkillProgressionEventData: Task={skillEvent.TaskType}, Milestone={skillEvent.Milestone.MilestoneName}, Level={skillEvent.CurrentSkillLevel}");
+        }
+        
+        private void TestCareActionProperties()
+        {
+            Debug.Log("Testing CareActionData properties...");
+            
+            var careAction = new ProjectChimera.Events.CareActionData
+            {
+                TaskType = CultivationTaskType.Fertilizing,
+                ToolName = "Organic Fertilizer Kit",
+                Timestamp = Time.time,
+                Duration = 3.0f,
+                MaxDuration = 5.0f,
+                PlayerSkillLevel = 7.2f
+            };
+            
+            Debug.Log($"✓ CareActionData: Task={careAction.TaskType}, Tool={careAction.ToolName}, Skill={careAction.PlayerSkillLevel}");
+        }
+    }
+}

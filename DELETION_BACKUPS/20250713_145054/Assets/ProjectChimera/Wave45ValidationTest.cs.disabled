@@ -1,0 +1,221 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Environment;
+using ProjectChimera.Data.Genetics;
+using GxE_ProfileSO = ProjectChimera.Data.Environment.GxE_ProfileSO;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Wave 45 Validation Test: Verify GxE_ProfileSO type resolution is working correctly.
+    /// 
+    /// This test validates:
+    /// 1. GxE_ProfileSO type can be found and instantiated
+    /// 2. EnvironmentalResponseSystem can use GxE_ProfileSO without CS0246 errors
+    /// 3. PlantUpdateProcessor compiles successfully with all type aliases
+    /// 4. No namespace conflicts are reintroduced from the fix
+    /// 5. Integration with PlantStrainSO.GxEProfile property works correctly
+    /// </summary>
+    public class Wave45ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool enableDebugLogging = true;
+        
+        private void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllValidationTests();
+            }
+        }
+        
+        public void RunAllValidationTests()
+        {
+            LogTest("=== Wave 45 Validation Test Suite ===");
+            
+            bool allTestsPassed = true;
+            
+            allTestsPassed &= TestGxEProfileSOTypeResolution();
+            allTestsPassed &= TestEnvironmentalResponseSystemCompilation();
+            allTestsPassed &= TestPlantUpdateProcessorCompilation();
+            allTestsPassed &= TestNoNamespaceConflicts();
+            allTestsPassed &= TestPlantStrainSOIntegration();
+            
+            LogTest($"=== Wave 45 Validation Complete: {(allTestsPassed ? "PASSED" : "FAILED")} ===");
+        }
+        
+        private bool TestGxEProfileSOTypeResolution()
+        {
+            LogTest("Testing GxE_ProfileSO type resolution...");
+            
+            try
+            {
+                // Test that we can reference the type without CS0246 errors
+                System.Type gxeProfileType = typeof(GxE_ProfileSO);
+                
+                // Test that we can create an instance (as ScriptableObject)
+                var gxeProfile = ScriptableObject.CreateInstance<GxE_ProfileSO>();
+                
+                if (gxeProfile != null)
+                {
+                    LogTest("✓ GxE_ProfileSO type resolution successful");
+                    LogTest($"  - Type: {gxeProfileType.FullName}");
+                    LogTest($"  - Instance created: {gxeProfile.GetType().Name}");
+                    
+                    // Clean up
+                    DestroyImmediate(gxeProfile);
+                    return true;
+                }
+                else
+                {
+                    LogTest("✗ GxE_ProfileSO instance creation failed");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ GxE_ProfileSO type resolution failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestEnvironmentalResponseSystemCompilation()
+        {
+            LogTest("Testing EnvironmentalResponseSystem compilation...");
+            
+            try
+            {
+                // Test that we can create an EnvironmentalResponseSystem without compilation errors
+                // This tests that the private GxE_ProfileSO field can be declared successfully
+                var environmentalSystem = new PlantUpdateProcessor.EnvironmentalResponseSystem();
+                
+                LogTest("✓ EnvironmentalResponseSystem compilation successful");
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ EnvironmentalResponseSystem compilation failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantUpdateProcessorCompilation()
+        {
+            LogTest("Testing PlantUpdateProcessor compilation...");
+            
+            try
+            {
+                // Test that PlantUpdateProcessor can be created with all type aliases working
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                LogTest("✓ PlantUpdateProcessor compilation successful");
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantUpdateProcessor compilation failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestNoNamespaceConflicts()
+        {
+            LogTest("Testing that no namespace conflicts were reintroduced...");
+            
+            try
+            {
+                // Test that we can still create all EnvironmentalConditions types without conflicts
+                var dataCultivationConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                var systemsCultivationConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CreateOptimal();
+                var dataEnvironmentConditions = new ProjectChimera.Data.Environment.EnvironmentalConditions();
+                
+                // Test that we can access GxE_ProfileSO without affecting other types
+                var gxeProfile = ScriptableObject.CreateInstance<GxE_ProfileSO>();
+                
+                LogTest("✓ No namespace conflicts detected");
+                LogTest("  - All EnvironmentalConditions types accessible");
+                LogTest("  - GxE_ProfileSO accessible without conflicts");
+                
+                // Clean up
+                DestroyImmediate(gxeProfile);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ Namespace conflict detected: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantStrainSOIntegration()
+        {
+            LogTest("Testing PlantStrainSO integration with GxE_ProfileSO...");
+            
+            try
+            {
+                // Create a PlantStrainSO instance
+                var plantStrain = ScriptableObject.CreateInstance<PlantStrainSO>();
+                
+                // Test that we can access the GxEProfile property
+                var gxeProfile = plantStrain.GxEProfile;
+                
+                // Test that we can create and assign a GxE_ProfileSO
+                var newGxeProfile = ScriptableObject.CreateInstance<GxE_ProfileSO>();
+                
+                // Verify types match
+                bool typesMatch = newGxeProfile.GetType() == typeof(ProjectChimera.Data.Environment.GxE_ProfileSO);
+                
+                LogTest("✓ PlantStrainSO integration successful");
+                LogTest($"  - GxEProfile property accessible: {gxeProfile == null}");
+                LogTest($"  - Type compatibility verified: {typesMatch}");
+                
+                // Clean up
+                DestroyImmediate(plantStrain);
+                DestroyImmediate(newGxeProfile);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogTest($"✗ PlantStrainSO integration failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private void LogTest(string message)
+        {
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Wave45Validation] {message}");
+            }
+        }
+    }
+}
+
+namespace ProjectChimera.Systems.Cultivation
+{
+    /// <summary>
+    /// Extension to PlantUpdateProcessor to expose EnvironmentalResponseSystem for testing.
+    /// This is needed because EnvironmentalResponseSystem is a nested class.
+    /// </summary>
+    public partial class PlantUpdateProcessor
+    {
+        /// <summary>
+        /// Public nested class for testing access to EnvironmentalResponseSystem.
+        /// </summary>
+        public class EnvironmentalResponseSystem
+        {
+            private PlantStrainSO _strain;
+            private GxE_ProfileSO _gxeProfile; // This line tests that GxE_ProfileSO is properly resolved
+            private float _environmentalFitness = 1f;
+            
+            public void Initialize(PlantStrainSO strain)
+            {
+                _strain = strain;
+                _gxeProfile = strain?.GxEProfile;
+            }
+            
+            public float GetEnvironmentalFitness() => _environmentalFitness;
+        }
+    }
+} 

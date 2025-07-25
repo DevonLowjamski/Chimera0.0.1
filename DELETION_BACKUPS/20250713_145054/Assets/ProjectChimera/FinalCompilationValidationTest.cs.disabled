@@ -1,0 +1,94 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Events;
+using ProjectChimera.Core.Events;
+using System.Collections.Generic;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final compilation validation test for all cultivation system fixes
+    /// Tests ConvertToLocalPendingConsequence, ConvertFromEventsConsequenceType, PlantCareEventData properties, and approach variable fixes
+    /// </summary>
+    public class FinalCompilationValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Final Compilation Validation Test ===");
+            
+            TestPlayerAgencyGamingSystemFixes();
+            TestPlantCareEventDataProperties();
+            TestEventDataStructures();
+            
+            Debug.Log("✅ All compilation fixes validated successfully!");
+        }
+        
+        private void TestPlayerAgencyGamingSystemFixes()
+        {
+            Debug.Log("Testing PlayerAgencyGamingSystem fixes...");
+            
+            // Test that PlayerAgencyGamingSystem compiles with all conversion methods
+            var agencySystem = gameObject.AddComponent<PlayerAgencyGamingSystem>();
+            
+            // Test local ConsequenceType enum
+            var localConsequence = ConsequenceType.YieldChange;
+            var eventsConsequence = ProjectChimera.Events.ConsequenceType.Immediate;
+            
+            Debug.Log($"✓ PlayerAgencyGamingSystem: Local={localConsequence}, Events={eventsConsequence}");
+        }
+        
+        private void TestPlantCareEventDataProperties()
+        {
+            Debug.Log("Testing PlantCareEventData properties...");
+            
+            // Test PlantCareEventData with all required properties
+            var careEvent = new ProjectChimera.Core.Events.PlantCareEventData
+            {
+                PlantId = "test-plant",
+                CareActionString = "Watering",
+                EffectivenessScore = 0.85f,
+                Timestamp = Time.time,
+                // New properties that were added
+                TaskType = "Watering", // Changed to string
+                PlayerSkillLevel = 5.5f,
+                PlantId_Int = 123
+            };
+            
+            Debug.Log($"✓ PlantCareEventData: {careEvent.CareActionString}, TaskType={careEvent.TaskType}, Skill={careEvent.PlayerSkillLevel}");
+        }
+        
+        private void TestEventDataStructures()
+        {
+            Debug.Log("Testing EventDataStructures compilation...");
+            
+            // Test that CareEffects is accessible from Events namespace (defined locally in Events)
+            var careEffects = new ProjectChimera.Events.CareEffects
+            {
+                HydrationChange = 0.2f,
+                HealthImprovement = 0.15f,
+                StressReduction = 0.1f
+            };
+            
+            // Test that InteractivePlant is accessible from Events namespace (defined locally in Events)
+            var plant = new ProjectChimera.Events.InteractivePlant
+            {
+                PlantInstanceID = 456,
+                PlantedTime = System.DateTime.Now
+            };
+            
+            Debug.Log($"✓ EventDataStructures: CareEffects={careEffects.HealthImprovement}, Plant={plant.PlantInstanceID}");
+        }
+    }
+    
+    // Local enum for testing - matches the one in PlayerAgencyGamingSystem
+    public enum ConsequenceType
+    {
+        YieldChange,
+        EfficiencyChange,
+        CostChange,
+        QualityChange,
+        UnlockChange,
+        RelationshipChange
+    }
+}

@@ -1,0 +1,77 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using System.Linq;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Wave 21 Validation Test - Duplicate Method and Shader Redefinition Fixes
+    /// Tests that PlantManager duplicate methods and shader conflicts are resolved
+    /// </summary>
+    public class Wave21ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 21 Duplicate Method and Shader Redefinition Validation ===");
+            
+            TestPlantManagerMethodResolution();
+            TestShaderCompilation();
+            
+            Debug.Log("✅ Wave 21 duplicate method and shader redefinition fixes validated successfully!");
+        }
+        
+        private void TestPlantManagerMethodResolution()
+        {
+            Debug.Log("Testing PlantManager method resolution...");
+            
+            // Test that PlantManager can be instantiated without duplicate method conflicts
+            var plantManagerType = typeof(PlantManager);
+            var performCacheCleanupMethods = plantManagerType.GetMethods(
+                System.Reflection.BindingFlags.NonPublic | 
+                System.Reflection.BindingFlags.Instance)
+                .Where(m => m.Name == "PerformCacheCleanup");
+            
+            int methodCount = performCacheCleanupMethods.Count();
+            Debug.Log($"✓ PerformCacheCleanup method count: {methodCount} (should be 1)");
+            
+            if (methodCount == 1)
+            {
+                Debug.Log("✓ PlantManager duplicate method issue resolved successfully");
+            }
+            else
+            {
+                Debug.LogError($"✗ PlantManager still has {methodCount} PerformCacheCleanup methods");
+            }
+        }
+        
+        private void TestShaderCompilation()
+        {
+            Debug.Log("Testing TraitExpressionCompute shader compilation...");
+            
+            // Test that the compute shader can be loaded without redefinition errors
+            var computeShader = Resources.Load<ComputeShader>("TraitExpressionCompute");
+            
+            if (computeShader != null)
+            {
+                Debug.Log("✓ TraitExpressionCompute shader loaded successfully");
+                
+                // Test that the shader has the expected kernel
+                bool hasKernel = computeShader.HasKernel("CalculateTraitExpression");
+                Debug.Log($"✓ CalculateTraitExpression kernel found: {hasKernel}");
+                
+                if (hasKernel)
+                {
+                    Debug.Log("✓ Shader GenotypeData redefinition issue resolved successfully");
+                }
+                else
+                {
+                    Debug.LogError("✗ Shader kernel not found - compilation may have failed");
+                }
+            }
+            else
+            {
+                Debug.LogError("✗ TraitExpressionCompute shader could not be loaded");
+            }
+        }
+    }
+} 

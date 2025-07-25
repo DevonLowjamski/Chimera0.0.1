@@ -1,0 +1,231 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Wave 47 Validation Test: Verify fully qualified type names resolve compiler confusion.
+    /// 
+    /// This test validates:
+    /// 1. ConvertToDataCultivationConditions method compiles with fully qualified parameter type
+    /// 2. Systems.Cultivation.EnvironmentalConditions properties are accessible (AirCirculation, EC, MoisureLevel)
+    /// 3. Data.Cultivation.EnvironmentalConditions properties are accessible (AirFlow, ElectricalConductivity, WaterAvailability)
+    /// 4. Type conversion works correctly between Systems and Data versions
+    /// 5. No CS1503, CS1061, or CS0029 compilation errors
+    /// 6. PlantUpdateProcessor compiles successfully with all method signatures
+    /// </summary>
+    public class Wave47ValidationTest : MonoBehaviour
+    {
+        [Header("Wave 47 Validation - Type Name Resolution")]
+        public bool runTestOnStart = true;
+        
+        void Start()
+        {
+            if (runTestOnStart)
+            {
+                RunValidationTest();
+            }
+        }
+        
+        public void RunValidationTest()
+        {
+            Debug.Log("=== Wave 47 Validation Test: Type Name Resolution ===");
+            
+            bool allTestsPassed = true;
+            
+            // Test 1: Verify Systems.Cultivation.EnvironmentalConditions type resolution
+            allTestsPassed &= TestSystemsEnvironmentalConditionsAccess();
+            
+            // Test 2: Verify Data.Cultivation.EnvironmentalConditions type resolution
+            allTestsPassed &= TestDataEnvironmentalConditionsAccess();
+            
+            // Test 3: Verify type conversion logic (without calling the private method)
+            allTestsPassed &= TestTypeConversionLogic();
+            
+            // Test 4: Verify PlantUpdateProcessor integration
+            allTestsPassed &= TestPlantUpdateProcessorIntegration();
+            
+            // Test 5: Verify namespace disambiguation
+            allTestsPassed &= TestNamespaceDisambiguation();
+            
+            if (allTestsPassed)
+            {
+                Debug.Log("✅ Wave 47 Validation PASSED: All type name resolution tests successful!");
+            }
+            else
+            {
+                Debug.LogError("❌ Wave 47 Validation FAILED: Some type name resolution tests failed!");
+            }
+        }
+        
+        private bool TestSystemsEnvironmentalConditionsAccess()
+        {
+            try
+            {
+                // Create Systems.Cultivation.EnvironmentalConditions and test property access
+                var systemsConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CreateOptimal();
+                
+                // Test accessing properties that should exist in Systems version
+                float airCirculation = systemsConditions.AirCirculation; // Should be percentage
+                float ec = systemsConditions.EC; // Should be μS/cm
+                float moistureLevel = systemsConditions.MoisureLevel; // Should be percentage
+                float temperature = systemsConditions.Temperature;
+                float humidity = systemsConditions.Humidity;
+                float lightIntensity = systemsConditions.LightIntensity;
+                float co2Level = systemsConditions.CO2Level;
+                float pH = systemsConditions.pH;
+                float photoperiodHours = systemsConditions.PhotoperiodHours;
+                
+                // Verify values are reasonable
+                bool validValues = airCirculation >= 0f && airCirculation <= 100f &&
+                                 ec >= 0f && ec <= 3000f &&
+                                 moistureLevel >= 0f && moistureLevel <= 100f &&
+                                 temperature > 0f && humidity > 0f;
+                
+                Debug.Log($"✅ Systems.Cultivation.EnvironmentalConditions properties accessible: AirCirculation={airCirculation}, EC={ec}, MoisureLevel={moistureLevel}");
+                return validValues;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Systems.Cultivation.EnvironmentalConditions property access failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestDataEnvironmentalConditionsAccess()
+        {
+            try
+            {
+                // Create Data.Cultivation.EnvironmentalConditions and test property access
+                var dataConditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test accessing properties that should exist in Data version
+                float airFlow = dataConditions.AirFlow; // Should be factor
+                float electricalConductivity = dataConditions.ElectricalConductivity; // Should be μS/cm
+                float waterAvailability = dataConditions.WaterAvailability; // Should be factor
+                float vpd = dataConditions.VPD; // Should be kPa
+                float temperature = dataConditions.Temperature;
+                float humidity = dataConditions.Humidity;
+                float lightIntensity = dataConditions.LightIntensity;
+                float co2Level = dataConditions.CO2Level;
+                float pH = dataConditions.pH;
+                float photoperiodHours = dataConditions.PhotoperiodHours;
+                
+                // Test CalculateDerivedValues method
+                dataConditions.CalculateDerivedValues();
+                
+                // Verify values are reasonable
+                bool validValues = airFlow >= 0f &&
+                                 electricalConductivity >= 0f &&
+                                 waterAvailability >= 0f &&
+                                 vpd >= 0f &&
+                                 temperature > 0f && humidity > 0f;
+                
+                Debug.Log($"✅ Data.Cultivation.EnvironmentalConditions properties accessible: AirFlow={airFlow}, ElectricalConductivity={electricalConductivity}, WaterAvailability={waterAvailability}, VPD={vpd}");
+                return validValues;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Data.Cultivation.EnvironmentalConditions property access failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestTypeConversionLogic()
+        {
+            try
+            {
+                // Create Systems version
+                var systemsConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions.CreateOptimal();
+                
+                // Simulate the conversion logic that should work in ConvertToDataCultivationConditions
+                var dataConditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test property assignments that should work
+                dataConditions.Temperature = systemsConditions.Temperature;
+                dataConditions.Humidity = systemsConditions.Humidity;
+                dataConditions.LightIntensity = systemsConditions.LightIntensity;
+                dataConditions.CO2Level = systemsConditions.CO2Level;
+                dataConditions.AirFlow = systemsConditions.AirCirculation / 100f; // Convert percentage to factor
+                dataConditions.pH = systemsConditions.pH;
+                dataConditions.PhotoperiodHours = systemsConditions.PhotoperiodHours;
+                dataConditions.WaterAvailability = systemsConditions.MoisureLevel; // Map property names
+                dataConditions.ElectricalConductivity = systemsConditions.EC; // Map property names
+                
+                // Calculate VPD
+                dataConditions.VPD = EnvironmentalConditions.CalculateVPD(systemsConditions.Temperature, systemsConditions.Humidity);
+                
+                // Calculate derived values
+                dataConditions.CalculateDerivedValues();
+                
+                Debug.Log($"✅ Type conversion logic successful: Systems→Data conversion completed");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Type conversion logic failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestPlantUpdateProcessorIntegration()
+        {
+            try
+            {
+                // Test PlantUpdateProcessor creation (this will test compilation)
+                var processor = new PlantUpdateProcessor(enableStressSystem: true, enableGxEInteractions: true, enableAdvancedGenetics: false);
+                
+                // Test performance methods
+                var stats = processor.GetCacheStatistics();
+                var performanceMetrics = processor.GetPerformanceMetrics();
+                
+                // Test cache operations
+                processor.ClearTraitExpressionCache();
+                processor.OptimizePerformance();
+                
+                Debug.Log($"✅ PlantUpdateProcessor integration successful: Cache size={stats.cacheSize}, Performance metrics available");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ PlantUpdateProcessor integration failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        private bool TestNamespaceDisambiguation()
+        {
+            try
+            {
+                // Test that we can create both types without confusion
+                var systemsType = typeof(ProjectChimera.Systems.Cultivation.EnvironmentalConditions);
+                var dataType = typeof(ProjectChimera.Data.Cultivation.EnvironmentalConditions);
+                
+                // Verify they are different types
+                bool typesDifferent = systemsType != dataType;
+                
+                // Test using alias resolution
+                var dataConditionsViaAlias = typeof(EnvironmentalConditions);
+                bool aliasCorrect = dataConditionsViaAlias == dataType;
+                
+                Debug.Log($"✅ Namespace disambiguation successful: Systems type={systemsType.Name}, Data type={dataType.Name}, Alias correct={aliasCorrect}");
+                return typesDifferent && aliasCorrect;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ Namespace disambiguation failed: {e.Message}");
+                return false;
+            }
+        }
+        
+        [ContextMenu("Run Wave 47 Validation")]
+        public void RunValidationFromMenu()
+        {
+            RunValidationTest();
+        }
+    }
+} 

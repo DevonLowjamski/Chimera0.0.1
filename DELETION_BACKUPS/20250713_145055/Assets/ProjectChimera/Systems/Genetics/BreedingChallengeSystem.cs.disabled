@@ -1,0 +1,730 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Advanced Breeding Challenge System for Project Chimera.
+    /// Creates engaging genetics puzzles that teach real breeding principles while
+    /// maintaining scientific accuracy. Features dynamic difficulty scaling,
+    /// educational content integration, and sophisticated scoring algorithms.
+    /// </summary>
+    public class BreedingChallengeSystem
+    {
+        private readonly GeneticsConfigSO _config;
+        private readonly Dictionary<string, BreedingChallenge> _allChallenges = new Dictionary<string, BreedingChallenge>();
+        private readonly Dictionary<string, BreedingAttempt> _activeAttempts = new Dictionary<string, BreedingAttempt>();
+        private readonly List<BreedingChallenge> _templateChallenges = new List<BreedingChallenge>();
+        
+        // Advanced Genetics Integration
+        private AdvancedGeneticsEngine _geneticsEngine;
+        private BreedingSimulator _breedingSimulator;
+        private TraitPredictionEngine _predictionEngine;
+        
+        // Challenge Generation
+        private ChallengeGenerator _challengeGenerator;
+        private DifficultyScaler _difficultyScaler;
+        private EducationalContentProvider _contentProvider;
+        
+        // Events
+        public event Action<BreedingChallenge, bool> OnChallengeCompleted;
+        public event Action<BreedingAttempt> OnBreedingStepCompleted;
+        public event Action<string, string> OnHintRequested;
+        
+        public BreedingChallengeSystem(GeneticsConfigSO config)
+        {
+            _config = config;
+            InitializeSystem();
+        }
+        
+        private void InitializeSystem()
+        {
+            // Initialize genetics engines
+            _geneticsEngine = new AdvancedGeneticsEngine(_config);
+            _breedingSimulator = new BreedingSimulator(_config);
+            _predictionEngine = new TraitPredictionEngine(_config);
+            
+            // Initialize challenge systems
+            _challengeGenerator = new ChallengeGenerator(_config);
+            _difficultyScaler = new DifficultyScaler(_config);
+            _contentProvider = new EducationalContentProvider(_config);
+            
+            // Generate base challenge templates
+            GenerateBaseChallenges();
+            
+            Debug.Log("[BreedingChallengeSystem] Initialized with advanced genetics integration");
+        }
+        
+        #region Challenge Creation & Management
+        
+        public BreedingChallenge CreateChallenge(BreedingChallengeConfig config)
+        {
+            var challenge = _challengeGenerator.GenerateChallenge(config);
+            
+            // Add educational content
+            challenge.LearningObjectives = _contentProvider.GetLearningObjectives(challenge);
+            challenge.ScientificExplanation = _contentProvider.GetScientificExplanation(challenge);
+            challenge.RealWorldApplications = _contentProvider.GetRealWorldApplications(challenge);
+            
+            _allChallenges[challenge.ChallengeId] = challenge;
+            return challenge;
+        }
+        
+        public List<BreedingChallenge> GetChallengesForSkillLevel(int playerLevel)
+        {
+            var availableChallenges = new List<BreedingChallenge>();
+            
+            // Get template challenges appropriate for level
+            var templates = _templateChallenges.Where(c => IsAppropriateForLevel(c, playerLevel)).ToList();
+            
+            // Generate variations of templates
+            foreach (var template in templates.Take(5)) // Limit to 5 active challenges
+            {
+                var variation = _challengeGenerator.CreateVariation(template, playerLevel);
+                availableChallenges.Add(variation);
+            }
+            
+            // Add some procedurally generated challenges
+            var proceduralChallenges = _challengeGenerator.GenerateProceduralChallenges(playerLevel, 3);
+            availableChallenges.AddRange(proceduralChallenges);
+            
+            return availableChallenges;
+        }
+        
+        public BreedingChallenge GetChallenge(string challengeId)
+        {
+            _allChallenges.TryGetValue(challengeId, out var challenge);
+            return challenge;
+        }
+        
+        public bool StartChallenge(string challengeId, string playerId)
+        {
+            var challenge = GetChallenge(challengeId);
+            if (challenge == null) return false;
+            
+            var attempt = new BreedingAttempt
+            {
+                ChallengeId = challengeId,
+                PlayerId = playerId,
+                StartTime = DateTime.Now
+            };
+            
+            _activeAttempts[attempt.AttemptId] = attempt;
+            return true;
+        }
+        
+        #endregion
+        
+        #region Breeding Simulation & Scoring
+        
+        public BreedingAttempt ProcessBreedingStep(string challengeId, string playerId, string parent1Id, string parent2Id, string reasoning = "")
+        {
+            var challenge = GetChallenge(challengeId);
+            var attempt = GetActiveAttempt(challengeId, playerId);
+            
+            if (challenge == null || attempt == null) return null;
+            
+            // Perform actual genetic cross using advanced genetics engine
+            var offspring = _breedingSimulator.PerformCross(parent1Id, parent2Id);
+            
+            // Predict traits using player's selected parents
+            var predictedTraits = _predictionEngine.PredictOffspringTraits(parent1Id, parent2Id);
+            
+            // Calculate accuracy of prediction vs actual result
+            var actualTraits = _geneticsEngine.AnalyzeStrainTraits(offspring.StrainId);
+            var stepAccuracy = CalculateTraitPredictionAccuracy(predictedTraits, actualTraits);
+            
+            var breedingStep = new BreedingStep
+            {
+                Generation = attempt.GenerationsUsed + 1,
+                Parent1Id = parent1Id,
+                Parent2Id = parent2Id,
+                OffspringId = offspring.StrainId,
+                PredictedTraits = predictedTraits,
+                ActualTraits = actualTraits,
+                StepAccuracy = stepAccuracy,
+                PlayerReasoning = reasoning
+            };
+            
+            attempt.BreedingSteps.Add(breedingStep);
+            attempt.GenerationsUsed++;
+            
+            // Update running accuracy score
+            UpdateAttemptAccuracy(attempt);
+            
+            OnBreedingStepCompleted?.Invoke(attempt);
+            
+            return attempt;
+        }
+        
+        public ChallengeCompletionResult CompleteChallengeSubmission(string challengeId, string playerId, string finalStrainId)
+        {
+            var challenge = GetChallenge(challengeId);
+            var attempt = GetActiveAttempt(challengeId, playerId);
+            
+            if (challenge == null || attempt == null)
+                return new ChallengeCompletionResult { WasSuccessful = false };
+            
+            // Analyze final strain against challenge requirements
+            var finalTraits = _geneticsEngine.AnalyzeStrainTraits(finalStrainId);
+            var success = EvaluateChallengeSuccess(challenge, finalTraits);
+            
+            // Calculate final scores
+            var result = CalculateFinalScore(challenge, attempt, finalTraits, success);
+            
+            // Complete the attempt
+            attempt.EndTime = DateTime.Now;
+            attempt.IsCompleted = true;
+            attempt.WasSuccessful = success;
+            attempt.FinalResult = result;
+            attempt.TotalPoints = CalculateTotalPoints(challenge, attempt, result);
+            
+            OnChallengeCompleted?.Invoke(challenge, success);
+            
+            return new ChallengeCompletionResult 
+            { 
+                Challenge = challenge, 
+                WasSuccessful = success, 
+                Result = result,
+                TotalPoints = attempt.TotalPoints
+            };
+        }
+        
+        #endregion
+        
+        #region Advanced Scoring & Evaluation
+        
+        private bool EvaluateChallengeSuccess(BreedingChallenge challenge, Dictionary<string, float> finalTraits)
+        {
+            var requiredTraitsMet = 0;
+            var totalRequiredTraits = challenge.RequiredTraits.Count(t => t.IsRequired);
+            
+            foreach (var targetTrait in challenge.RequiredTraits)
+            {
+                if (!finalTraits.TryGetValue(targetTrait.TraitName, out var actualValue))
+                    continue;
+                
+                var difference = Math.Abs(actualValue - targetTrait.TargetValue);
+                var isWithinTolerance = difference <= targetTrait.ToleranceRange;
+                
+                if (targetTrait.IsRequired && isWithinTolerance)
+                {
+                    requiredTraitsMet++;
+                }
+                else if (!targetTrait.IsRequired && isWithinTolerance)
+                {
+                    // Bonus points for optional traits
+                }
+            }
+            
+            return requiredTraitsMet >= totalRequiredTraits;
+        }
+        
+        private BreedingResult CalculateFinalScore(BreedingChallenge challenge, BreedingAttempt attempt, Dictionary<string, float> finalTraits, bool success)
+        {
+            var result = new BreedingResult
+            {
+                WasSuccessful = success,
+                TraitAccuracy = CalculateOverallTraitAccuracy(challenge, finalTraits),
+                EfficiencyScore = CalculateEfficiencyScore(challenge, attempt),
+                InnovationScore = CalculateInnovationScore(attempt),
+                EducationalScore = CalculateEducationalScore(challenge, attempt)
+            };
+            
+            // Apply difficulty multipliers
+            var difficultyMultiplier = _difficultyScaler.GetScoreMultiplier(challenge.Difficulty);
+            result.TraitAccuracy *= difficultyMultiplier;
+            result.EfficiencyScore *= difficultyMultiplier;
+            
+            return result;
+        }
+        
+        private float CalculateOverallTraitAccuracy(BreedingChallenge challenge, Dictionary<string, float> finalTraits)
+        {
+            float totalAccuracy = 0f;
+            int traitCount = 0;
+            
+            foreach (var targetTrait in challenge.RequiredTraits)
+            {
+                if (finalTraits.TryGetValue(targetTrait.TraitName, out var actualValue))
+                {
+                    var difference = Math.Abs(actualValue - targetTrait.TargetValue);
+                    var normalizedDifference = difference / (targetTrait.ToleranceRange * 2f); // Normalize to 0-1
+                    var accuracy = Mathf.Clamp01(1f - normalizedDifference);
+                    
+                    // Weight by priority
+                    var weightedAccuracy = accuracy * (targetTrait.Priority / 10f + 0.5f);
+                    totalAccuracy += weightedAccuracy;
+                    traitCount++;
+                }
+            }
+            
+            return traitCount > 0 ? totalAccuracy / traitCount : 0f;
+        }
+        
+        private float CalculateEfficiencyScore(BreedingChallenge challenge, BreedingAttempt attempt)
+        {
+            // Score based on generations used vs maximum allowed
+            var generationEfficiency = 1f - ((float)attempt.GenerationsUsed / challenge.MaxGenerations);
+            
+            // Score based on time taken vs time limit
+            var timeEfficiency = 1f;
+            if (attempt.EndTime.HasValue && challenge.TimeLimit > 0)
+            {
+                var timeTaken = (float)(attempt.EndTime.Value - attempt.StartTime).TotalSeconds;
+                timeEfficiency = 1f - (timeTaken / challenge.TimeLimit);
+            }
+            
+            return (generationEfficiency + timeEfficiency) / 2f;
+        }
+        
+        private float CalculateInnovationScore(BreedingAttempt attempt)
+        {
+            // Award points for creative breeding approaches
+            var innovationScore = 0f;
+            
+            // Check for novel parent combinations
+            var uniqueCombinations = GetUniqueCombinations(attempt.BreedingSteps);
+            innovationScore += uniqueCombinations * 0.1f;
+            
+            // Award points for strategic reasoning
+            var reasoningQuality = AnalyzeReasoningQuality(attempt.BreedingSteps);
+            innovationScore += reasoningQuality * 0.2f;
+            
+            return Mathf.Clamp01(innovationScore);
+        }
+        
+        private float CalculateEducationalScore(BreedingChallenge challenge, BreedingAttempt attempt)
+        {
+            // Score based on demonstrated understanding of genetic principles
+            var educationalScore = 0f;
+            
+            // Check if player followed scientific breeding principles
+            educationalScore += AnalyzeBreedingPrinciples(attempt.BreedingSteps) * 0.4f;
+            
+            // Award points for achieving learning objectives
+            educationalScore += EvaluateLearningObjectives(challenge, attempt) * 0.6f;
+            
+            return Mathf.Clamp01(educationalScore);
+        }
+        
+        #endregion
+        
+        #region Educational Integration
+        
+        public string GetHint(string challengeId, string playerId, int hintLevel)
+        {
+            var challenge = GetChallenge(challengeId);
+            var attempt = GetActiveAttempt(challengeId, playerId);
+            
+            if (challenge == null || attempt == null) return "";
+            
+            var hint = _contentProvider.GenerateContextualHint(challenge, attempt, hintLevel);
+            OnHintRequested?.Invoke(playerId, hint);
+            
+            return hint;
+        }
+        
+        public List<string> GetEducationalExplanations(string challengeId)
+        {
+            var challenge = GetChallenge(challengeId);
+            if (challenge == null) return new List<string>();
+            
+            return _contentProvider.GetDetailedExplanations(challenge);
+        }
+        
+        public Dictionary<string, string> GetGeneticPrinciples(string challengeId)
+        {
+            var challenge = GetChallenge(challengeId);
+            if (challenge == null) return new Dictionary<string, string>();
+            
+            return _contentProvider.GetRelevantGeneticPrinciples(challenge);
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private void GenerateBaseChallenges()
+        {
+            // Create educational challenge templates covering key genetics concepts
+            
+            // Mendelian Inheritance Challenges
+            _templateChallenges.AddRange(CreateMendelianChallenges());
+            
+            // Polygenic Trait Challenges  
+            _templateChallenges.AddRange(CreatePolygenicChallenges());
+            
+            // Cannabis-Specific Challenges
+            _templateChallenges.AddRange(CreateCannabisChallenges());
+            
+            // Advanced Genetics Challenges
+            _templateChallenges.AddRange(CreateAdvancedChallenges());
+        }
+        
+        private List<BreedingChallenge> CreateMendelianChallenges()
+        {
+            var challenges = new List<BreedingChallenge>();
+            
+            // Simple Dominance Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Understanding Dominance",
+                Description = "Create a strain expressing the dominant purple leaf trait",
+                Difficulty = DifficultyLevel.Beginner,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "LeafColor", TargetValue = 1f, ToleranceRange = 0.1f, IsRequired = true, Priority = 1 }
+                },
+                MaxGenerations = 2,
+                TimeLimit = 300f,
+                LearningObjectives = new List<string>
+                {
+                    "Understand dominant vs recessive alleles",
+                    "Learn basic Mendelian inheritance patterns",
+                    "Practice phenotype prediction"
+                }
+            });
+            
+            // Incomplete Dominance Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Incomplete Dominance",
+                Description = "Create a strain with intermediate flower color through incomplete dominance",
+                Difficulty = DifficultyLevel.Novice,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "FlowerColor", TargetValue = 0.5f, ToleranceRange = 0.05f, IsRequired = true, Priority = 1 }
+                },
+                MaxGenerations = 3,
+                TimeLimit = 450f
+            });
+            
+            return challenges;
+        }
+        
+        private List<BreedingChallenge> CreatePolygenicChallenges()
+        {
+            var challenges = new List<BreedingChallenge>();
+            
+            // Multiple Gene Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Polygenic Height Control",
+                Description = "Breed for specific plant height using multiple height genes",
+                Difficulty = DifficultyLevel.Intermediate,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "PlantHeight", TargetValue = 0.75f, ToleranceRange = 0.05f, IsRequired = true, Priority = 1 }
+                },
+                MaxGenerations = 4,
+                TimeLimit = 600f,
+                LearningObjectives = new List<string>
+                {
+                    "Understand polygenic inheritance",
+                    "Learn additive gene effects",
+                    "Practice quantitative trait breeding"
+                }
+            });
+            
+            return challenges;
+        }
+        
+        private List<BreedingChallenge> CreateCannabisChallenges()
+        {
+            var challenges = new List<BreedingChallenge>();
+            
+            // THC/CBD Ratio Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Perfect 1:1 CBD:THC",
+                Description = "Create a medical strain with equal CBD and THC content",
+                Difficulty = DifficultyLevel.Advanced,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "THC_Content", TargetValue = 0.15f, ToleranceRange = 0.02f, IsRequired = true, Priority = 1 },
+                    new TargetTrait { TraitName = "CBD_Content", TargetValue = 0.15f, ToleranceRange = 0.02f, IsRequired = true, Priority = 1 }
+                },
+                MaxGenerations = 5,
+                TimeLimit = 900f
+            });
+            
+            // Terpene Profile Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Citrus Terpene Profile",
+                Description = "Develop a strain with high limonene and low myrcene for energizing effects",
+                Difficulty = DifficultyLevel.Expert,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "Limonene", TargetValue = 0.8f, ToleranceRange = 0.1f, IsRequired = true, Priority = 1 },
+                    new TargetTrait { TraitName = "Myrcene", TargetValue = 0.2f, ToleranceRange = 0.1f, IsRequired = true, Priority = 2 }
+                },
+                MaxGenerations = 6,
+                TimeLimit = 1200f
+            });
+            
+            return challenges;
+        }
+        
+        private List<BreedingChallenge> CreateAdvancedChallenges()
+        {
+            var challenges = new List<BreedingChallenge>();
+            
+            // Epistasis Challenge
+            challenges.Add(new BreedingChallenge
+            {
+                ChallengeName = "Epistatic Interactions",
+                Description = "Navigate complex gene interactions to achieve target phenotype",
+                Difficulty = DifficultyLevel.Master,
+                RequiredTraits = new List<TargetTrait>
+                {
+                    new TargetTrait { TraitName = "TrichomeDensity", TargetValue = 0.9f, ToleranceRange = 0.05f, IsRequired = true, Priority = 1 },
+                    new TargetTrait { TraitName = "ResinProduction", TargetValue = 0.85f, ToleranceRange = 0.05f, IsRequired = true, Priority = 1 }
+                },
+                MaxGenerations = 8,
+                TimeLimit = 1800f
+            });
+            
+            return challenges;
+        }
+        
+        private bool IsAppropriateForLevel(BreedingChallenge challenge, int playerLevel)
+        {
+            var requiredLevel = challenge.Difficulty switch
+            {
+                DifficultyLevel.Beginner => 1,
+                DifficultyLevel.Novice => 3,
+                DifficultyLevel.Intermediate => 5,
+                DifficultyLevel.Advanced => 10,
+                DifficultyLevel.Expert => 15,
+                DifficultyLevel.Master => 25,
+                DifficultyLevel.Grandmaster => 40,
+                _ => 1
+            };
+            
+            return playerLevel >= requiredLevel && playerLevel <= requiredLevel + 10;
+        }
+        
+        private BreedingAttempt GetActiveAttempt(string challengeId, string playerId)
+        {
+            return _activeAttempts.Values.FirstOrDefault(a => 
+                a.ChallengeId == challengeId && 
+                a.PlayerId == playerId && 
+                !a.IsCompleted);
+        }
+        
+        private float CalculateTraitPredictionAccuracy(Dictionary<string, float> predicted, Dictionary<string, float> actual)
+        {
+            if (predicted.Count == 0) return 0f;
+            
+            float totalAccuracy = 0f;
+            int comparedTraits = 0;
+            
+            foreach (var kvp in predicted)
+            {
+                if (actual.TryGetValue(kvp.Key, out var actualValue))
+                {
+                    var difference = Math.Abs(kvp.Value - actualValue);
+                    var accuracy = 1f - Mathf.Clamp01(difference);
+                    totalAccuracy += accuracy;
+                    comparedTraits++;
+                }
+            }
+            
+            return comparedTraits > 0 ? totalAccuracy / comparedTraits : 0f;
+        }
+        
+        private void UpdateAttemptAccuracy(BreedingAttempt attempt)
+        {
+            if (attempt.BreedingSteps.Count == 0) return;
+            
+            var totalAccuracy = attempt.BreedingSteps.Sum(step => step.StepAccuracy);
+            attempt.AccuracyScore = totalAccuracy / attempt.BreedingSteps.Count;
+        }
+        
+        private int CalculateTotalPoints(BreedingChallenge challenge, BreedingAttempt attempt, BreedingResult result)
+        {
+            var basePoints = challenge.BasePoints;
+            var accuracyBonus = result.TraitAccuracy * challenge.AccuracyMultiplier;
+            var efficiencyBonus = result.EfficiencyScore * challenge.SpeedBonus;
+            var innovationBonus = result.InnovationScore * 100f;
+            
+            return Mathf.RoundToInt(basePoints + accuracyBonus + efficiencyBonus + innovationBonus);
+        }
+        
+        private int GetUniqueCombinations(List<BreedingStep> steps)
+        {
+            var combinations = new HashSet<string>();
+            foreach (var step in steps)
+            {
+                var combo = $"{step.Parent1Id}x{step.Parent2Id}";
+                combinations.Add(combo);
+            }
+            return combinations.Count;
+        }
+        
+        private float AnalyzeReasoningQuality(List<BreedingStep> steps)
+        {
+            // Analyze the quality of player's reasoning for breeding decisions
+            var reasoningScore = 0f;
+            
+            foreach (var step in steps)
+            {
+                if (!string.IsNullOrEmpty(step.PlayerReasoning))
+                {
+                    // Check for genetic terminology, logical thinking, etc.
+                    reasoningScore += EvaluateReasoningText(step.PlayerReasoning);
+                }
+            }
+            
+            return steps.Count > 0 ? reasoningScore / steps.Count : 0f;
+        }
+        
+        private float EvaluateReasoningText(string reasoning)
+        {
+            // Simple scoring based on genetic terminology and concepts
+            var score = 0f;
+            var lowerReasoning = reasoning.ToLower();
+            
+            // Award points for genetic terms
+            var geneticTerms = new[] { "allele", "dominant", "recessive", "heterozygous", "homozygous", "phenotype", "genotype", "trait", "gene" };
+            foreach (var term in geneticTerms)
+            {
+                if (lowerReasoning.Contains(term)) score += 0.1f;
+            }
+            
+            // Award points for breeding strategy terms
+            var strategyTerms = new[] { "cross", "backcross", "outcross", "inbreed", "selection", "combine", "inherit" };
+            foreach (var term in strategyTerms)
+            {
+                if (lowerReasoning.Contains(term)) score += 0.05f;
+            }
+            
+            return Mathf.Clamp01(score);
+        }
+        
+        private float AnalyzeBreedingPrinciples(List<BreedingStep> steps)
+        {
+            // Evaluate if player followed sound breeding principles
+            var principleScore = 0f;
+            
+            // Check for logical parent selection
+            principleScore += EvaluateParentSelection(steps) * 0.4f;
+            
+            // Check for appropriate generation planning
+            principleScore += EvaluateGenerationStrategy(steps) * 0.3f;
+            
+            // Check for trait tracking consistency
+            principleScore += EvaluateTraitTracking(steps) * 0.3f;
+            
+            return Mathf.Clamp01(principleScore);
+        }
+        
+        private float EvaluateLearningObjectives(BreedingChallenge challenge, BreedingAttempt attempt)
+        {
+            // Evaluate how well the attempt demonstrates achievement of learning objectives
+            // This would integrate with the educational content system
+            return 0.8f; // Placeholder - would implement detailed evaluation
+        }
+        
+        private float EvaluateParentSelection(List<BreedingStep> steps)
+        {
+            // Placeholder for evaluating logical parent selection
+            return 0.7f;
+        }
+        
+        private float EvaluateGenerationStrategy(List<BreedingStep> steps)
+        {
+            // Placeholder for evaluating generation planning
+            return 0.8f;
+        }
+        
+        private float EvaluateTraitTracking(List<BreedingStep> steps)
+        {
+            // Placeholder for evaluating trait consistency
+            return 0.75f;
+        }
+        
+        public void Update(float deltaTime)
+        {
+            // Update challenge timers, generate new challenges, etc.
+            CleanupExpiredAttempts();
+        }
+        
+        private void CleanupExpiredAttempts()
+        {
+            var expiredAttempts = _activeAttempts.Values
+                .Where(a => (DateTime.Now - a.StartTime).TotalHours > 24)
+                .ToList();
+            
+            foreach (var attempt in expiredAttempts)
+            {
+                _activeAttempts.Remove(attempt.AttemptId);
+            }
+        }
+        
+        public void ApplyConfiguration(GeneticsConfigSO config)
+        {
+            // Apply new configuration settings
+            _geneticsEngine?.ApplyConfiguration(config);
+            _breedingSimulator?.ApplyConfiguration(config);
+        }
+        
+        #endregion
+    }
+    
+    #region Supporting Classes
+    
+    public class ChallengeCompletionResult
+    {
+        public BreedingChallenge Challenge;
+        public bool WasSuccessful;
+        public BreedingResult Result;
+        public int TotalPoints;
+    }
+    
+    // Note: BreedingResult, AdvancedGeneticsEngine, and BreedingSimulator are defined in their respective dedicated files
+    
+    public class TraitPredictionEngine
+    {
+        public TraitPredictionEngine(GeneticsConfigSO config) { }
+        public Dictionary<string, float> PredictOffspringTraits(string parent1Id, string parent2Id) => new Dictionary<string, float>();
+    }
+    
+    public class ChallengeGenerator
+    {
+        public ChallengeGenerator(GeneticsConfigSO config) { }
+        public BreedingChallenge GenerateChallenge(BreedingChallengeConfig config) => new BreedingChallenge();
+        public BreedingChallenge CreateVariation(BreedingChallenge template, int playerLevel) => template;
+        public List<BreedingChallenge> GenerateProceduralChallenges(int playerLevel, int count) => new List<BreedingChallenge>();
+    }
+    
+    public class DifficultyScaler
+    {
+        public DifficultyScaler(GeneticsConfigSO config) { }
+        public float GetScoreMultiplier(DifficultyLevel difficulty) => (float)difficulty / 3f + 0.5f;
+    }
+    
+    public class EducationalContentProvider
+    {
+        public EducationalContentProvider(GeneticsConfigSO config) { }
+        public List<string> GetLearningObjectives(BreedingChallenge challenge) => new List<string>();
+        public string GetScientificExplanation(BreedingChallenge challenge) => "";
+        public List<string> GetRealWorldApplications(BreedingChallenge challenge) => new List<string>();
+        public string GenerateContextualHint(BreedingChallenge challenge, BreedingAttempt attempt, int hintLevel) => "";
+        public List<string> GetDetailedExplanations(BreedingChallenge challenge) => new List<string>();
+        public Dictionary<string, string> GetRelevantGeneticPrinciples(BreedingChallenge challenge) => new Dictionary<string, string>();
+    }
+    
+    public class OffspringResult
+    {
+        public string StrainId;
+    }
+    
+    #endregion
+}

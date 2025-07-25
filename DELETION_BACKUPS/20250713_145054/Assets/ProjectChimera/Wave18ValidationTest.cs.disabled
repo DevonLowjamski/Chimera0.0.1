@@ -1,0 +1,57 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using TraitExpressionEngine = ProjectChimera.Systems.Genetics.TraitExpressionEngine;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Wave 18 Validation Test - Namespace Ambiguity and Reference Fixes
+    /// Tests that validation files work correctly after fixing namespace conflicts
+    /// </summary>
+    public class Wave18ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 18 Namespace Ambiguity Fix Validation ===");
+            
+            TestNamespaceResolution();
+            TestScriptableObjectConstraints();
+            
+            Debug.Log("✅ Wave 18 namespace and reference fixes validated successfully!");
+        }
+        
+        private void TestNamespaceResolution()
+        {
+            Debug.Log("Testing namespace ambiguity resolution...");
+            
+            // Test that TraitExpressionEngine alias works correctly
+            var traitEngine = new TraitExpressionEngine(true, true);
+            Debug.Log("✓ TraitExpressionEngine alias resolved correctly");
+            
+            // Test that we can access both Data and Systems genetics types
+            var alleleSO = ScriptableObject.CreateInstance<AlleleSO>();
+            var breedingSimulator = new BreedingSimulator(false, 0.1f);
+            
+            Debug.Log("✓ Both Data.Genetics and Systems.Genetics types accessible");
+            Debug.Log("✓ Namespace ambiguity resolved successfully");
+        }
+        
+        private void TestScriptableObjectConstraints()
+        {
+            // Test that GenotypeDataSO can be created (ScriptableObject constraint)
+            var genotypeSO = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            Debug.Log($"✓ GenotypeDataSO created successfully: {genotypeSO != null}");
+            
+            // Test that we can access properties using reflection (properties are read-only)
+            if (genotypeSO != null)
+            {
+                var individualIDField = typeof(GenotypeDataSO).GetField("_individualID", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                individualIDField?.SetValue(genotypeSO, "TEST_WAVE18_001");
+                
+                Debug.Log($"✓ GenotypeDataSO properties accessible: ID = {genotypeSO.IndividualID}");
+            }
+        }
+    }
+} 

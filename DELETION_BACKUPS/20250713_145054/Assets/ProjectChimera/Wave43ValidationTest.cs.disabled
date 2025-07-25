@@ -1,0 +1,461 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Environment;
+using System.Collections.Generic;
+
+// Explicit aliases to match the fixed files
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+using SystemsEnvironmentalConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions;
+using PlantGenotype = ProjectChimera.Data.Genetics.PlantGenotype;
+using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 43 - SerializeField property access and assignment restrictions.
+    /// Tests the fixes for CS0117, CS1061 errors related to SerializeField properties.
+    /// </summary>
+    public class Wave43ValidationTest : MonoBehaviour
+    {
+        [Header("Test Configuration")]
+        [SerializeField] private bool runTestsOnStart = true;
+        [SerializeField] private bool logDetailedResults = true;
+        
+        void Start()
+        {
+            if (runTestsOnStart)
+            {
+                RunAllValidationTests();
+            }
+        }
+        
+        /// <summary>
+        /// Run all validation tests for Error Wave 43
+        /// </summary>
+        public void RunAllValidationTests()
+        {
+            LogInfo("=== Error Wave 43 Validation Tests Started ===");
+            
+            bool allTestsPassed = true;
+            
+            // Test 1: SerializeField Property Access Validation
+            allTestsPassed &= TestSerializeFieldPropertyAccess();
+            
+            // Test 2: Conversion Method Validation
+            allTestsPassed &= TestConversionMethodCorrectness();
+            
+            // Test 3: Property vs Field Assignment Validation
+            allTestsPassed &= TestPropertyVsFieldAssignment();
+            
+            // Test 4: Factory Method Integration Test
+            allTestsPassed &= TestFactoryMethodIntegration();
+            
+            // Test 5: PlantUpdateProcessor Integration Test
+            allTestsPassed &= TestPlantUpdateProcessorIntegration();
+            
+            // Test 6: Complete Cannabis Cultivation Workflow Test
+            allTestsPassed &= TestCompleteCultivationWorkflow();
+            
+            // Final results
+            if (allTestsPassed)
+            {
+                LogInfo("=== ✅ All Error Wave 43 Validation Tests PASSED ===");
+                LogInfo("🎉 ProjectChimera cannabis cultivation system SerializeField issues resolved!");
+            }
+            else
+            {
+                LogError("=== ❌ Some Error Wave 43 Validation Tests FAILED ===");
+            }
+        }
+        
+        /// <summary>
+        /// Test 1: Validate that SerializeField properties can be read but assignment is handled correctly
+        /// </summary>
+        private bool TestSerializeFieldPropertyAccess()
+        {
+            LogInfo("Test 1: SerializeField Property Access Validation");
+            
+            try
+            {
+                var conditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test reading SerializeField properties (should work)
+                float colorTemp = conditions.ColorTemperature; // SerializeField property
+                float oxygenLevel = conditions.OxygenLevel; // SerializeField property
+                float barometricPressure = conditions.BarometricPressure; // SerializeField property
+                float stressLevel = conditions.StressLevel; // SerializeField property
+                float dissolvedOxygen = conditions.DissolvedOxygen; // SerializeField property
+                float waterTemp = conditions.WaterTemperature; // SerializeField property
+                float tds = conditions.TotalDissolvedSolids; // SerializeField property
+                float chlorine = conditions.ChlorineLevel; // SerializeField property
+                
+                // Test reading regular properties (should work)
+                float temperature = conditions.Temperature;
+                float humidity = conditions.Humidity;
+                float lightIntensity = conditions.LightIntensity;
+                float co2Level = conditions.CO2Level;
+                float airFlow = conditions.AirFlow;
+                float electricalConductivity = conditions.ElectricalConductivity;
+                float vpd = conditions.VPD;
+                float waterAvailability = conditions.WaterAvailability;
+                float pH = conditions.pH;
+                
+                LogInfo("✅ All properties (SerializeField and regular) can be read successfully");
+                LogInfo($"   Sample values: ColorTemp={colorTemp}, Oxygen={oxygenLevel}, Temp={temperature}°C");
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ SerializeField property access test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Test 2: Validate the corrected conversion method works properly
+        /// </summary>
+        private bool TestConversionMethodCorrectness()
+        {
+            LogInfo("Test 2: Conversion Method Validation");
+            
+            try
+            {
+                // Create a PlantUpdateProcessor to test the conversion method
+                var processor = new PlantUpdateProcessor(true, true, true);
+                
+                // Create Systems.Cultivation.EnvironmentalConditions
+                var systemsConditions = new SystemsEnvironmentalConditions();
+                systemsConditions.Temperature = 25f;
+                systemsConditions.Humidity = 65f;
+                systemsConditions.LightIntensity = 700f;
+                systemsConditions.CO2Level = 800f;
+                systemsConditions.pH = 6.2f;
+                systemsConditions.EC = 1400f;
+                systemsConditions.AirCirculation = 80f; // Percentage
+                systemsConditions.MoisureLevel = 75f;
+                systemsConditions.AirVelocity = 0.6f;
+                systemsConditions.PhotoperiodHours = 18f;
+                
+                // The conversion should work without errors (we can't directly test the private method,
+                // but we can test that PlantUpdateProcessor can be created and used without compilation errors)
+                
+                // Test that we can create environmental conditions using the factory method
+                var cultivationConditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test that we can set the properties that should be settable
+                cultivationConditions.Temperature = systemsConditions.Temperature;
+                cultivationConditions.Humidity = systemsConditions.Humidity;
+                cultivationConditions.LightIntensity = systemsConditions.LightIntensity;
+                cultivationConditions.CO2Level = systemsConditions.CO2Level;
+                cultivationConditions.AirFlow = systemsConditions.AirCirculation / 100f;
+                cultivationConditions.pH = systemsConditions.pH;
+                cultivationConditions.PhotoperiodHours = systemsConditions.PhotoperiodHours;
+                cultivationConditions.WaterAvailability = systemsConditions.MoisureLevel;
+                cultivationConditions.ElectricalConductivity = systemsConditions.EC;
+                
+                // Calculate VPD
+                cultivationConditions.VPD = EnvironmentalConditions.CalculateVPD(
+                    systemsConditions.Temperature, 
+                    systemsConditions.Humidity);
+                
+                // Calculate derived values
+                cultivationConditions.CalculateDerivedValues();
+                
+                // Verify the conversion worked
+                if (cultivationConditions.Temperature == systemsConditions.Temperature &&
+                    cultivationConditions.ElectricalConductivity == systemsConditions.EC &&
+                    cultivationConditions.WaterAvailability == systemsConditions.MoisureLevel &&
+                    cultivationConditions.VPD > 0f)
+                {
+                    LogInfo("✅ Conversion method logic works correctly");
+                    LogInfo($"   Converted: {systemsConditions.Temperature}°C → {cultivationConditions.Temperature}°C");
+                    LogInfo($"   EC: {systemsConditions.EC} → {cultivationConditions.ElectricalConductivity}");
+                    LogInfo($"   VPD calculated: {cultivationConditions.VPD:F2} kPa");
+                    return true;
+                }
+                else
+                {
+                    LogError("❌ Conversion values don't match expected results");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ Conversion method validation failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Test 3: Validate property vs field assignment behavior
+        /// </summary>
+        private bool TestPropertyVsFieldAssignment()
+        {
+            LogInfo("Test 3: Property vs Field Assignment Validation");
+            
+            try
+            {
+                var conditions = EnvironmentalConditions.CreateIndoorDefault();
+                
+                // Test that properties with public setters can be assigned
+                conditions.Temperature = 24f; // Property with setter
+                conditions.Humidity = 60f; // Property with setter
+                conditions.LightIntensity = 600f; // Property with setter
+                conditions.CO2Level = 800f; // Property with setter
+                conditions.AirFlow = 1f; // Property with setter
+                conditions.pH = 6.5f; // Public field
+                conditions.WaterAvailability = 80f; // Public field
+                conditions.ElectricalConductivity = 1200f; // Public field
+                conditions.VPD = 1.0f; // Public field
+                conditions.PhotoperiodHours = 18f; // Public field
+                
+                // Verify assignments worked
+                if (conditions.Temperature == 24f &&
+                    conditions.Humidity == 60f &&
+                    conditions.pH == 6.5f &&
+                    conditions.ElectricalConductivity == 1200f)
+                {
+                    LogInfo("✅ Property and field assignments work correctly");
+                    LogInfo($"   Properties set: Temp={conditions.Temperature}°C, pH={conditions.pH}");
+                    return true;
+                }
+                else
+                {
+                    LogError("❌ Property/field assignments didn't work as expected");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ Property vs field assignment test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Test 4: Validate factory method integration works correctly
+        /// </summary>
+        private bool TestFactoryMethodIntegration()
+        {
+            LogInfo("Test 4: Factory Method Integration Test");
+            
+            try
+            {
+                // Test all factory methods
+                var indoorConditions = EnvironmentalConditions.CreateIndoorDefault();
+                var outdoorConditions = EnvironmentalConditions.CreateOutdoorDefault();
+                var stressConditions = EnvironmentalConditions.CreateStressConditions();
+                
+                // Verify they have different values and are properly initialized
+                if (indoorConditions.Temperature != outdoorConditions.Temperature &&
+                    indoorConditions.IsInitialized() &&
+                    outdoorConditions.IsInitialized() &&
+                    stressConditions.IsInitialized())
+                {
+                    LogInfo("✅ Factory method integration works correctly");
+                    LogInfo($"   Indoor: {indoorConditions.Temperature}°C, {indoorConditions.Humidity}% RH");
+                    LogInfo($"   Outdoor: {outdoorConditions.Temperature}°C, {outdoorConditions.Humidity}% RH");
+                    LogInfo($"   Stress: {stressConditions.Temperature}°C, {stressConditions.Humidity}% RH");
+                    return true;
+                }
+                else
+                {
+                    LogError("❌ Factory methods didn't create properly differentiated conditions");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ Factory method integration test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Test 5: Validate PlantUpdateProcessor integration works without errors
+        /// </summary>
+        private bool TestPlantUpdateProcessorIntegration()
+        {
+            LogInfo("Test 5: PlantUpdateProcessor Integration Test");
+            
+            try
+            {
+                // Create a PlantUpdateProcessor
+                var processor = new PlantUpdateProcessor(true, true, true);
+                
+                // Create a test plant
+                var plantStrain = ScriptableObject.CreateInstance<PlantStrainSO>();
+                plantStrain.StrainName = "Test Strain Wave 43";
+                plantStrain.BaseYieldGrams = 100f;
+                plantStrain.BaseQualityModifier = 1.2f;
+                plantStrain.BasePotencyModifier = 1.1f;
+                
+                var plantInstance = PlantInstance.CreateFromStrain(plantStrain, Vector3.zero);
+                
+                // Create environmental conditions
+                var environmentalConditions = EnvironmentalConditions.CreateIndoorDefault();
+                environmentalConditions.Temperature = 24f;
+                environmentalConditions.Humidity = 60f;
+                environmentalConditions.LightIntensity = 600f;
+                environmentalConditions.CO2Level = 800f;
+                environmentalConditions.ElectricalConductivity = 1200f;
+                environmentalConditions.AirFlow = 1f;
+                environmentalConditions.WaterAvailability = 80f;
+                environmentalConditions.pH = 6.5f;
+                environmentalConditions.VPD = 1.0f;
+                environmentalConditions.CalculateDerivedValues();
+                
+                // Update plant with environmental conditions
+                plantInstance.UpdateEnvironmentalConditions(environmentalConditions);
+                
+                // Test plant update processor (this should work without compilation errors)
+                processor.UpdatePlant(plantInstance, 0.016f, 1f); // Simulate one frame update
+                
+                // Verify the update worked
+                if (plantInstance.CurrentHealth > 0f && plantInstance.IsActive)
+                {
+                    LogInfo("✅ PlantUpdateProcessor integration works correctly");
+                    LogInfo($"   Plant health: {plantInstance.CurrentHealth:F2}");
+                    LogInfo($"   Growth stage: {plantInstance.CurrentGrowthStage}");
+                    LogInfo($"   Environmental fitness: {plantInstance.EnvironmentalFitness:F2}");
+                    return true;
+                }
+                else
+                {
+                    LogError("❌ PlantUpdateProcessor integration failed - plant not properly updated");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ PlantUpdateProcessor integration test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Test 6: Complete cannabis cultivation workflow test
+        /// </summary>
+        private bool TestCompleteCultivationWorkflow()
+        {
+            LogInfo("Test 6: Complete Cannabis Cultivation Workflow Test");
+            
+            try
+            {
+                // 1. Create a cannabis strain
+                var strain = ScriptableObject.CreateInstance<PlantStrainSO>();
+                strain.StrainName = "Northern Lights Auto";
+                strain.BaseYieldGrams = 120f;
+                strain.BaseQualityModifier = 1.3f;
+                strain.BasePotencyModifier = 1.2f;
+                strain.BaseFloweringTime = 65;
+                strain.BaseHeight = 0.8f;
+                
+                // 2. Create multiple plants
+                var plants = new List<PlantInstance>();
+                for (int i = 0; i < 3; i++)
+                {
+                    var plant = PlantInstance.CreateFromStrain(strain, new Vector3(i, 0, 0));
+                    plants.Add(plant);
+                }
+                
+                // 3. Create different environmental conditions for each growth stage
+                var seedlingConditions = EnvironmentalConditions.CreateIndoorDefault();
+                seedlingConditions.Temperature = 22f;
+                seedlingConditions.Humidity = 70f;
+                seedlingConditions.LightIntensity = 300f;
+                seedlingConditions.PhotoperiodHours = 18f;
+                seedlingConditions.CalculateDerivedValues();
+                
+                var vegetativeConditions = EnvironmentalConditions.CreateIndoorDefault();
+                vegetativeConditions.Temperature = 24f;
+                vegetativeConditions.Humidity = 60f;
+                vegetativeConditions.LightIntensity = 600f;
+                vegetativeConditions.PhotoperiodHours = 18f;
+                vegetativeConditions.CalculateDerivedValues();
+                
+                var floweringConditions = EnvironmentalConditions.CreateIndoorDefault();
+                floweringConditions.Temperature = 26f;
+                floweringConditions.Humidity = 50f;
+                floweringConditions.LightIntensity = 800f;
+                floweringConditions.PhotoperiodHours = 12f;
+                floweringConditions.CalculateDerivedValues();
+                
+                // 4. Create cultivation processor
+                var processor = new PlantUpdateProcessor(true, true, true);
+                
+                // 5. Simulate cultivation workflow
+                foreach (var plant in plants)
+                {
+                    // Update with appropriate environmental conditions based on growth stage
+                    var conditions = plant.CurrentGrowthStage switch
+                    {
+                        PlantGrowthStage.Seed => seedlingConditions,
+                        PlantGrowthStage.Germination => seedlingConditions,
+                        PlantGrowthStage.Seedling => seedlingConditions,
+                        PlantGrowthStage.Vegetative => vegetativeConditions,
+                        PlantGrowthStage.Flowering => floweringConditions,
+                        _ => vegetativeConditions
+                    };
+                    
+                    plant.UpdateEnvironmentalConditions(conditions);
+                    processor.UpdatePlant(plant, 0.016f, 1f);
+                }
+                
+                // 6. Verify all plants are healthy and responsive
+                bool allPlantsHealthy = plants.All(p => p.CurrentHealth > 0.8f && p.IsActive);
+                bool allEnvironmentalDataValid = plants.All(p => 
+                {
+                    var env = p.GetCurrentEnvironmentalConditions();
+                    return env != null && env.IsInitialized() && env.Temperature > 0f;
+                });
+                
+                if (allPlantsHealthy && allEnvironmentalDataValid)
+                {
+                    LogInfo("✅ Complete cannabis cultivation workflow successful");
+                    LogInfo($"   {plants.Count} plants cultivated successfully");
+                    foreach (var plant in plants)
+                    {
+                        var env = plant.GetCurrentEnvironmentalConditions();
+                        LogInfo($"   Plant {plant.PlantName}: Health={plant.CurrentHealth:F2}, " +
+                               $"Stage={plant.CurrentGrowthStage}, Temp={env.Temperature:F1}°C, " +
+                               $"VPD={env.VPD:F2}kPa");
+                    }
+                    return true;
+                }
+                else
+                {
+                    LogError("❌ Complete cultivation workflow failed - plants not healthy or environmental data invalid");
+                    return false;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ Complete cannabis cultivation workflow test failed: {ex.Message}");
+                return false;
+            }
+        }
+        
+        private void LogInfo(string message)
+        {
+            if (logDetailedResults)
+            {
+                Debug.Log($"[Wave43ValidationTest] {message}");
+            }
+        }
+        
+        private void LogWarning(string message)
+        {
+            Debug.LogWarning($"[Wave43ValidationTest] {message}");
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[Wave43ValidationTest] {message}");
+        }
+    }
+} 

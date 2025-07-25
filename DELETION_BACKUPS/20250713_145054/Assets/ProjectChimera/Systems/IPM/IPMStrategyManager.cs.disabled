@@ -1,0 +1,1010 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data.IPM;
+using IPMGaming = ProjectChimera.Systems.Gaming.IPM;
+
+namespace ProjectChimera.Systems.IPM
+{
+    /// <summary>
+    /// Advanced strategy optimization and AI decision-making manager for Project Chimera's Enhanced IPM Gaming System.
+    /// Manages intelligent strategy recommendations, AI-driven optimization algorithms, machine learning-based
+    /// decision making, adaptive strategy evolution, and comprehensive strategic planning for optimal pest
+    /// management outcomes. Features real-time strategy adaptation and multi-objective optimization.
+    /// 
+    /// Key Features:
+    /// - AI-driven strategy recommendation engine
+    /// - Multi-objective optimization algorithms
+    /// - Adaptive strategy evolution and learning
+    /// - Real-time decision making and strategy adjustment
+    /// - Strategic planning with predictive modeling
+    /// - Performance-based strategy optimization
+    /// - Machine learning integration for pattern recognition
+    /// - Strategic resource allocation optimization
+    /// </summary>
+    public class IPMStrategyManager : IPMEntityManagerBase<StrategyData, IPMStrategyType>, IPMGaming.IIPMStrategyManager
+    {
+        [Header("Strategy Configuration")]
+        [SerializeField] private float _strategyUpdateInterval = 15f;
+        [SerializeField] private float _optimizationInterval = 60f;
+        [SerializeField] private bool _enableAIRecommendations = true;
+        [SerializeField] private bool _enableAdaptiveLearning = true;
+        [SerializeField] private bool _enableRealTimeOptimization = true;
+        
+        [Header("AI Decision Making")]
+        [SerializeField] private float _decisionConfidenceThreshold = 0.7f;
+        [SerializeField] private int _maxStrategiesPerProblem = 5;
+        [SerializeField] private float _strategyDiversityFactor = 0.3f;
+        [SerializeField] private bool _enableMultiObjectiveOptimization = true;
+        [SerializeField] private float _learningRate = 0.1f;
+        
+        [Header("Optimization Parameters")]
+        [SerializeField] private int _maxOptimizationIterations = 100;
+        [SerializeField] private float _convergenceThreshold = 0.01f;
+        [SerializeField] private bool _enableGeneticAlgorithm = true;
+        [SerializeField] private bool _enableSimulatedAnnealing = true;
+        [SerializeField] private float _explorationFactor = 0.2f;
+        
+        [Header("Strategic Planning")]
+        [SerializeField] private int _planningHorizonDays = 30;
+        [SerializeField] private bool _enableContingencyPlanning = true;
+        [SerializeField] private bool _enableRiskAssessment = true;
+        [SerializeField] private float _riskTolerance = 0.3f;
+        
+        // Strategy Management Systems
+        private IPMGaming.StrategyRecommendationEngine _recommendationEngine;
+        private IPMGaming.AIDecisionMaker _aiDecisionMaker;
+        private IPMGaming.OptimizationAlgorithmSuite _optimizationSuite;
+        private IPMGaming.AdaptiveLearningSystem _learningSystem;
+        private IPMGaming.StrategicPlanningEngine _planningEngine;
+        
+        // Strategy State Management
+        private Dictionary<string, IPMGaming.StrategyState> _activeStrategies = new Dictionary<string, IPMGaming.StrategyState>();
+        private Dictionary<IPMStrategyType, IPMGaming.StrategyProfile> _strategyProfiles = new Dictionary<IPMStrategyType, IPMGaming.StrategyProfile>();
+        private Dictionary<string, IPMGaming.StrategyPerformanceRecord> _performanceHistory = new Dictionary<string, IPMGaming.StrategyPerformanceRecord>();
+        
+        // AI and Machine Learning
+        private IPMGaming.NeuralNetworkProcessor _neuralNetwork;
+        private IPMGaming.PatternRecognitionEngine _patternRecognition;
+        private IPMGaming.PredictiveModelingSystem _predictiveModeling;
+        private Dictionary<string, IPMGaming.MLModel> _mlModels = new Dictionary<string, IPMGaming.MLModel>();
+        
+        // Optimization and Analytics
+        private IPMGaming.MultiObjectiveOptimizer _multiObjectiveOptimizer;
+        private IPMGaming.GeneticAlgorithmEngine _geneticAlgorithm;
+        private IPMGaming.SimulatedAnnealingOptimizer _simulatedAnnealing;
+        private IPMGaming.StrategyMetrics _strategyMetrics = new IPMGaming.StrategyMetrics();
+        
+        // Performance Monitoring
+        private float _lastStrategyUpdate;
+        private float _lastOptimizationUpdate;
+        private IPMGaming.StrategyUpdateScheduler _updateScheduler;
+        private Dictionary<string, IPMGaming.PerformanceTracker> _performanceTrackers = new Dictionary<string, IPMGaming.PerformanceTracker>();
+        
+        // Events
+        public event Action<StrategyData> OnStrategyRecommended;
+        public event Action<StrategyData> OnStrategyOptimized;
+        public event Action<StrategyData> OnStrategyActivated;
+        public event Action<IPMGaming.StrategyMetrics> OnStrategyMetricsUpdated;
+        public event Action<string, float> OnStrategyPerformanceChanged;
+        
+        #region Initialization
+        
+        protected override void InitializeEntityManagerSpecific()
+        {
+            InitializeStrategyProfiles();
+            InitializeAISystems();
+            InitializeOptimizationSystems();
+            InitializeLearningSystem();
+            InitializePlanningEngine();
+            InitializePerformanceMonitoring();
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[IPMStrategyManager] Strategy optimization and AI systems initialized");
+            }
+        }
+        
+        private void InitializeStrategyProfiles()
+        {
+            _strategyProfiles.Clear();
+            
+            // Initialize strategy profiles for each strategy type
+            foreach (IPMStrategyType strategyType in Enum.GetValues(typeof(IPMStrategyType)))
+            {
+                var profile = new IPMGaming.StrategyProfile
+                {
+                    StrategyType = strategyType,
+                    BaseEffectiveness = GetBaseEffectivenessForStrategy(strategyType),
+                    ResourceRequirements = GetResourceRequirementsForStrategy(strategyType),
+                    TimeToImplement = GetImplementationTimeForStrategy(strategyType),
+                    RiskLevel = GetRiskLevelForStrategy(strategyType),
+                    Complexity = GetComplexityForStrategy(strategyType),
+                    EnvironmentalDependency = GetEnvironmentalDependencyForStrategy(strategyType),
+                    CompatibleStrategies = GetCompatibleStrategies(strategyType),
+                    ConflictingStrategies = GetConflictingStrategies(strategyType)
+                };
+                
+                _strategyProfiles[strategyType] = profile;
+            }
+        }
+        
+        private void InitializeAISystems()
+        {
+            _recommendationEngine = new IPMGaming.StrategyRecommendationEngine();
+            _aiDecisionMaker = new AIDecisionMaker();
+            _neuralNetwork = new NeuralNetworkProcessor();
+            _patternRecognition = new IPMGaming.PatternRecognitionEngine();
+            _predictiveModeling = new IPMGaming.PredictiveModelingSystem();
+            
+            // Initialize AI parameters
+            _aiDecisionMaker.Initialize(_decisionConfidenceThreshold, _learningRate);
+            _neuralNetwork.Initialize(IPMHelpers.GetNeuralNetworkArchitecture());
+            _patternRecognition.Initialize(IPMHelpers.GetPatternRecognitionSettings());
+            
+            // Load pre-trained models if available
+            LoadPreTrainedModels();
+        }
+        
+        private void InitializeOptimizationSystems()
+        {
+            _optimizationSuite = new OptimizationAlgorithmSuite();
+            _multiObjectiveOptimizer = new IPMGaming.MultiObjectiveOptimizer();
+            _geneticAlgorithm = new IPMGaming.GeneticAlgorithmEngine();
+            _simulatedAnnealing = new IPMGaming.SimulatedAnnealingOptimizer();
+            
+            // Configure optimization parameters
+            _multiObjectiveOptimizer.Initialize(IPMHelpers.GetOptimizationObjectives());
+            _geneticAlgorithm.Initialize(IPMHelpers.GetGeneticAlgorithmParameters());
+            _simulatedAnnealing.Initialize(IPMHelpers.GetSimulatedAnnealingParameters());
+        }
+        
+        private void InitializeLearningSystem()
+        {
+            _learningSystem = new IPMGaming.AdaptiveLearningSystem();
+            _learningSystem.Initialize(_learningRate, _explorationFactor);
+            
+            // Set up learning objectives and reward functions
+            _learningSystem.SetRewardFunction(CalculateStrategyReward);
+            _learningSystem.SetExplorationStrategy(ExplorationStrategy.EpsilonGreedy);
+        }
+        
+        private void InitializePlanningEngine()
+        {
+            _planningEngine = new IPMGaming.StrategicPlanningEngine();
+            _planningEngine.Initialize(_planningHorizonDays, _riskTolerance);
+            
+            if (_enableContingencyPlanning)
+            {
+                _planningEngine.EnableContingencyPlanning();
+            }
+            
+            if (_enableRiskAssessment)
+            {
+                _planningEngine.EnableRiskAssessment();
+            }
+        }
+        
+        private void InitializePerformanceMonitoring()
+        {
+            _updateScheduler = new StrategyUpdateScheduler();
+            _updateScheduler.Initialize(_strategyUpdateInterval, _optimizationInterval);
+            
+            // Initialize performance tracking for each strategy type
+            foreach (IPMStrategyType strategyType in Enum.GetValues(typeof(IPMStrategyType)))
+            {
+                _performanceTrackers[strategyType.ToString()] = new PerformanceTracker();
+            }
+        }
+        
+        #endregion
+        
+        #region Strategy Recommendation
+        
+        public List<IPMGaming.StrategyRecommendation> GenerateStrategyRecommendations(IPMGaming.IPMProblemContext problemContext)
+        {
+            var recommendations = new List<IPMGaming.StrategyRecommendation>();
+            
+            if (!_enableAIRecommendations)
+            {
+                return recommendations;
+            }
+            
+            try
+            {
+                // Analyze current situation
+                var situationAnalysis = AnalyzeSituation(problemContext);
+                
+                // Generate candidate strategies
+                var candidateStrategies = GenerateCandidateStrategies(situationAnalysis);
+                
+                // Evaluate and rank strategies
+                var evaluatedStrategies = EvaluateStrategies(candidateStrategies, problemContext);
+                
+                // Select top recommendations with diversity
+                recommendations = SelectDiverseRecommendations(evaluatedStrategies);
+                
+                // Apply machine learning insights
+                if (_enableAdaptiveLearning)
+                {
+                    recommendations = ApplyLearningInsights(recommendations, problemContext);
+                }
+                
+                foreach (var recommendation in recommendations)
+                {
+                    OnStrategyRecommended?.Invoke(recommendation.StrategyData);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMStrategyManager] Error generating strategy recommendations: {ex.Message}");
+            }
+            
+            return recommendations;
+        }
+        
+        private IPMGaming.SituationAnalysis AnalyzeSituation(IPMGaming.IPMProblemContext problemContext)
+        {
+            var analysis = new IPMGaming.SituationAnalysis
+            {
+                ProblemSeverity = CalculateProblemSeverity(problemContext),
+                ResourceAvailability = AssessResourceAvailability(problemContext),
+                EnvironmentalFactors = AnalyzeEnvironmentalFactors(problemContext),
+                TimeConstraints = AssessTimeConstraints(problemContext),
+                RiskFactors = IdentifyRiskFactors(problemContext),
+                PreviousSuccesses = AnalyzePreviousSuccesses(problemContext),
+                PatternMatches = _patternRecognition.FindPatterns(problemContext)
+            };
+            
+            return analysis;
+        }
+        
+        private List<IPMGaming.CandidateStrategy> GenerateCandidateStrategies(IPMGaming.SituationAnalysis analysis)
+        {
+            var candidates = new List<IPMGaming.CandidateStrategy>();
+            
+            // Generate strategies based on situation analysis
+            foreach (var strategyProfile in _strategyProfiles.Values)
+            {
+                if (IsStrategyApplicable(strategyProfile, analysis))
+                {
+                    var candidate = new IPMGaming.CandidateStrategy
+                    {
+                        StrategyType = strategyProfile.StrategyType,
+                        ApplicabilityScore = CalculateApplicabilityScore(strategyProfile, analysis),
+                        EstimatedEffectiveness = EstimateEffectiveness(strategyProfile, analysis),
+                        ResourceCost = CalculateResourceCost(strategyProfile, analysis),
+                        ImplementationTime = EstimateImplementationTime(strategyProfile, analysis),
+                        RiskLevel = AssessStrategyRisk(strategyProfile, analysis)
+                    };
+                    
+                    candidates.Add(candidate);
+                }
+            }
+            
+            // Generate novel strategies using AI creativity
+            if (_enableAdaptiveLearning)
+            {
+                var novelCandidates = GenerateNovelStrategies(analysis);
+                candidates.AddRange(novelCandidates);
+            }
+            
+            return candidates;
+        }
+        
+        #endregion
+        
+        #region Strategy Optimization
+        
+        public IPMGaming.OptimizationResult OptimizeStrategy(StrategyData strategy, IPMGaming.OptimizationObjectives objectives)
+        {
+            if (!_enableRealTimeOptimization)
+            {
+                return new IPMGaming.OptimizationResult { Success = false, Message = "Optimization disabled" };
+            }
+            
+            try
+            {
+                var result = new IPMGaming.OptimizationResult();
+                
+                if (_enableMultiObjectiveOptimization)
+                {
+                    result = _multiObjectiveOptimizer.Optimize(strategy, objectives);
+                }
+                else
+                {
+                    result = OptimizeSingleObjective(strategy, objectives.PrimaryObjective);
+                }
+                
+                if (result.Success)
+                {
+                    // Update strategy with optimized parameters
+                    ApplyOptimizedParameters(strategy, result.OptimizedParameters);
+                    
+                    // Record optimization results
+                    RecordOptimizationResult(strategy, result);
+                    
+                    OnStrategyOptimized?.Invoke(strategy);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMStrategyManager] Error optimizing strategy: {ex.Message}");
+                return new IPMGaming.OptimizationResult { Success = false, Message = ex.Message };
+            }
+        }
+        
+        private IPMGaming.OptimizationResult OptimizeSingleObjective(StrategyData strategy, IPMGaming.OptimizationObjective objective)
+        {
+            IPMGaming.OptimizationResult result = null;
+            
+            switch (objective.OptimizationType)
+            {
+                case OptimizationType.Effectiveness:
+                    result = OptimizeForEffectiveness(strategy, objective);
+                    break;
+                case OptimizationType.ResourceEfficiency:
+                    result = OptimizeForResourceEfficiency(strategy, objective);
+                    break;
+                case OptimizationType.Speed:
+                    result = OptimizeForSpeed(strategy, objective);
+                    break;
+                case OptimizationType.RiskMinimization:
+                    result = OptimizeForRiskMinimization(strategy, objective);
+                    break;
+                default:
+                    result = new IPMGaming.OptimizationResult { Success = false, Message = "Unknown optimization type" };
+                    break;
+            }
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region AI Decision Making
+        
+        public IPMGaming.DecisionResult MakeStrategicDecision(IPMGaming.DecisionContext context)
+        {
+            try
+            {
+                // Gather decision input data
+                var inputData = GatherDecisionData(context);
+                
+                // Process with neural network
+                var neuralOutput = _neuralNetwork.Process(inputData);
+                
+                // Apply decision logic
+                var decision = _aiDecisionMaker.MakeDecision(neuralOutput, context);
+                
+                // Validate decision
+                var validatedDecision = ValidateDecision(decision, context);
+                
+                // Learn from decision if enabled
+                if (_enableAdaptiveLearning)
+                {
+                    _learningSystem.RecordDecision(validatedDecision, context);
+                }
+                
+                return validatedDecision;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMStrategyManager] Error in AI decision making: {ex.Message}");
+                return new IPMGaming.DecisionResult { Success = false, Confidence = 0f, Message = ex.Message };
+            }
+        }
+        
+        #endregion
+        
+        #region Update Cycles
+        
+        protected override void UpdateSystemSpecific(float deltaTime)
+        {
+            base.UpdateSystemSpecific(deltaTime);
+            
+            var currentTime = Time.time;
+            
+            // Update strategies
+            if (currentTime - _lastStrategyUpdate >= _strategyUpdateInterval)
+            {
+                UpdateActiveStrategies();
+                _lastStrategyUpdate = currentTime;
+            }
+            
+            // Update optimization
+            if (currentTime - _lastOptimizationUpdate >= _optimizationInterval)
+            {
+                UpdateOptimizationSystems();
+                _lastOptimizationUpdate = currentTime;
+            }
+            
+            // Update AI learning
+            if (_enableAdaptiveLearning)
+            {
+                _learningSystem.Update();
+            }
+            
+            // Update metrics
+            UpdateStrategyMetrics();
+        }
+        
+        private void UpdateActiveStrategies()
+        {
+            var strategiesToUpdate = _activeStrategies.Values.ToList();
+            
+            foreach (var strategy in strategiesToUpdate)
+            {
+                UpdateStrategyState(strategy);
+                
+                if (strategy.IsCompleted)
+                {
+                    CompleteStrategy(strategy);
+                }
+            }
+        }
+        
+        private void UpdateOptimizationSystems()
+        {
+            // Update optimization algorithms
+            _multiObjectiveOptimizer.Update();
+            _geneticAlgorithm.Update();
+            _simulatedAnnealing.Update();
+            
+            // Update learning systems
+            _learningSystem.UpdateModels();
+            _patternRecognition.UpdatePatterns();
+        }
+        
+        #endregion
+        
+        #region Performance Monitoring
+        
+        private void UpdateStrategyMetrics()
+        {
+            _strategyMetrics.TotalActiveStrategies = _activeStrategies.Count;
+            _strategyMetrics.AverageEffectiveness = CalculateAverageEffectiveness();
+            _strategyMetrics.ResourceUtilization = CalculateResourceUtilization();
+            _strategyMetrics.OptimizationAccuracy = CalculateOptimizationAccuracy();
+            _strategyMetrics.LearningProgress = _learningSystem.GetLearningProgress();
+            _strategyMetrics.LastUpdated = DateTime.Now;
+            
+            OnStrategyMetricsUpdated?.Invoke(_strategyMetrics);
+        }
+        
+        private float CalculateAverageEffectiveness()
+        {
+            if (_activeStrategies.Count == 0) return 0f;
+            
+            return _activeStrategies.Values.Average(s => s.CurrentEffectiveness);
+        }
+        
+        #endregion
+        
+        #region Helper Methods
+        
+        private float GetBaseEffectivenessForStrategy(IPMStrategyType strategyType)
+        {
+            // Return base effectiveness values for different strategy types
+            switch (strategyType)
+            {
+                case IPMStrategyType.Biological: return 0.8f;
+                case IPMStrategyType.Environmental: return 0.7f;
+                case IPMStrategyType.Chemical: return 0.9f;
+                case IPMStrategyType.Preventive: return 0.6f;
+                case IPMStrategyType.Integrated: return 0.85f;
+                case IPMStrategyType.Emergency: return 0.75f;
+                default: return 0.5f;
+            }
+        }
+        
+        private float CalculateStrategyReward(IPMGaming.StrategyState strategy, IPMGaming.StrategyOutcome outcome)
+        {
+            var baseReward = outcome.EffectivenessAchieved;
+            var resourceEfficiency = 1f - (outcome.ResourcesUsed / strategy.ResourcesAllocated);
+            var timeEfficiency = 1f - (outcome.TimeToComplete / strategy.EstimatedDuration);
+            
+            return baseReward * 0.5f + resourceEfficiency * 0.3f + timeEfficiency * 0.2f;
+        }
+        
+        #endregion
+        
+        #region IIPMStrategyManager Implementation
+        
+        public bool ActivateStrategy(string strategyId)
+        {
+            if (_activeStrategies.ContainsKey(strategyId))
+            {
+                var strategy = _activeStrategies[strategyId];
+                strategy.IsActive = true;
+                strategy.ActivationTime = DateTime.Now;
+                
+                OnStrategyActivated?.Invoke(strategy.StrategyData);
+                return true;
+            }
+            
+            return false;
+        }
+        
+        public bool DeactivateStrategy(string strategyId)
+        {
+            if (_activeStrategies.ContainsKey(strategyId))
+            {
+                var strategy = _activeStrategies[strategyId];
+                strategy.IsActive = false;
+                strategy.DeactivationTime = DateTime.Now;
+                
+                return true;
+            }
+            
+            return false;
+        }
+        
+        public StrategyMetrics GetStrategyMetrics()
+        {
+            return _strategyMetrics;
+        }
+        
+        public List<StrategyData> GetActiveStrategyData()
+        {
+            return _activeStrategies.Values.Where(s => s.IsActive).Select(s => s.StrategyData).ToList();
+        }
+        
+        #endregion
+        
+        #region Abstract Method Implementations
+        
+        
+        protected override StrategyData CreateEntityInstance()
+        {
+            return new StrategyData
+            {
+                StrategyId = GenerateEntityId(),
+                Name = "New Strategy",
+                Description = "Auto-generated strategy",
+                Type = IPMStrategyType.Biological,
+                IsActive = false,
+                Effectiveness = 0f,
+                Cost = 0f
+            };
+        }
+        
+        protected override void DestroyEntityInstance(StrategyData entity)
+        {
+            // Cleanup strategy data
+            // No specific cleanup needed for basic data types
+        }
+        
+        protected override void ConfigureEntity(StrategyData entity, StrategyData sourceData, IPMStrategyType entityType, Vector3 position)
+        {
+            if (entity == null || sourceData == null) return;
+            
+            entity.Type = entityType;
+            entity.Name = sourceData.Name;
+            entity.Effectiveness = sourceData.Effectiveness;
+            entity.IsActive = sourceData.IsActive;
+        }
+        
+        protected override void UpdateEntitySpecific(string entityId, StrategyData entity, float deltaTime)
+        {
+            if (entity == null) return;
+            
+            // Update strategy effectiveness and performance metrics
+        }
+        
+        protected override IPMStrategyType GetEntityType(string entityId)
+        {
+            // Return strategy type based on entity ID pattern or stored data
+            return IPMStrategyType.Biological;
+        }
+        
+        protected override string GenerateEntityId()
+        {
+            return $"strategy_{Guid.NewGuid():N}";
+        }
+        
+        #endregion
+
+        #region Strategy Profile Helper Methods
+
+        private Dictionary<string, float> GetResourceRequirementsForStrategy(IPMStrategyType strategyType)
+        {
+            var baseRequirement = strategyType switch
+            {
+                IPMStrategyType.Biological => 0.6f,
+                IPMStrategyType.Chemical => 0.8f,
+                IPMStrategyType.Environmental => 0.4f,
+                IPMStrategyType.Preventive => 0.3f,
+                IPMStrategyType.Integrated => 0.7f,
+                IPMStrategyType.Emergency => 0.9f,
+                _ => 0.5f
+            };
+            
+            return new Dictionary<string, float>
+            {
+                ["totalCost"] = baseRequirement,
+                ["laborHours"] = baseRequirement * 10f,
+                ["materialCost"] = baseRequirement * 100f,
+                ["equipmentCost"] = baseRequirement * 50f
+            };
+        }
+
+        private float GetImplementationTimeForStrategy(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => 5.0f,
+                IPMStrategyType.Chemical => 1.0f,
+                IPMStrategyType.Environmental => 3.0f,
+                IPMStrategyType.Preventive => 8.0f,
+                IPMStrategyType.Integrated => 4.0f,
+                IPMStrategyType.Emergency => 0.5f,
+                _ => 2.0f
+            };
+        }
+
+        private float GetRiskLevelForStrategy(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => 0.2f,
+                IPMStrategyType.Chemical => 0.8f,
+                IPMStrategyType.Environmental => 0.3f,
+                IPMStrategyType.Preventive => 0.1f,
+                IPMStrategyType.Integrated => 0.4f,
+                IPMStrategyType.Emergency => 0.9f,
+                _ => 0.5f
+            };
+        }
+
+        private float GetComplexityForStrategy(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => 0.7f,
+                IPMStrategyType.Chemical => 0.3f,
+                IPMStrategyType.Environmental => 0.6f,
+                IPMStrategyType.Preventive => 0.4f,
+                IPMStrategyType.Integrated => 0.9f,
+                IPMStrategyType.Emergency => 0.5f,
+                _ => 0.5f
+            };
+        }
+
+        private float GetEnvironmentalDependencyForStrategy(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => 0.8f,
+                IPMStrategyType.Chemical => 0.3f,
+                IPMStrategyType.Environmental => 0.9f,
+                IPMStrategyType.Preventive => 0.6f,
+                IPMStrategyType.Integrated => 0.7f,
+                IPMStrategyType.Emergency => 0.4f,
+                _ => 0.5f
+            };
+        }
+
+        private List<IPMStrategyType> GetCompatibleStrategies(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => new List<IPMStrategyType> { IPMStrategyType.Environmental, IPMStrategyType.Preventive },
+                IPMStrategyType.Chemical => new List<IPMStrategyType> { IPMStrategyType.Emergency },
+                IPMStrategyType.Environmental => new List<IPMStrategyType> { IPMStrategyType.Biological, IPMStrategyType.Preventive },
+                IPMStrategyType.Preventive => new List<IPMStrategyType> { IPMStrategyType.Biological, IPMStrategyType.Environmental },
+                IPMStrategyType.Integrated => new List<IPMStrategyType> { IPMStrategyType.Biological, IPMStrategyType.Environmental, IPMStrategyType.Chemical },
+                IPMStrategyType.Emergency => new List<IPMStrategyType> { IPMStrategyType.Chemical },
+                _ => new List<IPMStrategyType>()
+            };
+        }
+
+        private List<IPMStrategyType> GetConflictingStrategies(IPMStrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                IPMStrategyType.Biological => new List<IPMStrategyType> { IPMStrategyType.Chemical },
+                IPMStrategyType.Chemical => new List<IPMStrategyType> { IPMStrategyType.Biological },
+                IPMStrategyType.Environmental => new List<IPMStrategyType>(),
+                IPMStrategyType.Preventive => new List<IPMStrategyType> { IPMStrategyType.Emergency },
+                IPMStrategyType.Integrated => new List<IPMStrategyType>(),
+                IPMStrategyType.Emergency => new List<IPMStrategyType> { IPMStrategyType.Preventive },
+                _ => new List<IPMStrategyType>()
+            };
+        }
+
+        #endregion
+
+        #region IIPMStrategyManager Interface Implementation
+
+        public event Action<IPMGaming.IPMStrategyPlan> OnStrategyCreated;
+        public event Action<IPMGaming.IPMStrategyPlan> OnStrategyExecuted;
+        public event Action<IPMGaming.IPMStrategyPlan> OnStrategyCompleted;
+
+        public IPMGaming.IPMStrategyPlan CreateStrategy(IPMStrategyType strategyType, Dictionary<string, object> parameters)
+        {
+            var strategy = new IPMGaming.IPMStrategyPlan
+            {
+                PlanId = Guid.NewGuid().ToString(),
+                StrategyType = strategyType,
+                PlanName = $"{strategyType} Strategy Plan",
+                CreatedAt = DateTime.Now,
+                Status = IPMGaming.StrategyStatus.Created,
+                Parameters = parameters ?? new Dictionary<string, object>(),
+                ExpectedEffectiveness = CalculateExpectedEffectiveness(strategyType, parameters),
+                EstimatedCost = CalculateEstimatedCost(strategyType, parameters)
+            };
+
+            OnStrategyCreated?.Invoke(strategy);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMStrategyManager] Strategy created: {strategy.PlanName} - ID: {strategy.PlanId}");
+            }
+
+            return strategy;
+        }
+
+        public void ExecuteStrategy(string planId)
+        {
+            var strategy = GetActiveStrategies().FirstOrDefault(s => s.PlanId == planId);
+            if (strategy == null)
+            {
+                Debug.LogWarning($"[IPMStrategyManager] Strategy plan not found: {planId}");
+                return;
+            }
+
+            strategy.Status = IPMGaming.StrategyStatus.Executing;
+            strategy.ExecutedAt = DateTime.Now;
+
+            OnStrategyExecuted?.Invoke(strategy);
+
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMStrategyManager] Strategy executed: {strategy.PlanName}");
+            }
+        }
+
+        public void ModifyStrategy(string planId, Dictionary<string, object> modifications)
+        {
+            var strategy = GetActiveStrategies().FirstOrDefault(s => s.PlanId == planId);
+            if (strategy == null)
+            {
+                Debug.LogWarning($"[IPMStrategyManager] Strategy plan not found for modification: {planId}");
+                return;
+            }
+
+            if (modifications != null)
+            {
+                foreach (var modification in modifications)
+                {
+                    strategy.Parameters[modification.Key] = modification.Value;
+                }
+
+                // Recalculate expected effectiveness after modifications
+                strategy.ExpectedEffectiveness = CalculateExpectedEffectiveness(strategy.StrategyType, strategy.Parameters);
+                strategy.EstimatedCost = CalculateEstimatedCost(strategy.StrategyType, strategy.Parameters);
+            }
+
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[IPMStrategyManager] Strategy modified: {strategy.PlanName}");
+            }
+        }
+
+        public List<IPMGaming.IPMStrategyPlan> GetActiveStrategies()
+        {
+            // Convert internal strategy states to IPM strategy plans
+            var strategyPlans = new List<IPMGaming.IPMStrategyPlan>();
+
+            foreach (var strategy in _activeStrategies.Values)
+            {
+                var plan = new IPMGaming.IPMStrategyPlan
+                {
+                    PlanId = strategy.StrategyData.StrategyId,
+                    StrategyType = ConvertToIPMStrategyType(strategy.StrategyData.Type),
+                    PlanName = strategy.StrategyData.StrategyName,
+                    CreatedAt = strategy.StrategyData.CreatedAt,
+                    Status = strategy.IsActive ? IPMGaming.StrategyStatus.Executing : IPMGaming.StrategyStatus.Ready,
+                    ExpectedEffectiveness = strategy.CurrentEffectiveness,
+                    ActualEffectiveness = strategy.CurrentEffectiveness
+                };
+
+                strategyPlans.Add(plan);
+            }
+
+            return strategyPlans;
+        }
+
+        public IPMGaming.IPMRecommendation GetRecommendation(IPMGaming.IPMBattleData battleData)
+        {
+            try
+            {
+                // Analyze battle situation
+                var problemContext = CreateProblemContextFromBattle(battleData);
+                
+                // Generate strategy recommendations
+                var recommendations = GenerateStrategyRecommendations(problemContext);
+                
+                if (recommendations.Any())
+                {
+                    var topRecommendation = recommendations.OrderByDescending(r => r.ConfidenceLevel).First();
+                    
+                    return new IPMGaming.IPMRecommendation
+                    {
+                        RecommendationId = Guid.NewGuid().ToString(),
+                        Title = $"Recommended Strategy: {topRecommendation.StrategyType}",
+                        Description = topRecommendation.Description,
+                        Priority = topRecommendation.ConfidenceLevel,
+                        ConfidenceLevel = topRecommendation.ConfidenceLevel,
+                        ActionItems = new List<string> { $"Deploy {topRecommendation.StrategyType} strategy", "Monitor effectiveness", "Adjust parameters as needed" },
+                        CreatedAt = DateTime.Now,
+                        IsPersonalized = true
+                    };
+                }
+                else
+                {
+                    return new IPMGaming.IPMRecommendation
+                    {
+                        Title = "No Specific Recommendation",
+                        Description = "Continue with current strategy and monitor battle conditions",
+                        Priority = 0.3f,
+                        ConfidenceLevel = 0.5f,
+                        CreatedAt = DateTime.Now
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[IPMStrategyManager] Error generating recommendation: {ex.Message}");
+                return new IPMGaming.IPMRecommendation
+                {
+                    Title = "Recommendation Error",
+                    Description = "Unable to generate recommendation at this time",
+                    Priority = 0.1f,
+                    ConfidenceLevel = 0.1f,
+                    CreatedAt = DateTime.Now
+                };
+            }
+        }
+
+        public float CalculateStrategyEffectiveness(string planId)
+        {
+            var strategy = GetActiveStrategies().FirstOrDefault(s => s.PlanId == planId);
+            if (strategy == null)
+            {
+                Debug.LogWarning($"[IPMStrategyManager] Strategy plan not found for effectiveness calculation: {planId}");
+                return 0f;
+            }
+
+            // Base effectiveness from strategy type
+            var baseEffectiveness = GetBaseEffectivenessForStrategy(ConvertFromIPMStrategyType(strategy.StrategyType));
+            
+            // Apply modifiers based on execution
+            var executionModifier = strategy.Status == IPMGaming.StrategyStatus.Executing ? 1.0f : 0.8f;
+            var timeModifier = CalculateTimeEffectivenessModifier(strategy);
+            
+            return baseEffectiveness * executionModifier * timeModifier;
+        }
+
+        #endregion
+
+        #region Helper Methods for Interface Implementation
+
+        private float CalculateExpectedEffectiveness(IPMStrategyType strategyType, Dictionary<string, object> parameters)
+        {
+            var baseEffectiveness = GetBaseEffectivenessForStrategy(ConvertFromIPMStrategyType(strategyType));
+            
+            // Apply parameter modifiers
+            var parameterModifier = 1.0f;
+            if (parameters != null && parameters.ContainsKey("EffectivenessModifier"))
+            {
+                if (float.TryParse(parameters["EffectivenessModifier"].ToString(), out var modifier))
+                {
+                    parameterModifier = modifier;
+                }
+            }
+
+            return Mathf.Clamp01(baseEffectiveness * parameterModifier);
+        }
+
+        private float CalculateEstimatedCost(IPMStrategyType strategyType, Dictionary<string, object> parameters)
+        {
+            // Base cost calculation based on strategy type
+            var baseCost = strategyType switch
+            {
+                IPMStrategyType.Biological => 150f,
+                IPMStrategyType.Chemical => 200f,
+                IPMStrategyType.Environmental => 100f,
+                _ => 125f
+            };
+
+            // Apply parameter modifiers
+            var costModifier = 1.0f;
+            if (parameters != null && parameters.ContainsKey("CostModifier"))
+            {
+                if (float.TryParse(parameters["CostModifier"].ToString(), out var modifier))
+                {
+                    costModifier = modifier;
+                }
+            }
+
+            return baseCost * costModifier;
+        }
+
+        private IPMGaming.IPMProblemContext CreateProblemContextFromBattle(IPMGaming.IPMBattleData battleData)
+        {
+            return new IPMGaming.IPMProblemContext
+            {
+                ProblemId = battleData.BattleId,
+                PrimaryPest = battleData.ActiveInvasions.FirstOrDefault()?.PestType ?? PestType.Aphids,
+                ProblemSeverity = battleData.BattleIntensity,
+                ProblemLocation = Vector3.zero, // Would come from battle location
+                DetectedAt = battleData.StartTime,
+                UrgencyLevel = CalculateUrgencyFromBattlePhase(battleData.CurrentPhase)
+            };
+        }
+
+        private float CalculateUrgencyFromBattlePhase(IPMGaming.IPMBattlePhase phase)
+        {
+            return phase switch
+            {
+                IPMGaming.IPMBattlePhase.Preparation => 0.2f,
+                IPMGaming.IPMBattlePhase.Early => 0.4f,
+                IPMGaming.IPMBattlePhase.Escalation => 0.7f,
+                IPMGaming.IPMBattlePhase.Peak => 1.0f,
+                IPMGaming.IPMBattlePhase.Resolution => 0.6f,
+                IPMGaming.IPMBattlePhase.Cleanup => 0.3f,
+                _ => 0.5f
+            };
+        }
+
+        private IPMStrategyType ConvertToIPMStrategyType(StrategyType strategyType)
+        {
+            return strategyType switch
+            {
+                StrategyType.Biological => IPMStrategyType.Biological,
+                StrategyType.Chemical => IPMStrategyType.Chemical,
+                StrategyType.Environmental => IPMStrategyType.Environmental,
+                _ => IPMStrategyType.Biological
+            };
+        }
+
+        private ProjectChimera.Data.IPM.StrategyType ConvertFromIPMStrategyType(IPMStrategyType ipmStrategyType)
+        {
+            return ipmStrategyType switch
+            {
+                IPMStrategyType.Biological => ProjectChimera.Data.IPM.StrategyType.Biological,
+                IPMStrategyType.Chemical => ProjectChimera.Data.IPM.StrategyType.Chemical,
+                IPMStrategyType.Environmental => ProjectChimera.Data.IPM.StrategyType.Environmental,
+                _ => ProjectChimera.Data.IPM.StrategyType.Biological
+            };
+        }
+
+        private float CalculateTimeEffectivenessModifier(IPMGaming.IPMStrategyPlan strategy)
+        {
+            if (strategy.ExecutedAt == null) return 0.8f;
+
+            var executionDuration = DateTime.Now - strategy.ExecutedAt.Value;
+            var expectedDuration = TimeSpan.FromMinutes(30); // Default 30 minutes
+
+            if (executionDuration < expectedDuration)
+            {
+                return 1.0f; // Full effectiveness during expected timeframe
+            }
+            else
+            {
+                // Gradual effectiveness decay after expected duration
+                var overtimeRatio = (float)(executionDuration.TotalMinutes / expectedDuration.TotalMinutes);
+                return Mathf.Max(0.3f, 1.0f / overtimeRatio);
+            }
+        }
+
+        #endregion
+    }
+}

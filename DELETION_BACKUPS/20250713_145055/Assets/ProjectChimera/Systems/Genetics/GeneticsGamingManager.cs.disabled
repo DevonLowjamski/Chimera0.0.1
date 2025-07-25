@@ -1,0 +1,778 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Core.Interfaces;
+using ProjectChimera.Data;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics.Gaming;
+
+namespace ProjectChimera.Systems.Genetics
+{
+    /// <summary>
+    /// Enhanced Genetics Gaming Manager for Project Chimera.
+    /// Combines world-class scientific genetics with innovative gaming mechanics.
+    /// Provides engaging and educational cannabis breeding gameplay while maintaining
+    /// research-grade genetic accuracy and sophisticated breeding algorithms.
+    /// </summary>
+    [System.Serializable]
+    public class GeneticsGamingManager : ChimeraManager, IConfigurableGameSystem<GeneticsConfigSO>
+    {
+        [Header("Gaming Configuration")]
+        [SerializeField] private GeneticsConfigSO _configuration;
+        [SerializeField] private bool _enableGamingFeatures = true;
+        [SerializeField] private bool _enableProgressionSystem = true;
+        [SerializeField] private bool _enableCompetitions = true;
+        [SerializeField] private bool _enableCommunityFeatures = true;
+
+        [Header("Challenge System")]
+        [SerializeField] private float _challengeUpdateInterval = 1f;
+        [SerializeField] private int _maxActiveChalllenges = 5;
+        [SerializeField] private bool _enableHints = true;
+        [SerializeField] private float _baseDifficultyMultiplier = 1f;
+
+        [Header("Progression Settings")]
+        [SerializeField] private int _baseExperiencePerAction = 10;
+        [SerializeField] private float _skillProgressionRate = 1f;
+        [SerializeField] private bool _enableAutoSave = true;
+        [SerializeField] private float _autoSaveInterval = 300f; // 5 minutes
+
+        // Core Gaming Systems
+        private BreedingChallengeSystem _challengeSystem;
+        private SensoryTrainingSystem _sensorySystem;
+        private CompetitionManager _competitionManager;
+        private DiscoveryEngine _discoveryEngine;
+        private ProgressionManager _progressionManager;
+        private CommunityManager _communityManager;
+
+        // Player Data Management
+        private Dictionary<string, GeneticsSkillProfile> _playerProfiles = new Dictionary<string, GeneticsSkillProfile>();
+        private Dictionary<string, List<BreedingChallenge>> _activePlayerChallenges = new Dictionary<string, List<BreedingChallenge>>();
+        private List<GeneticsCompetition> _activeCompetitions = new List<GeneticsCompetition>();
+        private List<GeneticDiscovery> _globalDiscoveries = new List<GeneticDiscovery>();
+
+        // Event System
+        public static event Action<string> OnPlayerLevelUp;
+        public static event Action<GeneticDiscovery> OnDiscoveryMade;
+        public static event Action<BreedingChallenge, bool> OnChallengeCompleted;
+        public static event Action<GeneticsCompetition> OnCompetitionStarted;
+        public static event Action<string, GeneticsAchievement> OnAchievementUnlocked;
+
+        // Interface Implementation
+        public GeneticsConfigSO Configuration 
+        { 
+            get => _configuration; 
+            set => _configuration = value; 
+        }
+
+        public string SystemName => "Genetics Gaming Manager";
+        public bool IsInitialized { get; private set; }
+        public bool IsEnabled { get; private set; }
+
+        #region System Lifecycle
+
+        protected override void OnManagerInitialize()
+        {
+            InitializeGamingSystems();
+            LoadPlayerProfiles();
+            InitializeEventSubscriptions();
+            StartPeriodicUpdates();
+            
+            IsInitialized = true;
+            IsEnabled = _enableGamingFeatures;
+
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[GeneticsGamingManager] Gaming systems initialized successfully");
+            }
+        }
+
+        private void InitializeGamingSystems()
+        {
+            // Initialize core gaming systems
+            _challengeSystem = new BreedingChallengeSystem(_configuration);
+            _sensorySystem = new SensoryTrainingSystem(_configuration);
+            _competitionManager = new CompetitionManager(_configuration);
+            _discoveryEngine = new DiscoveryEngine(_configuration);
+            _progressionManager = new ProgressionManager(_configuration);
+            _communityManager = new CommunityManager(_configuration);
+
+            // Configure system interactions
+            _challengeSystem.OnChallengeCompleted += HandleChallengeCompletion;
+            _sensorySystem.OnTrainingCompleted += HandleSensoryTrainingCompletion;
+            _competitionManager.OnCompetitionEnded += HandleCompetitionCompletion;
+            _discoveryEngine.OnDiscoveryMade += HandleDiscoveryMade;
+        }
+
+        private void InitializeEventSubscriptions()
+        {
+            // Subscribe to genetics system events for gaming integration
+            if (FindObjectsByType<GeneticsManager>(FindObjectsSortMode.None).Length > 0)
+            {
+                var geneticsManager = FindObjectsByType<GeneticsManager>(FindObjectsSortMode.None)[0];
+                // Subscribe to breeding events, trait discoveries, etc.
+            }
+        }
+
+        private void StartPeriodicUpdates()
+        {
+            InvokeRepeating(nameof(UpdateGamingSystems), 1f, _challengeUpdateInterval);
+            
+            if (_enableAutoSave)
+            {
+                InvokeRepeating(nameof(AutoSavePlayerData), _autoSaveInterval, _autoSaveInterval);
+            }
+        }
+
+        public void Enable()
+        {
+            IsEnabled = true;
+            _enableGamingFeatures = true;
+        }
+
+        public void Disable()
+        {
+            IsEnabled = false;
+            _enableGamingFeatures = false;
+        }
+
+        public void Shutdown()
+        {
+            SaveAllPlayerData();
+            CancelInvoke();
+            IsInitialized = false;
+            IsEnabled = false;
+        }
+
+        public void UpdateSystem(float deltaTime)
+        {
+            if (!IsEnabled) return;
+            
+            UpdateGamingSystems();
+            UpdatePlayerProgression(deltaTime);
+            UpdateActiveCompetitions(deltaTime);
+            CheckForDiscoveries();
+        }
+
+        #endregion
+
+        #region Breeding Challenge System
+
+        public BreedingChallenge CreateCustomChallenge(string playerId, BreedingChallengeConfig config)
+        {
+            var challenge = _challengeSystem.CreateChallenge(config);
+            AddChallengeToPlayer(playerId, challenge);
+            
+            return challenge;
+        }
+
+        public List<BreedingChallenge> GetAvailableChallenges(string playerId)
+        {
+            var playerProfile = GetOrCreatePlayerProfile(playerId);
+            return _challengeSystem.GetChallengesForSkillLevel(playerProfile.OverallLevel);
+        }
+
+        public bool StartChallenge(string playerId, string challengeId)
+        {
+            var challenge = _challengeSystem.GetChallenge(challengeId);
+            if (challenge == null) return false;
+
+            var playerProfile = GetOrCreatePlayerProfile(playerId);
+            if (!CanPlayerAttemptChallenge(playerProfile, challenge)) return false;
+
+            AddChallengeToPlayer(playerId, challenge);
+            _challengeSystem.StartChallenge(challengeId, playerId);
+
+            return true;
+        }
+
+        public BreedingAttempt SubmitBreedingStep(string playerId, string challengeId, string parent1Id, string parent2Id, string reasoning = "")
+        {
+            var attempt = _challengeSystem.ProcessBreedingStep(challengeId, playerId, parent1Id, parent2Id, reasoning);
+            
+            if (attempt != null)
+            {
+                // Award experience for attempt
+                AwardExperience(playerId, "BreedingAttempt", _baseExperiencePerAction);
+                
+                // Check for automatic discoveries
+                CheckBreedingForDiscoveries(playerId, attempt);
+            }
+
+            return attempt;
+        }
+
+        public void SubmitChallengeCompletion(string playerId, string challengeId, string finalStrainId)
+        {
+            var result = _challengeSystem.CompleteChallengeSubmission(challengeId, playerId, finalStrainId);
+            HandleChallengeCompletion(result.Challenge, result.WasSuccessful);
+        }
+
+        private void HandleChallengeCompletion(BreedingChallenge challenge, bool wasSuccessful)
+        {
+            var playerId = GetCurrentPlayerId(); // Implement based on your player system
+            
+            if (wasSuccessful)
+            {
+                // Award significant experience
+                AwardExperience(playerId, "ChallengeCompletion", challenge.BasePoints);
+                
+                // Check for achievement unlocks
+                CheckChallengeAchievements(playerId, challenge);
+                
+                // Unlock new challenges or techniques
+                UnlockChallengeRewards(playerId, challenge);
+            }
+
+            OnChallengeCompleted?.Invoke(challenge, wasSuccessful);
+        }
+
+        #endregion
+
+        #region Sensory Training System
+
+        public SensoryTrainingSession StartSensoryTraining(string playerId, SensoryGameType gameType, DifficultyLevel difficulty)
+        {
+            var session = _sensorySystem.CreateTrainingSession(playerId, gameType, difficulty);
+            return session;
+        }
+
+        public bool SubmitSensoryResponse(string sessionId, string challengeId, string response)
+        {
+            var result = _sensorySystem.ProcessResponse(sessionId, challengeId, response);
+            
+            if (result.IsCorrect)
+            {
+                var playerId = _sensorySystem.GetSessionPlayerId(sessionId);
+                AwardExperience(playerId, "SensoryCorrect", _baseExperiencePerAction / 2);
+                UpdateSensorySkills(playerId, result);
+            }
+
+            return result.IsCorrect;
+        }
+
+        private void HandleSensoryTrainingCompletion(SensoryTrainingSession session)
+        {
+            // Award experience based on performance
+            var experienceAmount = CalculateSensoryExperience(session);
+            AwardExperience(session.PlayerId, "SensoryTraining", experienceAmount);
+
+            // Update skill progression
+            UpdateSensorySkillProgression(session.PlayerId, session);
+
+            // Check for terpene proficiency achievements
+            CheckSensoryAchievements(session.PlayerId, session);
+        }
+
+        private void UpdateSensorySkills(string playerId, SensoryResponse response)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            
+            // Update sensory accuracy
+            var currentAccuracy = profile.Statistics.SensoryAccuracy;
+            var newAccuracy = (currentAccuracy + (response.IsCorrect ? 1f : 0f)) / 2f;
+            profile.Statistics.SensoryAccuracy = newAccuracy;
+
+            // Update terpene proficiency count
+            if (response.IsCorrect && !profile.SensorySkills.LearnedTechniques.Contains(response.TerpeneIdentified))
+            {
+                profile.SensorySkills.LearnedTechniques.Add(response.TerpeneIdentified);
+                profile.Statistics.TerpenesProficient++;
+            }
+        }
+
+        #endregion
+
+        #region Competition System
+
+        public void CreateCompetition(GeneticsCompetition competition)
+        {
+            _competitionManager.CreateCompetition(competition);
+            _activeCompetitions.Add(competition);
+            
+            OnCompetitionStarted?.Invoke(competition);
+        }
+
+        public bool RegisterForCompetition(string playerId, string competitionId)
+        {
+            var competition = _activeCompetitions.FirstOrDefault(c => c.CompetitionId == competitionId);
+            if (competition == null) return false;
+
+            var playerProfile = GetOrCreatePlayerProfile(playerId);
+            if (!CanPlayerJoinCompetition(playerProfile, competition)) return false;
+
+            return _competitionManager.RegisterParticipant(competitionId, playerId);
+        }
+
+        public void SubmitCompetitionEntry(string playerId, string competitionId, string strainId, string strategy, string innovation)
+        {
+            var entry = new CompetitionEntry
+            {
+                ParticipantId = playerId,
+                StrainId = strainId,
+                BreedingStrategy = strategy,
+                Innovation = innovation,
+                SubmissionTime = DateTime.Now
+            };
+
+            _competitionManager.SubmitEntry(competitionId, entry);
+        }
+
+        private void UpdateActiveCompetitions(float deltaTime)
+        {
+            var now = DateTime.Now;
+            var completedCompetitions = new List<GeneticsCompetition>();
+
+            foreach (var competition in _activeCompetitions)
+            {
+                if (now >= competition.EndDate && !competition.IsCompleted)
+                {
+                    _competitionManager.CompleteCompetition(competition.CompetitionId);
+                    completedCompetitions.Add(competition);
+                }
+            }
+
+            foreach (var completed in completedCompetitions)
+            {
+                HandleCompetitionCompletion(completed);
+                _activeCompetitions.Remove(completed);
+            }
+        }
+
+        private void HandleCompetitionCompletion(GeneticsCompetition competition)
+        {
+            var results = _competitionManager.GetCompetitionResults(competition.CompetitionId);
+            
+            foreach (var result in results)
+            {
+                // Award experience and prizes
+                var experienceAmount = CalculateCompetitionExperience(result.FinalRank, competition.Entries.Count);
+                AwardExperience(result.EntryId, "Competition", experienceAmount);
+
+                // Award prizes for top performers
+                AwardCompetitionPrizes(result.EntryId, result, competition);
+
+                // Update competition statistics
+                UpdateCompetitionStats(result.EntryId, result);
+            }
+        }
+
+        #endregion
+
+        #region Discovery System
+
+        public void CheckBreedingForDiscoveries(string playerId, BreedingAttempt attempt)
+        {
+            var discoveries = _discoveryEngine.AnalyzeBreedingResult(attempt);
+            
+            foreach (var discovery in discoveries)
+            {
+                RegisterDiscovery(playerId, discovery);
+            }
+        }
+
+        private void RegisterDiscovery(string playerId, GeneticDiscovery discovery)
+        {
+            discovery.DiscovererPlayerId = playerId;
+            discovery.DiscoveryDate = DateTime.Now;
+            
+            _globalDiscoveries.Add(discovery);
+            
+            // Award significant experience and points
+            var experienceAmount = CalculateDiscoveryExperience(discovery);
+            AwardExperience(playerId, "Discovery", experienceAmount);
+
+            // Update discovery statistics
+            UpdateDiscoveryStats(playerId, discovery);
+
+            // Check for discovery achievements
+            CheckDiscoveryAchievements(playerId, discovery);
+
+            HandleDiscoveryMade(discovery);
+        }
+
+        private void HandleDiscoveryMade(GeneticDiscovery discovery)
+        {
+            OnDiscoveryMade?.Invoke(discovery);
+
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[GeneticsGamingManager] Discovery made: {discovery.DiscoveryName} by {discovery.DiscovererPlayerId}");
+            }
+        }
+
+        #endregion
+
+        #region Progression System
+
+        public GeneticsSkillProfile GetOrCreatePlayerProfile(string playerId)
+        {
+            if (!_playerProfiles.TryGetValue(playerId, out var profile))
+            {
+                profile = _progressionManager.CreateNewPlayerProfile(playerId);
+                _playerProfiles[playerId] = profile;
+            }
+            return profile;
+        }
+
+        public void AwardExperience(string playerId, string category, int amount)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            var scaledAmount = Mathf.RoundToInt(amount * _skillProgressionRate);
+            
+            profile.TotalExperience += scaledAmount;
+            
+            // Update category-specific experience
+            UpdateCategoryExperience(profile, category, scaledAmount);
+            
+            // Check for level ups
+            CheckForLevelUp(playerId, profile);
+            
+            _playerProfiles[playerId] = profile;
+        }
+
+        private void UpdateCategoryExperience(GeneticsSkillProfile profile, string category, int amount)
+        {
+            switch (category.ToLower())
+            {
+                case "breeding":
+                case "breedingAttempt":
+                case "challengecompletion":
+                    profile.BreedingSkills.Experience += amount;
+                    break;
+                    
+                case "sensory":
+                case "sensorycorrect":
+                case "sensorytraining":
+                    profile.SensorySkills.Experience += amount;
+                    break;
+                    
+                case "discovery":
+                case "innovation":
+                    profile.InnovationAbility.Experience += amount;
+                    break;
+                    
+                case "competition":
+                    profile.CompetitionPerformance.Experience += amount;
+                    break;
+                    
+                default:
+                    profile.ScientificKnowledge.Experience += amount;
+                    break;
+            }
+        }
+
+        private void CheckForLevelUp(string playerId, GeneticsSkillProfile profile)
+        {
+            if (profile.TotalExperience >= profile.ExperienceToNextLevel)
+            {
+                var oldLevel = profile.OverallLevel;
+                profile.OverallLevel++;
+                profile.ExperienceToNextLevel = CalculateNextLevelRequirement(profile.OverallLevel);
+                
+                // Unlock new features based on level
+                UnlockLevelFeatures(profile);
+                
+                OnPlayerLevelUp?.Invoke(playerId);
+                
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[GeneticsGamingManager] Player {playerId} leveled up: {oldLevel} -> {profile.OverallLevel}");
+                }
+            }
+        }
+
+        private void UpdatePlayerProgression(float deltaTime)
+        {
+            // Update skill decay, bonus timers, etc.
+            foreach (var profile in _playerProfiles.Values)
+            {
+                _progressionManager.UpdateSkillProgression(profile, deltaTime);
+            }
+        }
+
+        #endregion
+
+        #region Achievement System
+
+        private void CheckChallengeAchievements(string playerId, BreedingChallenge challenge)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            var achievements = _progressionManager.CheckAchievements(profile, "ChallengeCompletion", challenge);
+            
+            foreach (var achievement in achievements)
+            {
+                UnlockAchievement(playerId, achievement);
+            }
+        }
+
+        private void CheckSensoryAchievements(string playerId, SensoryTrainingSession session)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            var achievements = _progressionManager.CheckAchievements(profile, "SensoryTraining", session);
+            
+            foreach (var achievement in achievements)
+            {
+                UnlockAchievement(playerId, achievement);
+            }
+        }
+
+        private void CheckDiscoveryAchievements(string playerId, GeneticDiscovery discovery)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            var achievements = _progressionManager.CheckAchievements(profile, "Discovery", discovery);
+            
+            foreach (var achievement in achievements)
+            {
+                UnlockAchievement(playerId, achievement);
+            }
+        }
+
+        private void UnlockAchievement(string playerId, GeneticsAchievement achievement)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            
+            // Award achievement rewards
+            foreach (var reward in achievement.Rewards)
+            {
+                ApplyAchievementReward(playerId, reward);
+            }
+
+            OnAchievementUnlocked?.Invoke(playerId, achievement);
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[GeneticsGamingManager] Achievement unlocked: {achievement.Name} for {playerId}");
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void UpdateGamingSystems()
+        {
+            _challengeSystem?.Update(Time.deltaTime);
+            _sensorySystem?.Update(Time.deltaTime);
+            _competitionManager?.Update(Time.deltaTime);
+            _discoveryEngine?.Update(Time.deltaTime);
+        }
+
+        private void CheckForDiscoveries()
+        {
+            // Check for global discoveries, rare combinations, etc.
+            _discoveryEngine.ProcessGlobalDiscoveryChecks();
+        }
+
+        private bool CanPlayerAttemptChallenge(GeneticsSkillProfile profile, BreedingChallenge challenge)
+        {
+            // Check skill level requirements, unlocked strains, etc.
+            return profile.OverallLevel >= GetRequiredLevelForChallenge(challenge);
+        }
+
+        private bool CanPlayerJoinCompetition(GeneticsSkillProfile profile, GeneticsCompetition competition)
+        {
+            // Check skill requirements, previous competition performance, etc.
+            return true; // Implement based on competition requirements
+        }
+
+        private void AddChallengeToPlayer(string playerId, BreedingChallenge challenge)
+        {
+            if (!_activePlayerChallenges.ContainsKey(playerId))
+            {
+                _activePlayerChallenges[playerId] = new List<BreedingChallenge>();
+            }
+            
+            if (_activePlayerChallenges[playerId].Count < _maxActiveChalllenges)
+            {
+                _activePlayerChallenges[playerId].Add(challenge);
+            }
+        }
+
+        private int GetRequiredLevelForChallenge(BreedingChallenge challenge)
+        {
+            return challenge.Difficulty switch
+            {
+                DifficultyLevel.Beginner => 1,
+                DifficultyLevel.Novice => 3,
+                DifficultyLevel.Intermediate => 5,
+                DifficultyLevel.Advanced => 10,
+                DifficultyLevel.Expert => 15,
+                DifficultyLevel.Master => 25,
+                DifficultyLevel.Grandmaster => 40,
+                _ => 1
+            };
+        }
+
+        private long CalculateNextLevelRequirement(int level)
+        {
+            return (long)(1000 * Mathf.Pow(1.5f, level - 1));
+        }
+
+        private int CalculateSensoryExperience(SensoryTrainingSession session)
+        {
+            var baseExp = (int)(session.OverallAccuracy * 100);
+            var streakBonus = session.LongestStreak * 5;
+            var difficultyMultiplier = (float)session.Difficulty / 3f + 0.5f;
+            
+            return Mathf.RoundToInt((baseExp + streakBonus) * difficultyMultiplier);
+        }
+
+        private int CalculateCompetitionExperience(int rank, int totalParticipants)
+        {
+            var baseExp = 200;
+            var rankMultiplier = 1f - ((float)rank / totalParticipants);
+            return Mathf.RoundToInt(baseExp * (1f + rankMultiplier));
+        }
+
+        private int CalculateDiscoveryExperience(GeneticDiscovery discovery)
+        {
+            var baseExp = 500;
+            var rarityMultiplier = discovery.RarityScore;
+            var innovationMultiplier = discovery.InnovationValue;
+            
+            return Mathf.RoundToInt(baseExp * (1f + rarityMultiplier + innovationMultiplier));
+        }
+
+        private void UnlockLevelFeatures(GeneticsSkillProfile profile)
+        {
+            // Unlock new strains, techniques, equipment access, etc. based on level
+            var newUnlocks = _progressionManager.GetLevelUnlocks(profile.OverallLevel);
+            profile.UnlockedTechniques.AddRange(newUnlocks.Techniques);
+            profile.AvailableStrains.AddRange(newUnlocks.Strains);
+            profile.AccessibleEquipment.AddRange(newUnlocks.Equipment);
+        }
+
+        private void UnlockChallengeRewards(string playerId, BreedingChallenge challenge)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            profile.UnlockedTechniques.AddRange(challenge.UnlockableRewards);
+        }
+
+        private void ApplyAchievementReward(string playerId, AchievementReward reward)
+        {
+            switch (reward.Type)
+            {
+                case RewardType.Experience:
+                    AwardExperience(playerId, "Achievement", reward.Amount);
+                    break;
+                // Handle other reward types as needed
+            }
+        }
+
+        private void UpdateCompetitionStats(string playerId, CompetitionResult result)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            profile.Statistics.CompetitionsEntered++;
+            
+            if (result.FinalRank == 1)
+            {
+                profile.Statistics.CompetitionsWon++;
+            }
+            
+            if (result.FinalRank <= 3)
+            {
+                profile.Statistics.PodiumFinishes++;
+            }
+            
+            // Update average rank
+            var totalRanks = profile.Statistics.AverageCompetitionRank * (profile.Statistics.CompetitionsEntered - 1) + result.FinalRank;
+            profile.Statistics.AverageCompetitionRank = totalRanks / profile.Statistics.CompetitionsEntered;
+        }
+
+        private void UpdateDiscoveryStats(string playerId, GeneticDiscovery discovery)
+        {
+            var profile = GetOrCreatePlayerProfile(playerId);
+            
+            switch (discovery.Type)
+            {
+                case DiscoveryType.NovelCombination:
+                    profile.Statistics.NovelCombinations++;
+                    break;
+                case DiscoveryType.UnexpectedTrait:
+                    profile.Statistics.RareTraitFinds++;
+                    break;
+            }
+            
+            profile.Statistics.InnovationPoints += (int)discovery.InnovationValue;
+        }
+
+        private string GetCurrentPlayerId()
+        {
+            // Implement based on your player identification system
+            return "Player1"; // Placeholder
+        }
+
+        #endregion
+
+        #region Data Persistence
+
+        private void LoadPlayerProfiles()
+        {
+            // Load saved player progression data
+            // Implement based on your save system
+        }
+
+        private void AutoSavePlayerData()
+        {
+            SaveAllPlayerData();
+        }
+
+        private void SaveAllPlayerData()
+        {
+            // Save all player profiles, achievements, etc.
+            // Implement based on your save system
+            
+            if (_enableDebugLogging)
+            {
+                Debug.Log("[GeneticsGamingManager] Player data auto-saved");
+            }
+        }
+
+        #endregion
+
+        #region Interface Implementation
+
+        public void ApplyConfiguration(GeneticsConfigSO config)
+        {
+            _configuration = config;
+            
+            // Apply configuration to subsystems
+            _challengeSystem?.ApplyConfiguration(config);
+            _sensorySystem?.ApplyConfiguration(config);
+            _competitionManager?.ApplyConfiguration(config);
+            _discoveryEngine?.ApplyConfiguration(config);
+            _progressionManager?.ApplyConfiguration(config);
+        }
+
+        public bool ValidateConfiguration(GeneticsConfigSO config)
+        {
+            return config != null;
+        }
+
+        #endregion
+    }
+
+    #region Supporting Classes
+
+    // Note: SensoryResponse is defined in SensoryTrainingSystem.cs
+
+    public class BreedingChallengeConfig
+    {
+        public DifficultyLevel Difficulty;
+        public List<TargetTrait> TargetTraits;
+        public List<string> AvailableParents;
+        public int MaxGenerations;
+        public float TimeLimit;
+    }
+
+    public class LevelUnlocks
+    {
+        public List<string> Techniques = new List<string>();
+        public List<string> Strains = new List<string>();
+        public List<string> Equipment = new List<string>();
+    }
+
+    #endregion
+}

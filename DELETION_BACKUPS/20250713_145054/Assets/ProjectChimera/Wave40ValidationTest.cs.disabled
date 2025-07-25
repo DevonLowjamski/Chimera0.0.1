@@ -1,0 +1,294 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Cultivation;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Systems.Environment;
+using System.Collections.Generic;
+
+// Explicit aliases to match the fixed files
+using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
+using SystemsEnvironmentalConditions = ProjectChimera.Systems.Cultivation.EnvironmentalConditions;
+using PlantGenotype = ProjectChimera.Data.Genetics.PlantGenotype;
+using TraitExpressionResult = ProjectChimera.Systems.Genetics.TraitExpressionResult;
+
+namespace ProjectChimera.Testing
+{
+    /// <summary>
+    /// Validation test for Error Wave 40 - Property access and method availability resolution.
+    /// Tests the fixes for CS0117, CS1061 property access errors and CS1503, CS0029 type conversion errors.
+    /// </summary>
+    public class Wave40ValidationTest : ChimeraTestBase
+    {
+        /// <summary>
+        /// Test 1: Verify that all required properties exist on both EnvironmentalConditions types.
+        /// This addresses the CS0117 and CS1061 property access errors.
+        /// </summary>
+        [Test]
+        public void Test_EnvironmentalConditionsPropertyAccess()
+        {
+            // Test Data.Cultivation.EnvironmentalConditions properties
+            var dataConditions = new EnvironmentalConditions
+            {
+                Temperature = 24.0f,
+                Humidity = 60.0f,
+                LightIntensity = 800.0f,
+                CO2Level = 1000.0f,
+                pH = 6.5f,
+                ElectricalConductivity = 1200.0f, // This property should exist
+                AirFlow = 0.5f, // This property should exist
+                VPD = 1.0f // This property should exist (VaporPressureDeficit equivalent)
+            };
+            
+            // Test Systems.Cultivation.EnvironmentalConditions properties
+            var systemsConditions = new SystemsEnvironmentalConditions
+            {
+                Temperature = 24.0f,
+                Humidity = 60.0f,
+                LightIntensity = 800.0f,
+                CO2Level = 1000.0f,
+                pH = 6.5f,
+                EC = 1200.0f, // Systems version uses EC instead of ElectricalConductivity
+                AirCirculation = 0.5f // Systems version uses AirCirculation instead of AirFlow
+            };
+            
+            // Verify properties can be accessed without CS0117 errors
+            Assert.Greater(dataConditions.ElectricalConductivity, 0f, "Data.Cultivation should have ElectricalConductivity property");
+            Assert.Greater(dataConditions.AirFlow, 0f, "Data.Cultivation should have AirFlow property");
+            Assert.Greater(dataConditions.VPD, 0f, "Data.Cultivation should have VPD property");
+            
+            Assert.Greater(systemsConditions.EC, 0f, "Systems.Cultivation should have EC property");
+            Assert.Greater(systemsConditions.AirCirculation, 0f, "Systems.Cultivation should have AirCirculation property");
+            
+            Debug.Log("✓ Error Wave 40 Test 1: Property access test passed");
+        }
+        
+        /// <summary>
+        /// Test 2: Verify that required methods exist on both EnvironmentalConditions types.
+        /// This addresses the CS1061 method access errors.
+        /// </summary>
+        [Test]
+        public void Test_EnvironmentalConditionsMethodAccess()
+        {
+            var dataConditions = new EnvironmentalConditions();
+            var systemsConditions = new SystemsEnvironmentalConditions();
+            
+            // Test IsInitialized method exists on both types
+            bool dataInitialized = dataConditions.IsInitialized();
+            bool systemsInitialized = systemsConditions.IsInitialized(); // This method was added
+            
+            // Test CreateIndoorDefault method exists on Data type
+            var defaultConditions = EnvironmentalConditions.CreateIndoorDefault();
+            Assert.IsNotNull(defaultConditions, "CreateIndoorDefault should create valid conditions");
+            
+            // Test CreateOptimal method exists on Systems type
+            var optimalConditions = SystemsEnvironmentalConditions.CreateOptimal();
+            Assert.IsNotNull(optimalConditions, "CreateOptimal should create valid conditions");
+            
+            Assert.IsFalse(dataInitialized, "Empty data conditions should not be initialized");
+            Assert.IsFalse(systemsInitialized, "Empty systems conditions should not be initialized");
+            Assert.IsTrue(defaultConditions.IsInitialized(), "Default conditions should be initialized");
+            
+            Debug.Log("✓ Error Wave 40 Test 2: Method access test passed");
+        }
+        
+        /// <summary>
+        /// Test 3: Verify that type conversion between Systems and Data EnvironmentalConditions works correctly.
+        /// This addresses the CS1503 and CS0029 type conversion errors.
+        /// </summary>
+        [Test]
+        public void Test_EnvironmentalConditionsTypeConversion()
+        {
+            // Create Systems.Cultivation.EnvironmentalConditions
+            var systemsConditions = new SystemsEnvironmentalConditions
+            {
+                Temperature = 23.5f,
+                Humidity = 58.0f,
+                LightIntensity = 780.0f,
+                CO2Level = 950.0f,
+                pH = 6.4f,
+                EC = 1100.0f, // Systems property name
+                AirCirculation = 0.45f // Systems property name
+            };
+            
+            // Simulate the conversion that PlantUpdateProcessor does
+            var dataConditions = new EnvironmentalConditions
+            {
+                Temperature = systemsConditions.Temperature,
+                Humidity = systemsConditions.Humidity,
+                LightIntensity = systemsConditions.LightIntensity,
+                CO2Level = systemsConditions.CO2Level,
+                pH = systemsConditions.pH,
+                ElectricalConductivity = systemsConditions.EC, // Convert EC to ElectricalConductivity
+                AirFlow = systemsConditions.AirCirculation // Convert AirCirculation to AirFlow
+            };
+            
+            // Calculate VPD since Systems version doesn't have it
+            dataConditions.VPD = EnvironmentalConditions.CalculateVPD(
+                systemsConditions.Temperature, 
+                systemsConditions.Humidity);
+            
+            // Verify conversion preserved all values correctly
+            Assert.AreEqual(systemsConditions.Temperature, dataConditions.Temperature, "Temperature should be preserved");
+            Assert.AreEqual(systemsConditions.Humidity, dataConditions.Humidity, "Humidity should be preserved");
+            Assert.AreEqual(systemsConditions.LightIntensity, dataConditions.LightIntensity, "Light intensity should be preserved");
+            Assert.AreEqual(systemsConditions.CO2Level, dataConditions.CO2Level, "CO2 level should be preserved");
+            Assert.AreEqual(systemsConditions.pH, dataConditions.pH, "pH should be preserved");
+            Assert.AreEqual(systemsConditions.EC, dataConditions.ElectricalConductivity, "EC should map to ElectricalConductivity");
+            Assert.AreEqual(systemsConditions.AirCirculation, dataConditions.AirFlow, "AirCirculation should map to AirFlow");
+            Assert.Greater(dataConditions.VPD, 0f, "VPD should be calculated and valid");
+            
+            Debug.Log("✓ Error Wave 40 Test 3: Type conversion test passed");
+        }
+        
+        /// <summary>
+        /// Test 4: Verify that PlantUpdateProcessor can properly handle the conversion without errors.
+        /// This tests the actual conversion method that was fixed.
+        /// </summary>
+        [Test]
+        public void Test_PlantUpdateProcessorConversion()
+        {
+            // We can't directly test the private conversion method, but we can test the types are compatible
+            var systemsConditions = SystemsEnvironmentalConditions.CreateOptimal();
+            
+            // Verify the Systems conditions have all required properties for conversion
+            Assert.Greater(systemsConditions.Temperature, 0f, "Temperature should be valid");
+            Assert.Greater(systemsConditions.Humidity, 0f, "Humidity should be valid");
+            Assert.Greater(systemsConditions.LightIntensity, 0f, "Light intensity should be valid");
+            Assert.Greater(systemsConditions.CO2Level, 0f, "CO2 level should be valid");
+            Assert.Greater(systemsConditions.pH, 0f, "pH should be valid");
+            Assert.Greater(systemsConditions.EC, 0f, "EC should be valid");
+            Assert.Greater(systemsConditions.AirCirculation, 0f, "Air circulation should be valid");
+            
+            // Verify IsInitialized method works
+            Assert.IsTrue(systemsConditions.IsInitialized(), "Optimal conditions should be initialized");
+            
+            // Verify we can create Data conditions with the same values
+            var dataConditions = new EnvironmentalConditions
+            {
+                Temperature = systemsConditions.Temperature,
+                Humidity = systemsConditions.Humidity,
+                LightIntensity = systemsConditions.LightIntensity,
+                CO2Level = systemsConditions.CO2Level,
+                pH = systemsConditions.pH,
+                ElectricalConductivity = systemsConditions.EC,
+                AirFlow = systemsConditions.AirCirculation
+            };
+            
+            dataConditions.VPD = EnvironmentalConditions.CalculateVPD(
+                systemsConditions.Temperature, 
+                systemsConditions.Humidity);
+            
+            dataConditions.CalculateDerivedValues();
+            
+            Assert.IsTrue(dataConditions.IsInitialized(), "Converted conditions should be initialized");
+            Assert.IsTrue(dataConditions.IsWithinAcceptableRanges(), "Converted conditions should be within acceptable ranges");
+            
+            Debug.Log("✓ Error Wave 40 Test 4: PlantUpdateProcessor conversion test passed");
+        }
+        
+        /// <summary>
+        /// Test 5: Verify that VPD calculation works correctly and replaces missing VaporPressureDeficit property.
+        /// This addresses the specific VPD/VaporPressureDeficit property mismatch.
+        /// </summary>
+        [Test]
+        public void Test_VPDCalculationCompatibility()
+        {
+            float temperature = 24.0f;
+            float humidity = 60.0f;
+            
+            // Test VPD calculation using the static method
+            float calculatedVPD = EnvironmentalConditions.CalculateVPD(temperature, humidity);
+            
+            // VPD should be a reasonable value for these conditions (typically 0.5-1.5 kPa)
+            Assert.Greater(calculatedVPD, 0.2f, "VPD should be greater than 0.2 kPa");
+            Assert.Less(calculatedVPD, 2.0f, "VPD should be less than 2.0 kPa");
+            
+            // Test that Data conditions can use calculated VPD
+            var dataConditions = new EnvironmentalConditions
+            {
+                Temperature = temperature,
+                Humidity = humidity,
+                VPD = calculatedVPD
+            };
+            
+            Assert.AreEqual(calculatedVPD, dataConditions.VPD, "VPD should be set correctly");
+            
+            // Test that calculated VPD makes sense (higher temperature or lower humidity should increase VPD)
+            float higherTempVPD = EnvironmentalConditions.CalculateVPD(temperature + 5f, humidity);
+            float lowerHumidityVPD = EnvironmentalConditions.CalculateVPD(temperature, humidity - 10f);
+            
+            Assert.Greater(higherTempVPD, calculatedVPD, "Higher temperature should increase VPD");
+            Assert.Greater(lowerHumidityVPD, calculatedVPD, "Lower humidity should increase VPD");
+            
+            Debug.Log("✓ Error Wave 40 Test 5: VPD calculation compatibility test passed");
+        }
+        
+        /// <summary>
+        /// Test 6: Verify that all namespace aliases are properly resolved and no ambiguous references exist.
+        /// This addresses potential CS0104 ambiguous reference errors.
+        /// </summary>
+        [Test]
+        public void Test_NamespaceAliasResolution()
+        {
+            // Test that we can use all aliased types without conflicts
+            
+            // Data.Cultivation.EnvironmentalConditions (our main alias)
+            var envConditions = new EnvironmentalConditions();
+            Assert.IsNotNull(envConditions, "EnvironmentalConditions alias should work");
+            
+            // Systems.Cultivation.EnvironmentalConditions (explicit alias)
+            var systemsEnvConditions = new SystemsEnvironmentalConditions();
+            Assert.IsNotNull(systemsEnvConditions, "SystemsEnvironmentalConditions should work");
+            
+            // Data.Genetics.PlantGenotype
+            var genotype = new PlantGenotype();
+            Assert.IsNotNull(genotype, "PlantGenotype alias should work");
+            
+            // Systems.Genetics.TraitExpressionResult
+            var traitResult = new TraitExpressionResult();
+            Assert.IsNotNull(traitResult, "TraitExpressionResult alias should work");
+            
+            // Verify they are different types
+            Assert.AreNotEqual(envConditions.GetType(), systemsEnvConditions.GetType(), 
+                "Data and Systems EnvironmentalConditions should be different types");
+            
+            // Verify both types have required methods
+            Assert.IsTrue(envConditions.GetType().GetMethod("IsInitialized") != null, 
+                "Data.EnvironmentalConditions should have IsInitialized method");
+            Assert.IsTrue(systemsEnvConditions.GetType().GetMethod("IsInitialized") != null, 
+                "Systems.EnvironmentalConditions should have IsInitialized method");
+            
+            Debug.Log("✓ Error Wave 40 Test 6: Namespace alias resolution test passed");
+        }
+        
+        /// <summary>
+        /// Run all Error Wave 40 validation tests.
+        /// </summary>
+        [Test]
+        public void RunAllWave40ValidationTests()
+        {
+            Debug.Log("=== Error Wave 40 Validation Tests ===");
+            
+            Test_EnvironmentalConditionsPropertyAccess();
+            Test_EnvironmentalConditionsMethodAccess();
+            Test_EnvironmentalConditionsTypeConversion();
+            Test_PlantUpdateProcessorConversion();
+            Test_VPDCalculationCompatibility();
+            Test_NamespaceAliasResolution();
+            
+            Debug.Log("=== All Error Wave 40 Tests Passed! ===");
+            Debug.Log("✓ CS0117 property access errors resolved");
+            Debug.Log("✓ CS1061 method access errors resolved");
+            Debug.Log("✓ CS1503 type conversion errors resolved");
+            Debug.Log("✓ CS0029 implicit conversion errors resolved");
+            Debug.Log("✓ ElectricalConductivity property mapping working");
+            Debug.Log("✓ AirFlow property mapping working");
+            Debug.Log("✓ VPD calculation replacing VaporPressureDeficit");
+            Debug.Log("✓ IsInitialized method added to Systems version");
+            Debug.Log("✓ Type conversion between Systems and Data working");
+            Debug.Log("✓ Namespace aliases properly configured");
+        }
+    }
+} 

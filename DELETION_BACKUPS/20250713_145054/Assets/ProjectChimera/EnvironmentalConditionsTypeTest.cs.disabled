@@ -1,0 +1,59 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Final verification test to ensure all EnvironmentalConditions type issues are resolved.
+    /// Tests the specific line numbers that were causing compilation errors.
+    /// </summary>
+    public class EnvironmentalConditionsTypeTest : MonoBehaviour
+    {
+        public void TestEnvironmentalConditionsTypes()
+        {
+            Debug.Log("=== Final EnvironmentalConditions Type Test ===");
+            
+            try
+            {
+                // Test PlantInstance field consistency
+                var plantObject = new GameObject("TypeTestPlant");
+                var plantInstance = plantObject.AddComponent<PlantInstance>();
+                
+                // Test line 506: _environmentalSystem?.UpdateEnvironmentalResponse(_currentEnvironment, deltaTime)
+                // This should work because _currentEnvironment is now ProjectChimera.Data.Cultivation.EnvironmentalConditions
+                // and UpdateEnvironmentalResponse expects ProjectChimera.Data.Cultivation.EnvironmentalConditions
+                
+                // Test line 538: _currentEnvironment = newConditions
+                var testConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions.CreateIndoorDefault();
+                plantInstance.UpdateEnvironmentalConditions(testConditions);
+                Debug.Log("✅ PlantInstance environmental conditions assignment - Success");
+                
+                // Test line 557: return _currentEnvironment
+                var retrievedConditions = plantInstance.GetCurrentEnvironmentalConditions();
+                Debug.Log($"✅ PlantInstance environmental conditions retrieval - Success. Type: {retrievedConditions.GetType().Name}");
+                
+                // Test property access (line 93)
+                var currentEnv = plantInstance.CurrentEnvironment;
+                Debug.Log($"✅ PlantInstance.CurrentEnvironment property - Success. Type: {currentEnv.GetType().Name}");
+                
+                Debug.Log("✅ All EnvironmentalConditions type tests passed!");
+                
+                // Cleanup
+                DestroyImmediate(plantObject);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"❌ EnvironmentalConditions type test failed: {e.Message}");
+                Debug.LogError($"Stack trace: {e.StackTrace}");
+            }
+            
+            Debug.Log("=== EnvironmentalConditions Type Test Complete ===");
+        }
+        
+        void Start()
+        {
+            // Run test on start
+            TestEnvironmentalConditionsTypes();
+        }
+    }
+}

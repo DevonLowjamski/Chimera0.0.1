@@ -1,0 +1,1030 @@
+using UnityEngine;
+using ProjectChimera.Core;
+using ProjectChimera.Data.Progression;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using ProjectChimera.Data;
+using ProjectChimera.Data.UI;
+
+namespace ProjectChimera.Systems.Progression
+{
+    /// <summary>
+    /// Manages competitive gameplay elements including leaderboards, tournaments, 
+    /// player rankings, and competitive achievements. Enhances game entertainment
+    /// through social comparison and competitive goals.
+    /// </summary>
+    public class CompetitiveManager : ChimeraManager
+    {
+        [Header("Competitive Configuration")]
+        [SerializeField] private bool _enableCompetitiveFeatures = true;
+        [SerializeField] private bool _enableGlobalLeaderboards = true;
+        [SerializeField] private bool _enableSeasonalCompetitions = true;
+        [SerializeField] private float _leaderboardUpdateInterval = 60f;
+        [SerializeField] private int _maxLeaderboardEntries = 100;
+        
+        [Header("Tournament Configuration")]
+        [SerializeField] private bool _enableWeeklyTournaments = true;
+        [SerializeField] private bool _enableMonthlyChampionships = true;
+        [SerializeField] private float _tournamentDurationDays = 7f;
+        [SerializeField] private int _maxTournamentParticipants = 50;
+        
+        [Header("Event Channels")]
+        [SerializeField] private SimpleGameEventSO _onRankingUpdated;
+        [SerializeField] private SimpleGameEventSO _onTournamentStarted;
+        [SerializeField] private SimpleGameEventSO _onTournamentEnded;
+        [SerializeField] private SimpleGameEventSO _onNewRecord;
+        [SerializeField] private SimpleGameEventSO _onCompetitiveAchievement;
+        
+        // System references - commented out during namespace transition
+        // private ProgressionManager _progressionManager;
+        // private PlantManager _plantManager;
+        // private ObjectiveManager _objectiveManager;
+        
+        // Competitive data
+        private List<LeaderboardEntry> _cultivationLeaderboard = new List<LeaderboardEntry>();
+        private List<LeaderboardEntry> _economicLeaderboard = new List<LeaderboardEntry>();
+        private List<LeaderboardEntry> _qualityLeaderboard = new List<LeaderboardEntry>();
+        private List<LeaderboardEntry> _speedLeaderboard = new List<LeaderboardEntry>();
+        private List<LeaderboardEntry> _overallLeaderboard = new List<LeaderboardEntry>();
+        
+        // Tournament tracking
+        private List<CompetitionEvent> _activeCompetitions = new List<CompetitionEvent>();
+        private List<TournamentEntry> _tournamentParticipants = new List<TournamentEntry>();
+        private Dictionary<string, PlayerCompetitiveStats> _playerStats = new Dictionary<string, PlayerCompetitiveStats>();
+        
+        // Personal records
+        private PlayerRecords _personalRecords = new PlayerRecords();
+        private float _lastLeaderboardUpdate = 0f;
+        private string _currentPlayerId = "LocalPlayer"; // Would come from player profile
+        
+        public override ManagerPriority Priority => ManagerPriority.Normal;
+        
+        // Public Properties
+        public PlayerRecords PersonalRecords => _personalRecords;
+        public List<LeaderboardEntry> CultivationLeaderboard => _cultivationLeaderboard.ToList();
+        public List<LeaderboardEntry> EconomicLeaderboard => _economicLeaderboard.ToList();
+        public List<LeaderboardEntry> QualityLeaderboard => _qualityLeaderboard.ToList();
+        public List<CompetitionEvent> ActiveCompetitions => _activeCompetitions.ToList();
+        public bool IsInTournament => _activeCompetitions.Any(c => c.IsActive && c.Type == CompetitionEventType.Tournament);
+        
+        // Events
+        public System.Action<LeaderboardType, int> OnRankingChanged;
+        public System.Action<CompetitionEvent> OnCompetitionStarted;
+        public System.Action<CompetitionEvent> OnCompetitionEnded;
+        public System.Action<RecordType, float> OnPersonalRecordSet;
+        
+        protected override void OnManagerInitialize()
+        {
+            // InitializeSystemReferences();
+            InitializePlayerStats();
+            GenerateSimulatedLeaderboards();
+            CheckForActiveCompetitions();
+            
+            if (_enableSeasonalCompetitions)
+            {
+                StartSeasonalCompetitions();
+            }
+            
+            LogInfo($"CompetitiveManager initialized with {_activeCompetitions.Count} active competitions");
+        }
+        
+        protected override void OnManagerUpdate()
+        {
+            if (!_enableCompetitiveFeatures) return;
+            
+            float currentTime = Time.time;
+            
+            // Update leaderboards periodically
+            if (currentTime - _lastLeaderboardUpdate >= _leaderboardUpdateInterval)
+            {
+                UpdateLeaderboards();
+                _lastLeaderboardUpdate = currentTime;
+            }
+            
+            // Check competition status
+            UpdateActiveCompetitions();
+            
+            // Update player stats from game state
+            UpdatePlayerStatsFromGameState();
+        }
+        
+        /// <summary>
+        /// Record a competitive achievement for the player
+        /// </summary>
+        public void RecordAchievement(CompetitiveAchievementType achievementType, float value, string context = "")
+        {
+            if (!_enableCompetitiveFeatures) return;
+            
+            var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+            bool newRecord = false;
+            
+            switch (achievementType)
+            {
+                case CompetitiveAchievementType.HighestYield:
+                    if (value > _personalRecords.HighestSingleHarvest)
+                    {
+                        _personalRecords.HighestSingleHarvest = value;
+                        newRecord = true;
+                    }
+                    playerStats.TotalYieldHarvested += value;
+                    break;
+                    
+                case CompetitiveAchievementType.FastestGrowth:
+                    if (value < _personalRecords.FastestGrowthCycle || _personalRecords.FastestGrowthCycle == 0)
+                    {
+                        _personalRecords.FastestGrowthCycle = value;
+                        newRecord = true;
+                    }
+                    break;
+                    
+                case CompetitiveAchievementType.HighestQuality:
+                    if (value > _personalRecords.HighestQualityRating)
+                    {
+                        _personalRecords.HighestQualityRating = value;
+                        newRecord = true;
+                    }
+                    break;
+                    
+                case CompetitiveAchievementType.ProfitGenerated:
+                    playerStats.TotalProfitGenerated += value;
+                    if (value > _personalRecords.LargestSingleProfit)
+                    {
+                        _personalRecords.LargestSingleProfit = value;
+                        newRecord = true;
+                    }
+                    break;
+                    
+                case CompetitiveAchievementType.StrainMastery:
+                    if (value > _personalRecords.MostStrainsMastered)
+                    {
+                        _personalRecords.MostStrainsMastered = (int)value;
+                        newRecord = true;
+                    }
+                    break;
+            }
+            
+            playerStats.LastActiveTime = DateTime.Now;
+            
+            if (newRecord)
+            {
+                _onNewRecord?.Raise();
+                OnPersonalRecordSet?.Invoke((RecordType)achievementType, value);
+                LogInfo($"🏆 New Personal Record: {achievementType} = {value:F2} {context}");
+                
+                // Check if this beats global records
+                CheckGlobalLeaderboardPosition(achievementType, value);
+            }
+            
+            // Update competitive achievements
+            CheckCompetitiveAchievements(playerStats);
+        }
+        
+        /// <summary>
+        /// Get current player's ranking in specified leaderboard
+        /// </summary>
+        public int GetPlayerRanking(LeaderboardType leaderboardType)
+        {
+            var leaderboard = GetLeaderboardByType(leaderboardType);
+            var playerEntry = leaderboard.FirstOrDefault(e => e.PlayerId == _currentPlayerId);
+            
+            if (playerEntry != null)
+            {
+                return leaderboard.IndexOf(playerEntry) + 1;
+            }
+            
+            return -1; // Not ranked
+        }
+        
+        /// <summary>
+        /// Get leaderboard data for UI display
+        /// </summary>
+        public List<LeaderboardDisplayData> GetLeaderboardDisplayData(LeaderboardType type, int maxEntries = 10)
+        {
+            var leaderboard = GetLeaderboardByType(type);
+            var displayData = new List<LeaderboardDisplayData>();
+            
+            for (int i = 0; i < Math.Min(maxEntries, leaderboard.Count); i++)
+            {
+                var entry = leaderboard[i];
+                displayData.Add(new LeaderboardDisplayData
+                {
+                    Rank = i + 1,
+                    PlayerName = entry.PlayerName,
+                    Score = entry.Score,
+                    FormattedScore = FormatScoreForDisplay(type, entry.Score),
+                    IsCurrentPlayer = entry.PlayerId == _currentPlayerId,
+                    AvatarIcon = "👤", // Would be actual avatar
+                    Badge = GetRankBadge(i + 1),
+                    LastActive = entry.LastUpdated
+                });
+            }
+            
+            return displayData;
+        }
+        
+        /// <summary>
+        /// Start a new tournament competition
+        /// </summary>
+        public CompetitionEvent StartTournament(TournamentConfig config)
+        {
+            if (!_enableWeeklyTournaments) return null;
+            
+            var tournament = new CompetitionEvent
+            {
+                CompetitionId = Guid.NewGuid().ToString(),
+                Name = config.TournamentName,
+                Description = config.Description,
+                Type = CompetitionEventType.Tournament,
+                Category = config.Category,
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddDays(_tournamentDurationDays),
+                MaxParticipants = _maxTournamentParticipants,
+                IsActive = true,
+                Rewards = config.Rewards,
+                Rules = config.Rules
+            };
+            
+            _activeCompetitions.Add(tournament);
+            _tournamentParticipants.Clear();
+            
+            // Auto-enroll current player
+            EnrollInTournament(tournament.CompetitionId, _currentPlayerId);
+            
+            _onTournamentStarted?.Raise();
+            OnCompetitionStarted?.Invoke(tournament);
+            
+            LogInfo($"🏆 Tournament Started: {tournament.Name} (Duration: {_tournamentDurationDays} days)");
+            
+            return tournament;
+        }
+        
+        /// <summary>
+        /// Get competitive statistics summary for player
+        /// </summary>
+        public CompetitiveStatsSummary GetCompetitiveStatsSummary()
+        {
+            var stats = GetOrCreatePlayerStats(_currentPlayerId);
+            
+            return new CompetitiveStatsSummary
+            {
+                OverallRank = GetPlayerRanking(LeaderboardType.Overall),
+                CultivationRank = GetPlayerRanking(LeaderboardType.Cultivation),
+                EconomicRank = GetPlayerRanking(LeaderboardType.Economic),
+                QualityRank = GetPlayerRanking(LeaderboardType.Quality),
+                
+                TotalCompetitionsEntered = stats.CompetitionsEntered,
+                TotalWins = stats.CompetitionWins,
+                TotalPodiumFinishes = stats.PodiumFinishes,
+                WinRate = stats.CompetitionsEntered > 0 ? (float)stats.CompetitionWins / stats.CompetitionsEntered : 0f,
+                
+                PersonalRecords = _personalRecords,
+                CompetitiveLevel = CalculateCompetitiveLevel(stats),
+                NextLevelProgress = CalculateNextLevelProgress(stats)
+            };
+        }
+        
+        private void InitializeSystemReferences()
+        {
+            // var gameManager = GameManager.Instance;
+            // if (gameManager != null)
+            // {
+            //     _progressionManager = gameManager.GetManager<ProgressionManager>();
+            //     _plantManager = gameManager.GetManager<PlantManager>();
+            //     _objectiveManager = gameManager.GetManager<ObjectiveManager>();
+            // }
+        }
+        
+        private void InitializePlayerStats()
+        {
+            // Initialize local player stats
+            if (!_playerStats.ContainsKey(_currentPlayerId))
+            {
+                _playerStats[_currentPlayerId] = new PlayerCompetitiveStats
+                {
+                    PlayerId = _currentPlayerId,
+                    PlayerName = "You", // Would come from player profile
+                    JoinDate = DateTime.Now,
+                    LastActiveTime = DateTime.Now
+                };
+            }
+        }
+        
+        private void GenerateSimulatedLeaderboards()
+        {
+            // Generate realistic leaderboard data for demonstration
+            GenerateSimulatedEntries();
+            SortAllLeaderboards();
+        }
+        
+        private void GenerateSimulatedEntries()
+        {
+            var random = new System.Random();
+            var names = new string[] 
+            { 
+                "GreenThumb", "CannaMaster", "HydroExpert", "QualityGuru", "SpeedGrower",
+                "ProfitKing", "GeneticsLab", "TerpLover", "YieldChaser", "PurelyOrganic",
+                "TechGrower", "SunlightFarm", "PremiumBuds", "CropCircle", "HighGrades"
+            };
+            
+            // Add player to leaderboards first
+            AddPlayerToLeaderboards();
+            
+            // Generate competitive entries
+            for (int i = 0; i < 20; i++)
+            {
+                var playerId = $"sim_player_{i}";
+                var playerName = names[random.Next(names.Length)] + random.Next(100, 999);
+                
+                // Cultivation leaderboard (total plants grown)
+                _cultivationLeaderboard.Add(new LeaderboardEntry
+                {
+                    PlayerId = playerId,
+                    PlayerName = playerName,
+                    Score = random.Next(50, 500),
+                    LastUpdated = DateTime.Now.AddHours(-random.Next(1, 72))
+                });
+                
+                // Economic leaderboard (total profit)
+                _economicLeaderboard.Add(new LeaderboardEntry
+                {
+                    PlayerId = playerId,
+                    PlayerName = playerName,
+                    Score = random.Next(10000, 100000),
+                    LastUpdated = DateTime.Now.AddHours(-random.Next(1, 72))
+                });
+                
+                // Quality leaderboard (highest THC/quality rating)
+                _qualityLeaderboard.Add(new LeaderboardEntry
+                {
+                    PlayerId = playerId,
+                    PlayerName = playerName,
+                    Score = 60f + (float)random.NextDouble() * 40f, // 60-100% quality
+                    LastUpdated = DateTime.Now.AddHours(-random.Next(1, 72))
+                });
+                
+                // Speed leaderboard (fastest growth in days - lower is better)
+                _speedLeaderboard.Add(new LeaderboardEntry
+                {
+                    PlayerId = playerId,
+                    PlayerName = playerName,
+                    Score = 15f + (float)random.NextDouble() * 25f, // 15-40 days
+                    LastUpdated = DateTime.Now.AddHours(-random.Next(1, 72))
+                });
+            }
+        }
+        
+        private void AddPlayerToLeaderboards()
+        {
+            var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+            
+            // Add player with current stats
+            _cultivationLeaderboard.Add(new LeaderboardEntry
+            {
+                PlayerId = _currentPlayerId,
+                PlayerName = "You",
+                Score = playerStats.TotalPlantsGrown,
+                LastUpdated = DateTime.Now
+            });
+            
+            _economicLeaderboard.Add(new LeaderboardEntry
+            {
+                PlayerId = _currentPlayerId,
+                PlayerName = "You", 
+                Score = playerStats.TotalProfitGenerated,
+                LastUpdated = DateTime.Now
+            });
+            
+            _qualityLeaderboard.Add(new LeaderboardEntry
+            {
+                PlayerId = _currentPlayerId,
+                PlayerName = "You",
+                Score = _personalRecords.HighestQualityRating,
+                LastUpdated = DateTime.Now
+            });
+            
+            if (_personalRecords.FastestGrowthCycle > 0)
+            {
+                _speedLeaderboard.Add(new LeaderboardEntry
+                {
+                    PlayerId = _currentPlayerId,
+                    PlayerName = "You",
+                    Score = _personalRecords.FastestGrowthCycle,
+                    LastUpdated = DateTime.Now
+                });
+            }
+        }
+        
+        private void UpdateLeaderboards()
+        {
+            // Update player's leaderboard entries with current stats
+            UpdatePlayerLeaderboardEntries();
+            
+            // Sort all leaderboards
+            SortAllLeaderboards();
+            
+            // Check for ranking changes
+            CheckRankingChanges();
+        }
+        
+        private void UpdatePlayerLeaderboardEntries()
+        {
+            var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+            
+            // Update cultivation leaderboard
+            var cultivationEntry = _cultivationLeaderboard.FirstOrDefault(e => e.PlayerId == _currentPlayerId);
+            if (cultivationEntry != null)
+            {
+                cultivationEntry.Score = playerStats.TotalPlantsGrown;
+                cultivationEntry.LastUpdated = DateTime.Now;
+            }
+            
+            // Update economic leaderboard
+            var economicEntry = _economicLeaderboard.FirstOrDefault(e => e.PlayerId == _currentPlayerId);
+            if (economicEntry != null)
+            {
+                economicEntry.Score = playerStats.TotalProfitGenerated;
+                economicEntry.LastUpdated = DateTime.Now;
+            }
+            
+            // Update quality leaderboard
+            var qualityEntry = _qualityLeaderboard.FirstOrDefault(e => e.PlayerId == _currentPlayerId);
+            if (qualityEntry != null)
+            {
+                qualityEntry.Score = _personalRecords.HighestQualityRating;
+                qualityEntry.LastUpdated = DateTime.Now;
+            }
+            
+            // Update speed leaderboard
+            var speedEntry = _speedLeaderboard.FirstOrDefault(e => e.PlayerId == _currentPlayerId);
+            if (speedEntry != null && _personalRecords.FastestGrowthCycle > 0)
+            {
+                speedEntry.Score = _personalRecords.FastestGrowthCycle;
+                speedEntry.LastUpdated = DateTime.Now;
+            }
+        }
+        
+        private void SortAllLeaderboards()
+        {
+            // Sort by score (descending, except speed which is ascending - lower is better)
+            _cultivationLeaderboard = _cultivationLeaderboard.OrderByDescending(e => e.Score).ToList();
+            _economicLeaderboard = _economicLeaderboard.OrderByDescending(e => e.Score).ToList();
+            _qualityLeaderboard = _qualityLeaderboard.OrderByDescending(e => e.Score).ToList();
+            _speedLeaderboard = _speedLeaderboard.OrderBy(e => e.Score).ToList();
+            
+            // Calculate overall ranking based on weighted average of ranks
+            CalculateOverallLeaderboard();
+        }
+        
+        private void CalculateOverallLeaderboard()
+        {
+            _overallLeaderboard.Clear();
+            var allPlayerIds = new HashSet<string>();
+            
+            // Collect all unique player IDs
+            allPlayerIds.UnionWith(_cultivationLeaderboard.Select(e => e.PlayerId));
+            allPlayerIds.UnionWith(_economicLeaderboard.Select(e => e.PlayerId));
+            allPlayerIds.UnionWith(_qualityLeaderboard.Select(e => e.PlayerId));
+            allPlayerIds.UnionWith(_speedLeaderboard.Select(e => e.PlayerId));
+            
+            foreach (var playerId in allPlayerIds)
+            {
+                var cultivationRank = GetPlayerRankInLeaderboard(_cultivationLeaderboard, playerId);
+                var economicRank = GetPlayerRankInLeaderboard(_economicLeaderboard, playerId);
+                var qualityRank = GetPlayerRankInLeaderboard(_qualityLeaderboard, playerId);
+                var speedRank = GetPlayerRankInLeaderboard(_speedLeaderboard, playerId);
+                
+                // Calculate weighted overall score (lower is better for overall ranking)
+                float overallScore = 0f;
+                int categoryCount = 0;
+                
+                if (cultivationRank > 0) { overallScore += cultivationRank * 0.3f; categoryCount++; }
+                if (economicRank > 0) { overallScore += economicRank * 0.3f; categoryCount++; }
+                if (qualityRank > 0) { overallScore += qualityRank * 0.25f; categoryCount++; }
+                if (speedRank > 0) { overallScore += speedRank * 0.15f; categoryCount++; }
+                
+                if (categoryCount > 0)
+                {
+                    overallScore = overallScore / categoryCount;
+                    
+                    var playerName = _cultivationLeaderboard.FirstOrDefault(e => e.PlayerId == playerId)?.PlayerName ??
+                                   _economicLeaderboard.FirstOrDefault(e => e.PlayerId == playerId)?.PlayerName ??
+                                   _qualityLeaderboard.FirstOrDefault(e => e.PlayerId == playerId)?.PlayerName ??
+                                   _speedLeaderboard.FirstOrDefault(e => e.PlayerId == playerId)?.PlayerName ??
+                                   "Unknown";
+                    
+                    _overallLeaderboard.Add(new LeaderboardEntry
+                    {
+                        PlayerId = playerId,
+                        PlayerName = playerName,
+                        Score = 1000f / overallScore, // Invert so higher is better for display
+                        LastUpdated = DateTime.Now
+                    });
+                }
+            }
+            
+            _overallLeaderboard = _overallLeaderboard.OrderByDescending(e => e.Score).ToList();
+        }
+        
+        private int GetPlayerRankInLeaderboard(List<LeaderboardEntry> leaderboard, string playerId)
+        {
+            var entry = leaderboard.FirstOrDefault(e => e.PlayerId == playerId);
+            return entry != null ? leaderboard.IndexOf(entry) + 1 : 0;
+        }
+        
+        private void CheckRankingChanges()
+        {
+            // Check if player's ranking has changed significantly
+            var currentOverallRank = GetPlayerRanking(LeaderboardType.Overall);
+            var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+            
+            if (playerStats.LastKnownOverallRank != currentOverallRank)
+            {
+                if (playerStats.LastKnownOverallRank > 0 && currentOverallRank < playerStats.LastKnownOverallRank)
+                {
+                    // Ranking improved
+                    LogInfo($"🎉 Ranking Improved! Overall rank: {currentOverallRank} (was {playerStats.LastKnownOverallRank})");
+                }
+                
+                playerStats.LastKnownOverallRank = currentOverallRank;
+                _onRankingUpdated?.Raise();
+                OnRankingChanged?.Invoke(LeaderboardType.Overall, currentOverallRank);
+            }
+        }
+        
+        private void UpdatePlayerStatsFromGameState()
+        {
+            // if (_plantManager != null)
+            // {
+            //     var plantStats = _plantManager.GetStatistics();
+            //     var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+            //     
+            //     // Update cultivation stats
+            //     playerStats.TotalPlantsGrown = Math.Max(playerStats.TotalPlantsGrown, plantStats.TotalPlants);
+            //     playerStats.LastActiveTime = DateTime.Now;
+            // }
+        }
+        
+        private void CheckForActiveCompetitions()
+        {
+            // Check if there should be active competitions based on time
+            if (_enableWeeklyTournaments && ShouldStartWeeklyTournament())
+            {
+                StartWeeklyTournament();
+            }
+        }
+        
+        private bool ShouldStartWeeklyTournament()
+        {
+            // Start tournament on Monday if none active
+            var now = DateTime.Now;
+            return now.DayOfWeek == DayOfWeek.Monday && 
+                   !_activeCompetitions.Any(c => c.Type == CompetitionEventType.Tournament && c.IsActive);
+        }
+        
+        private void StartWeeklyTournament()
+        {
+            var config = new TournamentConfig
+            {
+                TournamentName = "Weekly Growth Challenge",
+                Description = "Compete to grow the highest quality plants this week!",
+                Category = CompetitionCategory.Quality,
+                Rewards = new List<CompetitionReward>
+                {
+                    new CompetitionReward { Place = 1, ExperienceReward = 1000f, Description = "🥇 Gold Badge + Premium Seeds" },
+                    new CompetitionReward { Place = 2, ExperienceReward = 750f, Description = "🥈 Silver Badge + Growth Booster" },
+                    new CompetitionReward { Place = 3, ExperienceReward = 500f, Description = "🥉 Bronze Badge + Equipment Upgrade" }
+                },
+                Rules = "Grow plants and achieve the highest average quality rating. Only plants started during the tournament period count."
+            };
+            
+            StartTournament(config);
+        }
+        
+        private void StartSeasonalCompetitions()
+        {
+            // Add seasonal events based on real calendar
+            var season = GetCurrentSeason();
+            CreateSeasonalEvent(season);
+        }
+        
+        private SeasonType GetCurrentSeason()
+        {
+            var month = DateTime.Now.Month;
+            return month switch
+            {
+                12 or 1 or 2 => SeasonType.Winter,
+                3 or 4 or 5 => SeasonType.Spring,
+                6 or 7 or 8 => SeasonType.Summer,
+                9 or 10 or 11 => SeasonType.Fall,
+                _ => SeasonType.Spring
+            };
+        }
+        
+        private void CreateSeasonalEvent(SeasonType season)
+        {
+            var seasonalEvent = new CompetitionEvent
+            {
+                CompetitionId = $"seasonal_{season}_{DateTime.Now.Year}",
+                Name = $"{season} Championship",
+                Description = GetSeasonalDescription(season),
+                Type = CompetitionEventType.Seasonal,
+                Category = GetSeasonalCategory(season),
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddDays(90), // 3 month season
+                IsActive = true,
+                Rewards = GetSeasonalRewards(season)
+            };
+            
+            _activeCompetitions.Add(seasonalEvent);
+            LogInfo($"🌟 Seasonal Event Started: {seasonalEvent.Name}");
+        }
+        
+        private string GetSeasonalDescription(SeasonType season)
+        {
+            return season switch
+            {
+                SeasonType.Spring => "Spring Growth Festival - Focus on new growth and genetic diversity",
+                SeasonType.Summer => "Summer Harvest Bonanza - Maximize your yields in the growing season",
+                SeasonType.Fall => "Autumn Quality Awards - Perfect your craft with premium quality focus",
+                SeasonType.Winter => "Winter Innovation Challenge - Research and develop new techniques",
+                _ => "Seasonal Competition"
+            };
+        }
+        
+        private CompetitionCategory GetSeasonalCategory(SeasonType season)
+        {
+            return season switch
+            {
+                SeasonType.Spring => CompetitionCategory.Growth,
+                SeasonType.Summer => CompetitionCategory.Yield,
+                SeasonType.Fall => CompetitionCategory.Quality,
+                SeasonType.Winter => CompetitionCategory.Innovation,
+                _ => CompetitionCategory.Overall
+            };
+        }
+        
+        private List<CompetitionReward> GetSeasonalRewards(SeasonType season)
+        {
+            return new List<CompetitionReward>
+            {
+                new CompetitionReward { Place = 1, ExperienceReward = 2500f, Description = $"🏆 {season} Champion Title + Exclusive Equipment" },
+                new CompetitionReward { Place = 2, ExperienceReward = 1500f, Description = "🎖️ Elite Grower Badge + Premium Package" },
+                new CompetitionReward { Place = 3, ExperienceReward = 1000f, Description = "🏅 Expert Achievement + Upgrade Kit" }
+            };
+        }
+        
+        private void UpdateActiveCompetitions()
+        {
+            var now = DateTime.Now;
+            var expiredCompetitions = _activeCompetitions.Where(c => c.IsActive && now > c.EndTime).ToList();
+            
+            foreach (var competition in expiredCompetitions)
+            {
+                EndCompetition(competition);
+            }
+        }
+        
+        private void EndCompetition(CompetitionEvent competition)
+        {
+            competition.IsActive = false;
+            
+            // Award prizes to top performers
+            AwardCompetitionPrizes(competition);
+            
+            _onTournamentEnded?.Raise();
+            OnCompetitionEnded?.Invoke(competition);
+            
+            LogInfo($"🏁 Competition Ended: {competition.Name}");
+        }
+        
+        private void AwardCompetitionPrizes(CompetitionEvent competition)
+        {
+            // Get final leaderboard for competition category
+            var leaderboard = GetLeaderboardByCategory(competition.Category);
+            
+            for (int i = 0; i < Math.Min(3, leaderboard.Count); i++)
+            {
+                var winner = leaderboard[i];
+                var reward = competition.Rewards.FirstOrDefault(r => r.Place == i + 1);
+                
+                if (reward != null && winner.PlayerId == _currentPlayerId)
+                {
+                    // Award prize to current player
+                    // _progressionManager?.GainExperience(reward.ExperienceReward, ExperienceSource.Achievement);
+                    LogInfo($"🎉 Competition Prize: {reward.Description} (+{reward.ExperienceReward} XP)");
+                    
+                    // Update player competitive stats
+                    var playerStats = GetOrCreatePlayerStats(_currentPlayerId);
+                    if (i == 0) playerStats.CompetitionWins++;
+                    if (i < 3) playerStats.PodiumFinishes++;
+                }
+            }
+        }
+        
+        private void EnrollInTournament(string competitionId, string playerId)
+        {
+            var tournament = _activeCompetitions.FirstOrDefault(c => c.CompetitionId == competitionId);
+            if (tournament != null && _tournamentParticipants.Count < tournament.MaxParticipants)
+            {
+                _tournamentParticipants.Add(new TournamentEntry
+                {
+                    PlayerId = playerId,
+                    CompetitionId = competitionId,
+                    EnrollmentTime = DateTime.Now,
+                    CurrentScore = 0f
+                });
+                
+                var playerStats = GetOrCreatePlayerStats(playerId);
+                playerStats.CompetitionsEntered++;
+                
+                LogInfo($"Enrolled in tournament: {tournament.Name}");
+            }
+        }
+        
+        private void CheckGlobalLeaderboardPosition(CompetitiveAchievementType achievementType, float value)
+        {
+            var leaderboardType = achievementType switch
+            {
+                CompetitiveAchievementType.HighestYield => LeaderboardType.Cultivation,
+                CompetitiveAchievementType.HighestQuality => LeaderboardType.Quality,
+                CompetitiveAchievementType.FastestGrowth => LeaderboardType.Speed,
+                CompetitiveAchievementType.ProfitGenerated => LeaderboardType.Economic,
+                _ => LeaderboardType.Overall
+            };
+            
+            var currentRank = GetPlayerRanking(leaderboardType);
+            if (currentRank > 0 && currentRank <= 10)
+            {
+                LogInfo($"🌟 Top 10 Achievement: Rank #{currentRank} in {leaderboardType} leaderboard!");
+                _onCompetitiveAchievement?.Raise();
+            }
+        }
+        
+        private void CheckCompetitiveAchievements(PlayerCompetitiveStats playerStats)
+        {
+            // Check for milestone achievements
+            if (playerStats.TotalPlantsGrown == 100)
+            {
+                LogInfo("🏆 Achievement Unlocked: Century Grower (100 plants grown)");
+            }
+            
+            if (playerStats.CompetitionWins == 5)
+            {
+                LogInfo("🏆 Achievement Unlocked: Tournament Victor (5 wins)");
+            }
+            
+            if (playerStats.PodiumFinishes == 10)
+            {
+                LogInfo("🏆 Achievement Unlocked: Consistent Competitor (10 podium finishes)");
+            }
+        }
+        
+        private List<LeaderboardEntry> GetLeaderboardByType(LeaderboardType type)
+        {
+            return type switch
+            {
+                LeaderboardType.Cultivation => _cultivationLeaderboard,
+                LeaderboardType.Economic => _economicLeaderboard,
+                LeaderboardType.Quality => _qualityLeaderboard,
+                LeaderboardType.Speed => _speedLeaderboard,
+                LeaderboardType.Overall => _overallLeaderboard,
+                _ => _overallLeaderboard
+            };
+        }
+        
+        private List<LeaderboardEntry> GetLeaderboardByCategory(CompetitionCategory category)
+        {
+            return category switch
+            {
+                CompetitionCategory.Growth => _cultivationLeaderboard,
+                CompetitionCategory.Yield => _cultivationLeaderboard,
+                CompetitionCategory.Quality => _qualityLeaderboard,
+                CompetitionCategory.Economic => _economicLeaderboard,
+                CompetitionCategory.Innovation => _overallLeaderboard,
+                _ => _overallLeaderboard
+            };
+        }
+        
+        private PlayerCompetitiveStats GetOrCreatePlayerStats(string playerId)
+        {
+            if (!_playerStats.ContainsKey(playerId))
+            {
+                _playerStats[playerId] = new PlayerCompetitiveStats
+                {
+                    PlayerId = playerId,
+                    PlayerName = playerId == _currentPlayerId ? "You" : $"Player_{playerId.Substring(0, 6)}",
+                    JoinDate = DateTime.Now,
+                    LastActiveTime = DateTime.Now
+                };
+            }
+            
+            return _playerStats[playerId];
+        }
+        
+        private string FormatScoreForDisplay(LeaderboardType type, float score)
+        {
+            return type switch
+            {
+                LeaderboardType.Cultivation => $"{score:F0} plants",
+                LeaderboardType.Economic => $"${score:F0}",
+                LeaderboardType.Quality => $"{score:F1}%",
+                LeaderboardType.Speed => $"{score:F1} days",
+                LeaderboardType.Overall => $"{score:F0} pts",
+                _ => $"{score:F1}"
+            };
+        }
+        
+        private string GetRankBadge(int rank)
+        {
+            return rank switch
+            {
+                1 => "🥇",
+                2 => "🥈", 
+                3 => "🥉",
+                <= 10 => "🏅",
+                <= 25 => "⭐",
+                _ => ""
+            };
+        }
+        
+        private int CalculateCompetitiveLevel(PlayerCompetitiveStats stats)
+        {
+            // Calculate competitive level based on achievements
+            int level = 1;
+            level += stats.CompetitionWins;
+            level += stats.PodiumFinishes / 2;
+            level += stats.TotalPlantsGrown / 50;
+            level += (int)(stats.TotalProfitGenerated / 10000f);
+            
+            return Math.Min(level, 50); // Cap at level 50
+        }
+        
+        private float CalculateNextLevelProgress(PlayerCompetitiveStats stats)
+        {
+            var currentLevel = CalculateCompetitiveLevel(stats);
+            var nextLevelRequirement = (currentLevel + 1) * 100f; // Example progression
+            var currentProgress = stats.CompetitionWins * 50f + stats.PodiumFinishes * 25f;
+            
+            return (currentProgress % nextLevelRequirement) / nextLevelRequirement;
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            LogInfo("CompetitiveManager shutdown - competition data saved");
+        }
+    }
+    
+    // Supporting data structures
+    [System.Serializable]
+    public class CompetitionEvent
+    {
+        public string CompetitionId;
+        public string Name;
+        public string Description;
+        public CompetitionEventType Type;
+        public CompetitionCategory Category;
+        public DateTime StartTime;
+        public DateTime EndTime;
+        public bool IsActive;
+        public int MaxParticipants;
+        public List<CompetitionReward> Rewards = new List<CompetitionReward>();
+        public string Rules;
+    }
+    
+    [System.Serializable]
+    public class CompetitionReward
+    {
+        public int Place; // 1st, 2nd, 3rd, etc.
+        public float ExperienceReward;
+        public float CurrencyReward;
+        public string Description;
+        public string UnlockedFeature;
+    }
+    
+    [System.Serializable]
+    public class TournamentEntry
+    {
+        public string PlayerId;
+        public string CompetitionId;
+        public DateTime EnrollmentTime;
+        public float CurrentScore;
+    }
+    
+    [System.Serializable]
+    public class PlayerCompetitiveStats
+    {
+        public string PlayerId;
+        public string PlayerName;
+        public DateTime JoinDate;
+        public DateTime LastActiveTime;
+        
+        // Competition history
+        public int CompetitionsEntered = 0;
+        public int CompetitionWins = 0;
+        public int PodiumFinishes = 0;
+        
+        // Performance metrics
+        public int TotalPlantsGrown = 0;
+        public float TotalYieldHarvested = 0f;
+        public float TotalProfitGenerated = 0f;
+        public int StreaksCompleted = 0;
+        
+        // Ranking tracking
+        public int LastKnownOverallRank = 0;
+        public int BestOverallRank = 0;
+        public DateTime LastRankUpdate;
+    }
+    
+    [System.Serializable]
+    public class PlayerRecords
+    {
+        public float HighestSingleHarvest = 0f;
+        public float HighestQualityRating = 0f;
+        public float FastestGrowthCycle = 0f;
+        public float LargestSingleProfit = 0f;
+        public int MostStrainsMastered = 0;
+        public int LongestWinStreak = 0;
+        public DateTime FirstRecordSet;
+        public DateTime LastRecordSet;
+    }
+    
+    [System.Serializable]
+    public class TournamentConfig
+    {
+        public string TournamentName;
+        public string Description;
+        public CompetitionCategory Category;
+        public List<CompetitionReward> Rewards = new List<CompetitionReward>();
+        public string Rules;
+    }
+    
+    [System.Serializable]
+    public class LeaderboardDisplayData
+    {
+        public int Rank;
+        public string PlayerName;
+        public float Score;
+        public string FormattedScore;
+        public bool IsCurrentPlayer;
+        public string AvatarIcon;
+        public string Badge;
+        public DateTime LastActive;
+    }
+    
+    [System.Serializable]
+    public class CompetitiveStatsSummary
+    {
+        public int OverallRank;
+        public int CultivationRank;
+        public int EconomicRank;
+        public int QualityRank;
+        
+        public int TotalCompetitionsEntered;
+        public int TotalWins;
+        public int TotalPodiumFinishes;
+        public float WinRate;
+        
+        public PlayerRecords PersonalRecords;
+        public int CompetitiveLevel;
+        public float NextLevelProgress;
+    }
+    
+    public enum CompetitionEventType
+    {
+        Tournament,
+        Seasonal,
+        Special,
+        Daily
+    }
+    
+    public enum CompetitionCategory
+    {
+        Overall,
+        Growth,
+        Yield,
+        Quality,
+        Economic,
+        Innovation
+    }
+    
+    public enum CompetitiveAchievementType
+    {
+        HighestYield,
+        FastestGrowth,
+        HighestQuality,
+        ProfitGenerated,
+        StrainMastery
+    }
+    
+    public enum RecordType
+    {
+        HighestYield = 0,
+        FastestGrowth = 1,
+        HighestQuality = 2,
+        ProfitGenerated = 3,
+        StrainMastery = 4
+    }
+    
+    // Removed duplicate SeasonType enum - using canonical one from EnvironmentalManager
+}

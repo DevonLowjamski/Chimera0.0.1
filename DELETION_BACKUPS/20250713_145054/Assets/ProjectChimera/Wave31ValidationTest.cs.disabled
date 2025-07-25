@@ -1,0 +1,230 @@
+using UnityEngine;
+using ProjectChimera.Systems.Cultivation;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.Data.Environment;
+using System;
+
+/// <summary>
+/// Error Wave 31 Validation Test - Multiple Property and Method Errors Resolution
+/// 
+/// Tests that the CS1061, CS1503, and CS0117 errors for missing properties and methods 
+/// have been resolved in PlantUpdateProcessor.cs and PlantManager.cs.
+/// 
+/// Errors resolved:
+/// - CS1061: CannabinoidProfile missing THCPercentage and CBDPercentage properties
+/// - CS1061: HarvestResults missing TotalYield property  
+/// - CS1503: Type conversion issues between EnvironmentalConditions types
+/// - CS0117: Missing StressType enum values (Temperature, Light, Water, Nutrient)
+/// - CS1061: GeneticPerformanceMonitor missing GetPerformanceStats method
+/// </summary>
+public class Wave31ValidationTest : MonoBehaviour
+{
+    [System.Serializable]
+    public class ValidationResults
+    {
+        public bool CannabinoidProfilePropertiesExist = false;
+        public bool HarvestResultsTotalYieldExists = false;
+        public bool StressTypeEnumValuesExist = false;
+        public bool GeneticPerformanceMonitorMethodExists = false;
+        public bool EnvironmentalConditionsCompatible = false;
+        public bool AllErrorsResolved = false;
+    }
+    
+    [Header("Validation Results")]
+    [SerializeField] private ValidationResults Results = new ValidationResults();
+    
+    void Start()
+    {
+        Debug.Log("=== Error Wave 31 Validation Test Starting ===");
+        RunValidationTests();
+        DisplayResults();
+    }
+    
+    private void RunValidationTests()
+    {
+        ValidateCannabinoidProfileProperties();
+        ValidateHarvestResultsTotalYield();
+        ValidateStressTypeEnumValues();
+        ValidateGeneticPerformanceMonitorMethods();
+        ValidateEnvironmentalConditionsCompatibility();
+        
+        // Check if all errors are resolved
+        Results.AllErrorsResolved = Results.CannabinoidProfilePropertiesExist &&
+                                   Results.HarvestResultsTotalYieldExists &&
+                                   Results.StressTypeEnumValuesExist &&
+                                   Results.GeneticPerformanceMonitorMethodExists &&
+                                   Results.EnvironmentalConditionsCompatible;
+    }
+    
+    private void ValidateCannabinoidProfileProperties()
+    {
+        try
+        {
+            // Test CS1061: CannabinoidProfile missing THCPercentage and CBDPercentage properties
+            var profile = new CannabinoidProfile();
+            
+            // Test THCPercentage property access
+            profile.THCPercentage = 22.5f;
+            float thcValue = profile.THCPercentage;
+            
+            // Test CBDPercentage property access
+            profile.CBDPercentage = 8.2f;
+            float cbdValue = profile.CBDPercentage;
+            
+            // Verify the properties work correctly
+            if (thcValue == 22.5f && cbdValue == 8.2f)
+            {
+                Results.CannabinoidProfilePropertiesExist = true;
+                Debug.Log("✅ CannabinoidProfile THCPercentage and CBDPercentage properties exist and work correctly");
+            }
+            else
+            {
+                throw new Exception("Property values don't match expected values");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Results.CannabinoidProfilePropertiesExist = false;
+            Debug.LogError($"❌ CannabinoidProfile properties validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateHarvestResultsTotalYield()
+    {
+        try
+        {
+            // Test CS1061: HarvestResults missing TotalYield property
+            var harvestResults = new HarvestResults();
+            
+            // Test TotalYield property access
+            harvestResults.TotalYield = 125.7f;
+            float totalYield = harvestResults.TotalYield;
+            
+            // Verify it maps to TotalYieldGrams correctly
+            if (totalYield == 125.7f && harvestResults.TotalYieldGrams == 125.7f)
+            {
+                Results.HarvestResultsTotalYieldExists = true;
+                Debug.Log("✅ HarvestResults TotalYield property exists and maps to TotalYieldGrams correctly");
+            }
+            else
+            {
+                throw new Exception("TotalYield property doesn't map correctly to TotalYieldGrams");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Results.HarvestResultsTotalYieldExists = false;
+            Debug.LogError($"❌ HarvestResults TotalYield property validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateStressTypeEnumValues()
+    {
+        try
+        {
+            // Test CS0117: StressType enum missing Temperature, Light, Water, Nutrient values
+            var temperatureStress = StressType.Temperature;
+            var lightStress = StressType.Light;
+            var waterStress = StressType.Water;
+            var nutrientStress = StressType.Nutrient;
+            var atmosphericStress = StressType.Atmospheric;
+            
+            // Test StressFactor with these enum values
+            var stressFactor = new StressFactor();
+            stressFactor.StressType = StressType.Temperature;
+            stressFactor.Severity = 0.7f;
+            
+            Results.StressTypeEnumValuesExist = true;
+            Debug.Log("✅ StressType enum has all required values (Temperature, Light, Water, Nutrient, Atmospheric)");
+        }
+        catch (System.Exception ex)
+        {
+            Results.StressTypeEnumValuesExist = false;
+            Debug.LogError($"❌ StressType enum validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateGeneticPerformanceMonitorMethods()
+    {
+        try
+        {
+            // Test CS1061: GeneticPerformanceMonitor missing GetPerformanceStats method
+            var monitor = new GeneticPerformanceMonitor();
+            
+            // Test GetPerformanceStats method
+            var stats = monitor.GetPerformanceStats();
+            
+            // Test RecordBatchUpdate method (already tested in previous waves)
+            var mockStats = new GeneticPerformanceStats
+            {
+                TotalCalculations = 75,
+                AverageCalculationTimeMs = 6.8,
+                CacheHitRatio = 0.82,
+                BatchCalculations = 8,
+                AverageBatchTimeMs = 18.5
+            };
+            monitor.RecordBatchUpdate(30, mockStats);
+            
+            // Test GetPerformanceData method (already tested in previous waves)
+            var performanceData = monitor.GetPerformanceData();
+            
+            Results.GeneticPerformanceMonitorMethodExists = true;
+            Debug.Log("✅ GeneticPerformanceMonitor GetPerformanceStats method exists and works correctly");
+        }
+        catch (System.Exception ex)
+        {
+            Results.GeneticPerformanceMonitorMethodExists = false;
+            Debug.LogError($"❌ GeneticPerformanceMonitor GetPerformanceStats method validation failed: {ex.Message}");
+        }
+    }
+    
+    private void ValidateEnvironmentalConditionsCompatibility()
+    {
+        try
+        {
+            // Test CS1503: Type conversion issues between different EnvironmentalConditions types
+            var cultivationConditions = new ProjectChimera.Data.Cultivation.EnvironmentalConditions();
+            cultivationConditions.Temperature = 25.0f;
+            cultivationConditions.Humidity = 60.0f;
+            cultivationConditions.LightIntensity = 700f;
+            
+            var environmentConditions = new ProjectChimera.Data.Environment.EnvironmentalConditions();
+            environmentConditions.Temperature = 24.0f;
+            environmentConditions.Humidity = 55.0f;
+            environmentConditions.LightIntensity = 650f;
+            
+            // Test that both types can be used independently without conversion errors
+            float cultivationTemp = cultivationConditions.Temperature;
+            float environmentTemp = environmentConditions.Temperature;
+            
+            Results.EnvironmentalConditionsCompatible = true;
+            Debug.Log("✅ EnvironmentalConditions types are compatible and can be used without conversion errors");
+        }
+        catch (System.Exception ex)
+        {
+            Results.EnvironmentalConditionsCompatible = false;
+            Debug.LogError($"❌ EnvironmentalConditions compatibility validation failed: {ex.Message}");
+        }
+    }
+    
+    private void DisplayResults()
+    {
+        Debug.Log("=== Error Wave 31 Validation Results ===");
+        Debug.Log($"CannabinoidProfile Properties: {(Results.CannabinoidProfilePropertiesExist ? "✅ PASS" : "❌ FAIL")}");
+        Debug.Log($"HarvestResults TotalYield: {(Results.HarvestResultsTotalYieldExists ? "✅ PASS" : "❌ FAIL")}");
+        Debug.Log($"StressType Enum Values: {(Results.StressTypeEnumValuesExist ? "✅ PASS" : "❌ FAIL")}");
+        Debug.Log($"GeneticPerformanceMonitor Methods: {(Results.GeneticPerformanceMonitorMethodExists ? "✅ PASS" : "❌ FAIL")}");
+        Debug.Log($"EnvironmentalConditions Compatibility: {(Results.EnvironmentalConditionsCompatible ? "✅ PASS" : "❌ FAIL")}");
+        
+        if (Results.AllErrorsResolved)
+        {
+            Debug.Log("🎉 ERROR WAVE 31 SUCCESSFULLY RESOLVED! All CS1061, CS1503, and CS0117 errors fixed.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Error Wave 31 validation incomplete. Some errors may still exist.");
+        }
+        
+        Debug.Log("=== End Validation ===");
+    }
+} 

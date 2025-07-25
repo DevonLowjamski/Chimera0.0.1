@@ -1,0 +1,72 @@
+using UnityEngine;
+using ProjectChimera.Data.Genetics;
+using ProjectChimera.Systems.Genetics;
+using ProjectChimera.UI;
+
+namespace ProjectChimera
+{
+    /// <summary>
+    /// Wave 19 Validation Test - Method and Type Reference Fixes
+    /// Tests that BreedingUI methods and GenotypeDataSO types work correctly
+    /// </summary>
+    public class Wave19ValidationTest : MonoBehaviour
+    {
+        private void Start()
+        {
+            Debug.Log("=== Wave 19 Method and Type Reference Validation ===");
+            
+            TestBreedingUIMethods();
+            TestGenotypeDataSOType();
+            
+            Debug.Log("✅ Wave 19 method and type reference fixes validated successfully!");
+        }
+        
+        private void TestBreedingUIMethods()
+        {
+            Debug.Log("Testing BreedingUI method availability...");
+            
+            // Find BreedingUI in scene
+            var breedingUI = FindObjectOfType<BreedingUI>();
+            if (breedingUI != null)
+            {
+                // Test that GetLastBreedingResult method exists and is callable
+                var lastResult = breedingUI.GetLastBreedingResult();
+                Debug.Log($"✓ GetLastBreedingResult method accessible: {lastResult?.ToString() ?? "No result"}");
+                
+                // Test that RefreshAvailableParents method exists and is callable
+                breedingUI.RefreshAvailableParents();
+                Debug.Log("✓ RefreshAvailableParents method accessible and callable");
+            }
+            else
+            {
+                Debug.Log("⚠️ BreedingUI not found in scene (this is okay for validation)");
+            }
+        }
+        
+        private void TestGenotypeDataSOType()
+        {
+            Debug.Log("Testing GenotypeDataSO ScriptableObject creation...");
+            
+            // Test that GenotypeDataSO can be created as ScriptableObject
+            var genotypeData = ScriptableObject.CreateInstance<GenotypeDataSO>();
+            Debug.Log($"✓ GenotypeDataSO created successfully: {genotypeData != null}");
+            
+            if (genotypeData != null)
+            {
+                // Use reflection to set private fields (properties are read-only)
+                var individualIDField = typeof(GenotypeDataSO).GetField("_individualID", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                individualIDField?.SetValue(genotypeData, "WAVE19_TEST_001");
+                
+                Debug.Log($"✓ GenotypeDataSO IndividualID field set via reflection: {genotypeData.IndividualID}");
+                
+                // Test that we can access the read-only properties
+                Debug.Log($"✓ GenotypeDataSO properties accessible: ID={genotypeData.IndividualID}");
+                
+                // Clean up
+                DestroyImmediate(genotypeData);
+                Debug.Log("✓ GenotypeDataSO cleanup completed");
+            }
+        }
+    }
+} 
