@@ -7,8 +7,16 @@
         "ProjectChimera.Events",
         "ProjectChimera.Systems.Progression",
         "Unity.TextMeshPro",
+        "Unity.ugui",
         "Cinemachine",
         "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "1.0.0",
+            "define": "UNITY_UGUI"
+        }
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

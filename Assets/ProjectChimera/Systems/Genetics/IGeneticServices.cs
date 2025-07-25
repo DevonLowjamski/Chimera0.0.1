@@ -3,7 +3,6 @@ using ProjectChimera.Data.Cultivation;
 using System.Collections.Generic;
 using EnvironmentalConditions = ProjectChimera.Data.Cultivation.EnvironmentalConditions;
 using MutationRecord = ProjectChimera.Data.Genetics.MutationRecord;
-using TraitExpressionResult = ProjectChimera.Data.Genetics.TraitExpressionResult;
 using PhenotypeProjection = ProjectChimera.Systems.Genetics.PhenotypeProjection;
 using TraitStabilityAnalysis = ProjectChimera.Systems.Genetics.TraitStabilityAnalysis;
 using TraitExpressionStats = ProjectChimera.Systems.Genetics.TraitExpressionStats;
@@ -52,8 +51,8 @@ namespace ProjectChimera.Systems.Genetics
     /// </summary>
     public interface ITraitExpressionService : IGeneticService
     {
-        TraitExpressionResult CalculateTraitExpression(PlantGenotype genotype, EnvironmentalConditions environment);
-        List<TraitExpressionResult> CalculateBatchTraitExpression(List<PlantInstanceSO> plants, EnvironmentalConditions environment);
+        ProjectChimera.Systems.Genetics.TraitExpressionResult CalculateTraitExpression(PlantGenotype genotype, EnvironmentalConditions environment);
+        List<ProjectChimera.Systems.Genetics.TraitExpressionResult> CalculateBatchTraitExpression(List<PlantInstanceSO> plants, EnvironmentalConditions environment);
         PhenotypeProjection PredictPhenotype(PlantGenotype genotype, EnvironmentalConditions environment, int daysToPredict);
         TraitStabilityAnalysis AnalyzeTraitStability(PlantGenotype genotype, List<EnvironmentalConditions> environments);
         TraitExpressionStats GetExpressionStats();

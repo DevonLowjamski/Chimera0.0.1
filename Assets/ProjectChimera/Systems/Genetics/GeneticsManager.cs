@@ -165,19 +165,8 @@ namespace ProjectChimera.Systems.Genetics
                 var genotype = GetOrGenerateGenotype(plant);
                 if (genotype != null)
                 {
-                    // PC014-FIX-44: Service interface expects Data version but implementation might return Systems version
-                    try
-                    {
-                        var result = _traitExpressionProcessor.CalculateTraitExpression(genotype, environment);
-                        // The interface defines Data.Genetics.TraitExpressionResult, so convert to Systems version
-                        return ConvertToSystemsTraitExpression(result);
-                    }
-                    catch (System.InvalidCastException)
-                    {
-                        // Fallback if there's a type mismatch
-                        LogWarning("Type conversion issue in trait expression service, using fallback");
-                        return ConvertToSystemsTraitExpression(CreateFallbackTraitExpression(plant));
-                    }
+                    // PC014-FIX-44: Interface now properly returns Systems.Genetics.TraitExpressionResult
+                    return _traitExpressionProcessor.CalculateTraitExpression(genotype, environment);
                 }
             }
             
@@ -196,18 +185,8 @@ namespace ProjectChimera.Systems.Genetics
                 var genotypes = plants.Select(p => GetOrGenerateGenotype(p)).Where(g => g != null).ToList();
                 if (genotypes.Count > 0)
                 {
-                    // PC014-FIX-44: Service interface expects Data version, convert each result to Systems version
-                    try
-                    {
-                        var dataResults = _traitExpressionProcessor.CalculateBatchTraitExpression(plants, environment);
-                        return dataResults.Select(r => ConvertToSystemsTraitExpression(r)).ToList();
-                    }
-                    catch (System.InvalidCastException)
-                    {
-                        // Fallback if there's a type mismatch
-                        LogWarning("Type conversion issue in batch trait expression service, using fallback");
-                        return plants.Select(p => ConvertToSystemsTraitExpression(CreateFallbackTraitExpression(p))).ToList();
-                    }
+                    // PC014-FIX-44: Interface now properly returns Systems.Genetics.TraitExpressionResult list
+                    return _traitExpressionProcessor.CalculateBatchTraitExpression(plants, environment);
                 }
             }
             
