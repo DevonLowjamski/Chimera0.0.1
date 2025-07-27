@@ -39,7 +39,7 @@ namespace ProjectChimera
             
             // Test that Core types can be referenced
             var manager = GetComponent<ChimeraManager>();
-            var coreObject = GetComponent<ChimeraScriptableObject>();
+            var coreObject = GetComponent<ChimeraScriptableObjectSO>();
             
             Debug.Log("✓ Core types accessible");
         }

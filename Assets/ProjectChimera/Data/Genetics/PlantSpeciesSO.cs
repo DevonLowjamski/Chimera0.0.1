@@ -9,7 +9,7 @@ namespace ProjectChimera.Data.Genetics
     /// Contains fundamental genetic ranges and biological properties that all strains of this species inherit.
     /// </summary>
     [CreateAssetMenu(fileName = "New Plant Species", menuName = "Project Chimera/Genetics/Plant Species", order = 1)]
-    public class PlantSpeciesSO : ChimeraScriptableObject
+    public class PlantSpeciesSO : ChimeraScriptableObjectSO
     {
         [Header("Species Classification")]
         [SerializeField] private SpeciesType _speciesType = SpeciesType.CannabisIndica;

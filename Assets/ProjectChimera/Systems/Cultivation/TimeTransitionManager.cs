@@ -7,7 +7,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// <summary>
     /// Manages time transitions and acceleration mechanics
     /// </summary>
-    public class TimeTransitionManager : MonoBehaviour
+    public class TimeTransitionManager : ChimeraManager
     {
         [Header("Time Configuration")]
         [SerializeField] private TimeTransitionConfigSO _transitionConfig;
@@ -131,5 +131,20 @@ namespace ProjectChimera.Systems.Cultivation
                 _ => 1f
             };
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            SetTimeScale(GetTimeScaleMultiplier(GameTimeScale.Baseline));
+        }
+        
+        #endregion
     }
 }

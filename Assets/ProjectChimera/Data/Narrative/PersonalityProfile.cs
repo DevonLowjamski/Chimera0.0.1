@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ProjectChimera.Data.Narrative
 {
     [CreateAssetMenu(fileName = "New Personality Profile", menuName = "Project Chimera/Narrative/Personality Profile")]
-    public class PersonalityProfile : ScriptableObject
+    public class PersonalityProfileSO : ScriptableObject
     {
         public float Loyalty;
         public float Independence;

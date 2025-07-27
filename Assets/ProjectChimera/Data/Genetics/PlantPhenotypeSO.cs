@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Genetics
     /// Represents individual plant characteristics that may vary within the same strain.
     /// </summary>
     [CreateAssetMenu(fileName = "New Plant Phenotype", menuName = "Project Chimera/Genetics/Plant Phenotype", order = 3)]
-    public class PlantPhenotypeSO : ChimeraScriptableObject
+    public class PlantPhenotypeSO : ChimeraScriptableObjectSO
     {
         [Header("Phenotype Identity")]
         [SerializeField] private PlantStrainSO _parentStrain;

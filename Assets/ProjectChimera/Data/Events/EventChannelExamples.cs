@@ -20,9 +20,9 @@ namespace ProjectChimera.Data.Events
             
             #if UNITY_EDITOR
             // Set display name and description using reflection
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Plant Harvested");
@@ -42,9 +42,9 @@ namespace ProjectChimera.Data.Events
             eventChannel.name = "EnvironmentalAlertEvent";
             
             #if UNITY_EDITOR
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Environmental Alert");
@@ -64,9 +64,9 @@ namespace ProjectChimera.Data.Events
             eventChannel.name = "CurrencyChangedEvent";
             
             #if UNITY_EDITOR
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Currency Changed");
@@ -86,9 +86,9 @@ namespace ProjectChimera.Data.Events
             eventChannel.name = "EquipmentMalfunctionEvent";
             
             #if UNITY_EDITOR
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Equipment Malfunction");
@@ -108,9 +108,9 @@ namespace ProjectChimera.Data.Events
             eventChannel.name = "GameStateChangedEvent";
             
             #if UNITY_EDITOR
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Game State Changed");
@@ -130,9 +130,9 @@ namespace ProjectChimera.Data.Events
             eventChannel.name = "ResearchCompletedEvent";
             
             #if UNITY_EDITOR
-            var displayNameField = typeof(ChimeraScriptableObject).GetField("_displayName", 
+            var displayNameField = typeof(ChimeraScriptableObjectSO).GetField("_displayName", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var descriptionField = typeof(ChimeraScriptableObject).GetField("_description", 
+            var descriptionField = typeof(ChimeraScriptableObjectSO).GetField("_description", 
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
             displayNameField?.SetValue(eventChannel, "Research Completed");

@@ -6,7 +6,7 @@ namespace ProjectChimera.Core
     /// Base class for all Project Chimera data ScriptableObjects.
     /// Used for game configuration data that doesn't change at runtime.
     /// </summary>
-    public abstract class ChimeraDataSO : ChimeraScriptableObject
+    public abstract class ChimeraDataSO : ChimeraScriptableObjectSO
     {
         [Header("Data Properties")]
         [SerializeField] private bool _isReadOnly = true;

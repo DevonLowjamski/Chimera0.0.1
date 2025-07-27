@@ -12,7 +12,7 @@ namespace ProjectChimera.Data.Visuals
     /// Maps cannabis lifecycle stages to SpeedTree's 0-1 seasonal system with smooth transition curves.
     /// </summary>
     [CreateAssetMenu(fileName = "New Growth Stage Configuration", menuName = "Project Chimera/Visuals/Growth Stage Configuration", order = 3)]
-    public class GrowthStageConfigurationSO : ChimeraScriptableObject
+    public class GrowthStageConfigurationSO : ChimeraScriptableObjectSO
     {
         [Header("Growth Stage Definitions")]
         [SerializeField] private List<GrowthStageConfig> _growthStageConfigs = new List<GrowthStageConfig>();

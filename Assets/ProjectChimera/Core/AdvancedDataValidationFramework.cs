@@ -23,7 +23,7 @@ namespace ProjectChimera.Core
         [SerializeField] private int _maxValidationErrors = 100;
 
         // Validation data and tracking
-        private Dictionary<Type, List<ChimeraScriptableObject>> _registeredAssets = new Dictionary<Type, List<ChimeraScriptableObject>>();
+        private Dictionary<Type, List<ChimeraScriptableObjectSO>> _registeredAssets = new Dictionary<Type, List<ChimeraScriptableObjectSO>>();
         private List<ValidationResult> _validationResults = new List<ValidationResult>();
         private Dictionary<string, CrossReferenceRule> _crossReferenceRules = new Dictionary<string, CrossReferenceRule>();
         private ValidationMetrics _metrics = new ValidationMetrics();
@@ -142,7 +142,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Register a ScriptableObject asset for validation.
         /// </summary>
-        public void RegisterAsset(ChimeraScriptableObject asset)
+        public void RegisterAsset(ChimeraScriptableObjectSO asset)
         {
             if (asset == null) return;
 
@@ -150,7 +150,7 @@ namespace ProjectChimera.Core
             
             if (!_registeredAssets.ContainsKey(assetType))
             {
-                _registeredAssets[assetType] = new List<ChimeraScriptableObject>();
+                _registeredAssets[assetType] = new List<ChimeraScriptableObjectSO>();
             }
 
             if (!_registeredAssets[assetType].Contains(asset))
@@ -167,7 +167,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Unregister an asset from validation.
         /// </summary>
-        public void UnregisterAsset(ChimeraScriptableObject asset)
+        public void UnregisterAsset(ChimeraScriptableObjectSO asset)
         {
             if (asset == null) return;
 
@@ -241,7 +241,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate a single asset with comprehensive checks.
         /// </summary>
-        private void ValidateAsset(ChimeraScriptableObject asset)
+        private void ValidateAsset(ChimeraScriptableObjectSO asset)
         {
             if (asset == null) return;
 
@@ -271,7 +271,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Perform type-specific validation based on asset type.
         /// </summary>
-        private void PerformTypeSpecificValidation(ChimeraScriptableObject asset)
+        private void PerformTypeSpecificValidation(ChimeraScriptableObjectSO asset)
         {
             var assetType = asset.GetType().Name;
 
@@ -299,7 +299,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate PlantStrainSO specific requirements.
         /// </summary>
-        private void ValidatePlantStrain(ChimeraScriptableObject asset)
+        private void ValidatePlantStrain(ChimeraScriptableObjectSO asset)
         {
             // Use reflection to get properties since we don't have direct access to PlantStrainSO
             var strainType = asset.GetType();
@@ -334,7 +334,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate GeneDefinitionSO specific requirements.
         /// </summary>
-        private void ValidateGeneDefinition(ChimeraScriptableObject asset)
+        private void ValidateGeneDefinition(ChimeraScriptableObjectSO asset)
         {
             var geneType = asset.GetType();
             
@@ -364,7 +364,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate EquipmentDataSO specific requirements.
         /// </summary>
-        private void ValidateEquipmentData(ChimeraScriptableObject asset)
+        private void ValidateEquipmentData(ChimeraScriptableObjectSO asset)
         {
             ValidateNumericRange(asset, "PowerConsumption", 0f, 10000f, "Power consumption should be 0-10000W");
             ValidateNumericRange(asset, "PurchaseCost", 0f, 100000f, "Purchase cost should be reasonable");
@@ -374,7 +374,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate environmental parameters.
         /// </summary>
-        private void ValidateEnvironmentalParameters(ChimeraScriptableObject asset)
+        private void ValidateEnvironmentalParameters(ChimeraScriptableObjectSO asset)
         {
             ValidateNumericRange(asset, "OptimalTemperature", 15f, 35f, "Optimal temperature should be 15-35°C");
             ValidateNumericRange(asset, "OptimalHumidity", 30f, 80f, "Optimal humidity should be 30-80%");
@@ -384,7 +384,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate market product data.
         /// </summary>
-        private void ValidateMarketProduct(ChimeraScriptableObject asset)
+        private void ValidateMarketProduct(ChimeraScriptableObjectSO asset)
         {
             ValidateNumericRange(asset, "BasePrice", 0.1f, 1000f, "Base price should be reasonable");
             ValidateNumericRange(asset, "QualityMultiplier", 0.5f, 3f, "Quality multiplier should be 0.5-3x");
@@ -393,7 +393,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate numeric property ranges.
         /// </summary>
-        private void ValidateNumericRange(ChimeraScriptableObject asset, string propertyName, float min, float max, string errorMessage)
+        private void ValidateNumericRange(ChimeraScriptableObjectSO asset, string propertyName, float min, float max, string errorMessage)
         {
             var property = asset.GetType().GetProperty(propertyName);
             if (property != null && property.PropertyType == typeof(float))
@@ -409,7 +409,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate asset references for null or missing references.
         /// </summary>
-        private void ValidateAssetReferences(ChimeraScriptableObject asset)
+        private void ValidateAssetReferences(ChimeraScriptableObjectSO asset)
         {
             var assetType = asset.GetType();
             var properties = assetType.GetProperties();
@@ -469,7 +469,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate data consistency within the asset.
         /// </summary>
-        private void ValidateDataConsistency(ChimeraScriptableObject asset)
+        private void ValidateDataConsistency(ChimeraScriptableObjectSO asset)
         {
             var assetType = asset.GetType();
             
@@ -487,7 +487,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate plant strain data consistency.
         /// </summary>
-        private void ValidatePlantStrainConsistency(ChimeraScriptableObject asset)
+        private void ValidatePlantStrainConsistency(ChimeraScriptableObjectSO asset)
         {
             // Example: Check if flowering time matches strain type
             var strainType = GetPropertyValue<string>(asset, "StrainType");
@@ -502,7 +502,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Validate equipment data consistency.
         /// </summary>
-        private void ValidateEquipmentConsistency(ChimeraScriptableObject asset)
+        private void ValidateEquipmentConsistency(ChimeraScriptableObjectSO asset)
         {
             var powerConsumption = GetPropertyValue<float>(asset, "PowerConsumption");
             var efficiency = GetPropertyValue<float>(asset, "Efficiency");
@@ -585,11 +585,11 @@ namespace ProjectChimera.Core
         {
             // Example rules - add more based on actual asset relationships
             RegisterCrossReferenceRule("PlantStrain_GeneticProfile", 
-                typeof(ChimeraScriptableObject), typeof(ChimeraScriptableObject),
+                typeof(ChimeraScriptableObjectSO), typeof(ChimeraScriptableObjectSO),
                 "GeneticProfile", "name", true, ValidationSeverity.Error);
 
             RegisterCrossReferenceRule("Equipment_Category",
-                typeof(ChimeraScriptableObject), typeof(ChimeraScriptableObject),
+                typeof(ChimeraScriptableObjectSO), typeof(ChimeraScriptableObjectSO),
                 "EquipmentCategory", "name", true, ValidationSeverity.Warning);
         }
 
@@ -616,7 +616,7 @@ namespace ProjectChimera.Core
         /// </summary>
         private void DiscoverAndRegisterAssets()
         {
-            var allAssets = Resources.FindObjectsOfTypeAll<ChimeraScriptableObject>();
+            var allAssets = Resources.FindObjectsOfTypeAll<ChimeraScriptableObjectSO>();
             foreach (var asset in allAssets)
             {
                 RegisterAsset(asset);
@@ -710,7 +710,7 @@ namespace ProjectChimera.Core
         /// <summary>
         /// Add a validation result to the collection.
         /// </summary>
-        private void AddValidationResult(ChimeraScriptableObject asset, string rule, string message, ValidationSeverity severity, string suggestedFix = "")
+        private void AddValidationResult(ChimeraScriptableObjectSO asset, string rule, string message, ValidationSeverity severity, string suggestedFix = "")
         {
             var result = new ValidationResult
             {

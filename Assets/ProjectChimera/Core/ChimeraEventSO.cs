@@ -6,7 +6,7 @@ namespace ProjectChimera.Core
     /// Base class for all Project Chimera event ScriptableObjects.
     /// Implements the event channel pattern for decoupled system communication.
     /// </summary>
-    public abstract class ChimeraEventSO : ChimeraScriptableObject
+    public abstract class ChimeraEventSO : ChimeraScriptableObjectSO
     {
         [Header("Event Properties")]
         [SerializeField] private bool _logEventRaises = false;

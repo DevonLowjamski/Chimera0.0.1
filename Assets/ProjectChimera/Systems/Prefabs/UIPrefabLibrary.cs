@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// HUD elements, and complete UI interface templates using UI Toolkit.
     /// </summary>
     [CreateAssetMenu(fileName = "New UI Prefab Library", menuName = "Project Chimera/Prefabs/UI Library")]
-    public class UIPrefabLibrary : ScriptableObject
+    public class UIPrefabLibrarySO : ScriptableObject
     {
         [Header("UI Component Categories")]
         [SerializeField] private List<UIPrefabEntry> _uiPrefabs = new List<UIPrefabEntry>();

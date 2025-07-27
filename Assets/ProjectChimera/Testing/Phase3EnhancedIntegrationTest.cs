@@ -437,9 +437,9 @@ namespace ProjectChimera.Testing
         }
 
         /// <summary>
-        /// Test implementation of ChimeraScriptableObject for validation testing.
+        /// Test implementation of ChimeraScriptableObjectSO for validation testing.
         /// </summary>
-        private class TestChimeraScriptableObject : ChimeraScriptableObject
+        private class TestChimeraScriptableObject : ChimeraScriptableObjectSO
         {
             public string TestProperty = "TestValue";
 

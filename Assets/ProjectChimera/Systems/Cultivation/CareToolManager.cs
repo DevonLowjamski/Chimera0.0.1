@@ -9,7 +9,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// <summary>
     /// Manages cultivation care tools and their usage
     /// </summary>
-    public class CareToolManager : MonoBehaviour
+    public class CareToolManager : ChimeraManager
     {
         [Header("Tool Management")]
         [SerializeField] private CareToolLibrarySO _toolLibrary;
@@ -57,6 +57,21 @@ namespace ProjectChimera.Systems.Cultivation
             // Simple implementation - could be enhanced with unlock logic
             return tool != null;
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _availableTools?.Clear();
+        }
+        
+        #endregion
     }
     
     /// <summary>

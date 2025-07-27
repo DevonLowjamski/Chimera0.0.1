@@ -8,7 +8,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Calculates consequences and effects of player choices
     /// </summary>
     [CreateAssetMenu(fileName = "ConsequenceCalculator", menuName = "Project Chimera/Cultivation/Consequence Calculator")]
-    public class ConsequenceCalculatorSO : ChimeraScriptableObject
+    public class ConsequenceCalculatorSO : ChimeraScriptableObjectSO
     {
         [Header("Consequence Rules")]
         [SerializeField] private List<ConsequenceRule> _consequenceRules = new List<ConsequenceRule>();

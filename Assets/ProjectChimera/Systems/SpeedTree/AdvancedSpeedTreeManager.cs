@@ -41,7 +41,7 @@ namespace ProjectChimera.Systems.SpeedTree
         [SerializeField] private SpeedTreeLODConfigSO _lodConfig;
         
         [Header("Cannabis Plant Specifications")]
-        [SerializeField] private List<CannabisStrainAsset> _cannabisStrains = new List<CannabisStrainAsset>();
+        [SerializeField] private List<CannabisStrainAssetSO> _cannabisStrains = new List<CannabisStrainAssetSO>();
         [SerializeField] private SpeedTreeGeneticsConfigSO _geneticsConfig;
         [SerializeField] private SpeedTreeGrowthConfigSO _growthConfig;
         
@@ -993,17 +993,17 @@ namespace ProjectChimera.Systems.SpeedTree
         
         #region Utility Methods
         
-        private CannabisStrainAsset GetCannabisStrain(string strainId)
+        private CannabisStrainAssetSO GetCannabisStrain(string strainId)
         {
             return _cannabisStrains.FirstOrDefault(s => s.StrainId == strainId);
         }
         
-        private CannabisStrainAsset GetDefaultCannabisStrain()
+        private CannabisStrainAssetSO GetDefaultCannabisStrain()
         {
             return _cannabisStrains.FirstOrDefault();
         }
         
-        private SpeedTreeAsset GetSpeedTreeAssetForStrain(CannabisStrainAsset strain)
+        private SpeedTreeAsset GetSpeedTreeAssetForStrain(CannabisStrainAssetSO strain)
         {
             if (strain?.SpeedTreeAssetPath != null && _loadedAssets.TryGetValue(strain.SpeedTreeAssetPath, out var asset))
             {
@@ -1223,12 +1223,12 @@ namespace ProjectChimera.Systems.SpeedTree
             // Placeholder implementation
         }
         
-        public void RegisterStrain(CannabisStrainAsset strain)
+        public void RegisterStrain(CannabisStrainAssetSO strain)
         {
             // Placeholder implementation
         }
         
-        public CannabisGeneticData GenerateGeneticVariation(CannabisStrainAsset strain, object genotype)
+        public CannabisGeneticData GenerateGeneticVariation(CannabisStrainAssetSO strain, object genotype)
         {
             return new CannabisGeneticData { StrainId = strain.StrainId };
         }

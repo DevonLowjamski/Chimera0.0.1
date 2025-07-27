@@ -8,7 +8,7 @@ namespace ProjectChimera.Data.Cultivation
     /// System for managing player expression and creative choices
     /// </summary>
     [CreateAssetMenu(fileName = "ExpressionSystem", menuName = "Project Chimera/Cultivation/Expression System")]
-    public class ExpressionSystemSO : ChimeraScriptableObject
+    public class ExpressionSystemSO : ChimeraScriptableObjectSO
     {
         [Header("Expression Configuration")]
         [SerializeField] private List<ExpressionCategory> _expressionCategories = new List<ExpressionCategory>();

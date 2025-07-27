@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// Manages plant prefabs, strain variations, and growth stage transitions.
     /// </summary>
     [CreateAssetMenu(fileName = "New Plant Prefab Library", menuName = "Project Chimera/Prefabs/Plant Library")]
-    public class PlantPrefabLibrary : ScriptableObject
+    public class PlantPrefabLibrarySO : ScriptableObject
     {
         [Header("Plant Prefab Configuration")]
         [SerializeField] private List<PlantPrefabEntry> _plantPrefabs = new List<PlantPrefabEntry>();

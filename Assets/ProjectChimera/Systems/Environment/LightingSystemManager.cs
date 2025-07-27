@@ -20,7 +20,7 @@ namespace ProjectChimera.Systems.Environment
     /// Extracted from monolithic EnvironmentalManager.cs to handle grow lighting,
     /// spectrum control, photoperiod management, and DLI optimization.
     /// </summary>
-    public class LightingSystemManager : MonoBehaviour, IEnvironmentalService
+    public class LightingSystemManager : ChimeraManager, IEnvironmentalService
     {
         [Header("Lighting Configuration")]
         [SerializeField] private float _lightingUpdateInterval = 30f; // 30 seconds
@@ -730,6 +730,20 @@ namespace ProjectChimera.Systems.Environment
         {
             return _activeLightingAlerts;
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic (already implemented in Shutdown method)
+        }
+        
+        #endregion
     }
     
     

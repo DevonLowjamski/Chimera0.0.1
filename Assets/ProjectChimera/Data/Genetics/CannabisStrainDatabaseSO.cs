@@ -13,7 +13,7 @@ namespace ProjectChimera.Data.Genetics
     {
         [Header("Strain Database")]
         [SerializeField] private List<PlantStrainSO> _baseStrains = new List<PlantStrainSO>();
-        [SerializeField] private List<CannabisStrainAsset> _strainAssets = new List<CannabisStrainAsset>();
+        [SerializeField] private List<CannabisStrainAssetSO> _strainAssets = new List<CannabisStrainAssetSO>();
         
         [Header("Database Configuration")]
         [SerializeField] private bool _autoGenerateStrains = true;
@@ -23,7 +23,7 @@ namespace ProjectChimera.Data.Genetics
         // Public Properties
         public int TotalStrains => _baseStrains.Count + _strainAssets.Count;
         public List<PlantStrainSO> BaseStrains => _baseStrains;
-        public List<CannabisStrainAsset> StrainAssets => _strainAssets;
+        public List<CannabisStrainAssetSO> StrainAssets => _strainAssets;
 
         /// <summary>
         /// Get all base strains from the database
@@ -36,7 +36,7 @@ namespace ProjectChimera.Data.Genetics
         /// <summary>
         /// Get all strain assets from the database
         /// </summary>
-        public List<CannabisStrainAsset> GetAllStrainAssets()
+        public List<CannabisStrainAssetSO> GetAllStrainAssets()
         {
             return _strainAssets.ToList();
         }
@@ -52,7 +52,7 @@ namespace ProjectChimera.Data.Genetics
         /// <summary>
         /// Get a strain asset by ID
         /// </summary>
-        public CannabisStrainAsset GetStrainAssetById(string strainId)
+        public CannabisStrainAssetSO GetStrainAssetById(string strainId)
         {
             return _strainAssets.FirstOrDefault(s => s.StrainId == strainId);
         }
@@ -71,7 +71,7 @@ namespace ProjectChimera.Data.Genetics
         /// <summary>
         /// Add a new strain asset to the database
         /// </summary>
-        public void AddStrainAsset(CannabisStrainAsset strainAsset)
+        public void AddStrainAsset(CannabisStrainAssetSO strainAsset)
         {
             if (strainAsset != null && !_strainAssets.Contains(strainAsset))
             {

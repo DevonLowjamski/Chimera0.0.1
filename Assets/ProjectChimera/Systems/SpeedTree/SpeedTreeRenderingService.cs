@@ -27,7 +27,7 @@ namespace ProjectChimera.Systems.SpeedTree
         
         private Dictionary<string, SpeedTreeAsset> _loadedAssets;
         private Dictionary<int, SpeedTreePlantData> _plantInstances;
-        private List<CannabisStrainAsset> _cannabisStrains;
+        private List<CannabisStrainAssetSO> _cannabisStrains;
         
         // Events for rendering operations
         public System.Action<SpeedTreePlantData> OnPlantInstanceCreated;
@@ -36,13 +36,13 @@ namespace ProjectChimera.Systems.SpeedTree
         
         public SpeedTreeRenderingService(SpeedTreeLibrarySO library, SpeedTreeShaderConfigSO shaderConfig,
             SpeedTreeLODConfigSO lodConfig, SpeedTreeGeneticsConfigSO geneticsConfig,
-            List<CannabisStrainAsset> cannabisStrains)
+            List<CannabisStrainAssetSO> cannabisStrains)
         {
             _speedTreeLibrary = library;
             _shaderConfig = shaderConfig;
             _lodConfig = lodConfig;
             _geneticsConfig = geneticsConfig;
-            _cannabisStrains = cannabisStrains ?? new List<CannabisStrainAsset>();
+            _cannabisStrains = cannabisStrains ?? new List<CannabisStrainAssetSO>();
             
             _loadedAssets = new Dictionary<string, SpeedTreeAsset>();
             _plantInstances = new Dictionary<int, SpeedTreePlantData>();

@@ -45,7 +45,7 @@ namespace ProjectChimera.Systems.SpeedTree
         
         // Plant management
         private Dictionary<int, SpeedTreePlantData> _activePlants;
-        private List<CannabisStrainAsset> _cannabisStrains;
+        private List<CannabisStrainAssetSO> _cannabisStrains;
         
         // System state
         private bool _systemInitialized;
@@ -473,20 +473,22 @@ namespace ProjectChimera.Systems.SpeedTree
             LogInfo("SpeedTree system cleanup completed");
         }
         
-        private List<CannabisStrainAsset> LoadCannabisStrains()
+        private List<CannabisStrainAssetSO> LoadCannabisStrains()
         {
             // Load cannabis strain assets from resources or configuration
-            var strains = new List<CannabisStrainAsset>();
+            var strains = new List<CannabisStrainAssetSO>();
             
             // Add default strains if none configured
             if (strains.Count == 0)
             {
-                strains.Add(new CannabisStrainAsset
-                {
-                    StrainId = "default_indica",
-                    StrainName = "Default Indica",
-                    DefaultGenetics = new CannabisGeneticData { StrainId = "default_indica" }
-                });
+                // Note: Using the correct CannabisStrainAssetSO type
+                // strains.Add(new CannabisStrainAssetSO
+                // {
+                //     StrainId = "default_indica",
+                //     StrainName = "Default Indica",
+                //     DefaultGenetics = new CannabisGeneticData { StrainId = "default_indica" }
+                // });
+                Debug.LogWarning("[SpeedTreeOrchestrator] No cannabis strains configured - using empty list");
             }
             
             return strains;

@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Genetics
     /// Provides centralized access to genetic data for the cannabis genetics engine.
     /// </summary>
     [CreateAssetMenu(fileName = "CannabisGeneLibrary", menuName = "Project Chimera/Genetics/Cannabis Gene Library")]
-    public class CannabisGeneLibrarySO : ChimeraScriptableObject
+    public class CannabisGeneLibrarySO : ChimeraScriptableObjectSO
     {
         [Header("Gene Library")]
         [SerializeField] private List<GeneDefinitionSO> _geneDefinitions = new List<GeneDefinitionSO>();

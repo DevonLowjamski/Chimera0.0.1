@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// HVAC systems, irrigation, monitoring devices, and processing equipment.
     /// </summary>
     [CreateAssetMenu(fileName = "New Equipment Prefab Library", menuName = "Project Chimera/Prefabs/Equipment Library")]
-    public class EquipmentPrefabLibrary : ScriptableObject
+    public class EquipmentPrefabLibrarySO : ScriptableObject
     {
         [Header("Equipment Categories")]
         [SerializeField] private List<EquipmentPrefabEntry> _equipmentPrefabs = new List<EquipmentPrefabEntry>();

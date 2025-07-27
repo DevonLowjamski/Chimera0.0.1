@@ -11,7 +11,7 @@ namespace ProjectChimera.Data.Genetics
     /// Manages all gene-allele pairs and provides methods for genetic calculations and inheritance.
     /// </summary>
     [CreateAssetMenu(fileName = "New Genotype Data", menuName = "Project Chimera/Genetics/Genotype Data", order = 12)]
-    public class GenotypeDataSO : ChimeraScriptableObject
+    public class GenotypeDataSO : ChimeraScriptableObjectSO
     {
         [Header("Genotype Identity")]
         [SerializeField] private PlantSpeciesSO _species;

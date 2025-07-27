@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Genetics
     /// Extended implementation to support genetics system requirements.
     /// </summary>
     [CreateAssetMenu(fileName = "New Gene Definition", menuName = "Project Chimera/Genetics/Gene Definition")]
-    public class GeneDefinitionSO : ChimeraScriptableObject
+    public class GeneDefinitionSO : ChimeraScriptableObjectSO
     {
         [Header("Gene Identity")]
         [SerializeField] private string _geneName;

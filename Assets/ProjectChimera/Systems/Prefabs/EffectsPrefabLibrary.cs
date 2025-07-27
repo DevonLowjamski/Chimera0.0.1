@@ -9,7 +9,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// post-processing effects, audio feedback, and environmental atmosphere.
     /// </summary>
     [CreateAssetMenu(fileName = "New Effects Prefab Library", menuName = "Project Chimera/Prefabs/Effects Library")]
-    public class EffectsPrefabLibrary : ScriptableObject
+    public class EffectsPrefabLibrarySO : ScriptableObject
     {
         [Header("Effect Categories")]
         [SerializeField] private List<EffectPrefabEntry> _effectPrefabs = new List<EffectPrefabEntry>();

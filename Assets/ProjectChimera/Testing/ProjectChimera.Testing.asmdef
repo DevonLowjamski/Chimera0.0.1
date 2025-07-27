@@ -22,6 +22,7 @@
         "ProjectChimera.Systems.Construction",
         "ProjectChimera.Systems.Narrative",
         "ProjectChimera.Systems.Effects",
+        "ProjectChimera.Systems.Save",
         "ProjectChimera.Testing.Core",
         "ProjectChimera.Testing.Systems",
         "UnityEngine.TestRunner",

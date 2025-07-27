@@ -8,7 +8,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Library of audio clips for plant care actions and feedback
     /// </summary>
     [CreateAssetMenu(fileName = "CareAudioLibrary", menuName = "Project Chimera/Cultivation/Care Audio Library")]
-    public class CareAudioLibrarySO : ChimeraScriptableObject
+    public class CareAudioLibrarySO : ChimeraScriptableObjectSO
     {
         [Header("Care Action Sounds")]
         [SerializeField] private List<CareAudioClip> _careActionSounds = new List<CareAudioClip>();

@@ -12,7 +12,7 @@ namespace ProjectChimera.Data.Visuals
     /// Enables real-time visual response to growing conditions in the simulation.
     /// </summary>
     [CreateAssetMenu(fileName = "New SpeedTree Parameter Mapper", menuName = "Project Chimera/Visuals/SpeedTree Parameter Mapper", order = 2)]
-    public class SpeedTreeParameterMapperSO : ChimeraScriptableObject
+    public class SpeedTreeParameterMapperSO : ChimeraScriptableObjectSO
     {
         [Header("Environmental Response Curves")]
         [SerializeField] private AnimationCurve _temperatureResponseCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);

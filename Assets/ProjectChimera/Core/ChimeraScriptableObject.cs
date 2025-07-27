@@ -6,7 +6,7 @@ namespace ProjectChimera.Core
     /// Base class for all Project Chimera ScriptableObjects.
     /// Provides common functionality, validation, and enforces naming conventions.
     /// </summary>
-    public abstract class ChimeraScriptableObject : ScriptableObject
+    public abstract class ChimeraScriptableObjectSO : ScriptableObject
     {
         [Header("Chimera Base Properties")]
         [SerializeField] private string _uniqueID;

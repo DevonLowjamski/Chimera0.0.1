@@ -6,7 +6,7 @@ namespace ProjectChimera.Core
     /// Base class for Project Chimera configuration ScriptableObjects.
     /// Used for settings and parameters that may be modified by the player or system.
     /// </summary>
-    public abstract class ChimeraConfigSO : ChimeraScriptableObject
+    public abstract class ChimeraConfigSO : ChimeraScriptableObjectSO
     {
         [Header("Configuration Properties")]
         [SerializeField] private bool _allowRuntimeModification = false;

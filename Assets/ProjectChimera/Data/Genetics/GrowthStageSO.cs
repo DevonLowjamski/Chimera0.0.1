@@ -9,7 +9,7 @@ namespace ProjectChimera.Data.Genetics
     /// Each stage has unique environmental needs, resource consumption, and visual characteristics.
     /// </summary>
     [CreateAssetMenu(fileName = "New Growth Stage", menuName = "Project Chimera/Genetics/Growth Stage", order = 3)]
-    public class GrowthStageSO : ChimeraScriptableObject
+    public class GrowthStageSO : ChimeraScriptableObjectSO
     {
         [Header("Stage Identity")]
         [SerializeField] private PlantGrowthStage _stageType = PlantGrowthStage.Seedling;

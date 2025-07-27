@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// Extracted from monolithic CultivationManager.cs to handle zone creation,
     /// environmental configuration, and zone-based plant organization.
     /// </summary>
-    public class CultivationZoneManager : MonoBehaviour, ICultivationService
+    public class CultivationZoneManager : ChimeraManager, ICultivationService
     {
         [Header("Zone Configuration")]
         [SerializeField] private EnvironmentalConditions _defaultEnvironment;
@@ -307,6 +307,23 @@ namespace ProjectChimera.Systems.Cultivation
                 Debug.Log($"[CultivationZoneManager] Zone '{kvp.Key}': {kvp.Value.Count} plants (target: {targetPlantsPerZone})");
             }
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _cultivationZones?.Clear();
+            _zonePlants?.Clear();
+            _zoneMetrics?.Clear();
+        }
+        
+        #endregion
     }
     
     

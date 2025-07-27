@@ -47,7 +47,7 @@ namespace ProjectChimera.Systems.SpeedTree
         public float Age;
         public float LastUpdateTime;
         public float DistanceToCamera;
-        public CannabisStrainAsset StrainAsset;
+        public CannabisStrainAssetSO StrainAsset;
         public EnvironmentalStressData StressData;
         public bool IsActive;
         public Dictionary<string, float> EnvironmentalModifiers = new Dictionary<string, float>();
@@ -150,7 +150,7 @@ namespace ProjectChimera.Systems.SpeedTree
     /// Cannabis strain asset configuration.
     /// </summary>
     [System.Serializable]
-    public class CannabisStrainAsset
+    public class CannabisStrainData
     {
         public string StrainId;
         public string StrainName;

@@ -8,7 +8,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Manages player choice configurations and effects
     /// </summary>
     [CreateAssetMenu(fileName = "PlayerChoiceManager", menuName = "Project Chimera/Cultivation/Player Choice Manager")]
-    public class PlayerChoiceManagerSO : ChimeraScriptableObject
+    public class PlayerChoiceManagerSO : ChimeraScriptableObjectSO
     {
         [Header("Choice Configuration")]
         [SerializeField] private List<PlayerChoice> _availableChoices = new List<PlayerChoice>();

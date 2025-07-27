@@ -14,7 +14,7 @@ namespace ProjectChimera.Systems.Environment
     /// Extracted from monolithic EnvironmentalManager.cs to handle environmental
     /// sensors, data collection, calibration, and sensor network monitoring.
     /// </summary>
-    public class SensorNetworkManager : MonoBehaviour, IEnvironmentalService
+    public class SensorNetworkManager : ChimeraManager, IEnvironmentalService
     {
         [Header("Sensor Network Configuration")]
         [SerializeField] private float _sensorUpdateInterval = 5f; // 5 seconds
@@ -625,6 +625,20 @@ namespace ProjectChimera.Systems.Environment
         {
             return _activeSensorAlerts;
         }
+
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic (already implemented in Shutdown method)
+        }
+        
+        #endregion
     }
     
     /// <summary>

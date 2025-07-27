@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// processing areas, storage facilities, and complete facility templates.
     /// </summary>
     [CreateAssetMenu(fileName = "New Facility Prefab Library", menuName = "Project Chimera/Prefabs/Facility Library")]
-    public class FacilityPrefabLibrary : ScriptableObject
+    public class FacilityPrefabLibrarySO : ScriptableObject
     {
         [Header("Facility Types")]
         [SerializeField] private List<FacilityPrefabEntry> _facilityPrefabs = new List<FacilityPrefabEntry>();

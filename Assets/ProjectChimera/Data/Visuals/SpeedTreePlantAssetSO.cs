@@ -12,7 +12,7 @@ namespace ProjectChimera.Data.Visuals
     /// map to SpeedTree procedural parameters for dynamic plant visualization.
     /// </summary>
     [CreateAssetMenu(fileName = "New SpeedTree Plant Asset", menuName = "Project Chimera/Visuals/SpeedTree Plant Asset", order = 1)]
-    public class SpeedTreePlantAssetSO : ChimeraScriptableObject
+    public class SpeedTreePlantAssetSO : ChimeraScriptableObjectSO
     {
         [Header("Asset References")]
         [SerializeField] private PlantStrainSO _targetStrain;

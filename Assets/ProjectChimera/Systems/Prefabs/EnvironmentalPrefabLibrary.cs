@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Prefabs
     /// weather systems, air particles, and environmental sensors.
     /// </summary>
     [CreateAssetMenu(fileName = "New Environmental Prefab Library", menuName = "Project Chimera/Prefabs/Environmental Library")]
-    public class EnvironmentalPrefabLibrary : ScriptableObject
+    public class EnvironmentalPrefabLibrarySO : ScriptableObject
     {
         [Header("Environmental Categories")]
         [SerializeField] private List<EnvironmentalPrefabEntry> _environmentalPrefabs = new List<EnvironmentalPrefabEntry>();

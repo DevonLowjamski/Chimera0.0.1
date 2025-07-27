@@ -8,7 +8,7 @@ namespace ProjectChimera.Data.Genetics
     /// Contains genetic and environmental characteristics for cannabis strains.
     /// </summary>
     [CreateAssetMenu(fileName = "CannabisStrain", menuName = "Project Chimera/Genetics/Cannabis Strain")]
-    public class CannabisStrainAsset : ScriptableObject
+    public class CannabisStrainAssetSO : ScriptableObject
     {
         [Header("Strain Identity")]
         public string StrainId;
@@ -40,6 +40,10 @@ namespace ProjectChimera.Data.Genetics
         public Color LeafColorBase = Color.green;
         public Color BudColorBase = Color.white;
         public Vector3 Morphology = Vector3.one;
+        
+        [Header("SpeedTree Integration")]
+        public string SpeedTreeAssetPath = "";
+        public Vector2 WidthRange = new Vector2(0.3f, 1.5f);
 
         [Header("Strain Type Influences")]
         [Range(0f, 1f)] public float IndicaDominance = 0.5f;
@@ -47,7 +51,7 @@ namespace ProjectChimera.Data.Genetics
         [Range(0f, 1f)] public float RuderalisInfluence = 0.0f;
         
         [Header("Environmental Preferences")]
-        public EnvironmentalRange TemperatureRange;
+        public EnvironmentalRange TemperatureRange = new EnvironmentalRange { MinValue = 18f, MaxValue = 28f, OptimalValue = 23f };
         public EnvironmentalRange HumidityRange;
         public EnvironmentalRange LightIntensityRange;
         public EnvironmentalRange NutrientRange;

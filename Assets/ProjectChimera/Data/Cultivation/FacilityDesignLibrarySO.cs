@@ -9,7 +9,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Library of facility design templates and effects
     /// </summary>
     [CreateAssetMenu(fileName = "FacilityDesignLibrary", menuName = "Project Chimera/Cultivation/Facility Design Library")]
-    public class FacilityDesignLibrarySO : ChimeraScriptableObject
+    public class FacilityDesignLibrarySO : ChimeraScriptableObjectSO
     {
         [Header("Design Library")]
         [SerializeField] private List<FacilityDesignData> _availableDesigns = new List<FacilityDesignData>();

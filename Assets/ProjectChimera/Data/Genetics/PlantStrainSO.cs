@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Genetics
     /// Inherits base parameters from PlantSpeciesSO and adds strain-specific modifications and traits.
     /// </summary>
     [CreateAssetMenu(fileName = "New Plant Strain", menuName = "Project Chimera/Genetics/Plant Strain", order = 2)]
-    public class PlantStrainSO : ChimeraScriptableObject
+    public class PlantStrainSO : ChimeraScriptableObjectSO
     {
         [Header("Strain Identity")]
         [SerializeField] private PlantSpeciesSO _baseSpecies;

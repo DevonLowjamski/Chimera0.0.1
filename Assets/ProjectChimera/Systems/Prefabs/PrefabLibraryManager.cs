@@ -250,12 +250,12 @@ namespace ProjectChimera.Systems.Prefabs
     public class PrefabLibraryManager : ChimeraManager
     {
         [Header("Prefab Categories")]
-        [SerializeField] private PlantPrefabLibrary _plantPrefabs;
-        [SerializeField] private EquipmentPrefabLibrary _equipmentPrefabs;
-        [SerializeField] private FacilityPrefabLibrary _facilityPrefabs;
-        [SerializeField] private EnvironmentalPrefabLibrary _environmentalPrefabs;
-        [SerializeField] private UIPrefabLibrary _uiPrefabs;
-        [SerializeField] private EffectsPrefabLibrary _effectsPrefabs;
+        [SerializeField] private PlantPrefabLibrarySO _plantPrefabs;
+        [SerializeField] private EquipmentPrefabLibrarySO _equipmentPrefabs;
+        [SerializeField] private FacilityPrefabLibrarySO _facilityPrefabs;
+        [SerializeField] private EnvironmentalPrefabLibrarySO _environmentalPrefabs;
+        [SerializeField] private UIPrefabLibrarySO _uiPrefabs;
+        [SerializeField] private EffectsPrefabLibrarySO _effectsPrefabs;
         
         [Header("Instantiation Settings")]
         [SerializeField] private bool _enablePooling = true;
@@ -365,44 +365,44 @@ namespace ProjectChimera.Systems.Prefabs
             CacheAllPrefabs();
         }
         
-        private PlantPrefabLibrary CreatePlantPrefabLibrary()
+        private PlantPrefabLibrarySO CreatePlantPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<PlantPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<PlantPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }
         
-        private EquipmentPrefabLibrary CreateEquipmentPrefabLibrary()
+        private EquipmentPrefabLibrarySO CreateEquipmentPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<EquipmentPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<EquipmentPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }
         
-        private FacilityPrefabLibrary CreateFacilityPrefabLibrary()
+        private FacilityPrefabLibrarySO CreateFacilityPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<FacilityPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<FacilityPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }
         
-        private EnvironmentalPrefabLibrary CreateEnvironmentalPrefabLibrary()
+        private EnvironmentalPrefabLibrarySO CreateEnvironmentalPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<EnvironmentalPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<EnvironmentalPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }
         
-        private UIPrefabLibrary CreateUIPrefabLibrary()
+        private UIPrefabLibrarySO CreateUIPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<UIPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<UIPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }
         
-        private EffectsPrefabLibrary CreateEffectsPrefabLibrary()
+        private EffectsPrefabLibrarySO CreateEffectsPrefabLibrary()
         {
-            var library = ScriptableObject.CreateInstance<EffectsPrefabLibrary>();
+            var library = ScriptableObject.CreateInstance<EffectsPrefabLibrarySO>();
             library.InitializeDefaults();
             return library;
         }

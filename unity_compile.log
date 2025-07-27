@@ -7,19 +7,19 @@ Darwin version:          24.5.0
 Architecture:            arm64
 Running under Rosetta:   NO
 Available memory:        8192 MB
-Date:                    2025-07-15T01:53:08Z
+Date:                    2025-07-26T18:27:40Z
 [Licensing::Module] Trying to connect to existing licensing client channel...
-[Licensing::IpcConnector] Successfully connected to: "LicenseClient-devon" at "2025-07-15T01:53:08.492711Z"
-[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 1672, path: "/Applications/Unity Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client")
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-devon" at "2025-07-26T18:27:40.098578Z"
+[Licensing::Client] Code 1 while verifying Licensing Client signature (process Id: 1508, path: "/Applications/Unity/Hub/Editor/6000.2.0b2/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/MacOS/Unity.Licensing.Client")
 [Licensing::Module] LicensingClient has failed validation; ignoring
 [Licensing::Client] Handshaking with LicensingClient:
   Version:                 1.17.0+aa6cfba
-  Session Id:              546557824caa4b0aaa9b4cc18e88ec68
-  Correlation Id:          f733ce8f0a0daa77bb7bf947ebf4e5b8
-  External correlation Id: 5475100489146763535
+  Session Id:              49619ab511d34904af9a5edeafddbb19
+  Correlation Id:          5b66624274b8899a245ede42da13f409
+  External correlation Id: 7575776083355319398
   Machine Id:              GsWKSAAWUnbEEE99YjM7pWSOBUs=
-[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-devon" (connect: 0.00s, validation: 0.01s, handshake: 0.38s)
-[Licensing::IpcConnector] Successfully connected to: "LicenseClient-devon-notifications" at "2025-07-15T01:53:08.886366Z"
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-devon" (connect: 0.00s, validation: 0.01s, handshake: 0.04s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-devon-notifications" at "2025-07-26T18:27:40.151866Z"
 [Licensing::Module] Error: Access token is unavailable; failed to update
 [Licensing::Client] Successfully resolved entitlement details
 [Licensing::Module] License group:
@@ -28,7 +28,7 @@ Date:                    2025-07-15T01:53:08Z
   Type: Assigned
   Expiration: Unlimited
 [Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
-[Licensing::Module] Licensing Background thread has ended after 0.40s
+[Licensing::Module] Licensing Background thread has ended after 0.06s
 Launching external process: /Applications/Unity/Hub/Editor/6000.2.0b2/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
 
 COMMAND LINE ARGUMENTS:
@@ -37,8 +37,10 @@ COMMAND LINE ARGUMENTS:
 -quit
 -projectPath
 .
+-executeMethod
+UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation
 -logFile
-./unity_compile.log
+unity_compile.log
 Successfully changed project path to: /Users/devon/Documents/Cursor/Projects
 /Users/devon/Documents/Cursor/Projects
 It looks like another Unity instance is running with this project open.

@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Genetics
     /// Contains detailed information about the allele's molecular characteristics and phenotypic impact.
     /// </summary>
     [CreateAssetMenu(fileName = "New Allele", menuName = "Project Chimera/Genetics/Allele", order = 11)]
-    public class AlleleSO : ChimeraScriptableObject
+    public class AlleleSO : ChimeraScriptableObjectSO
     {
         [Header("Allele Identity")]
         [SerializeField] private GeneDefinitionSO _parentGene;

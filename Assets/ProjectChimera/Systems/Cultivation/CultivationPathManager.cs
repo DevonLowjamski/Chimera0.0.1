@@ -12,7 +12,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// <summary>
     /// Manages cultivation learning paths and player progression routes
     /// </summary>
-    public class CultivationPathManager : MonoBehaviour
+    public class CultivationPathManager : ChimeraManager
     {
         [Header("Path Management")]
         [SerializeField] private CultivationPathLibrarySO _pathLibrary;
@@ -127,5 +127,20 @@ namespace ProjectChimera.Systems.Cultivation
                 }
             }
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _activePaths?.Clear();
+        }
+        
+        #endregion
     }
 }

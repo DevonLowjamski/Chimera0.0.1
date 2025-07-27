@@ -10,7 +10,7 @@ namespace ProjectChimera.Data.Cultivation
     /// Simple cultivation path library for path management
     /// </summary>
     [CreateAssetMenu(fileName = "CultivationPathLibrary", menuName = "Project Chimera/Cultivation/Cultivation Path Library")]
-    public class CultivationPathLibrarySO : ChimeraScriptableObject
+    public class CultivationPathLibrarySO : ChimeraScriptableObjectSO
     {
         [Header("Available Paths")]
         [SerializeField] private List<CultivationPathData> _availablePaths = new List<CultivationPathData>();
