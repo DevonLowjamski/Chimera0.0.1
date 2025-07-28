@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using ProjectChimera.Core;
 
 namespace ProjectChimera.Core.Events
 {
@@ -157,9 +158,9 @@ namespace ProjectChimera.Core.Events
     }
     
     /// <summary>
-    /// Event Manager MonoBehaviour for Unity integration
+    /// Event Manager for Unity integration
     /// </summary>
-    public class EventManager : MonoBehaviour
+    public class EventManager : ChimeraManager
     {
         private static EventManager instance;
         public static EventManager Instance
@@ -176,7 +177,7 @@ namespace ProjectChimera.Core.Events
             }
         }
         
-        private void Awake()
+        protected override void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -185,17 +186,26 @@ namespace ProjectChimera.Core.Events
             }
             
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            base.Awake(); // Call ChimeraManager's Awake
         }
         
-        private void Update()
+        protected override void Update()
         {
+            base.Update(); // Call ChimeraManager's Update
+            
             // Process queued events each frame
             EventSystem.ProcessQueuedEvents();
         }
         
-        private void OnDestroy()
+        protected override void OnManagerInitialize()
         {
+            // Manager-specific initialization
+            Debug.Log("[EventManager] Event system initialized");
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
             if (instance == this)
             {
                 EventSystem.ClearAllHandlers();

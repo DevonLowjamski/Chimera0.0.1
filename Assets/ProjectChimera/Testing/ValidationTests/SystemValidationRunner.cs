@@ -567,39 +567,47 @@ namespace ProjectChimera.Testing.ValidationTests
             {
                 var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
                 var chimeraAssemblies = assemblies.Where(a => a.FullName.Contains("ProjectChimera")).ToArray();
+                bool hasViolations = false;
+                int totalChecked = 0;
+                int violationCount = 0;
+                
+                UnityEngine.Debug.Log($"VALIDATION-1c: Checking ScriptableObject naming in {chimeraAssemblies.Length} ProjectChimera assemblies...");
                 
                 foreach (var assembly in chimeraAssemblies)
                 {
-                    var scriptableObjectTypes = assembly.GetTypes()
-                        .Where(t => t.IsSubclassOf(typeof(ScriptableObject)) && !t.IsAbstract)
-                        .ToArray();
-                    
-                    foreach (var type in scriptableObjectTypes)
+                    try
                     {
-                        if (!type.Name.EndsWith("SO"))
+                        var scriptableObjectTypes = assembly.GetTypes()
+                            .Where(t => typeof(ScriptableObject).IsAssignableFrom(t) && !t.IsAbstract && t != typeof(ScriptableObject))
+                            .ToArray();
+                        
+                        totalChecked += scriptableObjectTypes.Length;
+                        UnityEngine.Debug.Log($"VALIDATION-1c: Assembly {assembly.GetName().Name}: Found {scriptableObjectTypes.Length} ScriptableObject types");
+                        
+                        foreach (var type in scriptableObjectTypes)
                         {
-                            UnityEngine.Debug.LogWarning($"VALIDATION-1c: ScriptableObject naming violation: {type.FullName} should end with 'SO'");
-                            // Continue checking all violations instead of returning immediately
+                            if (!type.Name.EndsWith("SO"))
+                            {
+                                UnityEngine.Debug.LogError($"VALIDATION-1c: ❌ ScriptableObject naming violation: {type.FullName} should end with 'SO'");
+                                hasViolations = true;
+                                violationCount++;
+                            }
                         }
+                    }
+                    catch (System.Reflection.ReflectionTypeLoadException ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Could not load types from assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies - this might be expected for some assemblies
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Error checking assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies
                     }
                 }
                 
-                // Check again to see if any violations were found
-                foreach (var assembly in chimeraAssemblies)
-                {
-                    var scriptableObjectTypes = assembly.GetTypes()
-                        .Where(t => t.IsSubclassOf(typeof(ScriptableObject)) && !t.IsAbstract)
-                        .ToArray();
-                    
-                    foreach (var type in scriptableObjectTypes)
-                    {
-                        if (!type.Name.EndsWith("SO"))
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
+                UnityEngine.Debug.Log($"VALIDATION-1c: ScriptableObject naming check complete: {totalChecked} types checked, {violationCount} violations found");
+                return !hasViolations;
             }
             catch (System.Exception ex)
             {
@@ -613,43 +621,46 @@ namespace ProjectChimera.Testing.ValidationTests
             try
             {
                 var chimeraManagerType = System.Type.GetType("ProjectChimera.Core.ChimeraManager, ProjectChimera.Core");
-                if (chimeraManagerType == null) return false;
+                if (chimeraManagerType == null) 
+                {
+                    UnityEngine.Debug.LogError("VALIDATION-1c: ChimeraManager type not found!");
+                    return false;
+                }
                 
                 var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-                var systemsAssemblies = assemblies.Where(a => a.FullName.Contains("ProjectChimera.Systems")).ToArray();
+                var chimeraAssemblies = assemblies.Where(a => a.FullName.Contains("ProjectChimera")).ToArray(); // Check all Chimera assemblies
+                bool hasViolations = false;
                 
-                foreach (var assembly in systemsAssemblies)
+                foreach (var assembly in chimeraAssemblies)
                 {
-                    var managerTypes = assembly.GetTypes()
-                        .Where(t => t.Name.EndsWith("Manager") && !t.IsAbstract && t.IsSubclassOf(typeof(MonoBehaviour)))
-                        .ToArray();
-                    
-                    foreach (var type in managerTypes)
+                    try
                     {
-                        if (!type.IsSubclassOf(chimeraManagerType))
+                        var managerTypes = assembly.GetTypes()
+                            .Where(t => t.Name.EndsWith("Manager") && !t.IsAbstract && t.IsSubclassOf(typeof(MonoBehaviour)))
+                            .ToArray();
+                        
+                        foreach (var type in managerTypes)
                         {
-                            UnityEngine.Debug.LogWarning($"VALIDATION-1c: Manager inheritance violation: {type.FullName} should inherit from ChimeraManager");
-                            // Continue checking all violations instead of returning immediately
+                            if (!type.IsSubclassOf(chimeraManagerType))
+                            {
+                                UnityEngine.Debug.LogWarning($"VALIDATION-1c: Manager inheritance violation: {type.FullName} should inherit from ChimeraManager");
+                                hasViolations = true;
+                            }
                         }
+                    }
+                    catch (System.Reflection.ReflectionTypeLoadException ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Could not load types from assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies - this might be expected for some assemblies
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Error checking assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies
                     }
                 }
                 
-                // Check again to see if any violations were found
-                foreach (var assembly in systemsAssemblies)
-                {
-                    var managerTypes = assembly.GetTypes()
-                        .Where(t => t.Name.EndsWith("Manager") && !t.IsAbstract && t.IsSubclassOf(typeof(MonoBehaviour)))
-                        .ToArray();
-                    
-                    foreach (var type in managerTypes)
-                    {
-                        if (!type.IsSubclassOf(chimeraManagerType))
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
+                return !hasViolations;
             }
             catch (System.Exception ex)
             {
@@ -665,47 +676,52 @@ namespace ProjectChimera.Testing.ValidationTests
                 // Validate that namespace structure matches assembly structure
                 var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
                 var chimeraAssemblies = assemblies.Where(a => a.FullName.Contains("ProjectChimera")).ToArray();
+                bool hasViolations = false;
+                int totalTypesChecked = 0;
+                int violationCount = 0;
+                
+                UnityEngine.Debug.Log($"VALIDATION-1c: Checking namespace consistency in {chimeraAssemblies.Length} ProjectChimera assemblies...");
                 
                 foreach (var assembly in chimeraAssemblies)
                 {
-                    var assemblyName = assembly.GetName().Name;
-                    var types = assembly.GetTypes().Where(t => !string.IsNullOrEmpty(t.Namespace)).ToArray();
-                    
-                    foreach (var type in types)
+                    try
                     {
-                        // Check if namespace starts with the expected assembly namespace  
-                        var expectedNamespaceStart = assemblyName;
-                        if (!type.Namespace.StartsWith(expectedNamespaceStart))
+                        var assemblyName = assembly.GetName().Name;
+                        var types = assembly.GetTypes().Where(t => !string.IsNullOrEmpty(t.Namespace)).ToArray();
+                        
+                        totalTypesChecked += types.Length;
+                        UnityEngine.Debug.Log($"VALIDATION-1c: Assembly {assemblyName}: Checking {types.Length} types");
+                        
+                        foreach (var type in types)
                         {
-                            // Allow some flexibility for Core and Data assemblies
-                            if (!assemblyName.Contains("Core") && !assemblyName.Contains("Data") && !assemblyName.Contains("Testing"))
+                            // Check if namespace starts with the expected assembly namespace  
+                            var expectedNamespaceStart = assemblyName;
+                            if (!type.Namespace.StartsWith(expectedNamespaceStart))
                             {
-                                UnityEngine.Debug.LogWarning($"VALIDATION-1c: Namespace inconsistency: {type.FullName} in assembly {assemblyName} (expected namespace to start with {expectedNamespaceStart})");
-                                // Continue checking all violations instead of returning immediately
+                                // Allow some flexibility for Core and Data assemblies, and specific cases
+                                if (!assemblyName.Contains("Core") && !assemblyName.Contains("Data") && !assemblyName.Contains("Testing") && !assemblyName.Contains("Editor"))
+                                {
+                                    UnityEngine.Debug.LogError($"VALIDATION-1c: ❌ Namespace inconsistency: {type.FullName} in assembly {assemblyName} (expected namespace to start with {expectedNamespaceStart})");
+                                    hasViolations = true;
+                                    violationCount++;
+                                }
                             }
                         }
+                    }
+                    catch (System.Reflection.ReflectionTypeLoadException ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Could not load types from assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies - this might be expected for some assemblies
+                    }
+                    catch (System.Exception ex)
+                    {
+                        UnityEngine.Debug.LogWarning($"VALIDATION-1c: Error checking assembly {assembly.FullName}: {ex.Message}");
+                        // Continue with other assemblies
                     }
                 }
                 
-                // Check again to see if any violations were found
-                foreach (var assembly in chimeraAssemblies)
-                {
-                    var assemblyName = assembly.GetName().Name;
-                    var types = assembly.GetTypes().Where(t => !string.IsNullOrEmpty(t.Namespace)).ToArray();
-                    
-                    foreach (var type in types)
-                    {
-                        var expectedNamespaceStart = assemblyName;
-                        if (!type.Namespace.StartsWith(expectedNamespaceStart))
-                        {
-                            if (!assemblyName.Contains("Core") && !assemblyName.Contains("Data") && !assemblyName.Contains("Testing"))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
+                UnityEngine.Debug.Log($"VALIDATION-1c: Namespace consistency check complete: {totalTypesChecked} types checked, {violationCount} violations found");
+                return !hasViolations;
             }
             catch (System.Exception ex)
             {

@@ -6,11 +6,12 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Narrative;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Events;
+using ProjectChimera.Events.Core;
 // Type alias to resolve ambiguity
 using ConsequenceType = ProjectChimera.Events.ConsequenceType;
 using ConsequenceSeverity = ProjectChimera.Events.ConsequenceSeverity;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Data.Events
 {
     /// <summary>
     /// Type-safe event channel for consequence tracking events in Project Chimera's narrative system.

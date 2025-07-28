@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 
 namespace ProjectChimera.Data.Community
 {

@@ -14,7 +14,7 @@ namespace ProjectChimera.Systems.Environment
     /// Extracted from monolithic EnvironmentalManager.cs to handle climate regulation,
     /// temperature control, humidity management, and atmospheric optimization.
     /// </summary>
-    public class ClimateControlManager : MonoBehaviour, IEnvironmentalService
+    public class ClimateControlManager : ChimeraManager, IEnvironmentalService
     {
         [Header("Climate Control Configuration")]
         [SerializeField] private float _climateUpdateInterval = 5f; // 5 seconds
@@ -450,6 +450,22 @@ namespace ProjectChimera.Systems.Environment
             string alertKey = $"climate_{zoneId}";
             _activeClimateAlerts.Remove(alertKey);
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization (already implemented in Initialize method)
+            Initialize();
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic (already implemented in Shutdown method)
+            Shutdown();
+        }
+        
+        #endregion
     }
     
     
@@ -533,6 +549,7 @@ namespace ProjectChimera.Systems.Environment
             var recentReadings = _readings.Where(r => r.Timestamp >= cutoff);
             return recentReadings.Any() ? recentReadings.Average(r => r.Humidity) : 0f;
         }
+        
     }
     
     /// <summary>

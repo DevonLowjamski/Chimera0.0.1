@@ -318,7 +318,7 @@ namespace ProjectChimera.Systems.Cultivation
         protected override void OnManagerShutdown()
         {
             // Manager-specific shutdown logic
-            _cultivationZones?.Clear();
+            _zoneEnvironments?.Clear();
             _zonePlants?.Clear();
             _zoneMetrics?.Clear();
         }

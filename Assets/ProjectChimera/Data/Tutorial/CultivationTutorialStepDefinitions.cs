@@ -8,8 +8,8 @@ namespace ProjectChimera.Data.Tutorial
     /// Cultivation tutorial step definitions for Project Chimera.
     /// Contains detailed tutorial steps for advanced growing mechanics education.
     /// </summary>
-    [CreateAssetMenu(fileName = "CultivationTutorialStepDefinitions", menuName = "Project Chimera/Tutorial/Cultivation Tutorial Step Definitions")]
-    public class CultivationTutorialStepDefinitions : ChimeraDataSO
+    [CreateAssetMenu(fileName = "CultivationTutorialStepDefinitionsSO", menuName = "Project Chimera/Tutorial/Cultivation Tutorial Step Definitions")]
+    public class CultivationTutorialStepDefinitionsSO : ChimeraDataSO
     {
         [Header("Environmental Control Module Steps")]
         [SerializeField] private List<TutorialStepData> _environmentalControlSteps;

@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Events;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
-using EventsPlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 
 namespace ProjectChimera.Systems.Cultivation
 {

@@ -3,7 +3,7 @@ using System;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Construction; // For SkillLevel enum
-using ProjectChimera.Core.Events; // For cultivation gaming event data
+using ProjectChimera.Events.Core; // For cultivation gaming event data
 using ProjectChimera.Data.Events; // For non-generic GameEventChannelSO
 using GameEventChannel = ProjectChimera.Data.Events.GameEventChannelSO;
 using ProjectChimera.Data.Progression; // For ExperienceSource enum

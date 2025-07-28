@@ -1,7 +1,6 @@
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Cultivation;
-using ProjectChimera.Environment;
+using ProjectChimera.Scripts.Cultivation;
 using ProjectChimera.Scripts.Environment;
 using ProjectChimera.Data.Construction;
 using ProjectChimera.Data.Automation;
@@ -14,7 +13,7 @@ using System.Collections;
 using System.Linq;
 using System;
 
-namespace ProjectChimera.SceneGeneration
+namespace ProjectChimera.Scripts.SceneGeneration
 {
     /// <summary>
     /// Advanced procedural scene generator that creates diverse cultivation environments

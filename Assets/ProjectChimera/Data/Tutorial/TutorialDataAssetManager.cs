@@ -9,8 +9,8 @@ namespace ProjectChimera.Data.Tutorial
     /// Tutorial data asset manager for Project Chimera.
     /// Manages creation and organization of tutorial ScriptableObject assets.
     /// </summary>
-    [CreateAssetMenu(fileName = "TutorialDataAssetManager", menuName = "Project Chimera/Tutorial/Tutorial Data Asset Manager")]
-    public class TutorialDataAssetManager : ChimeraDataSO
+    [CreateAssetMenu(fileName = "TutorialDataAssetManagerSO", menuName = "Project Chimera/Tutorial/Tutorial Data Asset Manager")]
+    public class TutorialDataAssetManagerSO : ChimeraDataSO
     {
         [Header("Tutorial Sequence Assets")]
         [SerializeField] private List<TutorialSequenceSO> _availableSequences;
@@ -27,10 +27,10 @@ namespace ProjectChimera.Data.Tutorial
         
         [Header("Tutorial Configuration Assets")]
         [SerializeField] private TutorialConfigurationSO _globalConfiguration;
-        [SerializeField] private OnboardingStepDefinitions _onboardingDefinitions;
-        [SerializeField] private CultivationTutorialStepDefinitions _cultivationDefinitions;
-        [SerializeField] private GeneticsTutorialStepDefinitions _geneticsDefinitions;
-        [SerializeField] private EconomicsTutorialStepDefinitions _economicsDefinitions;
+        [SerializeField] private OnboardingStepDefinitionsSO _onboardingDefinitions;
+        [SerializeField] private CultivationTutorialStepDefinitionsSO _cultivationDefinitions;
+        [SerializeField] private GeneticsTutorialStepDefinitionsSO _geneticsDefinitions;
+        [SerializeField] private EconomicsTutorialStepDefinitionsSO _economicsDefinitions;
         
         [Header("Asset Creation Settings")]
         [SerializeField] private bool _autoCreateMissingAssets = true;

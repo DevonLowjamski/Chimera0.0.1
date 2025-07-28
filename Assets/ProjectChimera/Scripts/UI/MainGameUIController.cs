@@ -20,7 +20,7 @@ using InteractivePlantComponent = ProjectChimera.Systems.Cultivation.Interactive
 using PlayerProfile = ProjectChimera.Data.PlayerProfile;
 using GrowRoomController = ProjectChimera.Scripts.Facilities.GrowRoomController;
 
-namespace ProjectChimera.UI
+namespace ProjectChimera.Scripts.UI
 {
     /// <summary>
     /// Main UI controller that manages the game's primary interface elements.

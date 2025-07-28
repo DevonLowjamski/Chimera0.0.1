@@ -213,7 +213,7 @@ namespace ProjectChimera.Systems.Tutorial.Testing
         /// <summary>
         /// Validate tutorial data asset manager
         /// </summary>
-        public static TutorialValidationResult ValidateDataAssetManager(TutorialDataAssetManager manager)
+        public static TutorialValidationResult ValidateDataAssetManager(TutorialDataAssetManagerSO manager)
         {
             var result = new TutorialValidationResult();
             
@@ -345,7 +345,7 @@ namespace ProjectChimera.Systems.Tutorial.Testing
         /// <summary>
         /// Generate validation report for tutorial system
         /// </summary>
-        public static string GenerateValidationReport(TutorialDataAssetManager manager)
+        public static string GenerateValidationReport(TutorialDataAssetManagerSO manager)
         {
             var result = ValidateDataAssetManager(manager);
             return GenerateValidationReport(result);

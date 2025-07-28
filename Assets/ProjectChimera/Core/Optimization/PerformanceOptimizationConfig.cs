@@ -7,8 +7,8 @@ namespace ProjectChimera.Core.Optimization
     /// PC015: Centralized performance optimization configuration for large-scale plant simulation
     /// Ensures all optimization systems are properly configured for 60 FPS with 1000+ plants
     /// </summary>
-    [CreateAssetMenu(fileName = "PerformanceOptimizationConfig", menuName = "Project Chimera/Optimization/Performance Config")]
-    public class PerformanceOptimizationConfig : ChimeraConfigSO
+    [CreateAssetMenu(fileName = "PerformanceOptimizationConfigSO", menuName = "Project Chimera/Optimization/Performance Config")]
+    public class PerformanceOptimizationConfigSO : ChimeraConfigSO
     {
         [Header("Performance Targets")]
         [Tooltip("Target frame rate for the simulation")]

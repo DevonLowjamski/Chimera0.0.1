@@ -9,8 +9,8 @@ namespace ProjectChimera.Data.Tutorial
     /// Onboarding step definitions for Project Chimera.
     /// Contains predefined tutorial steps for the onboarding sequence.
     /// </summary>
-    [CreateAssetMenu(fileName = "OnboardingStepDefinitions", menuName = "Project Chimera/Tutorial/Onboarding Step Definitions")]
-    public class OnboardingStepDefinitions : ChimeraDataSO
+    [CreateAssetMenu(fileName = "OnboardingStepDefinitionsSO", menuName = "Project Chimera/Tutorial/Onboarding Step Definitions")]
+    public class OnboardingStepDefinitionsSO : ChimeraDataSO
     {
         [Header("Welcome Phase Steps")]
         [SerializeField] private List<TutorialStepData> _welcomeSteps;

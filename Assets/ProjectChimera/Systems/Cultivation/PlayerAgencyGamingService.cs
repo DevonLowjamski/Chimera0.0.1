@@ -3,8 +3,8 @@ using System;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Events;
-using ProjectChimera.Core.Events;
-using EventsPlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using ProjectChimera.Events.Core;
+using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
 

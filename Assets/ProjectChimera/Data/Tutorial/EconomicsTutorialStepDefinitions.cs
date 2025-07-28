@@ -8,8 +8,8 @@ namespace ProjectChimera.Data.Tutorial
     /// Economics tutorial step definitions for Project Chimera.
     /// Contains detailed tutorial steps for cannabis business and financial education.
     /// </summary>
-    [CreateAssetMenu(fileName = "EconomicsTutorialStepDefinitions", menuName = "Project Chimera/Tutorial/Economics Tutorial Step Definitions")]
-    public class EconomicsTutorialStepDefinitions : ChimeraDataSO
+    [CreateAssetMenu(fileName = "EconomicsTutorialStepDefinitionsSO", menuName = "Project Chimera/Tutorial/Economics Tutorial Step Definitions")]
+    public class EconomicsTutorialStepDefinitionsSO : ChimeraDataSO
     {
         [Header("Business Fundamentals Module Steps")]
         [SerializeField] private List<TutorialStepData> _businessFundamentalsSteps;

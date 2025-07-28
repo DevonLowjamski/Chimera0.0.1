@@ -12,7 +12,7 @@ namespace ProjectChimera.Core.Optimization
     public class PerformanceOrchestrator : ChimeraManager
     {
         [Header("Configuration")]
-        [SerializeField] private PerformanceOptimizationConfig _config;
+        [SerializeField] private PerformanceOptimizationConfigSO _config;
         
         [Header("Current Status")]
         [SerializeField] private bool _isOptimizationActive = false;
@@ -39,7 +39,7 @@ namespace ProjectChimera.Core.Optimization
             if (_config == null)
             {
                 // Try to load default configuration from Resources
-                _config = Resources.Load<PerformanceOptimizationConfig>("Config/DefaultPerformanceOptimizationConfig");
+                _config = Resources.Load<PerformanceOptimizationConfigSO>("Config/DefaultPerformanceOptimizationConfig");
                 if (_config == null)
                 {
                     LogError("PerformanceOrchestrator: No configuration assigned and default config not found in Resources");

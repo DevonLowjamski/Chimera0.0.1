@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using ProjectChimera.Core;
 
 namespace ProjectChimera.Core.DependencyInjection
 {
@@ -10,7 +11,7 @@ namespace ProjectChimera.Core.DependencyInjection
     /// Coordinates service modules, dependency resolution, and lifecycle management
     /// Integrates with Unity's MonoBehaviour lifecycle for proper game integration
     /// </summary>
-    public class ServiceManager : MonoBehaviour
+    public class ServiceManager : ChimeraManager
     {
         [Header("Service Management Configuration")]
         [SerializeField] private bool _enableAutoInitialization = true;
@@ -488,6 +489,22 @@ namespace ProjectChimera.Core.DependencyInjection
             Debug.LogError($"[ServiceManager] ERROR: {message}");
         }
 
+        #endregion
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Start method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _serviceLocator = null;
+            _modules?.Clear();
+        }
+        
         #endregion
     }
 

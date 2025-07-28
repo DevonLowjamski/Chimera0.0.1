@@ -7,11 +7,11 @@ using ProjectChimera.Data.Events; // For event data types
 // Resolve ambiguous references with explicit namespace aliases
 using AutomationUnlockEventData = ProjectChimera.Core.Events.AutomationUnlockEventData;
 using SkillNodeEventData = ProjectChimera.Data.Cultivation.SkillNodeEventData;
-using PlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using PlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
 using TimeScaleEventData = ProjectChimera.Events.TimeScaleEventData;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Data.Events
 {
     /// <summary>
     /// Cultivation Gaming Events - ScriptableObject-based event channels for cultivation gaming systems

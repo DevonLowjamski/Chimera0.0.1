@@ -5,7 +5,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Construction; // For SkillLevel enum
 using ProjectChimera.Data.Events; // For event data structures
-using ProjectChimera.Core.Events; // For cultivation gaming event data
+using ProjectChimera.Events.Core; // For cultivation gaming event data
 using ProjectChimera.Data.Progression; // For progression data types
 using ProjectChimera.Systems.Progression; // For progression managers
 using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;

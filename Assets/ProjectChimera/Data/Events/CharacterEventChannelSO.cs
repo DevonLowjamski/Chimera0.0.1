@@ -6,10 +6,11 @@ using Collections = System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Narrative;
 using ProjectChimera.Events;
+using ProjectChimera.Events.Core;
 // Explicit namespace alias to resolve ambiguous references
 using CultivationExpertise = ProjectChimera.Events.CultivationExpertise;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Data.Events
 {
     /// <summary>
     /// Type-safe event channel for character interaction events in Project Chimera's narrative system.

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Narrative;
+using ProjectChimera.Events.Core;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Data.Events
 {
     /// <summary>
     /// Type-safe event channel for story progression events in Project Chimera's narrative system.

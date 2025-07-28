@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Events;
 
 // Import key enums from Data.Events namespace
 using Season = ProjectChimera.Data.Events.Season;
-using CoreEventPriority = ProjectChimera.Core.Events.EventPriority;
+using CoreEventPriority = ProjectChimera.Events.Core.EventPriority;
 
 namespace ProjectChimera.Systems.Events
 {

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using ProjectChimera.Core;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Events.Core
 {
     /// <summary>
     /// Generic base class for typed event channels in Project Chimera.

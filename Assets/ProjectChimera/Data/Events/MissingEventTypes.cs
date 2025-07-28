@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data;
 using System.Linq;
 

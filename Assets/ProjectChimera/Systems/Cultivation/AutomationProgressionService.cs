@@ -6,7 +6,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Construction;
 using ProjectChimera.Data.Events;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Systems.Progression;
 using ExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;

@@ -6,14 +6,14 @@ using ProjectChimera.Data.Cultivation;
 // using TimeScaleEventData = ProjectChimera.Events.TimeScaleEventData; // Commented out - namespace doesn't exist
 using ProjectChimera.Data.Construction; // For SkillLevel enum
 using ProjectChimera.Data.Events; // For event data structures including PlayerChoiceEventData
-using ProjectChimera.Core.Events; // For cultivation gaming event data
+using ProjectChimera.Events.Core; // For cultivation gaming event data
 // using ProjectChimera.Events; // Removed - namespace doesn't exist
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Progression; // For ExperienceSource enum
 // Type aliases to resolve ambiguities
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
 using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
-using EventsPlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
 // using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice; // Using local PlayerChoice class instead

@@ -4,7 +4,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Events;
-using EventPlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using EventPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using DataCultivationPathData = ProjectChimera.Data.Cultivation.CultivationPathData;
 
 namespace ProjectChimera.Systems.Cultivation

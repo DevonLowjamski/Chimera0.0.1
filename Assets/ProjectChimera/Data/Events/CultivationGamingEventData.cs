@@ -12,14 +12,14 @@ using CareQuality = ProjectChimera.Data.Cultivation.CareQuality;
 using AutomationSystemType = ProjectChimera.Data.Cultivation.AutomationSystemType;
 using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
 // Use specific namespaces to avoid conflicts
-using PlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using PlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using AutomationUnlockEventData = ProjectChimera.Core.Events.AutomationUnlockEventData;
 using SkillNodeEventData = ProjectChimera.Data.Cultivation.SkillNodeEventData;
-using CreativityLevel = ProjectChimera.Events.CreativityLevel;
-using PendingConsequence = ProjectChimera.Events.PendingConsequence;
-using PlayerAgencyLevel = ProjectChimera.Events.PlayerAgencyLevel;
+using CreativityLevel = ProjectChimera.Data.Events.CreativityLevel;
+using PendingConsequence = ProjectChimera.Data.Events.PendingConsequence;
+using PlayerAgencyLevel = ProjectChimera.Data.Events.PlayerAgencyLevel;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Data.Events
 {
     /// <summary>
     /// Cultivation Gaming Event Data - Event data structures for Enhanced Cultivation Gaming System

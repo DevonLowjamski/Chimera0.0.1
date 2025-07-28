@@ -9,7 +9,7 @@ namespace ProjectChimera.Systems.Cultivation
     /// <summary>
     /// Consequence Manager - Handles consequences of player actions in cultivation systems
     /// </summary>
-    public class ConsequenceManager : MonoBehaviour
+    public class ConsequenceManager : ChimeraManager
     {
         [Header("Consequence Processing")]
         [SerializeField] private bool _enableConsequenceProcessing = true;
@@ -53,6 +53,20 @@ namespace ProjectChimera.Systems.Cultivation
             // Additional consequence processing logic can be added here
             // For now, the main processing is handled via coroutines
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+        }
+        
+        #endregion
     }
     
     [System.Serializable]

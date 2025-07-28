@@ -2,13 +2,14 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Core.Logging;
+using ProjectChimera.Core;
 
 namespace ProjectChimera.Systems.Cultivation
 {
     /// <summary>
     /// Manages automation unlocks based on player progress and burden thresholds
     /// </summary>
-    public class AutomationUnlockManager : MonoBehaviour
+    public class AutomationUnlockManager : ChimeraManager
     {
         [Header("Unlock Configuration")]
         [SerializeField] private AutomationUnlockLibrarySO _unlockLibrary;
@@ -317,6 +318,22 @@ namespace ProjectChimera.Systems.Cultivation
             }
             return count;
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _lastUnlockTimes?.Clear();
+            _unlockedSystems?.Clear();
+        }
+        
+        #endregion
     }
     
     /// <summary>

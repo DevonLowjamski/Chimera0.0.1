@@ -1,11 +1,11 @@
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ProjectChimera.Core.Events
+namespace ProjectChimera.Events.Gaming
 {
     /// <summary>
     /// Event channel for mini-game related events following Project Chimera event architecture.

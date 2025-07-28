@@ -8,8 +8,8 @@ namespace ProjectChimera.Data.Tutorial
     /// Genetics tutorial step definitions for Project Chimera.
     /// Contains detailed tutorial steps for cannabis genetics and breeding education.
     /// </summary>
-    [CreateAssetMenu(fileName = "GeneticsTutorialStepDefinitions", menuName = "Project Chimera/Tutorial/Genetics Tutorial Step Definitions")]
-    public class GeneticsTutorialStepDefinitions : ChimeraDataSO
+    [CreateAssetMenu(fileName = "GeneticsTutorialStepDefinitionsSO", menuName = "Project Chimera/Tutorial/Genetics Tutorial Step Definitions")]
+    public class GeneticsTutorialStepDefinitionsSO : ChimeraDataSO
     {
         [Header("Genetics Fundamentals Module Steps")]
         [SerializeField] private List<TutorialStepData> _geneticsFundamentalsSteps;

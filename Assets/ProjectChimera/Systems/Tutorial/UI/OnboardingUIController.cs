@@ -17,7 +17,7 @@ namespace ProjectChimera.UI.Tutorial
         [SerializeField] private VisualTreeAsset _progressBarTemplate;
         
         [Header("Onboarding Configuration")]
-        [SerializeField] private OnboardingStepDefinitions _stepDefinitions;
+        [SerializeField] private OnboardingStepDefinitionsSO _stepDefinitions;
         [SerializeField] private float _welcomeScreenDuration = 3f;
         [SerializeField] private bool _showProgressDuringWelcome = true;
         

@@ -13,7 +13,7 @@ using SkillNodeEventData = ProjectChimera.Data.Cultivation.SkillNodeEventData;
 using AutomationUnlockEventData = ProjectChimera.Core.Events.AutomationUnlockEventData;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
 
-namespace ProjectChimera.Events
+namespace ProjectChimera.Data.Events
 {
 
 /// <summary>
@@ -622,4 +622,4 @@ public class CareActionData
     public float PlayerSkillLevel;
 }
 
-} // End namespace ProjectChimera.Events 
+} // End namespace ProjectChimera.Data.Events 

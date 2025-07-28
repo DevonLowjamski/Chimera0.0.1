@@ -6,7 +6,7 @@ using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Facilities;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Automation;
-using ProjectChimera.SceneGeneration;
+using ProjectChimera.Scripts.SceneGeneration;
 using ProjectChimera.Scripts.Environment;
 using ProjectChimera.Scripts.Facilities;
 using CultivationSystems = ProjectChimera.Systems.Cultivation;
@@ -17,14 +17,14 @@ using VentilationController = ProjectChimera.Scripts.Environment.VentilationCont
 using IrrigationController = ProjectChimera.Scripts.Environment.IrrigationController;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using InteractivePlantComponent = ProjectChimera.Systems.Cultivation.InteractivePlantComponent;
-using EnvironmentalSensor = ProjectChimera.Environment.EnvironmentalSensor;
-using SensorType = ProjectChimera.Environment.SensorType;
+using EnvironmentalSensor = ProjectChimera.Scripts.Environment.EnvironmentalSensor;
+using SensorType = ProjectChimera.Data.Automation.SensorType;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System;
 
-namespace ProjectChimera.Cultivation
+namespace ProjectChimera.Scripts.Cultivation
 {
     /// <summary>
     /// Advanced grow room controller with comprehensive environmental management,
@@ -406,11 +406,11 @@ namespace ProjectChimera.Cultivation
         {
             if (_sensors.Count == 0) return;
             
-            var tempSensors = _sensors.Where(s => s.SensorType == SensorType.Temperature).ToList();
-            var humiditySensors = _sensors.Where(s => s.SensorType == SensorType.Humidity).ToList();
-            var lightSensors = _sensors.Where(s => s.SensorType == SensorType.LightLevel).ToList();
-            var co2Sensors = _sensors.Where(s => s.SensorType == SensorType.CO2Level).ToList();
-            var airflowSensors = _sensors.Where(s => s.SensorType == SensorType.AirFlow).ToList();
+            var tempSensors = _sensors.Where(s => s.AutomationSensorType == SensorType.Temperature).ToList();
+            var humiditySensors = _sensors.Where(s => s.AutomationSensorType == SensorType.Humidity).ToList();
+            var lightSensors = _sensors.Where(s => s.AutomationSensorType == SensorType.LightLevel).ToList();
+            var co2Sensors = _sensors.Where(s => s.AutomationSensorType == SensorType.CO2Level).ToList();
+            var airflowSensors = _sensors.Where(s => s.AutomationSensorType == SensorType.AirFlow).ToList();
             
             if (tempSensors.Count > 0)
                 _currentConditions.Temperature = tempSensors.Average(s => s.CurrentReading);

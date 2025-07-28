@@ -21,7 +21,7 @@ namespace ProjectChimera.Systems.Tutorial.Testing
         [SerializeField] private bool _includePerformanceTests = true;
         
         [Header("Test Assets")]
-        [SerializeField] private TutorialDataAssetManager _tutorialDataManager;
+        [SerializeField] private TutorialDataAssetManagerSO _tutorialDataManager;
         [SerializeField] private List<TutorialSequenceSO> _testSequences;
         [SerializeField] private List<TutorialStepSO> _testSteps;
         

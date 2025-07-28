@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Data.Narrative;
 using EventType = ProjectChimera.Data.Events.EventType;

@@ -10,7 +10,7 @@ namespace ProjectChimera.Systems.Environment
     /// Optimization Competition Manager for Enhanced Environmental Gaming System v2.0
     /// Manages competitive optimization challenges and tournaments
     /// </summary>
-    public class OptimizationCompetitionManager : MonoBehaviour
+    public class OptimizationCompetitionManager : ChimeraManager
     {
         [Header("Competition Configuration")]
         [SerializeField] private bool _enableCompetitions = true;
@@ -71,6 +71,21 @@ namespace ProjectChimera.Systems.Environment
             IsInitialized = false;
             Debug.Log("Optimization Competition Manager shutdown");
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic (already implemented in Shutdown method)
+            Shutdown();
+        }
+        
+        #endregion
     }
     
     // Supporting classes

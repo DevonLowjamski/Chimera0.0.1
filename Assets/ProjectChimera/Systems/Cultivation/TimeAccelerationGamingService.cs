@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Events;
 
 namespace ProjectChimera.Systems.Cultivation

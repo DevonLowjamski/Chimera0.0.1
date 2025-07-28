@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data;
 // Explicit namespace aliases to resolve ambiguous references
 using CompetitionPhase = ProjectChimera.Data.Events.CompetitionPhase;

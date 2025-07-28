@@ -3,17 +3,17 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
-using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Events; // For event data classes
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Events; // For PlayerChoiceEventData
 // Type aliases to resolve ambiguities - comprehensive set for PlayerAgencyGamingSystem
-using EventsPlayerChoiceEventData = ProjectChimera.Events.PlayerChoiceEventData;
+using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
-using EventsPendingConsequence = ProjectChimera.Events.PendingConsequence;
+using EventsPendingConsequence = ProjectChimera.Data.Events.PendingConsequence;
 using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice;
-using EventsPlayerAgencyLevel = ProjectChimera.Events.PlayerAgencyLevel;
+using EventsPlayerAgencyLevel = ProjectChimera.Data.Events.PlayerAgencyLevel;
 // using EventsConsequenceType = ProjectChimera.Events.ConsequenceType; // Using local ConsequenceType enum instead
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
 using DataFacilityDesignApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach;

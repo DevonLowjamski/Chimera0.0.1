@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Core.Logging;
+using ProjectChimera.Core;
 
 namespace ProjectChimera.Systems.Cultivation
 {
     /// <summary>
     /// Manages the unlocking of skill nodes and their associated mechanics
     /// </summary>
-    public class SkillNodeUnlockManager : MonoBehaviour
+    public class SkillNodeUnlockManager : ChimeraManager
     {
         [Header("Unlock Configuration")]
         [SerializeField] private float _unlockAnimationDuration = 1.0f;
@@ -293,6 +294,22 @@ namespace ProjectChimera.Systems.Cultivation
                 StopAllCoroutines();
             }
         }
+        
+        #region ChimeraManager Implementation
+        
+        protected override void OnManagerInitialize()
+        {
+            // Manager-specific initialization logic (already implemented in Initialize method)
+        }
+        
+        protected override void OnManagerShutdown()
+        {
+            // Manager-specific shutdown logic
+            _lastUnlockTimes?.Clear();
+            _unlockQueue?.Clear();
+        }
+        
+        #endregion
     }
     
     /// <summary>

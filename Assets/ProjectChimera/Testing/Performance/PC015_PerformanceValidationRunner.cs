@@ -16,7 +16,7 @@ namespace ProjectChimera.Testing.Performance
     public class PC015_PerformanceValidationRunner : ChimeraTestBase
     {
         private PerformanceOrchestrator _performanceOrchestrator;
-        private PerformanceOptimizationConfig _testConfig;
+        private PerformanceOptimizationConfigSO _testConfig;
         
         [SetUp]
         public override void SetUp()
@@ -25,7 +25,7 @@ namespace ProjectChimera.Testing.Performance
             SetupTestEnvironment();
             
             // Create test configuration
-            _testConfig = ScriptableObject.CreateInstance<PerformanceOptimizationConfig>();
+            _testConfig = ScriptableObject.CreateInstance<PerformanceOptimizationConfigSO>();
             _testConfig.TargetFrameRate = 60;
             _testConfig.MaxPlantCount = 1000;
             _testConfig.MinAcceptableFPS = 55f;
@@ -66,8 +66,8 @@ namespace ProjectChimera.Testing.Performance
             LogInfo("PC015: Validating default configuration loading");
             
             // Test that default config can be loaded from Resources
-            var defaultConfig = Resources.Load<PerformanceOptimizationConfig>("Config/DefaultPerformanceOptimizationConfig");
-            Assert.IsNotNull(defaultConfig, "Default PerformanceOptimizationConfig not found in Resources");
+            var defaultConfig = Resources.Load<PerformanceOptimizationConfigSO>("Config/DefaultPerformanceOptimizationConfig");
+            Assert.IsNotNull(defaultConfig, "Default PerformanceOptimizationConfigSO not found in Resources");
             
             // Validate configuration values
             Assert.AreEqual(60, defaultConfig.TargetFrameRate, "Default target frame rate incorrect");
@@ -154,7 +154,7 @@ namespace ProjectChimera.Testing.Performance
         {
             LogInfo("PC015: Validating quality scaling functionality");
             
-            var config = ScriptableObject.CreateInstance<PerformanceOptimizationConfig>();
+            var config = ScriptableObject.CreateInstance<PerformanceOptimizationConfigSO>();
             
             // Test quality level selection based on FPS
             var ultraQuality = config.GetQualityLevelForFPS(60f);

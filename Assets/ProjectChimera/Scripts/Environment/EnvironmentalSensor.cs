@@ -3,14 +3,15 @@ using UnityEngine.UI;
 // using TMPro;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
-using ProjectChimera.Cultivation;
+using ProjectChimera.Scripts.Cultivation;
 using ProjectChimera.Data.Automation;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using AutomationSensorType = ProjectChimera.Data.Automation.SensorType;
+using UnityCamera = UnityEngine.Camera;
 
-namespace ProjectChimera.Environment
+namespace ProjectChimera.Scripts.Environment
 {
     /// <summary>
     /// Environmental sensor component that provides accurate readings
@@ -19,7 +20,7 @@ namespace ProjectChimera.Environment
     public class EnvironmentalSensor : MonoBehaviour
     {
         [Header("Sensor Configuration")]
-        [SerializeField] private SensorType _sensorType;
+        [SerializeField] private LocalSensorType _sensorType;
         [SerializeField] private string _sensorId;
         [SerializeField] private float _readingInterval = 1f;
         [SerializeField] private float _accuracy = 0.95f;
@@ -74,7 +75,7 @@ namespace ProjectChimera.Environment
         public System.Action<EnvironmentalSensor, SensorStatus> OnStatusChanged;
         
         // Properties
-        public SensorType SensorType => _sensorType;
+        public LocalSensorType SensorType => _sensorType;
         public string SensorId => _sensorId;
         public float CurrentReading => _currentReading;
         public float RawReading => _rawReading;
@@ -83,6 +84,9 @@ namespace ProjectChimera.Environment
         public bool HasAlert => _currentAlert != null;
         public SensorAlert CurrentAlert => _currentAlert;
         public List<float> ReadingHistory => _readingHistory.ToList();
+        
+        // Compatibility property for automation system comparisons
+        public ProjectChimera.Data.Automation.SensorType AutomationSensorType => GetAutomationSensorType();
         
         private void Awake()
         {
@@ -139,35 +143,35 @@ namespace ProjectChimera.Environment
         {
             switch (_sensorType)
             {
-                case SensorType.Temperature:
+                case LocalSensorType.Temperature:
                     _alertThresholdLow = 18f;
                     _alertThresholdHigh = 28f;
                     _criticalThresholdLow = 15f;
                     _criticalThresholdHigh = 32f;
                     break;
                     
-                case SensorType.Humidity:
+                case LocalSensorType.Humidity:
                     _alertThresholdLow = 40f;
                     _alertThresholdHigh = 80f;
                     _criticalThresholdLow = 30f;
                     _criticalThresholdHigh = 90f;
                     break;
                     
-                case SensorType.LightLevel:
+                case LocalSensorType.LightLevel:
                     _alertThresholdLow = 100f;
                     _alertThresholdHigh = 1000f;
                     _criticalThresholdLow = 50f;
                     _criticalThresholdHigh = 1200f;
                     break;
                     
-                case SensorType.CO2Level:
+                case LocalSensorType.CO2Level:
                     _alertThresholdLow = 300f;
                     _alertThresholdHigh = 1500f;
                     _criticalThresholdLow = 200f;
                     _criticalThresholdHigh = 2000f;
                     break;
                     
-                case SensorType.AirFlow:
+                case LocalSensorType.AirFlow:
                     _alertThresholdLow = 0.2f;
                     _alertThresholdHigh = 2f;
                     _criticalThresholdLow = 0.1f;
@@ -192,7 +196,7 @@ namespace ProjectChimera.Environment
             // Setup reading display
             if (_readingDisplay != null)
             {
-                _readingDisplay.worldCamera = Camera.main;
+                _readingDisplay.worldCamera = UnityCamera.main;
                 _readingDisplay.gameObject.SetActive(false);
             }
             
@@ -207,7 +211,7 @@ namespace ProjectChimera.Environment
         
         #region Sensor Initialization Interface
         
-        public void Initialize(SensorType sensorType, AdvancedGrowRoomController parentRoom)
+        public void Initialize(LocalSensorType sensorType, AdvancedGrowRoomController parentRoom)
         {
             _sensorType = sensorType;
             _parentRoom = parentRoom;
@@ -227,30 +231,50 @@ namespace ProjectChimera.Environment
         public void Initialize(ProjectChimera.Data.Automation.SensorType automationSensorType, AdvancedGrowRoomController parentRoom)
         {
             // Map AutomationDataStructures.SensorType to local SensorType
-            SensorType localSensorType = MapAutomationSensorType(automationSensorType);
+            LocalSensorType localSensorType = MapAutomationSensorType(automationSensorType);
             Initialize(localSensorType, parentRoom);
         }
         
         /// <summary>
         /// Map AutomationDataStructures.SensorType to local SensorType enum
         /// </summary>
-        private SensorType MapAutomationSensorType(ProjectChimera.Data.Automation.SensorType automationSensorType)
+        private LocalSensorType MapAutomationSensorType(ProjectChimera.Data.Automation.SensorType automationSensorType)
         {
             return automationSensorType switch
             {
-                ProjectChimera.Data.Automation.SensorType.Temperature => SensorType.Temperature,
-                ProjectChimera.Data.Automation.SensorType.Humidity => SensorType.Humidity,
-                ProjectChimera.Data.Automation.SensorType.Light_Intensity => SensorType.LightLevel,
-                ProjectChimera.Data.Automation.SensorType.LightLevel => SensorType.LightLevel,
-                ProjectChimera.Data.Automation.SensorType.CO2 => SensorType.CO2Level,
-                ProjectChimera.Data.Automation.SensorType.CO2Level => SensorType.CO2Level,
-                ProjectChimera.Data.Automation.SensorType.AirFlow => SensorType.AirFlow,
-                ProjectChimera.Data.Automation.SensorType.Air_Velocity => SensorType.AirFlow,
-                ProjectChimera.Data.Automation.SensorType.Soil_Moisture => SensorType.SoilMoisture,
-                ProjectChimera.Data.Automation.SensorType.pH => SensorType.pH,
-                ProjectChimera.Data.Automation.SensorType.EC_Conductivity => SensorType.EC,
-                ProjectChimera.Data.Automation.SensorType.Air_Pressure => SensorType.Pressure,
-                _ => SensorType.Temperature // Default fallback
+                ProjectChimera.Data.Automation.SensorType.Temperature => LocalSensorType.Temperature,
+                ProjectChimera.Data.Automation.SensorType.Humidity => LocalSensorType.Humidity,
+                ProjectChimera.Data.Automation.SensorType.Light_Intensity => LocalSensorType.LightLevel,
+                ProjectChimera.Data.Automation.SensorType.LightLevel => LocalSensorType.LightLevel,
+                ProjectChimera.Data.Automation.SensorType.CO2 => LocalSensorType.CO2Level,
+                ProjectChimera.Data.Automation.SensorType.CO2Level => LocalSensorType.CO2Level,
+                ProjectChimera.Data.Automation.SensorType.AirFlow => LocalSensorType.AirFlow,
+                ProjectChimera.Data.Automation.SensorType.Air_Velocity => LocalSensorType.AirFlow,
+                ProjectChimera.Data.Automation.SensorType.Soil_Moisture => LocalSensorType.SoilMoisture,
+                ProjectChimera.Data.Automation.SensorType.pH => LocalSensorType.pH,
+                ProjectChimera.Data.Automation.SensorType.EC_Conductivity => LocalSensorType.EC,
+                ProjectChimera.Data.Automation.SensorType.Air_Pressure => LocalSensorType.Pressure,
+                _ => LocalSensorType.Temperature // Default fallback
+            };
+        }
+        
+        /// <summary>
+        /// Get the corresponding automation SensorType for this sensor
+        /// </summary>
+        private ProjectChimera.Data.Automation.SensorType GetAutomationSensorType()
+        {
+            return _sensorType switch
+            {
+                LocalSensorType.Temperature => ProjectChimera.Data.Automation.SensorType.Temperature,
+                LocalSensorType.Humidity => ProjectChimera.Data.Automation.SensorType.Humidity,
+                LocalSensorType.LightLevel => ProjectChimera.Data.Automation.SensorType.LightLevel,
+                LocalSensorType.CO2Level => ProjectChimera.Data.Automation.SensorType.CO2Level,
+                LocalSensorType.AirFlow => ProjectChimera.Data.Automation.SensorType.AirFlow,
+                LocalSensorType.SoilMoisture => ProjectChimera.Data.Automation.SensorType.Soil_Moisture,
+                LocalSensorType.pH => ProjectChimera.Data.Automation.SensorType.pH,
+                LocalSensorType.EC => ProjectChimera.Data.Automation.SensorType.EC_Conductivity,
+                LocalSensorType.Pressure => ProjectChimera.Data.Automation.SensorType.Air_Pressure,
+                _ => ProjectChimera.Data.Automation.SensorType.Temperature // Default fallback
             };
         }
         
@@ -328,11 +352,11 @@ namespace ProjectChimera.Environment
         {
             return _sensorType switch
             {
-                SensorType.Temperature => conditions.Temperature,
-                SensorType.Humidity => conditions.Humidity,
-                SensorType.LightLevel => conditions.LightIntensity,
-                SensorType.CO2Level => conditions.CO2Level,
-                SensorType.AirFlow => conditions.AirFlow,
+                LocalSensorType.Temperature => conditions.Temperature,
+                LocalSensorType.Humidity => conditions.Humidity,
+                LocalSensorType.LightLevel => conditions.LightIntensity,
+                LocalSensorType.CO2Level => conditions.CO2Level,
+                LocalSensorType.AirFlow => conditions.AirFlow,
                 _ => 0f
             };
         }
@@ -358,11 +382,11 @@ namespace ProjectChimera.Environment
         {
             return _sensorType switch
             {
-                SensorType.Temperature => Mathf.Clamp(value, -10f, 50f),
-                SensorType.Humidity => Mathf.Clamp(value, 0f, 100f),
-                SensorType.LightLevel => Mathf.Clamp(value, 0f, 2000f),
-                SensorType.CO2Level => Mathf.Clamp(value, 0f, 5000f),
-                SensorType.AirFlow => Mathf.Clamp(value, 0f, 5f),
+                LocalSensorType.Temperature => Mathf.Clamp(value, -10f, 50f),
+                LocalSensorType.Humidity => Mathf.Clamp(value, 0f, 100f),
+                LocalSensorType.LightLevel => Mathf.Clamp(value, 0f, 2000f),
+                LocalSensorType.CO2Level => Mathf.Clamp(value, 0f, 5000f),
+                LocalSensorType.AirFlow => Mathf.Clamp(value, 0f, 5f),
                 _ => value
             };
         }
@@ -382,11 +406,11 @@ namespace ProjectChimera.Environment
         {
             return _sensorType switch
             {
-                SensorType.Temperature => 0.1f,
-                SensorType.Humidity => 1f,
-                SensorType.LightLevel => 10f,
-                SensorType.CO2Level => 20f,
-                SensorType.AirFlow => 0.05f,
+                LocalSensorType.Temperature => 0.1f,
+                LocalSensorType.Humidity => 1f,
+                LocalSensorType.LightLevel => 10f,
+                LocalSensorType.CO2Level => 20f,
+                LocalSensorType.AirFlow => 0.05f,
                 _ => 0.01f
             };
         }
@@ -475,11 +499,11 @@ namespace ProjectChimera.Environment
         {
             return _sensorType switch
             {
-                SensorType.Temperature => "°C",
-                SensorType.Humidity => "%",
-                SensorType.LightLevel => "PPFD",
-                SensorType.CO2Level => "ppm",
-                SensorType.AirFlow => "m/s",
+                LocalSensorType.Temperature => "°C",
+                LocalSensorType.Humidity => "%",
+                LocalSensorType.LightLevel => "PPFD",
+                LocalSensorType.CO2Level => "ppm",
+                LocalSensorType.AirFlow => "m/s",
                 _ => ""
             };
         }
@@ -826,7 +850,7 @@ namespace ProjectChimera.Environment
     
     // Supporting data structures
     [System.Serializable]
-    public enum SensorType
+    public enum LocalSensorType
     {
         Temperature,
         Humidity,
@@ -862,7 +886,7 @@ namespace ProjectChimera.Environment
     public class SensorAlert
     {
         public string SensorId;
-        public SensorType SensorType;
+        public LocalSensorType SensorType;
         public AlertLevel AlertLevel;
         public float Reading;
         public string Message;
@@ -875,7 +899,7 @@ namespace ProjectChimera.Environment
     public class SensorDataPacket
     {
         public string SensorId;
-        public SensorType SensorType;
+        public LocalSensorType SensorType;
         public float Reading;
         public SensorStatus Status;
         public DateTime Timestamp;
@@ -887,7 +911,7 @@ namespace ProjectChimera.Environment
     public class SensorAnalytics
     {
         public string SensorId;
-        public SensorType SensorType;
+        public LocalSensorType SensorType;
         public float CurrentReading;
         public float AverageReading;
         public float MinReading;

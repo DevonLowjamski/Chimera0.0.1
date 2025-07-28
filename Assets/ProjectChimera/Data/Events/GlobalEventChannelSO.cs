@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Core.Events;
 
 namespace ProjectChimera.Data.Events

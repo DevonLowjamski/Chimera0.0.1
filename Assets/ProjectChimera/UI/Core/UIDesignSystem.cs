@@ -7,8 +7,8 @@ namespace ProjectChimera.UI.Core
     /// UI Design System for Project Chimera.
     /// Defines consistent visual language, colors, typography, and design tokens.
     /// </summary>
-    [CreateAssetMenu(fileName = "UIDesignSystem", menuName = "Project Chimera/UI/Design System")]
-    public class UIDesignSystem : ChimeraConfigSO
+    [CreateAssetMenu(fileName = "UIDesignSystemSO", menuName = "Project Chimera/UI/Design System")]
+    public class UIDesignSystemSO : ChimeraConfigSO
     {
         [Header("Color Palette")]
         [SerializeField] private UIColorPalette _colorPalette;
