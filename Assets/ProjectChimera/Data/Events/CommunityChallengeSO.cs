@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
 using ProjectChimera.Core.Events;
+using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Narrative;
 
 namespace ProjectChimera.Data.Events

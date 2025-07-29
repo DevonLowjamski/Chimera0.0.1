@@ -10,6 +10,8 @@ using ProjectChimera.Data.Progression; // For ExperienceSource enum
 using ProjectChimera.Data.Construction; // For SkillLevel enum
 // Type alias to resolve ExperienceSource ambiguity
 using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
+using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
+using SkillBranch = ProjectChimera.Data.Cultivation.SkillBranch;
 
 namespace ProjectChimera.Systems.Cultivation
 {

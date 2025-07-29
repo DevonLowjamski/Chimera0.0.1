@@ -9,10 +9,10 @@ namespace ProjectChimera.Editor.Tutorial
     /// Custom inspector for tutorial data asset manager.
     /// Provides tools for managing and validating tutorial assets.
     /// </summary>
-    [CustomEditor(typeof(TutorialDataAssetManager))]
+    [CustomEditor(typeof(TutorialDataAssetManagerSO))]
     public class TutorialDataInspector : UnityEditor.Editor
     {
-        private TutorialDataAssetManager _target;
+        private TutorialDataAssetManagerSO _target;
         private bool _showStatistics = true;
         private bool _showSequences = true;
         private bool _showValidation = false;
@@ -20,7 +20,7 @@ namespace ProjectChimera.Editor.Tutorial
         
         private void OnEnable()
         {
-            _target = target as TutorialDataAssetManager;
+            _target = target as TutorialDataAssetManagerSO;
         }
         
         public override void OnInspectorGUI()

@@ -5,10 +5,7 @@ using UnityEngine;
 using Collections = System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Narrative;
-using ProjectChimera.Events;
 using ProjectChimera.Events.Core;
-// Explicit namespace alias to resolve ambiguous references
-using CultivationExpertise = ProjectChimera.Events.CultivationExpertise;
 
 namespace ProjectChimera.Data.Events
 {
@@ -498,27 +495,6 @@ namespace ProjectChimera.Data.Events
     
     // Note: Supporting data structures are defined in ProjectChimera.Events.EventDataStructures
     
-    // Local definition of TimeScaleEventData to resolve assembly reference issues
-    [System.Serializable]
-    public class TimeScaleEventData
-    {
-        public GameTimeScale NewTimeScale;
-        public GameTimeScale PreviousTimeScale;
-        public float ScaleMultiplier;
-        public float TransitionDuration;
-        public string ScaleChangeReason;
-        public float Timestamp;
-        
-        // Additional properties referenced in gaming systems
-        public float RealTimeDayDuration;
-        public float GameDaysPerRealHour;
-        public string Description;
-        public float PlayerEngagementOptimal;
-        public float RealTimeDayDuration2;
-        public float GameDayPerRealHour;
-        public float LockInPeriod;
-        public bool IsPlayerInitiated;
-        public float ChangeTimestamp;
-        public Collections.Dictionary<string, object> ScaleParameters = new Collections.Dictionary<string, object>();
-    }
+    // Note: TimeScaleEventData is defined in EventDataStructures.cs
+    // Removed duplicate definition to resolve CS0101 compilation error
 }

@@ -15,7 +15,7 @@ namespace ProjectChimera.UI.Core
     public class UIManager : ChimeraManager
     {
         [Header("UI Configuration")]
-        [SerializeField] private UIDesignSystem _designSystem;
+        [SerializeField] private UIDesignSystemSO _designSystem;
         [SerializeField] private UIDocument _mainUIDocument;
         [SerializeField] private bool _enableUITransitions = true;
         [SerializeField] private float _defaultTransitionDuration = 0.25f;
@@ -42,7 +42,7 @@ namespace ProjectChimera.UI.Core
         private VisualElement _modalContainer;
         
         // Properties
-        public UIDesignSystem DesignSystem => _designSystem;
+        public UIDesignSystemSO DesignSystem => _designSystem;
         public bool IsTransitioning => _isTransitioning;
         public UIState CurrentUIState => _currentUIState;
         public string CurrentPanelId => _currentPanelId;

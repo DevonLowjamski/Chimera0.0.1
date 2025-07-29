@@ -5,8 +5,10 @@ using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Events.Core;
 using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
-using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
+using EventsChoiceConsequences = ProjectChimera.Data.Events.ChoiceConsequences;
+using EventsPlayerChoice = ProjectChimera.Data.Events.PlayerChoice;
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
+using FacilityDesignApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach;
 
 namespace ProjectChimera.Systems.Cultivation
 {

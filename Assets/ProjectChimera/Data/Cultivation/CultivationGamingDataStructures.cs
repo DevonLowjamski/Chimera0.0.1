@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+
 namespace ProjectChimera.Data.Cultivation
 {
     /// <summary>

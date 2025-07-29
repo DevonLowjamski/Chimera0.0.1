@@ -192,22 +192,36 @@ public enum CultivationTaskType
     Maintenance,
     Research,
     EnvironmentalControl,
-    DataCollection
+    EnvironmentalAdjustment,
+    DataCollection,
+    Breeding,
+    Processing,
+    Construction,
+    Automation
 }
 
 public enum AutomationSystemType
 {
+    BasicWatering,
+    AdvancedWatering,
     IrrigationSystem,
     NutrientDelivery,
+    EnvironmentalControl,
     ClimateControl,
+    LightingAutomation,
     LightingControl,
     LightingSchedule,
+    MonitoringSystem,
     MonitoringSensors,
-    HarvestAssist,
     SensorNetwork,
+    AlertSystem,
+    DataLogging,
     DataCollection,
+    PredictiveAnalytics,
+    HarvestAssist,
     VentilationControl,
-    IPM
+    IPM,
+    FullAutomation
 }
 
 public enum AutomationLevel
@@ -381,7 +395,23 @@ public enum ConsequenceType
     Environmental,
     Economic,
     Social,
-    Narrative
+    Narrative,
+    PlantHealth,
+    Currency,
+    Reputation,
+    PlantLoss,
+    Experience,
+    UnlockStrain,
+    SkillPoints,
+    GradualRelationshipChange,
+    TrustChange,
+    RespectChange,
+    InfluenceChange,
+    RelationshipStatus,
+    EconomicImpact,
+    EnvironmentalChange,
+    CultivationEffect,
+    ProgressionUnlock
 }
 
 public enum ConsequenceSeverity

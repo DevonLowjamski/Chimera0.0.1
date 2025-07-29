@@ -10,11 +10,14 @@ using ProjectChimera.Data.Events;
 // Type aliases to resolve ambiguities
 using DataAutomationDesireLevel = ProjectChimera.Data.Cultivation.AutomationDesireLevel;
 using NarrativeTaskType = ProjectChimera.Data.Narrative.TaskType;
-using DataCultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+// Removed alias - using full namespace qualification to avoid CS0029 errors
 using DataTaskType = ProjectChimera.Data.Cultivation.TaskType;
 using FacilityScaleClass = ProjectChimera.Systems.Cultivation.FacilityScale;
 using UnlockedSystems = ProjectChimera.Data.Cultivation.UnlockedSystems;
 using CareQuality = ProjectChimera.Systems.Cultivation.CareQuality;
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+using CultivationTaskType = ProjectChimera.Data.Events.CultivationTaskType;
+using AutomationUnlockEventData = ProjectChimera.Core.Events.AutomationUnlockEventData;
 
 namespace ProjectChimera.Systems.Cultivation
 {
@@ -43,8 +46,8 @@ namespace ProjectChimera.Systems.Cultivation
         
         // System State
         private bool _isInitialized = false;
-        private Dictionary<DataCultivationTaskType, AutomationProgress> _automationProgress = new Dictionary<DataCultivationTaskType, AutomationProgress>();
-        private Dictionary<DataCultivationTaskType, TaskBurdenState> _taskBurdenStates = new Dictionary<DataCultivationTaskType, TaskBurdenState>();
+        private Dictionary<CultivationTaskType, AutomationProgress> _automationProgress = new Dictionary<CultivationTaskType, AutomationProgress>();
+        private Dictionary<CultivationTaskType, TaskBurdenState> _taskBurdenStates = new Dictionary<CultivationTaskType, TaskBurdenState>();
         private Dictionary<AutomationSystemType, AutomationSystemState> _automationSystems = new Dictionary<AutomationSystemType, AutomationSystemState>();
         
         // Dependencies
@@ -94,13 +97,13 @@ namespace ProjectChimera.Systems.Cultivation
         private void InitializeAutomationProgress()
         {
             // Initialize automation progress for all task types
-            foreach (DataCultivationTaskType taskType in System.Enum.GetValues(typeof(DataCultivationTaskType)))
+            foreach (CultivationTaskType taskType in System.Enum.GetValues(typeof(CultivationTaskType)))
             {
                 _automationProgress[taskType] = new AutomationProgress
                 {
                     TaskType = taskType,
                     CurrentBurden = 0f,
-                    BurdenThreshold = _automationConfig.GetBurdenThreshold(taskType),
+                    BurdenThreshold = _automationConfig.GetBurdenThreshold(ConvertToCultivationDataTaskType(taskType)),
                     AutomationDesireLevel = DataAutomationDesireLevel.None,
                     IsAutomationAvailable = false,
                     IsAutomationUnlocked = false,
@@ -112,7 +115,7 @@ namespace ProjectChimera.Systems.Cultivation
         private void InitializeBurdenStates()
         {
             // Initialize burden tracking for all task types
-            foreach (DataCultivationTaskType taskType in System.Enum.GetValues(typeof(DataCultivationTaskType)))
+            foreach (CultivationTaskType taskType in System.Enum.GetValues(typeof(CultivationTaskType)))
             {
                 _taskBurdenStates[taskType] = new TaskBurdenState
                 {
@@ -213,7 +216,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private float CalculateCognitiveLoad(ManualCareTask task, PlayerProficiency proficiency)
         {
-            var baseComplexity = _automationConfig.GetTaskComplexity(task.TaskType);
+            var baseComplexity = _automationConfig.GetTaskComplexity(ConvertToCultivationDataTaskType(task.TaskType));
             var skillModifier = 1.0f - (proficiency.SkillLevel / _automationConfig.MaxSkillLevel);
             var frequencyModifier = Mathf.Log(1 + task.Frequency) / Mathf.Log(2); // Logarithmic scaling
             
@@ -231,7 +234,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private float CalculateConsistencyChallenge(ManualCareTask task, PlayerProficiency proficiency)
         {
-            var precisionRequired = _automationConfig.GetPrecisionRequirement(task.TaskType);
+            var precisionRequired = _automationConfig.GetPrecisionRequirement(ConvertToCultivationDataTaskType(task.TaskType));
             var skillGap = Mathf.Max(0, precisionRequired - proficiency.SkillLevel);
             var consistencyHistory = proficiency.ConsistencyRating;
             
@@ -249,7 +252,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private float CalculateQualityRisk(ManualCareTask task, PlayerProficiency proficiency)
         {
-            var errorTolerance = _automationConfig.GetErrorTolerance(task.TaskType);
+            var errorTolerance = _automationConfig.GetErrorTolerance(ConvertToCultivationDataTaskType(task.TaskType));
             var skillReliability = proficiency.ConsistencyRating;
             var qualityStandard = task.RequiredQualityLevel;
             
@@ -284,7 +287,7 @@ namespace ProjectChimera.Systems.Cultivation
                 return DataAutomationDesireLevel.None;
         }
         
-        private void UpdateBurdenState(DataCultivationTaskType taskType, AutomationDesire desire)
+        private void UpdateBurdenState(CultivationTaskType taskType, AutomationDesire desire)
         {
             var burdenState = _taskBurdenStates[taskType];
             var progress = _automationProgress[taskType];
@@ -319,7 +322,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Unlock automation system for specified task type
         /// </summary>
-        public AutomationUnlock UnlockAutomationSystem(DataCultivationTaskType taskType, PlayerProgress progress)
+        public AutomationUnlock UnlockAutomationSystem(CultivationTaskType taskType, PlayerProgress progress)
         {
             if (!_isInitialized)
                 return new AutomationUnlock { Success = false, Reason = "System not initialized" };
@@ -366,7 +369,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private AutomationSystemUnlock UnlockWateringSystem(AutomationProgress progress, PlayerProgress playerProgress)
         {
-            if (progress.TaskType != DataCultivationTaskType.Watering) 
+            if (progress.TaskType != CultivationTaskType.Watering) 
                 return new AutomationSystemUnlock { IsUnlocked = false };
             
             var irrigationMastery = playerProgress.IrrigationMastery;
@@ -383,7 +386,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private AutomationSystemUnlock UnlockClimateControl(AutomationProgress progress, PlayerProgress playerProgress)
         {
-            if (progress.TaskType != DataCultivationTaskType.EnvironmentalControl) 
+            if (progress.TaskType != CultivationTaskType.EnvironmentalControl) 
                 return new AutomationSystemUnlock { IsUnlocked = false };
             
             var environmentalSkill = playerProgress.EnvironmentalSkill;
@@ -400,7 +403,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private AutomationSystemUnlock UnlockFertigation(AutomationProgress progress, PlayerProgress playerProgress)
         {
-            if (progress.TaskType != DataCultivationTaskType.Fertilizing) 
+            if (progress.TaskType != CultivationTaskType.Fertilizing) 
                 return new AutomationSystemUnlock { IsUnlocked = false };
             
             var nutritionExpertise = playerProgress.NutritionExpertise;
@@ -417,7 +420,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private AutomationSystemUnlock UnlockSensorSystems(AutomationProgress progress, PlayerProgress playerProgress)
         {
-            if (progress.TaskType != DataCultivationTaskType.DataCollection) 
+            if (progress.TaskType != CultivationTaskType.DataCollection) 
                 return new AutomationSystemUnlock { IsUnlocked = false };
             
             var observationSkill = playerProgress.ObservationSkill;
@@ -434,7 +437,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         private AutomationSystemUnlock UnlockLightScheduling(AutomationProgress progress, PlayerProgress playerProgress)
         {
-            if (progress.TaskType != DataCultivationTaskType.EnvironmentalControl) 
+            if (progress.TaskType != CultivationTaskType.EnvironmentalControl) 
                 return new AutomationSystemUnlock { IsUnlocked = false };
             
             var photoperiodKnowledge = playerProgress.PhotoperiodKnowledge;
@@ -449,7 +452,7 @@ namespace ProjectChimera.Systems.Cultivation
             };
         }
         
-        private void ApplyAutomationUnlock(DataCultivationTaskType taskType, AutomationUnlock unlock)
+        private void ApplyAutomationUnlock(CultivationTaskType taskType, AutomationUnlock unlock)
         {
             var progress = _automationProgress[taskType];
             progress.IsAutomationUnlocked = true;
@@ -685,12 +688,12 @@ namespace ProjectChimera.Systems.Cultivation
         
         #region System State Management
         
-        private void CheckAutomationAvailability(DataCultivationTaskType taskType, AutomationProgress progress)
+        private void CheckAutomationAvailability(CultivationTaskType taskType, AutomationProgress progress)
         {
             if (progress.IsAutomationAvailable) return;
             
-            var burdenThreshold = _automationConfig.GetBurdenThreshold(taskType);
-            var experienceThreshold = _automationConfig.GetExperienceThreshold(taskType);
+            var burdenThreshold = _automationConfig.GetBurdenThreshold(ConvertToCultivationDataTaskType(taskType));
+            var experienceThreshold = _automationConfig.GetExperienceThreshold(ConvertToCultivationDataTaskType(taskType));
             
             var burdenMet = (int)progress.CurrentBurden >= (int)burdenThreshold;
             var experienceMet = GetTaskExperience(taskType) >= experienceThreshold;
@@ -706,7 +709,7 @@ namespace ProjectChimera.Systems.Cultivation
             }
         }
         
-        private int GetTaskExperience(DataCultivationTaskType taskType)
+        private int GetTaskExperience(CultivationTaskType taskType)
         {
             return _taskBurdenStates[taskType].TotalTasksPerformed;
         }
@@ -715,7 +718,7 @@ namespace ProjectChimera.Systems.Cultivation
         
         #region Event Management
         
-        private void RaiseBurdenThresholdReached(DataCultivationTaskType taskType, DataAutomationDesireLevel desireLevel)
+        private void RaiseBurdenThresholdReached(CultivationTaskType taskType, DataAutomationDesireLevel desireLevel)
         {
             var eventData = new BurdenThresholdEventData
             {
@@ -728,7 +731,7 @@ namespace ProjectChimera.Systems.Cultivation
             _onBurdenThresholdReached?.RaiseEvent(eventData);
         }
         
-        private void RaiseAutomationAvailableEvent(DataCultivationTaskType taskType)
+        private void RaiseAutomationAvailableEvent(CultivationTaskType taskType)
         {
             var eventData = new AutomationAvailableEventData
             {
@@ -741,12 +744,15 @@ namespace ProjectChimera.Systems.Cultivation
         
         private void RaiseAutomationUnlockedEvent(AutomationUnlock unlock)
         {
-            var eventData = new AutomationUnlockEventData
+            // Convert enum to string explicitly
+            string taskTypeString = ConvertTaskTypeToString(unlock.TaskType);
+            string systemTypeString = GetPrimaryAutomationSystemType(unlock);
+            
+            var eventData = new ProjectChimera.Core.Events.AutomationUnlockEventData
             {
-                TaskType = ConvertToCultivationTaskType(unlock.TaskType),
-                SystemType = ConvertToAutomationSystemType(unlock),
+                TaskType = taskTypeString,
+                SystemType = systemTypeString,
                 UnlockTimestamp = Time.time,
-                BurdenLevel = AutomationDesireLevel.High,
                 Timestamp = Time.time
             };
             
@@ -771,7 +777,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Get current automation desire level for specific task type
         /// </summary>
-        public AutomationDesire GetAutomationDesire(DataCultivationTaskType taskType)
+        public AutomationDesire GetAutomationDesire(CultivationTaskType taskType)
         {
             if (!_isInitialized || !_automationProgress.ContainsKey(taskType))
                 return new AutomationDesire { DesireLevel = DataAutomationDesireLevel.None };
@@ -795,7 +801,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Check if automation is available for unlock for specific task type
         /// </summary>
-        public bool IsAutomationAvailable(DataCultivationTaskType taskType)
+        public bool IsAutomationAvailable(CultivationTaskType taskType)
         {
             return _isInitialized && 
                    _automationProgress.ContainsKey(taskType) && 
@@ -805,7 +811,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Check if automation is already unlocked for specific task type
         /// </summary>
-        public bool IsAutomationUnlocked(DataCultivationTaskType taskType)
+        public bool IsAutomationUnlocked(CultivationTaskType taskType)
         {
             return _isInitialized && 
                    _automationProgress.ContainsKey(taskType) && 
@@ -848,7 +854,7 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Record manual task performance for burden calculation
         /// </summary>
-        public void RecordManualTaskPerformance(DataCultivationTaskType taskType, float duration, string quality)
+        public void RecordManualTaskPerformance(CultivationTaskType taskType, float duration, string quality)
         {
             if (!_isInitialized || !_taskBurdenStates.ContainsKey(taskType))
                 return;
@@ -926,25 +932,27 @@ namespace ProjectChimera.Systems.Cultivation
         
         #region Automation Benefits
         
-        public void ApplyAutomationBenefits(AutomationUnlockEventData unlockData)
+        public void ApplyAutomationBenefits(ProjectChimera.Core.Events.AutomationUnlockEventData unlockData)
         {
-            // Apply benefits of automation unlock
-            // Convert enum types to match Dictionary key types
-            var systemType = unlockData.SystemType;
-            var taskType = ConvertToDataCultivationTaskType(unlockData.TaskType);
+            // Apply benefits of automation unlock using string-based lookup
+            var systemType = GetAutomationSystemTypeFromString(unlockData.SystemType);
+            var taskType = GetDataCultivationTaskTypeFromString(unlockData.TaskType);
             
-            if (_automationSystems.ContainsKey(systemType))
+            if (systemType.HasValue && taskType.HasValue)
             {
-                var systemState = _automationSystems[systemType];
-                systemState.IsActive = true;
-                systemState.EfficiencyLevel = CalculateInitialEfficiency(systemType);
-                
-                // Reduce burden for the associated task
-                if (_automationProgress.ContainsKey(taskType))
+                if (_automationSystems.ContainsKey(systemType.Value))
                 {
-                    var progress = _automationProgress[taskType];
-                    progress.CurrentBurden *= 0.3f; // Reduce burden by 70%
-                    progress.IsAutomationUnlocked = true;
+                    var systemState = _automationSystems[systemType.Value];
+                    systemState.IsActive = true;
+                    systemState.EfficiencyLevel = CalculateInitialEfficiency(systemType.Value);
+                    
+                    // Reduce burden for the associated task
+                    if (_automationProgress.ContainsKey(taskType.Value))
+                    {
+                        var progress = _automationProgress[taskType.Value];
+                        progress.CurrentBurden *= 0.3f; // Reduce burden by 70%
+                        progress.IsAutomationUnlocked = true;
+                    }
                 }
             }
         }
@@ -998,27 +1006,10 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Convert DataCultivationTaskType to CultivationTaskType for event data
         /// </summary>
-        private CultivationTaskType ConvertToCultivationTaskType(DataCultivationTaskType dataTaskType)
+        private CultivationTaskType ConvertToCultivationTaskType(CultivationTaskType dataTaskType)
         {
-            return dataTaskType switch
-            {
-                DataCultivationTaskType.Watering => CultivationTaskType.Watering,
-                DataCultivationTaskType.Fertilizing => CultivationTaskType.Fertilizing,
-                DataCultivationTaskType.Pruning => CultivationTaskType.Pruning,
-                DataCultivationTaskType.Training => CultivationTaskType.Training,
-                DataCultivationTaskType.Harvesting => CultivationTaskType.Harvesting,
-                DataCultivationTaskType.Transplanting => CultivationTaskType.Transplanting,
-                DataCultivationTaskType.PestControl => CultivationTaskType.PestControl,
-                DataCultivationTaskType.EnvironmentalControl => CultivationTaskType.EnvironmentalControl,
-                DataCultivationTaskType.Monitoring => CultivationTaskType.Monitoring,
-                DataCultivationTaskType.Maintenance => CultivationTaskType.Maintenance,
-                DataCultivationTaskType.Breeding => CultivationTaskType.Breeding,
-                DataCultivationTaskType.Processing => CultivationTaskType.Processing,
-                DataCultivationTaskType.Research => CultivationTaskType.Research,
-                DataCultivationTaskType.Construction => CultivationTaskType.Construction,
-                DataCultivationTaskType.Automation => CultivationTaskType.Automation,
-                _ => CultivationTaskType.Watering // Default fallback
-            };
+            // Since both types are now the same (Events.CultivationTaskType), just return the input
+            return dataTaskType;
         }
         
         /// <summary>
@@ -1038,41 +1029,172 @@ namespace ProjectChimera.Systems.Cultivation
         }
 
         /// <summary>
-        /// Convert CultivationTaskType to DataCultivationTaskType for dictionary operations
+        /// Get primary automation system type from unlock data
         /// </summary>
-        private DataCultivationTaskType ConvertToDataCultivationTaskType(CultivationTaskType taskType)
+        private string GetPrimaryAutomationSystemType(AutomationUnlock unlock)
+        {
+            // Return the string representation of the primary system type
+            if (unlock.IrrigationAutomation.IsUnlocked) return "IrrigationSystem";
+            if (unlock.EnvironmentalAutomation.IsUnlocked) return "ClimateControl";
+            if (unlock.NutrientAutomation.IsUnlocked) return "NutrientDelivery";
+            if (unlock.MonitoringAutomation.IsUnlocked) return "SensorNetwork";
+            if (unlock.LightingAutomation.IsUnlocked) return "LightingSchedule";
+            
+            // Default fallback
+            return "IrrigationSystem";
+        }
+
+        /// <summary>
+        /// Convert Events.CultivationTaskType to Data.Cultivation.CultivationTaskType for config compatibility
+        /// </summary>
+        private ProjectChimera.Data.Cultivation.CultivationTaskType ConvertToCultivationDataTaskType(CultivationTaskType eventsTaskType)
+        {
+            return eventsTaskType switch
+            {
+                CultivationTaskType.None => ProjectChimera.Data.Cultivation.CultivationTaskType.None,
+                CultivationTaskType.Watering => ProjectChimera.Data.Cultivation.CultivationTaskType.Watering,
+                CultivationTaskType.Feeding => ProjectChimera.Data.Cultivation.CultivationTaskType.Feeding,
+                CultivationTaskType.Fertilizing => ProjectChimera.Data.Cultivation.CultivationTaskType.Fertilizing,
+                CultivationTaskType.Pruning => ProjectChimera.Data.Cultivation.CultivationTaskType.Pruning,
+                CultivationTaskType.Training => ProjectChimera.Data.Cultivation.CultivationTaskType.Training,
+                CultivationTaskType.Monitoring => ProjectChimera.Data.Cultivation.CultivationTaskType.Monitoring,
+                CultivationTaskType.Harvesting => ProjectChimera.Data.Cultivation.CultivationTaskType.Harvesting,
+                CultivationTaskType.Transplanting => ProjectChimera.Data.Cultivation.CultivationTaskType.Transplanting,
+                CultivationTaskType.Cloning => ProjectChimera.Data.Cultivation.CultivationTaskType.Transplanting, // Map to closest equivalent
+                CultivationTaskType.PestControl => ProjectChimera.Data.Cultivation.CultivationTaskType.PestControl,
+                CultivationTaskType.Defoliation => ProjectChimera.Data.Cultivation.CultivationTaskType.Defoliation,
+                CultivationTaskType.Cleaning => ProjectChimera.Data.Cultivation.CultivationTaskType.Cleaning,
+                CultivationTaskType.Maintenance => ProjectChimera.Data.Cultivation.CultivationTaskType.Maintenance,
+                CultivationTaskType.Research => ProjectChimera.Data.Cultivation.CultivationTaskType.Research,
+                CultivationTaskType.EnvironmentalControl => ProjectChimera.Data.Cultivation.CultivationTaskType.EnvironmentalControl,
+                CultivationTaskType.EnvironmentalAdjustment => ProjectChimera.Data.Cultivation.CultivationTaskType.EnvironmentalAdjustment,
+                CultivationTaskType.DataCollection => ProjectChimera.Data.Cultivation.CultivationTaskType.DataCollection,
+                CultivationTaskType.Breeding => ProjectChimera.Data.Cultivation.CultivationTaskType.Breeding,
+                CultivationTaskType.Processing => ProjectChimera.Data.Cultivation.CultivationTaskType.Processing,
+                CultivationTaskType.Construction => ProjectChimera.Data.Cultivation.CultivationTaskType.Construction,
+                CultivationTaskType.Automation => ProjectChimera.Data.Cultivation.CultivationTaskType.Automation,
+                _ => ProjectChimera.Data.Cultivation.CultivationTaskType.Watering // Default fallback
+            };
+        }
+
+        /// <summary>
+        /// Convert DataCultivationTaskType to string safely
+        /// </summary>
+        private string ConvertTaskTypeToString(CultivationTaskType taskType)
         {
             return taskType switch
             {
-                CultivationTaskType.Watering => DataCultivationTaskType.Watering,
-                CultivationTaskType.Fertilizing => DataCultivationTaskType.Fertilizing,
-                CultivationTaskType.Pruning => DataCultivationTaskType.Pruning,
-                CultivationTaskType.Training => DataCultivationTaskType.Training,
-                CultivationTaskType.Harvesting => DataCultivationTaskType.Harvesting,
-                CultivationTaskType.Transplanting => DataCultivationTaskType.Transplanting,
-                CultivationTaskType.PestControl => DataCultivationTaskType.PestControl,
-                CultivationTaskType.EnvironmentalControl => DataCultivationTaskType.EnvironmentalControl,
-                CultivationTaskType.Monitoring => DataCultivationTaskType.Monitoring,
-                CultivationTaskType.Maintenance => DataCultivationTaskType.Maintenance,
-                CultivationTaskType.Breeding => DataCultivationTaskType.Breeding,
-                CultivationTaskType.Processing => DataCultivationTaskType.Processing,
-                CultivationTaskType.Research => DataCultivationTaskType.Research,
-                CultivationTaskType.Construction => DataCultivationTaskType.Construction,
-                CultivationTaskType.Automation => DataCultivationTaskType.Automation,
-                _ => DataCultivationTaskType.Watering // Default fallback
+                CultivationTaskType.None => "None",
+                CultivationTaskType.Watering => "Watering",
+                CultivationTaskType.Feeding => "Feeding",
+                CultivationTaskType.Fertilizing => "Fertilizing",
+                CultivationTaskType.Pruning => "Pruning",
+                CultivationTaskType.Training => "Training",
+                CultivationTaskType.Monitoring => "Monitoring",
+                CultivationTaskType.Harvesting => "Harvesting",
+                CultivationTaskType.Transplanting => "Transplanting",
+                CultivationTaskType.Cleaning => "Cleaning",
+                CultivationTaskType.Maintenance => "Maintenance",
+                CultivationTaskType.Research => "Research",
+                CultivationTaskType.PestControl => "PestControl",
+                CultivationTaskType.Defoliation => "Defoliation",
+                CultivationTaskType.EnvironmentalControl => "EnvironmentalControl",
+                CultivationTaskType.EnvironmentalAdjustment => "EnvironmentalAdjustment",
+                CultivationTaskType.DataCollection => "DataCollection",
+                CultivationTaskType.Breeding => "Breeding",
+                CultivationTaskType.Processing => "Processing",
+                CultivationTaskType.Construction => "Construction",
+                CultivationTaskType.Automation => "Automation",
+                _ => "Watering" // Default fallback
             };
+        }
+
+        /// <summary>
+        /// Safely convert string to AutomationSystemType using manual mapping
+        /// </summary>
+        private AutomationSystemType? GetAutomationSystemTypeFromString(string systemTypeString)
+        {
+            if (string.IsNullOrEmpty(systemTypeString)) return null;
+            
+            return systemTypeString.ToLowerInvariant() switch
+            {
+                "basicwatering" => AutomationSystemType.BasicWatering,
+                "advancedwatering" => AutomationSystemType.AdvancedWatering,
+                "irrigationsystem" => AutomationSystemType.IrrigationSystem,
+                "nutrientdelivery" => AutomationSystemType.NutrientDelivery,
+                "environmentalcontrol" => AutomationSystemType.EnvironmentalControl,
+                "climatecontrol" => AutomationSystemType.ClimateControl,
+                "lightingautomation" => AutomationSystemType.LightingAutomation,
+                "lightingcontrol" => AutomationSystemType.LightingControl,
+                "lightingschedule" => AutomationSystemType.LightingSchedule,
+                "monitoringsystem" => AutomationSystemType.MonitoringSystem,
+                "monitoringsensors" => AutomationSystemType.MonitoringSensors,
+                "sensornetwork" => AutomationSystemType.SensorNetwork,
+                "alertsystem" => AutomationSystemType.AlertSystem,
+                "datalogging" => AutomationSystemType.DataLogging,
+                "datacollection" => AutomationSystemType.DataCollection,
+                "predictiveanalytics" => AutomationSystemType.PredictiveAnalytics,
+                "harvestassist" => AutomationSystemType.HarvestAssist,
+                "ventilationcontrol" => AutomationSystemType.VentilationControl,
+                "ipm" => AutomationSystemType.IPM,
+                "fullautomation" => AutomationSystemType.FullAutomation,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Safely convert string to DataCultivationTaskType using manual mapping
+        /// </summary>
+        private CultivationTaskType? GetDataCultivationTaskTypeFromString(string taskTypeString)
+        {
+            if (string.IsNullOrEmpty(taskTypeString)) return null;
+            
+            return taskTypeString.ToLowerInvariant() switch
+            {
+                "none" => CultivationTaskType.None,
+                "watering" => CultivationTaskType.Watering,
+                "feeding" => CultivationTaskType.Feeding,
+                "fertilizing" => CultivationTaskType.Fertilizing,
+                "pruning" => CultivationTaskType.Pruning,
+                "training" => CultivationTaskType.Training,
+                "monitoring" => CultivationTaskType.Monitoring,
+                "harvesting" => CultivationTaskType.Harvesting,
+                "transplanting" => CultivationTaskType.Transplanting,
+                "cleaning" => CultivationTaskType.Cleaning,
+                "maintenance" => CultivationTaskType.Maintenance,
+                "research" => CultivationTaskType.Research,
+                "pestcontrol" => CultivationTaskType.PestControl,
+                "defoliation" => CultivationTaskType.Defoliation,
+                "environmentalcontrol" => CultivationTaskType.EnvironmentalControl,
+                "environmentaladjustment" => CultivationTaskType.EnvironmentalAdjustment,
+                "datacollection" => CultivationTaskType.DataCollection,
+                "breeding" => CultivationTaskType.Breeding,
+                "processing" => CultivationTaskType.Processing,
+                "construction" => CultivationTaskType.Construction,
+                "automation" => CultivationTaskType.Automation,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Convert CultivationTaskType to DataCultivationTaskType for dictionary operations
+        /// </summary>
+        private CultivationTaskType ConvertToDataCultivationTaskType(CultivationTaskType taskType)
+        {
+            // Since both types are now the same (Events.CultivationTaskType), just return the input
+            return taskType;
         }
 
         /// <summary>
         /// Helper method to convert string to DataCultivationTaskType enum
         /// </summary>
-        private DataCultivationTaskType ParseDataCultivationTaskType(string taskTypeString)
+        private CultivationTaskType ParseDataCultivationTaskType(string taskTypeString)
         {
-            if (System.Enum.TryParse<DataCultivationTaskType>(taskTypeString, true, out var result))
+            if (System.Enum.TryParse<CultivationTaskType>(taskTypeString, true, out var result))
             {
                 return result;
             }
-            return DataCultivationTaskType.Watering; // Default fallback
+            return CultivationTaskType.Watering; // Default fallback
         }
         
         /// <summary>
@@ -1113,25 +1235,25 @@ namespace ProjectChimera.Systems.Cultivation
             return "MonitoringSystem";
         }
         
-        private NarrativeTaskType ConvertToNarrativeTaskType(DataCultivationTaskType cultivationTaskType)
+        private NarrativeTaskType ConvertToNarrativeTaskType(CultivationTaskType cultivationTaskType)
         {
             return cultivationTaskType switch
             {
-                DataCultivationTaskType.Watering => NarrativeTaskType.Watering,
-                DataCultivationTaskType.Fertilizing => NarrativeTaskType.Fertilizing,
-                DataCultivationTaskType.Pruning => NarrativeTaskType.Pruning,
-                DataCultivationTaskType.Training => NarrativeTaskType.Training,
-                DataCultivationTaskType.Harvesting => NarrativeTaskType.Harvesting,
-                DataCultivationTaskType.Transplanting => NarrativeTaskType.Transplanting,
-                DataCultivationTaskType.PestControl => NarrativeTaskType.PestControl,
-                DataCultivationTaskType.EnvironmentalAdjustment => NarrativeTaskType.EnvironmentalAdjustment,
-                DataCultivationTaskType.Monitoring => NarrativeTaskType.Monitoring,
-                DataCultivationTaskType.Maintenance => NarrativeTaskType.Maintenance,
-                DataCultivationTaskType.Breeding => NarrativeTaskType.Breeding,
-                DataCultivationTaskType.Processing => NarrativeTaskType.Processing,
-                DataCultivationTaskType.Research => NarrativeTaskType.Research,
-                DataCultivationTaskType.Construction => NarrativeTaskType.Construction,
-                DataCultivationTaskType.Automation => NarrativeTaskType.Automation,
+                CultivationTaskType.Watering => NarrativeTaskType.Watering,
+                CultivationTaskType.Fertilizing => NarrativeTaskType.Fertilizing,
+                CultivationTaskType.Pruning => NarrativeTaskType.Pruning,
+                CultivationTaskType.Training => NarrativeTaskType.Training,
+                CultivationTaskType.Harvesting => NarrativeTaskType.Harvesting,
+                CultivationTaskType.Transplanting => NarrativeTaskType.Transplanting,
+                CultivationTaskType.PestControl => NarrativeTaskType.PestControl,
+                CultivationTaskType.EnvironmentalAdjustment => NarrativeTaskType.EnvironmentalAdjustment,
+                CultivationTaskType.Monitoring => NarrativeTaskType.Monitoring,
+                CultivationTaskType.Maintenance => NarrativeTaskType.Maintenance,
+                CultivationTaskType.Breeding => NarrativeTaskType.Breeding,
+                CultivationTaskType.Processing => NarrativeTaskType.Processing,
+                CultivationTaskType.Research => NarrativeTaskType.Research,
+                CultivationTaskType.Construction => NarrativeTaskType.Construction,
+                CultivationTaskType.Automation => NarrativeTaskType.Automation,
                 _ => NarrativeTaskType.Monitoring // Default fallback
             };
         }
@@ -1188,7 +1310,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class AutomationProgress
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public float CurrentBurden;
         public float BurdenThreshold;
         public DataAutomationDesireLevel AutomationDesireLevel;
@@ -1203,7 +1325,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class TaskBurdenState
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public float CognitiveLoad;
         public float TimeInvestment;
         public float ConsistencyChallenge;
@@ -1229,7 +1351,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class AutomationDesire
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public DataAutomationDesireLevel DesireLevel;
         public float OverallBurden;
         public float CognitiveLoad;
@@ -1244,7 +1366,7 @@ namespace ProjectChimera.Systems.Cultivation
     {
         public bool Success;
         public string Reason;
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public AutomationSystemUnlock IrrigationAutomation;
         public AutomationSystemUnlock EnvironmentalAutomation;
         public AutomationSystemUnlock NutrientAutomation;
@@ -1266,7 +1388,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class ManualCareTask
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public float AverageDuration;
         public int PlantCount;
         public int FacilitySize;
@@ -1317,7 +1439,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class BurdenThresholdEventData
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public DataAutomationDesireLevel DesireLevel;
         public float CurrentBurden;
         public float Timestamp;
@@ -1326,7 +1448,7 @@ namespace ProjectChimera.Systems.Cultivation
     [System.Serializable]
     public class AutomationAvailableEventData
     {
-        public DataCultivationTaskType TaskType;
+        public CultivationTaskType TaskType;
         public float Timestamp;
     }
     

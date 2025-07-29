@@ -9,7 +9,7 @@ using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
 using FacilityDesignApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach;
 using FacilityDesignData = ProjectChimera.Data.Cultivation.FacilityDesignData;
 using CareQuality = ProjectChimera.Data.Cultivation.CareQuality;
-using AutomationSystemType = ProjectChimera.Data.Cultivation.AutomationSystemType;
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
 using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
 // Use specific namespaces to avoid conflicts
 using PlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;

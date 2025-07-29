@@ -14,9 +14,15 @@ using ProjectChimera.Data.Progression; // For ExperienceSource enum
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
 using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
 using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
-using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
+using EventsChoiceConsequences = ProjectChimera.Data.Events.ChoiceConsequences;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
-// using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice; // Using local PlayerChoice class instead
+using EventsPlayerChoice = ProjectChimera.Data.Events.PlayerChoice;
+using GameTimeScale = ProjectChimera.Data.Cultivation.GameTimeScale;
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
+using FacilityDesignApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach;
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
 
 namespace ProjectChimera.Systems.Cultivation
 {
@@ -442,7 +448,24 @@ namespace ProjectChimera.Systems.Cultivation
         private void UpdateAutomationLevel(AutomationUnlockEventData unlockData)
         {
             _currentGamingState.AutomationLevel = CalculateNewAutomationLevel(unlockData);
-            _automationProgressionSystem?.ApplyAutomationBenefits(unlockData);
+            
+            // Convert to Core.Events version for compatibility with EarnedAutomationProgressionSystem
+            var coreEventData = ConvertToCoreEventData(unlockData);
+            _automationProgressionSystem?.ApplyAutomationBenefits(coreEventData);
+        }
+        
+        /// <summary>
+        /// Convert Systems.Cultivation.AutomationUnlockEventData to Core.Events.AutomationUnlockEventData
+        /// </summary>
+        private ProjectChimera.Core.Events.AutomationUnlockEventData ConvertToCoreEventData(AutomationUnlockEventData systemsData)
+        {
+            return new ProjectChimera.Core.Events.AutomationUnlockEventData
+            {
+                TaskType = systemsData.TaskType.ToString(),
+                SystemType = systemsData.SystemType.ToString(),
+                UnlockTimestamp = systemsData.UnlockTimestamp,
+                Timestamp = systemsData.Timestamp
+            };
         }
         
         private void AdjustGameplayComplexity(GameTimeScale newTimeScale)

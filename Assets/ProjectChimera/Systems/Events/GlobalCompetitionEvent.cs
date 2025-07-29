@@ -2,9 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using ProjectChimera.Events.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Data;
 using ProjectChimera.Data.Events;
+using ProjectChimera.Core.Events;
+
+// Type aliases to resolve ambiguous references
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
+using CompetitionPhase = ProjectChimera.Data.Events.CompetitionPhase;
 
 namespace ProjectChimera.Systems.Events
 {

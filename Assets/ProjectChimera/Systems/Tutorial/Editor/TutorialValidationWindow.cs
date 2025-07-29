@@ -15,7 +15,7 @@ namespace ProjectChimera.Editor.Tutorial
     public class TutorialValidationWindow : EditorWindow
     {
         private Vector2 _scrollPosition;
-        private TutorialDataAssetManager _selectedDataManager;
+        private TutorialDataAssetManagerSO _selectedDataManager;
         private SystemsTutorialValidationResult _lastValidationResult;
         private string _validationReport = "";
         private bool _showDetailedResults = true;
@@ -41,11 +41,11 @@ namespace ProjectChimera.Editor.Tutorial
             // Find tutorial data manager if not selected
             if (_selectedDataManager == null)
             {
-                var guids = AssetDatabase.FindAssets("t:TutorialDataAssetManager");
+                var guids = AssetDatabase.FindAssets("t:TutorialDataAssetManagerSO");
                 if (guids.Length > 0)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                    _selectedDataManager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManager>(path);
+                    _selectedDataManager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManagerSO>(path);
                 }
             }
         }
@@ -121,7 +121,7 @@ namespace ProjectChimera.Editor.Tutorial
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             
             var newManager = EditorGUILayout.ObjectField("Tutorial Data Manager", 
-                _selectedDataManager, typeof(TutorialDataAssetManager), false) as TutorialDataAssetManager;
+                _selectedDataManager, typeof(TutorialDataAssetManagerSO), false) as TutorialDataAssetManagerSO;
             
             if (newManager != _selectedDataManager)
             {
@@ -340,7 +340,7 @@ namespace ProjectChimera.Editor.Tutorial
         /// </summary>
         private void FindTutorialDataManager()
         {
-            var guids = AssetDatabase.FindAssets("t:TutorialDataAssetManager");
+            var guids = AssetDatabase.FindAssets("t:TutorialDataAssetManagerSO");
             
             if (guids.Length == 0)
             {
@@ -351,19 +351,19 @@ namespace ProjectChimera.Editor.Tutorial
             if (guids.Length == 1)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                _selectedDataManager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManager>(path);
+                _selectedDataManager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManagerSO>(path);
                 Debug.Log($"Found and selected Tutorial Data Manager: {_selectedDataManager.name}");
             }
             else
             {
                 // Multiple found - show selection dialog
                 var options = new List<string>();
-                var managers = new List<TutorialDataAssetManager>();
+                var managers = new List<TutorialDataAssetManagerSO>();
                 
                 foreach (var guid in guids)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(guid);
-                    var manager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManager>(path);
+                    var manager = AssetDatabase.LoadAssetAtPath<TutorialDataAssetManagerSO>(path);
                     options.Add(manager.name);
                     managers.Add(manager);
                 }

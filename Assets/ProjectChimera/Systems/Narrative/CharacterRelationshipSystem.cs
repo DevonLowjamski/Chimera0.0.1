@@ -7,9 +7,13 @@ using System.Linq;
 using System;
 using ProjectChimera.Systems.Narrative;
 // Type aliases to resolve ambiguous references
-using NarrativeCharacterEventChannelSO = ProjectChimera.Data.Narrative.CharacterEventChannelSO;
+using CharacterEventChannelSO = ProjectChimera.Data.Events.CharacterEventChannelSO;
+using NarrativeCharacterEventChannelSO = ProjectChimera.Data.Events.CharacterEventChannelSO;
 using EventsEffectivenessDataPoint = ProjectChimera.Data.Events.EffectivenessDataPoint;
 using EventsEffectivenessTrend = ProjectChimera.Data.Events.EffectivenessTrend;
+using CultivationExpertise = ProjectChimera.Data.Narrative.CultivationExpertise;
+using ConsequenceType = ProjectChimera.Data.Events.ConsequenceType;
+using ConsequenceSeverity = ProjectChimera.Data.Events.ConsequenceSeverity;
 
 namespace ProjectChimera.Systems.Narrative
 {

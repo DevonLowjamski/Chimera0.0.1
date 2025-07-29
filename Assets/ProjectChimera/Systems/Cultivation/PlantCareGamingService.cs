@@ -8,6 +8,8 @@ using ProjectChimera.Data.Events; // For non-generic GameEventChannelSO
 using GameEventChannel = ProjectChimera.Data.Events.GameEventChannelSO;
 using ProjectChimera.Data.Progression; // For ExperienceSource enum
 using ExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
 
 namespace ProjectChimera.Systems.Cultivation
 {

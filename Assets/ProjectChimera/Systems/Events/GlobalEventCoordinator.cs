@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Systems.Events;
+using ProjectChimera.Core.Events;
 
-// Resolve EventPriority namespace conflicts
+// Type aliases to resolve ambiguous references
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 using CoreEventPriority = ProjectChimera.Core.Events.EventPriority;
 using SystemsEventPriority = ProjectChimera.Systems.Events.EventPriority;
 

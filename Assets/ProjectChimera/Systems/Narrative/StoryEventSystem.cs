@@ -6,6 +6,10 @@ using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Narrative;
+using ProjectChimera.Data.Events;
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using CharacterEventChannelSO = ProjectChimera.Data.Events.CharacterEventChannelSO;
+using NarrativeCharacterEventChannelSO = ProjectChimera.Data.Events.CharacterEventChannelSO;
 
 namespace ProjectChimera.Systems.Narrative
 {

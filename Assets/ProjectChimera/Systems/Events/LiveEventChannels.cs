@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Data.Events;
+using ProjectChimera.Core.Events;
 
-// Import key enums from Data.Events namespace
+// Type aliases to resolve ambiguous references
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 using Season = ProjectChimera.Data.Events.Season;
-using CoreEventPriority = ProjectChimera.Events.Core.EventPriority;
+using CoreEventPriority = ProjectChimera.Core.Events.EventPriority;
 
 namespace ProjectChimera.Systems.Events
 {

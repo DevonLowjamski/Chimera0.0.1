@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Data;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Data.Narrative;
+using ProjectChimera.Core.Events;
 
 // Type aliases to resolve ambiguous references
 using DataPlayerContribution = ProjectChimera.Data.PlayerContribution;
 using DataCollaborationMode = ProjectChimera.Data.Events.CollaborationMode;
 using DataRewardDistributionType = ProjectChimera.Data.Events.RewardDistributionType;
 using ChallengeType = ProjectChimera.Data.Events.ChallengeType;
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 
 namespace ProjectChimera.Systems.Events
 {

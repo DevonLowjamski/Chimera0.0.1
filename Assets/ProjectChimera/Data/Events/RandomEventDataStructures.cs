@@ -109,7 +109,7 @@ namespace ProjectChimera.Data.Events
     public class EventConsequence
     {
         [Header("Effect Type")]
-        public ConsequenceType Type;
+        public RandomEventConsequenceType Type;
         public float Value;
         public float Duration = 0f; // in hours, 0 = permanent
         
@@ -221,7 +221,7 @@ namespace ProjectChimera.Data.Events
     /// <summary>
     /// Types of consequences that events can have
     /// </summary>
-    public enum ConsequenceType
+    public enum RandomEventConsequenceType
     {
         // Economic
         Currency,
@@ -284,7 +284,7 @@ namespace ProjectChimera.Data.Events
     /// <summary>
     /// Severity levels for consequences
     /// </summary>
-    public enum ConsequenceSeverity
+    public enum RandomEventConsequenceSeverity
     {
         Trivial,        // Very minor impact
         Minor,          // Small impact

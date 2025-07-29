@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Core;
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
 
 namespace ProjectChimera.Systems.Cultivation
 {

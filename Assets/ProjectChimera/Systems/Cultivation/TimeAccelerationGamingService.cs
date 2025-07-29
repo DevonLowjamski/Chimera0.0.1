@@ -4,6 +4,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Events;
+using GameTimeScale = ProjectChimera.Data.Cultivation.GameTimeScale;
 
 namespace ProjectChimera.Systems.Cultivation
 {

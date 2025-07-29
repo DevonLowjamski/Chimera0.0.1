@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+// Type alias to use AutomationSystemType from Events namespace  
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+
 namespace ProjectChimera.Data.Cultivation
 {
     /// <summary>
@@ -232,30 +235,6 @@ namespace ProjectChimera.Data.Cultivation
         public RewardType Type = RewardType.SkillBonus;
         public float Value;
         public string Description;
-    }
-    
-    public enum AutomationSystemType
-    {
-        BasicWatering,
-        AdvancedWatering,
-        IrrigationSystem,
-        NutrientDelivery,
-        EnvironmentalControl,
-        ClimateControl,
-        LightingAutomation,
-        LightingControl,
-        LightingSchedule,
-        MonitoringSystem,
-        MonitoringSensors,
-        SensorNetwork,
-        AlertSystem,
-        DataLogging,
-        DataCollection,
-        PredictiveAnalytics,
-        HarvestAssist,
-        VentilationControl,
-        IPM,
-        FullAutomation
     }
     
     public enum AutomationTier

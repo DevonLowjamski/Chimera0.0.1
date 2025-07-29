@@ -4,6 +4,7 @@ using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Events;
+using SkillTreeBranch = ProjectChimera.Data.Progression.SkillTreeBranch;
 
 namespace ProjectChimera.Systems.Progression
 {

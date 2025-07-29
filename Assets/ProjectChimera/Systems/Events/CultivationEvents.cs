@@ -5,6 +5,8 @@ using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Environment;
 using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
 
 namespace ProjectChimera.Core.Events
 {

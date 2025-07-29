@@ -5,6 +5,15 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Narrative;
+using ProjectChimera.Data.Events;
+using ProjectChimera.Core.Events;
+
+// Type aliases to resolve ambiguous references
+using ConsequenceType = ProjectChimera.Data.Narrative.ConsequenceType;
+using ConsequenceSeverity = ProjectChimera.Data.Narrative.ConsequenceSeverity;
+using CultivationExpertise = ProjectChimera.Data.Events.CultivationExpertise;
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 
 namespace ProjectChimera.Systems.Narrative
 {

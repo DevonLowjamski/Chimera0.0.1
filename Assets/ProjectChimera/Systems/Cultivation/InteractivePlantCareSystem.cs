@@ -10,12 +10,13 @@ using ProjectChimera.Data.Genetics; // For PlantGrowthStage enum
 using ProjectChimera.Events; // For event data classes
 // Type aliases to resolve ambiguous references - use consistent naming
 using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+using EventsCultivationTaskType = ProjectChimera.Data.Events.CultivationTaskType;
 using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
 using InteractivePlant = ProjectChimera.Data.Cultivation.InteractivePlant;
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 // Event system aliases
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
-using SkillProgressionEventData = ProjectChimera.Core.Events.SkillProgressionEventData;
+using SkillProgressionEventData = ProjectChimera.Data.Events.SkillProgressionEventData;
 // Local system types
 using CareAction = ProjectChimera.Systems.Cultivation.CareAction;
 using CareQuality = ProjectChimera.Systems.Cultivation.CareQuality;
@@ -827,7 +828,7 @@ namespace ProjectChimera.Systems.Cultivation
         {
             var eventData = new SkillProgressionEventData
             {
-                TaskType = taskType,
+                TaskType = (EventsCultivationTaskType)taskType,
                 Milestone = milestone,
                 CurrentSkillLevel = GetCurrentSkillLevel(taskType),
                 Timestamp = Time.time

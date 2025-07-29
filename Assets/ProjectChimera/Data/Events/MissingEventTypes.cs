@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Events.Core;
 using ProjectChimera.Data;
 using System.Linq;
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 
 namespace ProjectChimera.Data.Events
 {
@@ -25,6 +28,15 @@ namespace ProjectChimera.Data.Events
         Critical,
         Emergency
     }
+    
+    // Note: EventPriority enum is defined in ProjectChimera.Core.Events.CoreEventInterfaces
+    // Removed duplicate definition to resolve namespace conflicts
+    
+    // Note: LiveEventMessageType enum is defined in ProjectChimera.Core.Events.CoreEventInterfaces
+    // Removed duplicate definition to resolve namespace conflicts
+    
+    // Note: RewardType enum is defined in RewardTemplateSO.cs
+    // Removed duplicate definition to resolve CS0101 compilation error
     
     [CreateAssetMenu(fileName = "New Competition Template", menuName = "Project Chimera/Events/Competition Template", order = 108)]
     public class CompetitionTemplateSO : ChimeraDataSO
@@ -747,66 +759,11 @@ namespace ProjectChimera.Data.Events
         Market_Fluctuation_Event
     }
 
-    // Player Agency and Cultivation Gaming Event Data
-    [System.Serializable]
-    public class PlayerChoiceEventData
-    {
-        [Header("Choice Information")]
-        public string ChoiceId;
-        public string ChoiceName;
-        public string Description;
-        public string PlayerId;
-        public DateTime ChoiceTimestamp;
-        
-        [Header("Choice Details")]
-        public string ChoiceCategory;
-        public int ChoiceValue;
-        public Dictionary<string, object> ChoiceParameters = new Dictionary<string, object>();
-        public List<string> ConsequenceIds = new List<string>();
-        
-        [Header("Context")]
-        public string PlantId;
-        public string FacilityId;
-        public string SystemContext;
-        public object ChoiceContext;
-    }
+    // Note: PlayerChoiceEventData is defined in CultivationGamingEventData.cs
+    // Removed duplicate definition to resolve CS0101 compilation error
 
-    // Event Channel ScriptableObjects for different systems
-    [CreateAssetMenu(fileName = "New Consequence Event Channel", menuName = "Project Chimera/Events/Consequence Event Channel", order = 301)]
-    public class ConsequenceEventChannelSO : GameEventChannelSO
-    {
-        [Header("Consequence Event Channel Configuration")]
-        [SerializeField] private string _channelId;
-        [SerializeField] private bool _trackConsequenceHistory = true;
-        
-        public string ChannelId => _channelId;
-        public bool TrackConsequenceHistory => _trackConsequenceHistory;
-        
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (string.IsNullOrEmpty(_channelId))
-                _channelId = $"consequence_channel_{name.ToLower().Replace(" ", "_")}";
-        }
-    }
-
-    [CreateAssetMenu(fileName = "New Character Event Channel", menuName = "Project Chimera/Events/Character Event Channel", order = 302)]
-    public class CharacterEventChannelSO : GameEventChannelSO
-    {
-        [Header("Character Event Channel Configuration")]
-        [SerializeField] private string _channelId;
-        [SerializeField] private bool _trackCharacterInteractions = true;
-        
-        public string ChannelId => _channelId;
-        public bool TrackCharacterInteractions => _trackCharacterInteractions;
-        
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            if (string.IsNullOrEmpty(_channelId))
-                _channelId = $"character_channel_{name.ToLower().Replace(" ", "_")}";
-        }
-    }
+    // Note: ConsequenceEventChannelSO and CharacterEventChannelSO are defined in their respective files
+    // Removed duplicate definitions to resolve CS0101 compilation errors
 
     // Character relationship and effectiveness data structures
     [System.Serializable]

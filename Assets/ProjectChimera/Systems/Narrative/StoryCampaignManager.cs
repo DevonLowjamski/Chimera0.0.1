@@ -11,7 +11,7 @@ using System;
 using System.Threading.Tasks;
 
 // Type aliases to resolve ambiguous references
-using NarrativeCharacterEventChannelSO = ProjectChimera.Data.Narrative.CharacterEventChannelSO;
+using NarrativeCharacterEventChannelSO = ProjectChimera.Data.Events.CharacterEventChannelSO;
 using NarrativeStoryEventData = ProjectChimera.Data.Narrative.StoryEventData;
 using DataPlayerDecision = ProjectChimera.Data.Narrative.PlayerDecision;
 using DataPlayerChoice = ProjectChimera.Data.Narrative.PlayerChoice;

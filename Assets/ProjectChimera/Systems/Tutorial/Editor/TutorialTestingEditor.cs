@@ -335,7 +335,7 @@ namespace ProjectChimera.Editor.Tutorial
             }
             
             // Basic asset validation
-            var manager = dataManager as ProjectChimera.Data.Tutorial.TutorialDataAssetManager;
+            var manager = dataManager as ProjectChimera.Data.Tutorial.TutorialDataAssetManagerSO;
             if (manager != null)
             {
                 bool isValid = manager.ValidateData();

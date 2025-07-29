@@ -5,13 +5,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
+using ProjectChimera.Core.Events;
 using ProjectChimera.Data;
-// Explicit namespace aliases to resolve ambiguous references
-using CompetitionPhase = ProjectChimera.Data.Events.CompetitionPhase;
+using ProjectChimera.Core.Events;
+
+// Type aliases to resolve ambiguous references
 using EventPriority = ProjectChimera.Core.Events.EventPriority;
-using ILiveEventDefinition = ProjectChimera.Core.Events.ILiveEventDefinition;
 using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
+using CompetitionPhase = ProjectChimera.Data.Events.CompetitionPhase;
+using ILiveEventDefinition = ProjectChimera.Core.Events.ILiveEventDefinition;
 using LiveEventMessage = ProjectChimera.Core.Events.LiveEventMessage;
 using GlobalEventState = ProjectChimera.Core.Events.GlobalEventState;
 using UrgencyLevel = ProjectChimera.Data.Events.UrgencyLevel;

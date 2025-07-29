@@ -4,6 +4,8 @@ using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Events.Core;
 using ProjectChimera.Core.Events;
+using EventPriority = ProjectChimera.Core.Events.EventPriority;
+using LiveEventMessageType = ProjectChimera.Core.Events.LiveEventMessageType;
 
 namespace ProjectChimera.Data.Events
 {

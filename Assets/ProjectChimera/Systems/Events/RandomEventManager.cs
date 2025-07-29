@@ -13,6 +13,7 @@ using SimpleGameEventSO = ProjectChimera.Core.SimpleGameEventSO;
 
 // Resolve enum conflicts
 using EventCategory = ProjectChimera.Data.Events.RandomEventCategory;
+using ConsequenceType = ProjectChimera.Data.Events.RandomEventConsequenceType;
 
 namespace ProjectChimera.Systems.Events
 {

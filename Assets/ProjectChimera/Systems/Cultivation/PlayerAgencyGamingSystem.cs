@@ -7,13 +7,16 @@ using ProjectChimera.Events.Core;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Events; // For event data classes
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Events; // For PlayerChoiceEventData
+// using ProjectChimera.Events; // For PlayerChoiceEventData - namespace doesn't exist, using Data.Events instead
 // Type aliases to resolve ambiguities - comprehensive set for PlayerAgencyGamingSystem
 using EventsPlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
-using EventsChoiceConsequences = ProjectChimera.Events.ChoiceConsequences;
+using EventsChoiceConsequences = ProjectChimera.Data.Events.ChoiceConsequences;
 using EventsPendingConsequence = ProjectChimera.Data.Events.PendingConsequence;
-using EventsPlayerChoice = ProjectChimera.Events.PlayerChoice;
+using EventsPlayerChoice = ProjectChimera.Data.Events.PlayerChoice;
+using EventsConsequenceType = ProjectChimera.Data.Events.ConsequenceType;
+using ConsequenceType = ProjectChimera.Data.Events.ConsequenceType;
 using EventsPlayerAgencyLevel = ProjectChimera.Data.Events.PlayerAgencyLevel;
+using PlayerChoiceType = ProjectChimera.Data.Events.PlayerChoiceType;
 // using EventsConsequenceType = ProjectChimera.Events.ConsequenceType; // Using local ConsequenceType enum instead
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
 using DataFacilityDesignApproach = ProjectChimera.Data.Cultivation.FacilityDesignApproach;
@@ -238,7 +241,7 @@ namespace ProjectChimera.Systems.Cultivation
             // Trigger events
             _onPlayerChoiceMade?.RaiseEvent(new EventsPlayerChoiceEventData
             {
-                ChoiceType = (ProjectChimera.Events.PlayerChoiceType)choice.ChoiceType,
+                ChoiceType = (ProjectChimera.Data.Events.PlayerChoiceType)choice.ChoiceType,
                 ChoiceDescription = choice.ChoiceDescription,
                 ImpactLevel = choice.ImpactLevel,
                 ChoiceParameters = choice.ChoiceParameters,
@@ -492,15 +495,15 @@ namespace ProjectChimera.Systems.Cultivation
         {
             switch (consequence.Type)
             {
-                case ProjectChimera.Events.ConsequenceType.Immediate:
+                case EventsConsequenceType.Immediate:
                     ApplyYieldModifier(1.0f + (consequence.ImpactValue * 0.1f));
                     break;
                     
-                case ProjectChimera.Events.ConsequenceType.Delayed:
+                case EventsConsequenceType.Delayed:
                     ApplyEfficiencyModifier(1.0f + (consequence.ImpactValue * 0.08f));
                     break;
                     
-                case ProjectChimera.Events.ConsequenceType.Educational:
+                case EventsConsequenceType.Educational:
                     ApplyCostModifier(1.0f - (consequence.ImpactValue * 0.05f));
                     break;
                     
@@ -895,17 +898,17 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Convert local ConsequenceType to Events namespace ConsequenceType
         /// </summary>
-        private ProjectChimera.Events.ConsequenceType ConvertToEventsConsequenceType(ConsequenceType localType)
+        private EventsConsequenceType ConvertToEventsConsequenceType(ConsequenceType localType)
         {
             return localType switch
             {
-                ConsequenceType.YieldChange => ProjectChimera.Events.ConsequenceType.Immediate,
-                ConsequenceType.EfficiencyChange => ProjectChimera.Events.ConsequenceType.Delayed,
-                ConsequenceType.CostChange => ProjectChimera.Events.ConsequenceType.Educational,
-                ConsequenceType.QualityChange => ProjectChimera.Events.ConsequenceType.Immediate,
-                ConsequenceType.UnlockChange => ProjectChimera.Events.ConsequenceType.Delayed,
-                ConsequenceType.RelationshipChange => ProjectChimera.Events.ConsequenceType.Educational,
-                _ => ProjectChimera.Events.ConsequenceType.Immediate
+                ConsequenceType.YieldChange => EventsConsequenceType.Immediate,
+                ConsequenceType.EfficiencyChange => EventsConsequenceType.Delayed,
+                ConsequenceType.CostChange => EventsConsequenceType.Educational,
+                ConsequenceType.QualityChange => EventsConsequenceType.Immediate,
+                ConsequenceType.UnlockChange => EventsConsequenceType.Delayed,
+                ConsequenceType.RelationshipChange => EventsConsequenceType.Educational,
+                _ => EventsConsequenceType.Immediate
             };
         }
         
@@ -926,13 +929,13 @@ namespace ProjectChimera.Systems.Cultivation
         /// <summary>
         /// Convert Events namespace ConsequenceType to local ConsequenceType
         /// </summary>
-        private ConsequenceType ConvertFromEventsConsequenceType(ProjectChimera.Events.ConsequenceType eventsType)
+        private ConsequenceType ConvertFromEventsConsequenceType(EventsConsequenceType eventsType)
         {
             return eventsType switch
             {
-                ProjectChimera.Events.ConsequenceType.Immediate => ConsequenceType.YieldChange,
-                ProjectChimera.Events.ConsequenceType.Delayed => ConsequenceType.EfficiencyChange,
-                ProjectChimera.Events.ConsequenceType.Educational => ConsequenceType.CostChange,
+                EventsConsequenceType.Immediate => ConsequenceType.YieldChange,
+                EventsConsequenceType.Delayed => ConsequenceType.EfficiencyChange,
+                EventsConsequenceType.Educational => ConsequenceType.CostChange,
                 _ => ConsequenceType.YieldChange
             };
         }

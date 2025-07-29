@@ -10,8 +10,10 @@ using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Systems.Progression;
 using ExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
-using AutomationSystemType = ProjectChimera.Data.Cultivation.AutomationSystemType;
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
 
 namespace ProjectChimera.Systems.Cultivation
 {

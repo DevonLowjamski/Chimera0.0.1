@@ -9,7 +9,7 @@ using AutomationUnlockEventData = ProjectChimera.Core.Events.AutomationUnlockEve
 using SkillNodeEventData = ProjectChimera.Data.Cultivation.SkillNodeEventData;
 using PlayerChoiceEventData = ProjectChimera.Data.Events.PlayerChoiceEventData;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
-using TimeScaleEventData = ProjectChimera.Events.TimeScaleEventData;
+using TimeScaleEventData = ProjectChimera.Data.Events.TimeScaleEventData;
 
 namespace ProjectChimera.Data.Events
 {

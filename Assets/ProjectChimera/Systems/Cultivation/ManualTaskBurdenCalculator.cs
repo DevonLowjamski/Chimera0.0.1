@@ -2,6 +2,7 @@ using UnityEngine;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Core.Logging;
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
+using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
 
 namespace ProjectChimera.Systems.Cultivation
 {

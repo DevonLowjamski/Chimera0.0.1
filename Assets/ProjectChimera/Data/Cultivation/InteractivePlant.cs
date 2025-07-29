@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
 
+// Type alias to use AutomationSystemType from Events namespace
+using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+
 namespace ProjectChimera.Data.Cultivation
 {
     /// <summary>

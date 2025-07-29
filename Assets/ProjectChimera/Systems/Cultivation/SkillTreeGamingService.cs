@@ -9,6 +9,8 @@ using ProjectChimera.Events.Core; // For cultivation gaming event data
 using ProjectChimera.Data.Progression; // For progression data types
 using ProjectChimera.Systems.Progression; // For progression managers
 using ProgressionExperienceSource = ProjectChimera.Data.Progression.ExperienceSource;
+using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
+using SkillBranch = ProjectChimera.Data.Cultivation.SkillBranch;
 
 namespace ProjectChimera.Systems.Cultivation
 {
