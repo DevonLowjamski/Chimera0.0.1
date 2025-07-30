@@ -25,8 +25,8 @@ namespace ProjectChimera.Testing.Economy
         private CultivationManager _cultivationManager;
         private TradingManager _tradingManager;
         private MarketManager _marketManager;
-        private TestStrainData _testStrain;
-        private TestGenotypeData _testGenotype;
+        private TestStrainDataSO _testStrain;
+        private TestGenotypeDataSO _testGenotype;
         
         [SetUp]
         public void SetUp()
@@ -72,7 +72,7 @@ namespace ProjectChimera.Testing.Economy
         private void SetupTestData()
         {
             // Create test strain
-            _testStrain = new TestStrainData
+            _testStrain = new TestStrainDataSO
             {
                 DisplayName = "Test Strain OG",
                 YieldPotential = 150f,
@@ -81,7 +81,7 @@ namespace ProjectChimera.Testing.Economy
             };
             
             // Create test genotype
-            _testGenotype = new TestGenotypeData
+            _testGenotype = new TestGenotypeDataSO
             {
                 TraitValues = new Dictionary<string, float>
                 {
@@ -537,7 +537,7 @@ namespace ProjectChimera.Testing.Economy
         
         #region Test Data Classes
         
-        private class TestStrainData : PlantStrainSO
+        private class TestStrainDataSO : PlantStrainSO
         {
             public string DisplayName { get; set; }
             public float YieldPotential { get; set; }
@@ -545,7 +545,7 @@ namespace ProjectChimera.Testing.Economy
             public float GrowthRate { get; set; }
         }
         
-        private class TestGenotypeData : GenotypeDataSO
+        private class TestGenotypeDataSO : GenotypeDataSO
         {
             public Dictionary<string, float> TraitValues { get; set; }
         }

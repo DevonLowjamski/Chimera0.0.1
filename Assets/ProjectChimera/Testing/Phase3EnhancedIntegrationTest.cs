@@ -128,7 +128,7 @@ namespace ProjectChimera.Testing
                 LogTestResult("Validation Framework Initialization", true, "Framework initialized successfully");
 
                 // Test 2.2: Asset Registration
-                var testAsset = ScriptableObject.CreateInstance<TestChimeraScriptableObject>();
+                var testAsset = ScriptableObject.CreateInstance<TestChimeraScriptableObjectSO>();
                 testAsset.name = "TestAsset";
                 validationFramework.RegisterAsset(testAsset);
                 LogTestResult("Asset Registration", true, "Test asset registered successfully");
@@ -146,8 +146,8 @@ namespace ProjectChimera.Testing
                     metricsAvailable ? $"Metrics available: {metrics.TotalAssetsValidated} assets validated" : "No metrics available");
 
                 // Test 2.5: Cross-Reference Rule Registration
-                validationFramework.RegisterCrossReferenceRule("TestRule", typeof(TestChimeraScriptableObject), 
-                    typeof(TestChimeraScriptableObject), "TestProperty", "name", false, 
+                validationFramework.RegisterCrossReferenceRule("TestRule", typeof(TestChimeraScriptableObjectSO), 
+                    typeof(TestChimeraScriptableObjectSO), "TestProperty", "name", false, 
                     AdvancedDataValidationFramework.ValidationSeverity.Warning);
                 LogTestResult("Cross-Reference Rules", true, "Cross-reference rule registered successfully");
 
@@ -439,7 +439,7 @@ namespace ProjectChimera.Testing
         /// <summary>
         /// Test implementation of ChimeraScriptableObjectSO for validation testing.
         /// </summary>
-        private class TestChimeraScriptableObject : ChimeraScriptableObjectSO
+        private class TestChimeraScriptableObjectSO : ChimeraScriptableObjectSO
         {
             public string TestProperty = "TestValue";
 
