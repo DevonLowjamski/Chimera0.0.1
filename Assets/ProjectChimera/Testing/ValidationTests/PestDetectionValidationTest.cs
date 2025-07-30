@@ -221,7 +221,7 @@ namespace ProjectChimera
             {
                 Season = "Summer",
                 PestType = ProjectChimera.Data.IPM.PestType.SpiderMites,
-                TrendDirection = TrendDirection.Increasing,
+                TrendDirection = TrendDirection.Rising,
                 Magnitude = 0.7f
             };
             Debug.Log($"✅ Seasonal Trend: {seasonalTrend != null}");

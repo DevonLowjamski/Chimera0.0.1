@@ -952,12 +952,7 @@ namespace ProjectChimera.Systems.IPM
         PredictiveAnalytics
     }
     
-    public enum TrendDirection
-    {
-        Decreasing,
-        Stable,
-        Increasing
-    }
+    // Note: TrendDirection is defined in IPMLeaderboardDataStructures.cs
     
     public enum OutbreakSeverity
     {
