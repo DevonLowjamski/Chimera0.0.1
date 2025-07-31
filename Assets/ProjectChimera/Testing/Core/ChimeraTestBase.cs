@@ -90,7 +90,7 @@ namespace ProjectChimera.Testing.Core
             InitializeTest();
         }
         
-        protected virtual T CreateTestManager<T>() where T : ChimeraManager
+        protected virtual T CreateTestManager<T>() where T : MonoBehaviour
         {
             var gameObject = new GameObject($"Test{typeof(T).Name}");
             var manager = gameObject.AddComponent<T>();

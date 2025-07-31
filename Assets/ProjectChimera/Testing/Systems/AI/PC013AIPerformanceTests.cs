@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using ProjectChimera.Core;
 using ProjectChimera.Testing.Core;
@@ -55,7 +56,7 @@ namespace ProjectChimera.Testing.Systems.AI
         
         #region Performance Tests
         
-        [Test, Performance]
+        [Test]
         public void AIAnalysisService_CultivationAnalysis_PerformanceTest()
         {
             // Arrange
@@ -80,7 +81,7 @@ namespace ProjectChimera.Testing.Systems.AI
             UnityEngine.Debug.Log($"[Performance] Cultivation Analysis: {stopwatch.ElapsedMilliseconds}ms, Memory: +{memoryIncrease}MB");
         }
         
-        [Test, Performance]
+        [Test]
         public void AIAnalysisService_EnvironmentalAnalysis_PerformanceTest()
         {
             // Arrange
@@ -105,7 +106,7 @@ namespace ProjectChimera.Testing.Systems.AI
             UnityEngine.Debug.Log($"[Performance] Environmental Analysis: {stopwatch.ElapsedMilliseconds}ms, Memory: +{memoryIncrease}MB");
         }
         
-        [Test, Performance]
+        [Test]
         public void AIRecommendationService_GenerateRecommendations_PerformanceTest()
         {
             // Arrange
@@ -301,7 +302,7 @@ namespace ProjectChimera.Testing.Systems.AI
         
         #region Benchmark Tests
         
-        [Test, Performance]
+        [Test]
         public void AIServices_ComprehensiveBenchmark()
         {
             // Arrange

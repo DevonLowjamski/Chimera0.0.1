@@ -78,6 +78,7 @@ namespace ProjectChimera.Systems.AI
         public int PendingTrainingRequests => _trainingQueue.Count;
         public LearningStatistics Statistics => _currentStatistics;
         public Dictionary<string, MLModelData> ActiveModels => new Dictionary<string, MLModelData>(_activeModels);
+        public List<LearningRecord> LearningHistory => _learningHistory.ToList();
         
         // Events
         public event Action<LearningRecord> OnLearningRecordAdded;
@@ -425,6 +426,48 @@ namespace ProjectChimera.Systems.AI
                 LogError($"Training failed for model {modelId}: {ex.Message}");
                 model.ModelState = ModelState.Error;
                 return false;
+            }
+        }
+        
+        public async Task<TrainingResult> TrainModelAsync(string modelId, List<LearningRecord> trainingData)
+        {
+            if (!_activeModels.ContainsKey(modelId))
+            {
+                LogError($"Model {modelId} not found");
+                return new TrainingResult { Success = false, ModelId = modelId };
+            }
+            
+            if (trainingData == null || trainingData.Count < _minTrainingDataSize)
+            {
+                LogWarning($"Insufficient training data for model {modelId}");
+                return new TrainingResult { Success = false, ModelId = modelId };
+            }
+            
+            var model = _activeModels[modelId];
+            
+            try
+            {
+                // Add training data to the dataset
+                foreach (var record in trainingData)
+                {
+                    AddLearningRecord(record.ActionTaken, record.Context, record.Outcome, record.SuccessRating);
+                }
+                
+                // Train the model
+                bool success = await TrainModelAsync(modelId);
+                
+                return new TrainingResult 
+                { 
+                    Success = success, 
+                    ModelId = modelId,
+                    Accuracy = model.Accuracy,
+                    TrainingDataPoints = trainingData.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                LogError($"Training failed for model {modelId}: {ex.Message}");
+                return new TrainingResult { Success = false, ModelId = modelId };
             }
         }
         
@@ -880,6 +923,10 @@ namespace ProjectChimera.Systems.AI
     [System.Serializable]
     public class TrainingResult
     {
+        public bool Success;
+        public string ModelId;
+        public float Accuracy;
+        public int TrainingDataPoints;
         public float FinalAccuracy;
         public float TrainingLoss;
         public float ValidationLoss;

@@ -705,7 +705,10 @@ namespace ProjectChimera.Data.AI
         Performance_Focused,
         Innovation_Driven,
         Detail_Oriented,
-        Big_Picture_Thinker
+        Big_Picture_Thinker,
+        Supportive,
+        Efficient,
+        Educational
     }
     
     public enum ComplexityLevel

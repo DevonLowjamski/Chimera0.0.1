@@ -361,6 +361,28 @@ namespace ProjectChimera.Systems.AI
             _lastAdaptationTime = Time.time;
         }
         
+        public void AdaptPersonality(AIPersonality newPersonality)
+        {
+            var previousPersonality = _currentPersonality;
+            _currentPersonality = newPersonality;
+            
+            // Update personality traits
+            InitializePersonalityTraits();
+            
+            // Update active profile
+            _activeProfile = CreatePersonalityProfile(_currentPersonality);
+            
+            OnPersonalityChanged?.Invoke(previousPersonality, _currentPersonality);
+            OnPersonalityProfileUpdated?.Invoke(_activeProfile);
+            
+            LogInfo($"Personality manually adapted from {previousPersonality} to {_currentPersonality}");
+            
+            // Adapt communication style
+            AdaptCommunicationStyle();
+            
+            _lastAdaptationTime = Time.time;
+        }
+        
         private AIPersonality DetermineBestPersonality()
         {
             var recentInteractions = _interactionHistory
@@ -608,6 +630,101 @@ namespace ProjectChimera.Systems.AI
         private void LogError(string message)
         {
             Debug.LogError($"[AIPersonalityService] {message}");
+        }
+        
+        #endregion
+        
+        #region Public API Methods
+        
+        public List<PlayerInteractionData> GetInteractionHistory()
+        {
+            return _interactionHistory.ToList();
+        }
+        
+        public void RecordPlayerInteraction(string interactionType, float playerSatisfaction)
+        {
+            var interaction = new PlayerInteractionData
+            {
+                InteractionId = Guid.NewGuid().ToString(),
+                Timestamp = DateTime.UtcNow,
+                InteractionType = interactionType,
+                PlayerSatisfaction = playerSatisfaction,
+                PersonalityAtTime = _currentPersonality,
+                CommunicationStyleAtTime = _currentCommunicationStyle,
+                Context = GetCurrentSessionContext()
+            };
+            
+            _interactionHistory.Add(interaction);
+            
+            // Maintain history size limit
+            if (_interactionHistory.Count > _maxInteractionHistory)
+            {
+                _interactionHistory.RemoveAt(0);
+            }
+            
+            // Update learning systems with the interaction
+            UpdatePersonalityWeights(interaction);
+            
+            OnPlayerInteractionRecorded?.Invoke(interaction);
+            
+            LogInfo($"Player interaction recorded: {interactionType} (Satisfaction: {playerSatisfaction:F2})");
+        }
+        
+        private void UpdatePersonalityWeights(PlayerInteractionData interaction)
+        {
+            // Update personality weights based on interaction satisfaction
+            var personalityKey = interaction.PersonalityAtTime;
+            var adjustment = (interaction.PlayerSatisfaction - 0.5f) * _learningRate;
+            _personalityWeights[personalityKey] = Mathf.Clamp01(_personalityWeights[personalityKey] + adjustment);
+        }
+        
+        public void UpdatePersonalityFromInteractions()
+        {
+            if (_interactionHistory.Count < 5) return; // Need minimum interactions
+            
+            var recentInteractions = _interactionHistory.TakeLast(20).ToList();
+            var averageSatisfaction = recentInteractions.Average(i => i.PlayerSatisfaction);
+            
+            // Adapt personality based on satisfaction
+            if (averageSatisfaction < 0.3f)
+            {
+                // Switch to more supportive personality
+                if (_currentPersonality != AIPersonality.Supportive)
+                {
+                    AdaptPersonality(AIPersonality.Supportive);
+                }
+            }
+            else if (averageSatisfaction > 0.8f)
+            {
+                // Can be more analytical or efficient
+                if (_currentPersonality == AIPersonality.Supportive)
+                {
+                    AdaptPersonality(AIPersonality.Analytical);
+                }
+            }
+        }
+        
+        public string GeneratePersonalizedMessage(string baseMessage, string context)
+        {
+            string personalizedMessage = baseMessage;
+            
+            switch (_currentPersonality)
+            {
+                case AIPersonality.Supportive:
+                    personalizedMessage = $"I'm here to help! {baseMessage} Let me know if you need any clarification.";
+                    break;
+                case AIPersonality.Analytical:
+                    personalizedMessage = $"Based on the data: {baseMessage}";
+                    break;
+                case AIPersonality.Efficient:
+                    personalizedMessage = $"{baseMessage}";
+                    break;
+                case AIPersonality.Educational:
+                    personalizedMessage = $"{baseMessage} This will help you understand the cultivation process better.";
+                    break;
+            }
+            
+            return personalizedMessage;
         }
         
         #endregion

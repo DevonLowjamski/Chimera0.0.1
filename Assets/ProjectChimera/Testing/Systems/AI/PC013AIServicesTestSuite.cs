@@ -13,6 +13,7 @@ using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Environment;
 using AIEnvironmentalAnalysisResult = ProjectChimera.Data.AI.EnvironmentalAnalysisResult;
+using RecommendationPriority = ProjectChimera.Data.AI.RecommendationPriority;
 
 namespace ProjectChimera.Testing.Systems.AI
 {
@@ -447,6 +448,11 @@ namespace ProjectChimera.Testing.Systems.AI
             Assert.AreEqual(IntegrationStatus.Running, _integrationService.Status, "Should be in running status");
             Assert.IsNotNull(_integrationService.ServiceContainer, "Should have service container");
             Assert.IsNotNull(_integrationService.EventBus, "Should have event bus");
+            // Verify the service container and event bus are properly initialized
+            var serviceContainer = _integrationService.ServiceContainer;
+            var eventBus = _integrationService.EventBus;
+            Assert.IsNotNull(serviceContainer, "Service container should be accessible");
+            Assert.IsNotNull(eventBus, "Event bus should be accessible");
         }
         
         [Test]

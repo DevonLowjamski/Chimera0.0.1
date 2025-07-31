@@ -4,6 +4,7 @@
     "references": [
         "ProjectChimera.Core",
         "ProjectChimera.Core.DependencyInjection",
+        "ProjectChimera.Core.ServiceContainer",
         "ProjectChimera.Core.Optimization",
         "ProjectChimera.Data",
         "ProjectChimera.UI",
@@ -18,6 +19,7 @@
         "ProjectChimera.Systems.Analytics",
         "ProjectChimera.Systems.Settings",
         "ProjectChimera.Systems.AI",
+        "ProjectChimera.Systems.Gaming",
         "ProjectChimera.Systems.IPM",
         "ProjectChimera.Systems.Construction",
         "ProjectChimera.Systems.Narrative",

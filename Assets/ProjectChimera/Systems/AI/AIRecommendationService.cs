@@ -77,11 +77,12 @@ namespace ProjectChimera.Systems.AI
         public bool IsInitialized { get; private set; }
         public int ActiveRecommendationCount => _activeRecommendations.Count;
         public int PendingRecommendationCount => _pendingRecommendations.Count;
-        public AIRecommendation[] ActiveRecommendations => _activeRecommendations.ToArray();
+        public List<AIRecommendation> ActiveRecommendations => _activeRecommendations.ToList();
+        public List<AIRecommendation> RecommendationHistory => _recommendationHistory.Values.ToList();
         public RecommendationStatistics Statistics { get; private set; }
         
         // Events
-        public event Action<AIRecommendation[]> OnRecommendationsGenerated;
+        public event Action<List<AIRecommendation>> OnRecommendationsGenerated;
         public event Action<AIRecommendation> OnRecommendationCreated;
         public event Action<AIRecommendation> OnRecommendationImplemented;
         public event Action<AIRecommendation> OnRecommendationDismissed;
@@ -226,12 +227,12 @@ namespace ProjectChimera.Systems.AI
         
         #region Core Recommendation Interface
         
-        public async Task<AIRecommendation[]> GenerateRecommendationsAsync(CultivationAnalysisResult analysisResult)
+        public async Task<List<AIRecommendation>> GenerateRecommendationsAsync(CultivationAnalysisResult analysisResult)
         {
             if (!IsInitialized)
             {
                 LogWarning("Recommendation service not initialized");
-                return new AIRecommendation[0];
+                return new List<AIRecommendation>();
             }
             
             if (_isGeneratingRecommendations)
@@ -288,13 +289,13 @@ namespace ProjectChimera.Systems.AI
                 _lastGenerationTime = Time.time;
                 _nextScheduledGeneration = Time.time + _generationInterval;
                 
-                LogInfo($"Recommendation generation complete - {processedRecommendations.Length} recommendations generated");
+                LogInfo($"Recommendation generation complete - {processedRecommendations.Count} recommendations generated");
                 return processedRecommendations;
             }
             catch (Exception ex)
             {
                 LogError($"Error during recommendation generation: {ex.Message}");
-                return new AIRecommendation[0];
+                return new List<AIRecommendation>();
             }
             finally
             {
@@ -388,14 +389,14 @@ namespace ProjectChimera.Systems.AI
             LogInfo($"Recommendation dismissed: {recommendation.Title} - {dismissalReason}");
         }
         
-        public AIRecommendation[] GetRecommendationsByCategory(string category)
+        public List<AIRecommendation> GetRecommendationsByCategory(string category)
         {
-            return _activeRecommendations.Where(r => r.Category == category).ToArray();
+            return _activeRecommendations.Where(r => r.Category == category).ToList();
         }
         
-        public AIRecommendation[] GetRecommendationsByPriority(AIRecommendationPriority priority)
+        public List<AIRecommendation> GetRecommendationsByPriority(AIRecommendationPriority priority)
         {
-            return _activeRecommendations.Where(r => r.Priority == priority).ToArray();
+            return _activeRecommendations.Where(r => r.Priority == priority).ToList();
         }
         
         #endregion
@@ -588,7 +589,7 @@ namespace ProjectChimera.Systems.AI
         
         #region Recommendation Processing Pipeline
         
-        private async Task<AIRecommendation[]> ProcessRecommendationPipeline(List<AIRecommendation> recommendations)
+        private async Task<List<AIRecommendation>> ProcessRecommendationPipeline(List<AIRecommendation> recommendations)
         {
             // Step 1: Filter by confidence threshold
             var filteredRecommendations = FilterByConfidence(recommendations);
@@ -608,7 +609,7 @@ namespace ProjectChimera.Systems.AI
             // Step 6: Apply session limits
             var finalRecommendations = ApplySessionLimits(categoryLimitedRecommendations);
             
-            return await Task.FromResult(finalRecommendations.ToArray());
+            return await Task.FromResult(finalRecommendations);
         }
         
         private List<AIRecommendation> FilterByConfidence(List<AIRecommendation> recommendations)
@@ -650,13 +651,23 @@ namespace ProjectChimera.Systems.AI
             return recommendations.Where(r => !ShouldFilterBasedOnHistory(r)).ToList();
         }
         
-        private List<AIRecommendation> PrioritizeRecommendations(List<AIRecommendation> recommendations)
+        public List<AIRecommendation> PrioritizeRecommendations(List<AIRecommendation> recommendations)
         {
             return recommendations
                 .OrderByDescending(r => (int)r.Priority)
                 .ThenByDescending(r => r.ImpactScore)
                 .ThenByDescending(r => r.ConfidenceScore)
                 .ThenByDescending(r => GetCategoryWeight(r.Category))
+                .ToList();
+        }
+        
+        public List<AIRecommendation> FilterRecommendations(List<AIRecommendation> recommendations, string category)
+        {
+            if (string.IsNullOrEmpty(category))
+                return recommendations;
+                
+            return recommendations.Where(r => 
+                string.Equals(r.Category, category, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
         
@@ -798,7 +809,7 @@ namespace ProjectChimera.Systems.AI
             return AIRecommendationPriority.Low;
         }
         
-        private void UpdateActiveRecommendations(AIRecommendation[] newRecommendations)
+        private void UpdateActiveRecommendations(List<AIRecommendation> newRecommendations)
         {
             // Remove expired recommendations
             var now = DateTime.UtcNow;
@@ -827,13 +838,13 @@ namespace ProjectChimera.Systems.AI
             LogInfo($"Active recommendations updated: {_activeRecommendations.Count} active, {_pendingRecommendations.Count} pending");
         }
         
-        private void UpdateStatistics(AIRecommendation[] recommendations)
+        private void UpdateStatistics(List<AIRecommendation> recommendations)
         {
-            Statistics.TotalGenerated += recommendations.Length;
+            Statistics.TotalGenerated += recommendations.Count;
             Statistics.LastGenerationTime = DateTime.UtcNow;
-            Statistics.AverageConfidence = recommendations.Length > 0 ? 
+            Statistics.AverageConfidence = recommendations.Count > 0 ? 
                 recommendations.Average(r => r.ConfidenceScore) : 0f;
-            Statistics.AverageImpact = recommendations.Length > 0 ? 
+            Statistics.AverageImpact = recommendations.Count > 0 ? 
                 recommendations.Average(r => r.ImpactScore) : 0f;
         }
         

@@ -198,44 +198,54 @@ namespace ProjectChimera.Testing.Systems.AI
             
             foreach (var method in testMethods)
             {
-                try
+                bool testPassed = false;
+                string errorMessage = null;
+                
+                // Execute setup if available
+                var setupMethod = testSuiteType.GetMethod("SetUp");
+                setupMethod?.Invoke(testInstance, null);
+                
+                // Execute test method
+                var isUnityTest = method.GetCustomAttribute<UnityTestAttribute>() != null;
+                
+                if (isUnityTest)
                 {
-                    // Execute setup if available
-                    var setupMethod = testSuiteType.GetMethod("SetUp");
-                    setupMethod?.Invoke(testInstance, null);
-                    
-                    // Execute test method
-                    var isUnityTest = method.GetCustomAttribute<UnityTestAttribute>() != null;
-                    
-                    if (isUnityTest)
+                    yield return StartCoroutine(ExecuteUnityTest(method, testInstance, results));
+                }
+                else
+                {
+                    // Execute regular test
+                    try
                     {
-                        var coroutine = (IEnumerator)method.Invoke(testInstance, null);
-                        yield return StartCoroutine(coroutine);
+                        method.Invoke(testInstance, null);
+                        testPassed = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        testPassed = false;
+                        errorMessage = ex.Message;
+                    }
+                    
+                    if (testPassed)
+                    {
+                        results.PassedTests++;
+                        Debug.Log($"[PC013AITestRunner] ✓ {method.Name} passed");
                     }
                     else
                     {
-                        method.Invoke(testInstance, null);
+                        results.FailedTests++;
+                        Debug.LogError($"[PC013AITestRunner] ✗ {method.Name} failed: {errorMessage}");
+                        
+                        // Store failure details
+                        if (results.FailureDetails == null)
+                            results.FailureDetails = new List<string>();
+                        results.FailureDetails.Add($"{method.Name}: {errorMessage}");
                     }
-                    
-                    results.PassedTests++;
-                    Debug.Log($"[PC013AITestRunner] ✓ {method.Name} passed");
                 }
-                catch (Exception ex)
-                {
-                    results.FailedTests++;
-                    Debug.LogError($"[PC013AITestRunner] ✗ {method.Name} failed: {ex.Message}");
-                    
-                    // Store failure details
-                    if (results.FailureDetails == null)
-                        results.FailureDetails = new List<string>();
-                    results.FailureDetails.Add($"{method.Name}: {ex.Message}");
-                }
-                finally
-                {
-                    // Execute teardown if available
-                    var teardownMethod = testSuiteType.GetMethod("TearDown");
-                    teardownMethod?.Invoke(testInstance, null);
-                }
+                
+                // Execute teardown if available
+                var teardownMethod = testSuiteType.GetMethod("TearDown");
+                teardownMethod?.Invoke(testInstance, null);
                 
                 yield return null; // Allow frame processing
             }
@@ -247,6 +257,47 @@ namespace ProjectChimera.Testing.Systems.AI
             if (testInstance is MonoBehaviour mb)
             {
                 DestroyImmediate(mb.gameObject);
+            }
+        }
+        
+        private IEnumerator ExecuteUnityTest(MethodInfo method, object testInstance, TestExecutionResult results)
+        {
+            bool testPassed = false;
+            string errorMessage = null;
+            
+            // Get the coroutine first
+            IEnumerator coroutine = null;
+            try
+            {
+                coroutine = (IEnumerator)method.Invoke(testInstance, null);
+            }
+            catch (Exception ex)
+            {
+                testPassed = false;
+                errorMessage = ex.Message;
+            }
+            
+            // Execute coroutine outside of try-catch to avoid CS1626
+            if (coroutine != null)
+            {
+                yield return StartCoroutine(coroutine);
+                testPassed = true;
+            }
+            
+            if (testPassed)
+            {
+                results.PassedTests++;
+                Debug.Log($"[PC013AITestRunner] ✓ {method.Name} passed");
+            }
+            else
+            {
+                results.FailedTests++;
+                Debug.LogError($"[PC013AITestRunner] ✗ {method.Name} failed: {errorMessage}");
+                
+                // Store failure details
+                if (results.FailureDetails == null)
+                    results.FailureDetails = new List<string>();
+                results.FailureDetails.Add($"{method.Name}: {errorMessage}");
             }
         }
         

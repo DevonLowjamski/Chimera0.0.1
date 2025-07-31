@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectChimera.Data.AI;
 using ProjectChimera.Data.Cultivation;
@@ -28,9 +29,9 @@ namespace ProjectChimera.Systems.AI
         int PendingRecommendationCount { get; }
         
         /// <summary>
-        /// Array of all currently active recommendations
+        /// List of all currently active recommendations
         /// </summary>
-        AIRecommendation[] ActiveRecommendations { get; }
+        List<AIRecommendation> ActiveRecommendations { get; }
         
         /// <summary>
         /// Current recommendation statistics
@@ -51,8 +52,8 @@ namespace ProjectChimera.Systems.AI
         /// Generate recommendations based on cultivation analysis results
         /// </summary>
         /// <param name="analysisResult">Results from cultivation analysis</param>
-        /// <returns>Array of generated recommendations</returns>
-        Task<AIRecommendation[]> GenerateRecommendationsAsync(CultivationAnalysisResult analysisResult);
+        /// <returns>List of generated recommendations</returns>
+        Task<List<AIRecommendation>> GenerateRecommendationsAsync(CultivationAnalysisResult analysisResult);
         
         /// <summary>
         /// Create a single recommendation with specified parameters
@@ -81,22 +82,22 @@ namespace ProjectChimera.Systems.AI
         /// Get all recommendations for a specific category
         /// </summary>
         /// <param name="category">Category to filter by</param>
-        /// <returns>Array of recommendations in the category</returns>
-        AIRecommendation[] GetRecommendationsByCategory(string category);
+        /// <returns>List of recommendations in the category</returns>
+        List<AIRecommendation> GetRecommendationsByCategory(string category);
         
         /// <summary>
         /// Get all recommendations with a specific priority level
         /// </summary>
         /// <param name="priority">Priority level to filter by</param>
-        /// <returns>Array of recommendations with the specified priority</returns>
-        AIRecommendation[] GetRecommendationsByPriority(AIRecommendationPriority priority);
+        /// <returns>List of recommendations with the specified priority</returns>
+        List<AIRecommendation> GetRecommendationsByPriority(AIRecommendationPriority priority);
         
         // Events
         
         /// <summary>
         /// Fired when new recommendations are generated
         /// </summary>
-        event Action<AIRecommendation[]> OnRecommendationsGenerated;
+        event Action<List<AIRecommendation>> OnRecommendationsGenerated;
         
         /// <summary>
         /// Fired when a single recommendation is created

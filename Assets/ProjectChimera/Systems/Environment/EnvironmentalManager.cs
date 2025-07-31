@@ -1,6 +1,6 @@
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Core.ServiceContainer;
+using ProjectChimera.Core.DependencyInjection;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Automation;

@@ -311,6 +311,8 @@ namespace ProjectChimera.Data.AI
         public float SuccessRating;
         public Dictionary<string, object> Parameters = new Dictionary<string, object>();
         public List<string> LessonsLearned = new List<string>();
+        public Dictionary<string, float> InputData = new Dictionary<string, float>();
+        public Dictionary<string, float> OutputData = new Dictionary<string, float>();
     }
 
     [System.Serializable]

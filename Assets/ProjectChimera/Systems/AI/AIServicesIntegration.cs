@@ -43,6 +43,10 @@ namespace ProjectChimera.Systems.AI
         private IGameEventBus _eventBus;
         private ServiceBootstrapper _bootstrapper;
         
+        // Concrete implementations for tests
+        private ServiceContainer _concreteServiceContainer;
+        private GameEventBus _concreteEventBus;
+        
         // AI Services
         private IAIAnalysisService _analysisService;
         private IAIRecommendationService _recommendationService;
@@ -61,11 +65,18 @@ namespace ProjectChimera.Systems.AI
         private readonly List<EventSubscription> _eventSubscriptions = new List<EventSubscription>();
         private readonly Dictionary<string, int> _eventMetrics = new Dictionary<string, int>();
         
+        // Timing tracking
+        private TimeSpan _initializationTime;
+        
         // Properties
         public bool IsInitialized { get; private set; }
         public IntegrationStatus Status => _integrationStatus;
         public IServiceContainer ServiceContainer => _serviceContainer;
         public IGameEventBus EventBus => _eventBus;
+        
+        // Additional properties for test access to concrete implementations
+        public ServiceContainer ConcreteServiceContainer => _concreteServiceContainer;
+        public GameEventBus ConcreteEventBus => _concreteEventBus;
         public Dictionary<Type, ServiceIntegrationInfo> ServiceIntegrations => new Dictionary<Type, ServiceIntegrationInfo>(_serviceIntegrations);
         
         // Events
@@ -80,6 +91,7 @@ namespace ProjectChimera.Systems.AI
         {
             if (IsInitialized) return;
             
+            var initStartTime = DateTime.UtcNow;
             LogInfo("Initializing AI Services Integration...");
             _integrationStatus = IntegrationStatus.Initializing;
             OnIntegrationStatusChanged?.Invoke(_integrationStatus);
@@ -97,8 +109,9 @@ namespace ProjectChimera.Systems.AI
                 SetupEventSubscriptions();
                 StartServices();
                 
-                _integrationStatus = IntegrationStatus.Active;
+                _integrationStatus = IntegrationStatus.Running;
                 IsInitialized = true;
+                _initializationTime = DateTime.UtcNow - initStartTime;
                 
                 LogInfo("AI Services Integration initialized successfully");
                 OnIntegrationStatusChanged?.Invoke(_integrationStatus);
@@ -114,11 +127,14 @@ namespace ProjectChimera.Systems.AI
         
         private void InitializeDependencyInjection()
         {
+            // Create concrete service container for tests
+            _concreteServiceContainer = new ServiceContainer();
+            
             // Get or create service container
             _serviceContainer = ServiceLocator.Instance.TryResolve<IServiceContainer>();
             if (_serviceContainer == null)
             {
-                _serviceContainer = new ServiceContainer();
+                _serviceContainer = _concreteServiceContainer;
                 ServiceLocator.Instance.RegisterSingleton<IServiceContainer>(_serviceContainer);
                 LogInfo("Created new service container");
             }
@@ -138,6 +154,16 @@ namespace ProjectChimera.Systems.AI
                 var eventBusObject = new GameObject("GameEventBus");
                 _eventBus = eventBusObject.AddComponent<GameEventBus>();
                 LogWarning("Created new GameEventBus - consider using existing instance");
+            }
+            
+            // Set concrete event bus for test access
+            _concreteEventBus = _eventBus as GameEventBus;
+            if (_concreteEventBus == null)
+            {
+                // Create concrete instance if casting failed
+                var eventBusObject = new GameObject("GameEventBus");
+                _concreteEventBus = eventBusObject.AddComponent<GameEventBus>();
+                _eventBus = _concreteEventBus;
             }
             
             // Register event bus in service container
@@ -504,7 +530,7 @@ namespace ProjectChimera.Systems.AI
                 {
                     RequestId = Guid.NewGuid().ToString(),
                     WorkflowType = WorkflowType.FastRecommendation,
-                    Priority = RequestPriority.Normal,
+                    Priority = CoordinationPriority.Medium,
                     Data = growthEvent
                 });
             }
@@ -580,7 +606,10 @@ namespace ProjectChimera.Systems.AI
                 HealthyServices = _serviceIntegrations.Values.Count(s => s.Status == ServiceStatus.Running),
                 TotalEventSubscriptions = _eventSubscriptions.Count,
                 EventMetrics = new Dictionary<string, int>(_eventMetrics),
-                LastUpdated = DateTime.UtcNow
+                LastUpdated = DateTime.UtcNow,
+                InitializationTime = _initializationTime,
+                TotalEvents = _eventMetrics.Values.Sum(),
+                TotalEventsProcessed = _eventMetrics.Values.Sum()
             };
         }
         
@@ -781,4 +810,5 @@ namespace ProjectChimera.Systems.AI
         
         #endregion
     }
+    
 }

@@ -72,8 +72,10 @@ namespace ProjectChimera.Systems.AI
         public ServiceRegistry ServiceRegistry => _serviceRegistry;
         public CoordinatorStatistics Statistics => _statistics;
         public int ActiveRequestCount => _activeRequests.Count;
-        public int QueuedRequestCount => _requestQueue.Count;
+        public int QueuedRequestCount => _requestQueue.Count;  
         public WorkflowMode CurrentWorkflowMode => _workflowMode;
+        public List<CoordinationRequest> ActiveRequests => _activeRequests.ToList();
+        public List<ActiveWorkflow> WorkflowHistory => _activeWorkflows.ToList();
         
         // Events
         public event Action<CoordinationRequest> OnRequestReceived;
@@ -545,6 +547,11 @@ namespace ProjectChimera.Systems.AI
             return _serviceHealthStatus.ContainsKey(serviceName) && _serviceHealthStatus[serviceName].IsHealthy;
         }
         
+        public Dictionary<string, ServiceHealthStatus> GetServiceHealthStatus()
+        {
+            return new Dictionary<string, ServiceHealthStatus>(_serviceHealthStatus);
+        }
+        
         private void PerformServiceHealthCheck()
         {
             foreach (var serviceName in _serviceRegistry.GetRegisteredServiceNames())
@@ -756,7 +763,7 @@ namespace ProjectChimera.Systems.AI
                 {
                     RequestId = Guid.NewGuid().ToString(),
                     WorkflowType = WorkflowType.StandardAnalysis,
-                    Priority = RequestPriority.Normal,
+                    Priority = CoordinationPriority.Medium,
                     Data = null // Analysis service will use current game state
                 };
                 
@@ -836,8 +843,11 @@ namespace ProjectChimera.Systems.AI
     public class CoordinationRequest
     {
         public string RequestId;
+        public RequestType RequestType;
         public WorkflowType WorkflowType;
-        public RequestPriority Priority;
+        public CoordinationPriority Priority;
+        public DateTime RequestedAt;
+        public Dictionary<string, object> Parameters;
         public object Data;
         public DateTime ReceivedAt;
         public DateTime? StartedAt;
@@ -852,6 +862,7 @@ namespace ProjectChimera.Systems.AI
         public string Message;
         public string ErrorMessage;
         public Dictionary<string, object> Data;
+        public List<AIRecommendation> GeneratedRecommendations = new List<AIRecommendation>();
     }
     
     [System.Serializable]
@@ -872,13 +883,31 @@ namespace ProjectChimera.Systems.AI
         public DateTime LastResetTime;
     }
     
+    public enum RequestType
+    {
+        Analysis,
+        Recommendation,
+        Learning,
+        Personality,
+        HealthCheck
+    }
+    
+    public enum CoordinationPriority
+    {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+
     public enum WorkflowType
     {
         StandardAnalysis,
         FastRecommendation,
         LearningOnly,
         PersonalityAdaptation,
-        HealthCheck
+        HealthCheck,
+        CultivationOptimization
     }
     
     public enum WorkflowMode
@@ -896,14 +925,6 @@ namespace ProjectChimera.Systems.AI
         Completed,
         Failed,
         Cancelled
-    }
-    
-    public enum RequestPriority
-    {
-        Low,
-        Normal,
-        High,
-        Critical
     }
     
     #endregion

@@ -66,6 +66,8 @@ namespace ProjectChimera.Systems.AI
         public DateTime LastUpdated;
         public float AverageServiceResponseTime;
         public int TotalEventsProcessed;
+        public int TotalEvents;
+        public TimeSpan InitializationTime;
     }
     
     [System.Serializable]
@@ -208,6 +210,7 @@ namespace ProjectChimera.Systems.AI
         NotInitialized,
         Initializing,
         Active,
+        Running,
         Degraded,
         Failed,
         ShuttingDown,

@@ -3,6 +3,7 @@
     "rootNamespace": "ProjectChimera.Systems.Environment",
     "references": [
         "ProjectChimera.Core",
+        "ProjectChimera.Core.ServiceContainer",
         "ProjectChimera.Data",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
