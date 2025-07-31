@@ -6,6 +6,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using DifficultyLevel = ProjectChimera.Data.Environment.DifficultyLevel;
 using EnvironmentalChallengeStatus = ProjectChimera.Data.Environment.ChallengeStatus;
+using EnvironmentalZone = ProjectChimera.Data.Environment.EnvironmentalZone;
 
 namespace ProjectChimera.Systems.Environment
 {

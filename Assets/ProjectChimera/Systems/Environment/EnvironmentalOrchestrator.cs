@@ -8,6 +8,7 @@ using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Automation;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 using SensorReading = ProjectChimera.Data.Automation.SensorReading;
 using SensorType = ProjectChimera.Data.Automation.SensorType;
 

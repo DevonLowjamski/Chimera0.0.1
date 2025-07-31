@@ -5,7 +5,7 @@ using ProjectChimera.Data.Cultivation;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Systems.SpeedTree;
+// using ProjectChimera.Systems.SpeedTree; // Removed to prevent circular dependency
 
 namespace ProjectChimera.Core
 {
@@ -100,7 +100,7 @@ namespace ProjectChimera.Core
 
         PlantStrainSO BreedPlants(PlantStrainSO parent1, PlantStrainSO parent2);
         CannabisGenotype GenerateGenotype(PlantStrainSO strain);
-        CannabisGeneticsEngine.CannabisPhenotype ExpressPhenotype(CannabisGenotype genotype, EnvironmentalConditions conditions);
+        PlantPhenotypeSO ExpressPhenotype(CannabisGenotype genotype, EnvironmentalConditions conditions);
         void DiscoverTrait(string traitId);
         bool IsTraitDiscovered(string traitId);
         float CalculateBreedingSuccess(PlantStrainSO parent1, PlantStrainSO parent2);

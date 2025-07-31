@@ -7,6 +7,7 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Facilities;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 // using ProjectChimera.Systems.Cultivation; // Cannot reference without circular dependency
 using System.Collections.Generic;
 using System.Collections;

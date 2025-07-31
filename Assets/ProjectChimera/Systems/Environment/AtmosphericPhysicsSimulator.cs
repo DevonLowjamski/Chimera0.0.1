@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
+using EnvironmentalZone = ProjectChimera.Data.Environment.EnvironmentalZone;
 
 namespace ProjectChimera.Systems.Environment
 {

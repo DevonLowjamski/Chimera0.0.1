@@ -12,6 +12,7 @@ using LightingZoneStatus = ProjectChimera.Data.Environment.LightingZoneStatus;
 using LightingZoneSettings = ProjectChimera.Data.Environment.LightingZoneSettings;
 using ActiveLightingFixture = ProjectChimera.Data.Environment.ActiveLightingFixture;
 using LightingMaintenanceStatus = ProjectChimera.Data.Environment.LightingMaintenanceStatus;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 
 namespace ProjectChimera.Systems.Environment
 {

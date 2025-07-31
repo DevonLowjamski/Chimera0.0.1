@@ -6,6 +6,8 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Facilities;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
+using EnvironmentalZone = ProjectChimera.Data.Environment.EnvironmentalZone;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;

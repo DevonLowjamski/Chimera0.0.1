@@ -3,8 +3,8 @@
     "rootNamespace": "ProjectChimera.Testing",
     "references": [
         "ProjectChimera.Core",
-        "ProjectChimera.Core.DependencyInjection",
         "ProjectChimera.Core.ServiceContainer",
+        "ProjectChimera.Core.DependencyInjection",
         "ProjectChimera.Core.Optimization",
         "ProjectChimera.Data",
         "ProjectChimera.UI",

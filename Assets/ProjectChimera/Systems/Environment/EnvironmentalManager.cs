@@ -8,6 +8,8 @@ using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalCon
 using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 using SeasonType = ProjectChimera.Data.Environment.SeasonType;
 using SensorReading = ProjectChimera.Data.Automation.SensorReading;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
+using EnvironmentalZone = ProjectChimera.Data.Environment.EnvironmentalZone;
 using System.Collections.Generic;
 using System.Linq;
 using System;

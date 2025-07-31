@@ -3,9 +3,7 @@
     "rootNamespace": "ProjectChimera.Core.DependencyInjection",
     "references": [
         "ProjectChimera.Core",
-        "ProjectChimera.Data",
-        "ProjectChimera.Systems",
-        "ProjectChimera.Systems.SpeedTree"
+        "ProjectChimera.Data"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

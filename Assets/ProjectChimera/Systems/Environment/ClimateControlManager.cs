@@ -6,6 +6,7 @@ using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 
 namespace ProjectChimera.Systems.Environment
 {

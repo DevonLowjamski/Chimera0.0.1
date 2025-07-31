@@ -3,6 +3,7 @@
     "rootNamespace": "ProjectChimera.Systems.Cultivation",
     "references": [
         "ProjectChimera.Core",
+        "ProjectChimera.Core.ServiceContainer",
         "ProjectChimera.Data",
         "ProjectChimera.Events",
         "ProjectChimera.Systems.Automation",

@@ -10,6 +10,7 @@ using DataLightingZone = ProjectChimera.Data.Environment.LightingZone;
 using LightingZoneSettings = ProjectChimera.Data.Environment.LightingZoneSettings;
 using LightingMaintenanceStatus = ProjectChimera.Data.Environment.LightingMaintenanceStatus;
 using PhotoperiodStage = ProjectChimera.Data.Environment.PhotoperiodStage;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 
 namespace ProjectChimera.Systems.Environment
 {
