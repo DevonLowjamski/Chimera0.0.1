@@ -3,7 +3,9 @@
     "rootNamespace": "ProjectChimera.Systems.AI",
     "references": [
         "ProjectChimera.Core",
+        "ProjectChimera.Core.DependencyInjection",
         "ProjectChimera.Data",
+        "ProjectChimera.Systems.Gaming",
         "ProjectChimera.Systems.Environment",
         "ProjectChimera.Systems.Cultivation",
         "ProjectChimera.Systems.Genetics",

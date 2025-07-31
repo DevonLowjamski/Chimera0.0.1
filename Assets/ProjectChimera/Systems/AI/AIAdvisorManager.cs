@@ -18,6 +18,7 @@ using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalCon
 using EnvironmentalOptimization = ProjectChimera.Data.AI.EnvironmentalOptimization;
 using OptimizationComplexity = ProjectChimera.Data.AI.OptimizationComplexity;
 using ProductMarketData = ProjectChimera.Data.AI.ProductMarketData;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 using OptimalRange = ProjectChimera.Data.AI.OptimalRange;
 
 namespace ProjectChimera.Systems.AI

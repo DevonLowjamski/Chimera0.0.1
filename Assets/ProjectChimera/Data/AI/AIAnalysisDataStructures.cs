@@ -87,6 +87,15 @@ namespace ProjectChimera.Data.AI
         public List<string> EnvironmentalAlerts;
         public List<string> OptimizationSuggestions;
         public float EnvironmentalScore;
+        
+        // Additional properties for comprehensive environmental analysis
+        public float TemperatureScore;
+        public float HumidityScore;
+        public float CO2Score;
+        public float LightScore;
+        public float OverallScore;
+        public List<string> Recommendations;
+        public Dictionary<string, (float min, float max)> OptimalRanges;
     }
 
     [System.Serializable]
@@ -108,6 +117,13 @@ namespace ProjectChimera.Data.AI
         public List<string> GeneticRecommendations;
         public Dictionary<string, float> TraitPerformance;
         public float GeneticsScore;
+        
+        // Additional properties for comprehensive genetics analysis
+        public int TotalStrains;
+        public float BreedingPotential;
+        public List<string> OptimalCrosses;
+        public Dictionary<string, float> TraitDistribution;
+        public List<string> HybridizationOpportunities;
     }
 
     [System.Serializable]

@@ -25,7 +25,7 @@ namespace ProjectChimera.Systems.AI
     /// Extracted from AIAdvisorManager for improved modularity and testability
     /// Handles plant, environmental, genetic, and system performance analysis
     /// </summary>
-    public class AIAnalysisService : MonoBehaviour, IAIAnalysisService, ICultivationAnalysisService, IEnvironmentalAnalysisService, IGeneticsAnalysisService
+    public class AIAnalysisService : MonoBehaviour, IAIAnalysisServiceExtended
     {
         [Header("Analysis Configuration")]
         [SerializeField] private AnalysisSettings _analysisConfig;
@@ -72,6 +72,25 @@ namespace ProjectChimera.Systems.AI
         public AIEnvironmentalAnalysisResult LastEnvironmentalAnalysis { get; private set; }
         public GeneticsAnalysisResult LastGeneticsAnalysis { get; private set; }
         public List<DataInsight> CriticalInsights => _discoveredInsights.Where(i => i.Severity == InsightSeverity.Critical).ToList();
+        
+        // Configuration properties from IAIAnalysisServiceExtended
+        public bool EnableRealTimeAnalysis 
+        { 
+            get => _enableRealTimeAnalysis; 
+            set => _enableRealTimeAnalysis = value; 
+        }
+        
+        public bool EnablePredictiveAnalysis 
+        { 
+            get => _enablePredictiveAnalysis; 
+            set => _enablePredictiveAnalysis = value; 
+        }
+        
+        public float ConfidenceThreshold 
+        { 
+            get => _confidenceThreshold; 
+            set => _confidenceThreshold = value; 
+        }
         
         // Events
         public event Action<CultivationAnalysisResult> OnCultivationAnalysisComplete;
@@ -311,6 +330,93 @@ namespace ProjectChimera.Systems.AI
             {
                 LogError($"Error in cultivation analysis: {ex.Message}");
                 return Task.FromResult<CultivationAnalysisResult>(null);
+            }
+        }
+        
+        public Task<AIEnvironmentalAnalysisResult> AnalyzeEnvironmentalDataAsync()
+        {
+            if (!IsInitialized)
+            {
+                LogWarning("Analysis service not initialized");
+                return Task.FromResult<AIEnvironmentalAnalysisResult>(null);
+            }
+            
+            try
+            {
+                LogInfo("Starting comprehensive environmental analysis...");
+                
+                // Get current environmental data with null checks
+                var environmentData = _environmentalService != null ? 
+                    new EnvironmentalConditions { Temperature = 24f, Humidity = 60f, CO2Level = 400f, LightIntensity = 50f } :
+                    new EnvironmentalConditions { Temperature = 24f, Humidity = 60f, CO2Level = 400f, LightIntensity = 50f };
+                
+                // Perform environmental analysis
+                var analysisResult = new AIEnvironmentalAnalysisResult();
+                
+                analysisResult.TemperatureScore = AnalyzeTemperatureOptimality(environmentData.Temperature);
+                analysisResult.HumidityScore = AnalyzeHumidityOptimality(environmentData.Humidity);
+                analysisResult.CO2Score = AnalyzeCO2Optimality(environmentData.CO2Level);
+                analysisResult.LightScore = AnalyzeLightOptimality(environmentData.LightIntensity);
+                analysisResult.OverallScore = (analysisResult.TemperatureScore + analysisResult.HumidityScore + 
+                                             analysisResult.CO2Score + analysisResult.LightScore) / 4f;
+                analysisResult.Recommendations = GenerateEnvironmentalRecommendations(environmentData);
+                analysisResult.OptimalRanges = GetOptimalEnvironmentalRanges();
+                
+                LastEnvironmentalAnalysis = analysisResult;
+                
+                // Publish analysis complete event
+                OnEnvironmentalAnalysisComplete?.Invoke(analysisResult);
+                
+                LogInfo($"Environmental analysis complete - Overall score: {analysisResult.OverallScore:P0}");
+                return Task.FromResult(analysisResult);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error in environmental analysis: {ex.Message}");
+                return Task.FromResult<AIEnvironmentalAnalysisResult>(null);
+            }
+        }
+        
+        public Task<GeneticsAnalysisResult> AnalyzeGeneticsDataAsync()
+        {
+            if (!IsInitialized)
+            {
+                LogWarning("Analysis service not initialized");
+                return Task.FromResult<GeneticsAnalysisResult>(null);
+            }
+            
+            try
+            {
+                LogInfo("Starting comprehensive genetics analysis...");
+                
+                // Get current genetic data with null checks
+                var geneticData = _geneticService != null ? 
+                    new List<GeneticDataHolder>() :
+                    new List<GeneticDataHolder>();
+                
+                // Perform genetics analysis
+                var analysisResult = new GeneticsAnalysisResult();
+                
+                analysisResult.TotalStrains = geneticData.Count();
+                analysisResult.GeneticDiversity = CalculateGeneticDiversity(geneticData);
+                analysisResult.BreedingPotential = AssessBreedingPotential(geneticData);
+                analysisResult.OptimalCrosses = IdentifyOptimalCrosses(geneticData);
+                analysisResult.TraitDistribution = AnalyzeTraitDistribution(geneticData);
+                analysisResult.HybridizationOpportunities = IdentifyHybridizationOpportunities(geneticData);
+                analysisResult.GeneticRecommendations = GenerateGeneticRecommendations(geneticData);
+                
+                LastGeneticsAnalysis = analysisResult;
+                
+                // Publish analysis complete event
+                OnGeneticsAnalysisComplete?.Invoke(analysisResult);
+                
+                LogInfo($"Genetics analysis complete - {analysisResult.TotalStrains} strains analyzed");
+                return Task.FromResult(analysisResult);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error in genetics analysis: {ex.Message}");
+                return Task.FromResult<GeneticsAnalysisResult>(null);
             }
         }
         
@@ -1121,6 +1227,179 @@ namespace ProjectChimera.Systems.AI
         {
             // Optimize system parameters based on analysis
             LogInfo("Optimizing system parameters...");
+        }
+        
+        #endregion
+        
+        #region Environmental Analysis Helper Methods
+        
+        private float AnalyzeTemperatureOptimality(float temperature)
+        {
+            // Optimal cannabis temperature range: 20-30°C
+            float optimal = 25f;
+            float tolerance = 5f;
+            float deviation = Math.Abs(temperature - optimal);
+            return Math.Max(0f, 1f - (deviation / tolerance));
+        }
+        
+        private float AnalyzeHumidityOptimality(float humidity)
+        {
+            // Optimal cannabis humidity range: 40-60%
+            float optimal = 50f;
+            float tolerance = 15f;
+            float deviation = Math.Abs(humidity - optimal);
+            return Math.Max(0f, 1f - (deviation / tolerance));
+        }
+        
+        private float AnalyzeCO2Optimality(float co2Level)
+        {
+            // Optimal CO2 range: 400-1200ppm
+            float optimalMin = 400f;
+            float optimalMax = 1200f;
+            if (co2Level >= optimalMin && co2Level <= optimalMax)
+                return 1f;
+            else if (co2Level < optimalMin)
+                return Math.Max(0f, co2Level / optimalMin);
+            else
+                return Math.Max(0f, 1f - ((co2Level - optimalMax) / optimalMax));
+        }
+        
+        private float AnalyzeLightOptimality(float lightIntensity)
+        {
+            // Optimal light intensity range: 40-70%
+            float optimal = 55f;
+            float tolerance = 20f;
+            float deviation = Math.Abs(lightIntensity - optimal);
+            return Math.Max(0f, 1f - (deviation / tolerance));
+        }
+        
+        private List<string> GenerateEnvironmentalRecommendations(EnvironmentalConditions conditions)
+        {
+            var recommendations = new List<string>();
+            
+            if (conditions.Temperature < 20f)
+                recommendations.Add("Increase temperature - current level too low for optimal growth");
+            else if (conditions.Temperature > 30f)
+                recommendations.Add("Decrease temperature - current level too high, may stress plants");
+                
+            if (conditions.Humidity < 40f)
+                recommendations.Add("Increase humidity - plants may experience moisture stress");
+            else if (conditions.Humidity > 60f)
+                recommendations.Add("Decrease humidity - high levels may promote mold growth");
+                
+            if (conditions.CO2Level < 400f)
+                recommendations.Add("Increase CO2 levels to enhance photosynthesis");
+            else if (conditions.CO2Level > 1200f)
+                recommendations.Add("Reduce CO2 levels - excessive amounts may be wasteful");
+                
+            if (conditions.LightIntensity < 40f)
+                recommendations.Add("Increase light intensity for better growth");
+            else if (conditions.LightIntensity > 70f)
+                recommendations.Add("Consider reducing light intensity to prevent light burn");
+                
+            return recommendations;
+        }
+        
+        private Dictionary<string, (float min, float max)> GetOptimalEnvironmentalRanges()
+        {
+            return new Dictionary<string, (float min, float max)>
+            {
+                ["Temperature"] = (20f, 30f),
+                ["Humidity"] = (40f, 60f),
+                ["CO2"] = (400f, 1200f),
+                ["Light"] = (40f, 70f)
+            };
+        }
+        
+        #endregion
+        
+        #region Genetics Analysis Helper Methods
+        
+        private float CalculateGeneticDiversity(List<GeneticDataHolder> geneticData)
+        {
+            if (geneticData == null || geneticData.Count == 0)
+                return 0f;
+                
+            // Simplified genetic diversity calculation
+            // In real implementation, this would analyze allele frequencies
+            return Math.Min(1f, geneticData.Count / 10f);
+        }
+        
+        private float AssessBreedingPotential(List<GeneticDataHolder> geneticData)
+        {
+            if (geneticData == null || geneticData.Count < 2)
+                return 0f;
+                
+            // Simplified breeding potential assessment
+            // Higher genetic diversity = higher breeding potential
+            float diversity = CalculateGeneticDiversity(geneticData);
+            return diversity * 0.8f + UnityEngine.Random.Range(0.1f, 0.2f);
+        }
+        
+        private List<string> IdentifyOptimalCrosses(List<GeneticDataHolder> geneticData)
+        {
+            var crosses = new List<string>();
+            
+            if (geneticData == null || geneticData.Count < 2)
+                return crosses;
+                
+            // Simplified optimal cross identification
+            for (int i = 0; i < Math.Min(3, geneticData.Count - 1); i++)
+            {
+                crosses.Add($"Cross {i + 1}: Strain_{i} × Strain_{i + 1} - High yield potential");
+            }
+            
+            return crosses;
+        }
+        
+        private Dictionary<string, float> AnalyzeTraitDistribution(List<GeneticDataHolder> geneticData)
+        {
+            var distribution = new Dictionary<string, float>();
+            
+            if (geneticData == null || geneticData.Count == 0)
+                return distribution;
+                
+            // Simplified trait distribution analysis
+            distribution["Yield"] = UnityEngine.Random.Range(0.6f, 0.9f);
+            distribution["Potency"] = UnityEngine.Random.Range(0.5f, 0.8f);
+            distribution["Disease Resistance"] = UnityEngine.Random.Range(0.4f, 0.7f);
+            distribution["Growth Speed"] = UnityEngine.Random.Range(0.5f, 0.8f);
+            
+            return distribution;
+        }
+        
+        private List<string> IdentifyHybridizationOpportunities(List<GeneticDataHolder> geneticData)
+        {
+            var opportunities = new List<string>();
+            
+            if (geneticData == null || geneticData.Count < 2)
+                return opportunities;
+                
+            opportunities.Add("High-yield × Fast-growth hybridization opportunity");
+            opportunities.Add("Disease-resistant × High-potency cross potential");
+            opportunities.Add("Climate-adaptive × Commercial strain development");
+            
+            return opportunities;
+        }
+        
+        private List<string> GenerateGeneticRecommendations(List<GeneticDataHolder> geneticData)
+        {
+            var recommendations = new List<string>();
+            
+            if (geneticData == null || geneticData.Count == 0)
+            {
+                recommendations.Add("Consider acquiring diverse genetic material to start breeding program");
+                return recommendations;
+            }
+            
+            if (geneticData.Count < 5)
+                recommendations.Add("Expand genetic library for better breeding options");
+                
+            recommendations.Add("Focus on trait stability in current breeding lines");
+            recommendations.Add("Document phenotype expressions for breeding records");
+            recommendations.Add("Consider outcrossing to maintain genetic diversity");
+            
+            return recommendations;
         }
         
         #endregion

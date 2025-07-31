@@ -11,6 +11,7 @@ using DataEnvironmentalAnalysisResult = ProjectChimera.Data.AI.EnvironmentalAnal
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using AIPriority = ProjectChimera.Data.AI.RecommendationPriority;
+using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 
 namespace ProjectChimera.Systems.AI
 {

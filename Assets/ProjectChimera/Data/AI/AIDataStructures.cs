@@ -144,6 +144,7 @@ namespace ProjectChimera.Data.AI
     [System.Serializable]
     public class ModelPerformanceMetrics
     {
+        public string ModelId;
         public float Precision;
         public float Recall;
         public float F1Score;
@@ -909,6 +910,64 @@ namespace ProjectChimera.Data.AI
     {
         public float CurrentDemand;
         public float SeasonalFactor;
+    }
+    
+    /// <summary>
+    /// PC-012-3: Communication styles for AI personality adaptation
+    /// </summary>
+    public enum CommunicationStyle
+    {
+        Professional,
+        Casual,
+        Encouraging,
+        Direct,
+        Detailed,
+        Concise,
+        Friendly,
+        Technical
+    }
+    
+    /// <summary>
+    /// PC-012-3: Player Interaction Data for AI Personality Service
+    /// Tracks individual player interactions for personality adaptation
+    /// </summary>
+    [System.Serializable]
+    public class PlayerInteractionData
+    {
+        public string InteractionId;
+        public string InteractionType;
+        public string Context;
+        public DateTime Timestamp;
+        public AIPersonality PersonalityAtTime;
+        public CommunicationStyle CommunicationStyleAtTime;
+        public float PlayerSatisfaction;
+        public float ResponseTime;
+        public string SessionContext;
+        public Dictionary<string, string> AdditionalData = new Dictionary<string, string>();
+    }
+    
+    /// <summary>
+    /// PC-012-5: Player Feedback Data for AI Coordinator
+    /// </summary>
+    [System.Serializable]
+    public class PlayerFeedbackData
+    {
+        public string FeedbackType;
+        public float Rating;
+        public string Context;
+        public Dictionary<string, object> AdditionalData = new Dictionary<string, object>();
+    }
+    
+    /// <summary>
+    /// PC-012-5: Learning Record Data for AI Coordinator
+    /// </summary>
+    [System.Serializable]
+    public class LearningRecordData
+    {
+        public string ActionTaken;
+        public string Context;
+        public string Outcome;
+        public float SuccessRating;
     }
     
 }
