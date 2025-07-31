@@ -910,4 +910,5 @@ namespace ProjectChimera.Data.AI
         public float CurrentDemand;
         public float SeasonalFactor;
     }
+    
 }

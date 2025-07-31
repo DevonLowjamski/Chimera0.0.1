@@ -769,14 +769,7 @@ namespace ProjectChimera.Systems.Performance
         public ComplexityLevel OverallComplexity;
     }
     
-    // Enums for migration strategy planning
-    public enum MigrationPriority
-    {
-        Low,
-        Medium, 
-        High,
-        Critical
-    }
+    // Note: MigrationPriority enum is defined in ECSMigrationAnalysis.cs to avoid duplication
     
     public enum MigrationRiskLevel
     {
