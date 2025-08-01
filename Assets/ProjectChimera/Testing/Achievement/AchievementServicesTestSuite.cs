@@ -9,6 +9,8 @@ using ProjectChimera.Systems.Progression;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Achievements;
 using ProjectChimera.Core.Logging;
+using AchievementData = ProjectChimera.Systems.Progression.Achievement;
+using AchievementRarity = ProjectChimera.Data.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Testing.Achievement
 {
@@ -115,13 +117,13 @@ namespace ProjectChimera.Testing.Achievement
         {
             // Act
             var cultivationAchievements = trackingService.GetAchievementsByCategory(
-                ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery);
+                ProjectChimera.Data.Achievements.AchievementCategory.Cultivation);
 
             // Assert
             Assert.IsNotNull(cultivationAchievements);
             Assert.Greater(cultivationAchievements.Count, 0, "Should have cultivation achievements");
             Assert.IsTrue(cultivationAchievements.All(a => 
-                a.Category == ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery),
+                (int)a.Category == (int)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation),
                 "All returned achievements should be cultivation category");
         }
 
@@ -159,13 +161,13 @@ namespace ProjectChimera.Testing.Achievement
         public void RewardService_CalculateRewards_ReturnsValidBundle()
         {
             // Arrange
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 AchievementName = "Test Achievement",
                 Points = 100f,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = (ProjectChimera.Data.Progression.AchievementCategory)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation
             };
 
             // Act
@@ -184,12 +186,12 @@ namespace ProjectChimera.Testing.Achievement
         public void RewardService_DistributeRewards_TriggersEvents()
         {
             // Arrange
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 Points = 100f,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = (ProjectChimera.Data.Progression.AchievementCategory)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation
             };
             
             var rewardBundle = rewardService.CalculateRewards(testAchievement, "test_player");
@@ -214,12 +216,12 @@ namespace ProjectChimera.Testing.Achievement
         public void RewardService_GetRewardStatistics_ReturnsValidData()
         {
             // Arrange - distribute some rewards first
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 Points = 100f,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = (ProjectChimera.Data.Progression.AchievementCategory)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation
             };
             
             var rewardBundle = rewardService.CalculateRewards(testAchievement, "test_player");
@@ -254,11 +256,11 @@ namespace ProjectChimera.Testing.Achievement
         public void DisplayService_ShowAchievementNotification_CreatesNotification()
         {
             // Arrange
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 AchievementName = "Test Achievement",
-                Rarity = AchievementRarity.Common
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)AchievementRarity.Common
             };
 
             bool notificationDisplayed = false;
@@ -296,11 +298,11 @@ namespace ProjectChimera.Testing.Achievement
         public void DisplayService_ClearAllNotifications_ResetsState()
         {
             // Arrange - add some notifications first
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 AchievementName = "Test Achievement",
-                Rarity = AchievementRarity.Common
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)AchievementRarity.Common
             };
             
             displayService.ShowAchievementNotification(testAchievement);
@@ -370,13 +372,13 @@ namespace ProjectChimera.Testing.Achievement
         public void Coordinator_ProcessAchievementUnlock_HandlesValidAchievement()
         {
             // Arrange
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "test_achievement",
                 AchievementName = "Test Achievement",
                 Points = 100f,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = (ProjectChimera.Data.Progression.AchievementCategory)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation
             };
 
             bool achievementCompleted = false;
@@ -433,11 +435,11 @@ namespace ProjectChimera.Testing.Achievement
         public IEnumerator Services_AsyncOperations_CompleteSuccessfully()
         {
             // Test async operations like coroutines in display service
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "async_test_achievement",
                 AchievementName = "Async Test Achievement",
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Rare
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Rare
             };
 
             // Act
@@ -524,12 +526,12 @@ namespace ProjectChimera.Testing.Achievement
         public void RewardService_ManyCalculations_PerformsWell()
         {
             // Arrange
-            var testAchievement = new AchievementSystemManager.Achievement
+            var testAchievement = new AchievementData
             {
                 AchievementID = "performance_test",
                 Points = 100f,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Cultivation_Mastery
+                Rarity = (ProjectChimera.Data.Progression.AchievementRarity)ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = (ProjectChimera.Data.Progression.AchievementCategory)ProjectChimera.Data.Achievements.AchievementCategory.Cultivation
             };
             
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();

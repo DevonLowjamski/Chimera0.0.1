@@ -357,7 +357,9 @@ namespace ProjectChimera.Systems.Progression
         {
             if (_trackingService != null)
             {
-                return _trackingService.GetAchievementsByCategory(category).Count;
+                // Convert from Data.Progression.AchievementCategory to Data.Achievements.AchievementCategory
+                var achievementsCategory = (ProjectChimera.Data.Achievements.AchievementCategory)(int)category;
+                return _trackingService.GetAchievementsByCategory(achievementsCategory).Count;
             }
             return 10; // Default estimate
         }
