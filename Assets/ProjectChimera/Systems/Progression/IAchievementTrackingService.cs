@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Achievements;
 
@@ -44,6 +45,16 @@ namespace ProjectChimera.Systems.Progression
         ProgressValidationResult ValidateProgress(string achievementId, string playerId = "current_player");
         
         #endregion
+
+        #region Achievement Queries
+        
+        Achievement GetAchievementById(string achievementId);
+        List<Achievement> GetAchievementsByCategory(ProjectChimera.Data.Achievements.AchievementCategory category);
+        List<Achievement> GetAchievementsByRarity(ProjectChimera.Data.Achievements.AchievementRarity rarity);
+        int GetCompletedAchievementCount(string playerId);
+        float GetTotalAchievementPoints(string playerId);
+        
+        #endregion
     }
 
     /// <summary>
@@ -59,4 +70,5 @@ namespace ProjectChimera.Systems.Progression
         public float ProgressPercentage;
         public DateTime ValidationTime;
     }
+
 }
