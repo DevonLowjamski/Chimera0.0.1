@@ -55,6 +55,7 @@ namespace ProjectChimera.Data.Achievements
         Trivial,          // Automatic or very easy
         Easy,             // Minimal effort required
         Normal,           // Standard gameplay achievement
+        Medium,           // Moderate difficulty level
         Hard,             // Requires dedication and skill
         Expert,           // Master-level accomplishment
         Legendary,        // Extreme difficulty and dedication
@@ -78,7 +79,9 @@ namespace ProjectChimera.Data.Achievements
         Milestone,       // Major progression markers
         Easter_Egg,      // Special discovery achievements
         Cultural,        // Heritage and tradition based
-        Educational     // Learning objective achievements
+        Educational,     // Learning objective achievements
+        Progression,     // General progression-based achievements
+        Skills          // Skill-related achievements
     }
     
     /// <summary>

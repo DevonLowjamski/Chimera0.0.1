@@ -7,6 +7,7 @@ using ProjectChimera.Data.Research;
 using ProjectChimera.Systems.Registry;
 using ResourceAllocation = ProjectChimera.Data.Research.ResourceAllocation;
 using ResourceBudget = ProjectChimera.Data.Research.ResourceBudget;
+using ResourceRequirements = ProjectChimera.Data.Research.ResourceRequirements;
 using ResearchFacility = ProjectChimera.Data.Research.ResearchFacility;
 using FacilityUpgrade = ProjectChimera.Data.Research.FacilityUpgrade;
 using ResearchEquipment = ProjectChimera.Data.Research.ResearchEquipment;
@@ -211,6 +212,44 @@ namespace ProjectChimera.Systems.Services.Research
             
             Debug.Log($"Updated budget for project {projectId}");
         }
+
+        public bool ValidateResources(string projectId)
+        {
+            if (!IsInitialized || string.IsNullOrEmpty(projectId))
+                return false;
+
+            if (!_activeAllocations.ContainsKey(projectId))
+                return true; // No resources allocated, validation passes
+
+            var allocation = _activeAllocations[projectId];
+            return ValidateResourceAvailability(allocation);
+        }
+
+        public bool ConsumeResources(string projectId, ResourceRequirements requirements)
+        {
+            if (!IsInitialized || string.IsNullOrEmpty(projectId) || requirements == null)
+                return false;
+
+            // Check if we have enough resources
+            foreach (var requirement in requirements.RequiredResources)
+            {
+                if (!_availableResources.ContainsKey(requirement.Key) || 
+                    _availableResources[requirement.Key] < requirement.Value)
+                {
+                    Debug.LogWarning($"Insufficient {requirement.Key} for project {projectId}");
+                    return false;
+                }
+            }
+
+            // Consume the resources
+            foreach (var requirement in requirements.RequiredResources)
+            {
+                _availableResources[requirement.Key] -= requirement.Value;
+            }
+
+            Debug.Log($"Consumed resources for project {projectId}");
+            return true;
+        }
         
         #endregion
 
@@ -358,38 +397,6 @@ namespace ProjectChimera.Systems.Services.Research
             // TODO: Implement maintenance duration and restoration
             
             Debug.Log($"Started maintenance for equipment {equipmentId}");
-        }
-        
-        #endregion
-
-        #region Validation Methods
-        
-        public bool ValidateResources(string projectId)
-        {
-            if (!_activeAllocations.ContainsKey(projectId))
-            {
-                // Check if project has basic resource requirements
-                return HasMinimumResources();
-            }
-
-            var allocation = _activeAllocations[projectId];
-            return allocation.IsActive;
-        }
-
-        public void ConsumeResources(string projectId)
-        {
-            if (!_activeAllocations.ContainsKey(projectId))
-            {
-                Debug.LogWarning($"No resource allocation found for project {projectId}");
-                return;
-            }
-
-            var allocation = _activeAllocations[projectId];
-            
-            // Resource consumption is handled during allocation
-            // This method can be used for ongoing consumption
-            
-            Debug.Log($"Consumed resources for project {projectId}");
         }
         
         #endregion

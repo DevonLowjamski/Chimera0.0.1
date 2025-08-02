@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Systems.Economy;
 using ProjectChimera.Data.Economy;
+// Explicit alias to resolve InventoryItem ambiguity
+using InventoryItem = ProjectChimera.Systems.Economy.InventoryItem;
 
 namespace ProjectChimera.Testing.Economy
 {

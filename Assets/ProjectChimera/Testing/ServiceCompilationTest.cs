@@ -1,8 +1,21 @@
 using System;
 using UnityEngine;
 using ProjectChimera.Systems.Registry;
+using ProjectChimera.Systems.Services.CompetitionServices;
 using ProjectChimera.Systems.Services.Competition;
 using ProjectChimera.Systems.Services.Research;
+// Import service interfaces
+using ICompetitionManagementService = ProjectChimera.Systems.Registry.ICompetitionManagementService;
+using IJudgingEvaluationService = ProjectChimera.Systems.Registry.IJudgingEvaluationService;
+using IParticipantRegistrationService = ProjectChimera.Systems.Registry.IParticipantRegistrationService;
+using ICompetitionRewardsService = ProjectChimera.Systems.Registry.ICompetitionRewardsService;
+using IResearchProjectService = ProjectChimera.Systems.Registry.IResearchProjectService;
+// Import concrete service classes (note different namespaces)
+using CompetitionManagementService = ProjectChimera.Systems.Services.CompetitionServices.CompetitionManagementService;
+using JudgingEvaluationService = ProjectChimera.Systems.Services.Competition.JudgingEvaluationService;
+using ParticipantRegistrationService = ProjectChimera.Systems.Services.Competition.ParticipantRegistrationService;
+using CompetitionRewardsService = ProjectChimera.Systems.Services.Competition.CompetitionRewardsService;
+using ResearchProjectService = ProjectChimera.Systems.Services.Research.ResearchProjectService;
 
 namespace ProjectChimera.Testing
 {

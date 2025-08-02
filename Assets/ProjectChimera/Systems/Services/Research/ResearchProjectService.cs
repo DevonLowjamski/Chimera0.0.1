@@ -136,8 +136,8 @@ namespace ProjectChimera.Systems.Services.Research
                 Requirements = requirements,
                 Phases = GenerateDefaultPhases(category),
                 Milestones = GenerateDefaultMilestones(category),
-                EstimatedDuration = CalculateEstimatedDuration(requirements),
-                SuccessProbability = CalculateSuccessProbability(requirements),
+                EstimatedDuration = CalculateEstimatedDuration(ConvertToResourceRequirements(requirements)),
+                SuccessProbability = CalculateSuccessProbability(ConvertToResourceRequirements(requirements)),
                 Metadata = new Dictionary<string, object>()
             };
 
@@ -207,7 +207,8 @@ namespace ProjectChimera.Systems.Services.Research
             // Allocate resources
             if (_resourceService != null)
             {
-                _resourceService.ConsumeResources(projectId);
+                var resourceReq = ConvertToResourceRequirements(offer.ResearchProject.Requirements);
+                _resourceService.ConsumeResources(projectId, resourceReq);
             }
 
             RecordProjectEvent(projectId, ResearchEventType.Project_Started, "Project started successfully");
@@ -359,7 +360,12 @@ namespace ProjectChimera.Systems.Services.Research
 
         public void ConsumeResources(string projectId)
         {
-            _resourceService?.ConsumeResources(projectId);
+            var project = GetProject(projectId);
+            if (project?.Requirements != null && _resourceService != null)
+            {
+                var resourceReq = ConvertToResourceRequirements(project.Requirements);
+                _resourceService.ConsumeResources(projectId, resourceReq);
+            }
         }
         
         #endregion
@@ -371,6 +377,26 @@ namespace ProjectChimera.Systems.Services.Research
             _projectProgress = new Dictionary<string, float>();
             _projectHistory = new List<ResearchEvent>();
             Debug.Log("Project system initialized");
+        }
+
+        private ResourceRequirements ConvertToResourceRequirements(ResearchRequirements researchRequirements)
+        {
+            if (researchRequirements == null)
+                return null;
+
+            return new ResourceRequirements
+            {
+                RequiredResources = new Dictionary<ResourceType, float>
+                {
+                    { ResourceType.Currency, researchRequirements.Cost?.MonetaryCost ?? 0f },
+                    { ResourceType.Expertise, researchRequirements.MinimumExpertise },
+                    { ResourceType.Time, 100f } // Default time requirement
+                },
+                RequiredFacilities = researchRequirements.RequiredFacilities ?? new List<string>(),
+                RequiredEquipment = researchRequirements.RequiredEquipment ?? new List<string>(),
+                MinimumExpertise = researchRequirements.MinimumExpertise,
+                EstimatedDuration = TimeSpan.FromHours(100) // Default duration
+            };
         }
 
         private void LoadExistingProjects()

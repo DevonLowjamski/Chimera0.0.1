@@ -11,6 +11,7 @@ using ProjectChimera.Systems.Registry;
 using ProgressionAchievementReward = ProjectChimera.Data.Progression.AchievementReward;
 using AchievementType = ProjectChimera.Data.Achievements.AchievementType;
 using AchievementDifficulty = ProjectChimera.Data.Achievements.AchievementDifficulty;
+using MilestoneRewardType = ProjectChimera.Data.Progression.MilestoneRewardType;
 
 namespace ProjectChimera.Systems.Services.Progression
 {
@@ -433,8 +434,9 @@ namespace ProjectChimera.Systems.Services.Progression
                 {
                     RewardID = $"milestone_{milestone.MilestoneID}",
                     MilestoneID = milestone.MilestoneID,
-                    RewardType = AchievementRewardType.Experience_Bonus,
+                    RewardType = MilestoneRewardType.Permanent_Bonus,
                     RewardValue = CalculateMilestoneRewardValue(milestone),
+                    RewardDescription = $"Reward for {milestone.Name}",
                     Description = $"Reward for {milestone.Name}"
                 };
             }
@@ -449,7 +451,7 @@ namespace ProjectChimera.Systems.Services.Progression
             {
                 RewardID = "experience",
                 RewardName = "Experience Points",
-                RewardType = AchievementRewardType.Experience_Bonus,
+                RewardType = AchievementRewardType.Experience_Bonus.ToString(),
                 Description = "Bonus experience for progression"
             });
 
@@ -457,7 +459,7 @@ namespace ProjectChimera.Systems.Services.Progression
             {
                 RewardID = "skill_points",
                 RewardName = "Skill Points",
-                RewardType = CleanProgressionRewardType.Currency.ToString(),
+                RewardType = AchievementRewardType.Skill_Points.ToString(),
                 Description = "Points to spend on skills"
             });
 

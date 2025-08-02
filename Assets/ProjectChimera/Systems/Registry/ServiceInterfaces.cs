@@ -299,6 +299,10 @@ namespace ProjectChimera.Systems.Registry
         float GetAvailableResources(ResourceType resourceType);
         void UpdateResourceBudget(string projectId, ResourceBudget budget);
         
+        // Resource Validation and Consumption
+        bool ValidateResources(string projectId);
+        bool ConsumeResources(string projectId, ResourceRequirements requirements);
+        
         // Facility Management
         List<ResearchFacility> GetAvailableFacilities();
         bool ReserveFacility(string facilityId, string projectId, TimeSpan duration);

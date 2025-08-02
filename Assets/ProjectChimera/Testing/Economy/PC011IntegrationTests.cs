@@ -12,6 +12,8 @@ using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 // Explicit alias to resolve PlantGrowthStage ambiguity
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
+// Explicit alias to resolve InventoryItem ambiguity
+using InventoryItem = ProjectChimera.Systems.Economy.InventoryItem;
 
 namespace ProjectChimera.Testing.Economy
 {

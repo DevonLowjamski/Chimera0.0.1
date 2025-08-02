@@ -299,9 +299,12 @@ namespace ProjectChimera.Data.Progression
     [System.Serializable]
     public class MilestoneReward
     {
+        public string RewardID = "";
+        public string MilestoneID = "";
         public MilestoneRewardType RewardType;
         public float RewardValue;
         public string RewardDescription;
+        public string Description; // Make it a regular property instead of computed
         public SkillNodeSO UnlockedSkillNode;
         public string UnlockedFeature;
         public bool IsPermanentBonus = true;

@@ -6,17 +6,11 @@
         "ProjectChimera.Data",
         "ProjectChimera.Events",
         "ProjectChimera.Systems.Progression",
+        "ProjectChimera.Systems.Economy",
         "Unity.TextMeshPro",
         "Unity.ugui",
         "Cinemachine",
         "Unity.RenderPipelines.Universal.Runtime"
-    ],
-    "versionDefines": [
-        {
-            "name": "com.unity.ugui",
-            "expression": "1.0.0",
-            "define": "UNITY_UGUI"
-        }
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -25,6 +19,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "1.0.0",
+            "define": "UNITY_UGUI"
+        }
+    ],
     "noEngineReferences": false
 }
