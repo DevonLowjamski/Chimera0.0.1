@@ -42,9 +42,9 @@ namespace ProjectChimera.Systems.Services.Economy
         [SerializeField] private Dictionary<string, float> _monthlyIncome = new Dictionary<string, float>();
         
         [Header("Events")]
-        [SerializeField] private GameEventSO _financialStatusChangedEvent;
-        [SerializeField] private GameEventSO _creditScoreChangedEvent;
-        [SerializeField] private GameEventSO _loanStatusChangedEvent;
+        [SerializeField] private GameEventSO<PlayerFinances> _financialStatusChangedEvent;
+        [SerializeField] private GameEventSO<CreditProfile> _creditScoreChangedEvent;
+        [SerializeField] private GameEventSO<LoanContract> _loanStatusChangedEvent;
         
         private float _lastInterestCalculation;
         
@@ -56,6 +56,11 @@ namespace ProjectChimera.Systems.Services.Economy
         public event Action<FinancialTransaction> OnTransactionRecorded;
         public event Action<CreditProfile> OnCreditScoreChanged;
         public event Action<LoanContract> OnLoanStatusChanged;
+        
+        // IFinancialManagementService events
+        public event Action<string, float, float> OnCashChanged;
+        public event Action<string, InventoryItem, float> OnInventoryChanged;
+        public event Action<string, FinancialMetrics> OnFinancialMetricsUpdated;
         
         #endregion
 
@@ -226,7 +231,7 @@ namespace ProjectChimera.Systems.Services.Economy
             {
                 _playerCreditProfile.CreditRating = CalculateCreditRating(_playerCreditProfile.CreditScore);
                 OnCreditScoreChanged?.Invoke(_playerCreditProfile);
-                _creditScoreChangedEvent?.Raise();
+                _creditScoreChangedEvent?.Raise(_playerCreditProfile);
                 
                 Debug.Log($"Credit score updated: {oldScore} → {_playerCreditProfile.CreditScore} ({_playerCreditProfile.CreditRating})");
             }
@@ -304,7 +309,7 @@ namespace ProjectChimera.Systems.Services.Economy
 
             OnLoanStatusChanged?.Invoke(loanContract);
             OnFinancialStatusChanged?.Invoke(_playerFinances);
-            _loanStatusChangedEvent?.Raise();
+            _loanStatusChangedEvent?.Raise(loanContract);
             
             Debug.Log($"Loan approved: ${amount:F2} at {loanContract.InterestRate:P2} for {termMonths} months");
             return true;
@@ -386,6 +391,123 @@ namespace ProjectChimera.Systems.Services.Economy
             float monthlyIncome = _monthlyIncome.Values.Sum();
             
             return monthlyIncome > 0 ? monthlyDebt / monthlyIncome : 0f;
+        }
+        
+        #endregion
+
+        #region IFinancialManagementService Implementation
+        
+        public float GetCashBalance(string playerId)
+        {
+            return _playerFinances.CashBalance;
+        }
+
+        public float GetNetWorth(string playerId)
+        {
+            return CalculateNetWorth();
+        }
+
+        public bool TransferCash(string playerId, float amount, CashTransferType transferType)
+        {
+            if (amount <= 0) return false;
+
+            float oldBalance = _playerFinances.CashBalance;
+            
+            switch (transferType)
+            {
+                case CashTransferType.Income:
+                    _playerFinances.CashBalance += amount;
+                    break;
+                case CashTransferType.Expense:
+                    if (_playerFinances.CashBalance < amount) return false;
+                    _playerFinances.CashBalance -= amount;
+                    break;
+                default:
+                    return false;
+            }
+
+            OnCashChanged?.Invoke(playerId, oldBalance, _playerFinances.CashBalance);
+            return true;
+        }
+
+        public FinancialMetrics GetFinancialMetrics(string playerId)
+        {
+            return _playerFinances.Metrics ?? new FinancialMetrics
+            {
+                NetWorth = CalculateNetWorth(),
+                LiquidAssets = _playerFinances.CashBalance,
+                TotalDebt = GetTotalLoanBalance() + _playerFinances.UsedCredit,
+                MonthlyIncome = _monthlyIncome.Values.Sum(),
+                MonthlyExpenses = _monthlyExpenses.Values.Sum(),
+                CashFlow = _monthlyIncome.Values.Sum() - _monthlyExpenses.Values.Sum(),
+                DebtToIncomeRatio = CalculateDebtToIncomeRatio(),
+                LastCalculation = DateTime.Now
+            };
+        }
+
+        public PlayerInventory GetPlayerInventory(string playerId)
+        {
+            // For now, return a basic inventory - this would typically be managed by a separate inventory service
+            return new PlayerInventory
+            {
+                PlayerId = playerId,
+                Items = new List<InventoryItem>(),
+                MaxCapacity = 1000f,
+                CurrentCapacity = 0f,
+                LastUpdate = DateTime.Now
+            };
+        }
+
+        public List<InventoryItem> GetInventoryForProduct(string playerId, MarketProductSO product)
+        {
+            // This would typically delegate to an inventory service
+            return new List<InventoryItem>();
+        }
+
+        public float GetTotalInventoryQuantity(string playerId, MarketProductSO product)
+        {
+            // This would typically delegate to an inventory service
+            return 0f;
+        }
+
+        public bool AddToInventory(string playerId, InventoryItem item)
+        {
+            // This would typically delegate to an inventory service
+            OnInventoryChanged?.Invoke(playerId, item, item.Quantity);
+            return true;
+        }
+
+        public bool RemoveFromInventory(string playerId, string itemId, float quantity)
+        {
+            // This would typically delegate to an inventory service
+            return false;
+        }
+
+        public TradingProfitabilityAnalysis AnalyzeProfitability(MarketProductSO product, float quantity, TradingTransactionType transactionType)
+        {
+            return new TradingProfitabilityAnalysis
+            {
+                Product = product,
+                Quantity = quantity,
+                TransactionType = transactionType,
+                EstimatedProfit = 0f,
+                ProfitMargin = 0f,
+                BreakEvenPrice = 0f,
+                RiskAssessment = 0.5f,
+                Recommendation = "Requires market analysis",
+                AnalysisDate = DateTime.Now
+            };
+        }
+
+        public float CalculateBreakEvenPrice(MarketProductSO product, float quantity)
+        {
+            // Basic break-even calculation - would be more sophisticated in practice
+            return product.BaseWholesalePrice;
+        }
+
+        public float EstimateProfit(MarketProductSO product, float quantity, float buyPrice, float sellPrice)
+        {
+            return (sellPrice - buyPrice) * quantity;
         }
         
         #endregion
@@ -502,7 +624,7 @@ namespace ProjectChimera.Systems.Services.Economy
             _transactionHistory.RemoveAll(r => r.Date < cutoffDate);
 
             OnTransactionRecorded?.Invoke(record);
-            _financialStatusChangedEvent?.Raise();
+            _financialStatusChangedEvent?.Raise(_playerFinances);
         }
 
         private void UpdateFinancialAnalytics(float amount, bool isIncome)

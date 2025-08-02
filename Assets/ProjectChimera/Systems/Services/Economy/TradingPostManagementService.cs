@@ -46,8 +46,13 @@ namespace ProjectChimera.Systems.Services.Economy
 
         #region Events
         
+        // Interface events
+        public event Action<TradingPost> OnTradingPostStatusChanged;
+        public event Action<TradingOpportunity> OnTradingOpportunityAdded;
+        public event Action<string> OnTradingOpportunityExpired;
+        
+        // Additional events
         public event Action<TradingPost, TradingPostState> OnTradingPostStateChanged;
-        public event Action<TradingOpportunity> OnTradingOpportunityCreated;
         public event Action<TradingPost> OnTradingPostRestocked;
         public event Action<TradingPost, float> OnTradingPostPricesUpdated;
         
@@ -68,7 +73,7 @@ namespace ProjectChimera.Systems.Services.Economy
             InitializeTradingPosts();
             
             // Generate initial opportunities
-            GenerateInitialOpportunities();
+            GenerateNewOpportunities();
             
             // Register with ServiceRegistry
             ServiceRegistry.Instance.RegisterService<ITradingPostManagementService>(this, ServiceDomain.Economy);
@@ -101,8 +106,113 @@ namespace ProjectChimera.Systems.Services.Economy
         
         public List<TradingPost> GetAvailableTradingPosts()
         {
-            return _availableTradingPosts.Where(tp => tp.IsActive).ToList();
+            return _availableTradingPosts.Where(tp => tp.Status == TradingPostStatus.Open).ToList();
         }
+
+        public List<TradingPost> GetTradingPostsByType(TradingPostType type)
+        {
+            return _availableTradingPosts.Where(tp => tp.Type == type && tp.Status == TradingPostStatus.Open).ToList();
+        }
+
+        public TradingPost GetTradingPost(string tradingPostId)
+        {
+            return _availableTradingPosts.FirstOrDefault(tp => tp.TradingPostId == tradingPostId);
+        }
+
+        public TradingPostStatus GetTradingPostStatus(string tradingPostId)
+        {
+            var tradingPost = GetTradingPost(tradingPostId);
+            return tradingPost?.Status ?? TradingPostStatus.Closed;
+        }
+
+        public List<MarketProductSO> GetAvailableProducts(string tradingPostId)
+        {
+            var tradingPost = GetTradingPost(tradingPostId);
+            if (tradingPost == null) return new List<MarketProductSO>();
+
+            // Return placeholder - would need to resolve product IDs to actual SO references
+            return new List<MarketProductSO>();
+        }
+
+        public float GetProductQuantity(string tradingPostId, MarketProductSO product)
+        {
+            var tradingPost = GetTradingPost(tradingPostId);
+            if (tradingPost == null) return 0f;
+
+            var state = GetTradingPostState(tradingPost);
+            return state?.CurrentInventory?.GetValueOrDefault(product.name, 0f) ?? 0f;
+        }
+
+        public bool IsProductAvailable(string tradingPostId, MarketProductSO product, float quantity)
+        {
+            var tradingPost = GetTradingPost(tradingPostId);
+            return tradingPost != null && IsTradingPostAvailable(tradingPost, product, quantity);
+        }
+
+        public List<TradingOpportunity> GetTradingOpportunities(OpportunityType opportunityType = OpportunityType.All)
+        {
+            if (opportunityType == OpportunityType.All)
+                return GetCurrentTradingOpportunities();
+            
+            return _currentOpportunities.Where(o => o.Type == opportunityType && o.ExpirationTime > DateTime.Now).ToList();
+        }
+
+        public bool IsOpportunityValid(string opportunityId)
+        {
+            var opportunity = GetTradingOpportunity(opportunityId);
+            return opportunity != null && opportunity.ExpirationTime > DateTime.Now;
+        }
+
+        public void UpdateTradingOpportunities()
+        {
+            GenerateNewOpportunities();
+            RemoveExpiredOpportunities();
+        }
+
+        private void GenerateNewOpportunities()
+        {
+            // Generate new trading opportunities
+            int numToGenerate = UnityEngine.Random.Range(1, 4);
+            for (int i = 0; i < numToGenerate; i++)
+            {
+                CreateRandomTradingOpportunity();
+            }
+        }
+
+        private void RemoveExpiredOpportunities()
+        {
+            var expired = _currentOpportunities.Where(o => o.ExpirationTime <= DateTime.Now).ToList();
+            foreach (var opportunity in expired)
+            {
+                _currentOpportunities.Remove(opportunity);
+                OnTradingOpportunityExpired?.Invoke(opportunity.OpportunityId);
+            }
+        }
+
+        private void CreateRandomTradingOpportunity()
+        {
+            if (_availableTradingPosts.Count == 0) return;
+
+            var tradingPost = _availableTradingPosts[UnityEngine.Random.Range(0, _availableTradingPosts.Count)];
+            var opportunity = new TradingOpportunity
+            {
+                OpportunityId = Guid.NewGuid().ToString(),
+                Name = "Trading Opportunity",
+                Description = "Limited time trading opportunity",
+                Type = (OpportunityType)UnityEngine.Random.Range(1, 5), // Skip 'All' which is 0
+                SourcePost = tradingPost,
+                PotentialProfit = UnityEngine.Random.Range(100f, 1000f),
+                ProfitMargin = UnityEngine.Random.Range(0.1f, 0.3f),
+                RequiredCapital = UnityEngine.Random.Range(500f, 5000f),
+                ExpirationTime = DateTime.Now.AddHours(UnityEngine.Random.Range(6, 72)),
+                RiskLevel = UnityEngine.Random.Range(0.1f, 0.8f),
+                RecommendedAction = "Evaluate for profitability"
+            };
+
+            _currentOpportunities.Add(opportunity);
+            OnTradingOpportunityAdded?.Invoke(opportunity);
+        }
+
 
         public TradingPostState GetTradingPostState(TradingPost tradingPost)
         {
@@ -111,7 +221,7 @@ namespace ProjectChimera.Systems.Services.Economy
 
         public bool IsTradingPostAvailable(TradingPost tradingPost, MarketProductSO product, float quantity)
         {
-            if (!_enableTradingPosts || tradingPost == null || !tradingPost.IsActive)
+            if (!_enableTradingPosts || tradingPost == null || tradingPost.Status != TradingPostStatus.Open)
                 return false;
 
             var state = GetTradingPostState(tradingPost);
@@ -119,12 +229,12 @@ namespace ProjectChimera.Systems.Services.Economy
                 return false;
 
             // Check if trading post accepts this product type
-            if (!tradingPost.AcceptedProductTypes.Contains(product.ProductType))
+            if (!tradingPost.AvailableProducts.Contains(product.name))
                 return false;
 
             // Check available quantity
-            var availableProduct = state.AvailableProducts.FirstOrDefault(p => p.Product == product);
-            if (availableProduct == null || availableProduct.AvailableQuantity < quantity)
+            var availableQuantity = state.CurrentInventory.GetValueOrDefault(product.name, 0f);
+            if (availableQuantity < quantity)
                 return false;
 
             return true;
@@ -136,7 +246,7 @@ namespace ProjectChimera.Systems.Services.Economy
             if (state == null)
                 return 0f;
 
-            float basePrice = product.BasePrice;
+            float basePrice = product.BaseWholesalePrice;
             float markup = isBuying ? state.PriceMarkup : (1f / state.PriceMarkup);
             
             return basePrice * markup * quantity;
@@ -148,13 +258,11 @@ namespace ProjectChimera.Systems.Services.Economy
                 return false;
 
             var state = GetTradingPostState(tradingPost);
-            var availableProduct = state.AvailableProducts.FirstOrDefault(p => p.Product == product);
-            
-            if (availableProduct != null)
+            if (state != null && state.CurrentInventory.ContainsKey(product.name))
             {
-                availableProduct.AvailableQuantity -= quantity;
+                state.CurrentInventory[product.name] -= quantity;
                 OnTradingPostStateChanged?.Invoke(tradingPost, state);
-                Debug.Log($"Reserved {quantity} of {product.ProductName} at {tradingPost.TradingPostName}");
+                Debug.Log($"Reserved {quantity} of {product.ProductName} at {tradingPost.Name}");
                 return true;
             }
 
@@ -166,10 +274,19 @@ namespace ProjectChimera.Systems.Services.Economy
             var state = GetTradingPostState(tradingPost);
             if (state != null)
             {
-                state.ReputationWithPlayer = Mathf.Clamp01(state.ReputationWithPlayer + reputationChange);
+                // Store reputation in DynamicData since ReputationWithPlayer doesn't exist
+                float currentReputation = 0.5f; // Default reputation
+                if (state.DynamicData.ContainsKey("PlayerReputation"))
+                {
+                    currentReputation = (float)state.DynamicData["PlayerReputation"];
+                }
+                
+                currentReputation = Mathf.Clamp01(currentReputation + reputationChange);
+                state.DynamicData["PlayerReputation"] = currentReputation;
+                
                 UpdateTradingPostPrices(state);
                 OnTradingPostStateChanged?.Invoke(tradingPost, state);
-                Debug.Log($"Updated reputation with {tradingPost.TradingPostName}: {state.ReputationWithPlayer:F2}");
+                Debug.Log($"Updated reputation with {tradingPost.Name}: {currentReputation:F2}");
             }
         }
         
@@ -179,7 +296,7 @@ namespace ProjectChimera.Systems.Services.Economy
         
         public List<TradingOpportunity> GetCurrentTradingOpportunities()
         {
-            return _currentOpportunities.Where(o => o.IsActive && o.ExpirationDate > DateTime.Now).ToList();
+            return _currentOpportunities.Where(o => o.ExpirationTime > DateTime.Now).ToList();
         }
 
         public TradingOpportunity GetTradingOpportunity(string opportunityId)
@@ -190,24 +307,25 @@ namespace ProjectChimera.Systems.Services.Economy
         public bool ClaimTradingOpportunity(string opportunityId, string playerId)
         {
             var opportunity = GetTradingOpportunity(opportunityId);
-            if (opportunity == null || !opportunity.IsActive)
+            if (opportunity == null || opportunity.ExpirationTime <= DateTime.Now)
                 return false;
 
-            opportunity.IsActive = false;
-            opportunity.ClaimedBy = playerId;
-            opportunity.ClaimedDate = DateTime.Now;
+            // Mark opportunity as claimed in metadata since these properties don't exist
+            opportunity.OpportunityData["IsActive"] = false;
+            opportunity.OpportunityData["ClaimedBy"] = playerId;
+            opportunity.OpportunityData["ClaimedDate"] = DateTime.Now;
 
-            Debug.Log($"Player {playerId} claimed trading opportunity: {opportunity.OpportunityType}");
+            Debug.Log($"Player {playerId} claimed trading opportunity: {opportunity.Type}");
             return true;
         }
 
         public void GenerateTradingOpportunity()
         {
             var opportunityTypes = new[] { 
-                OpportunityType.Bulk_Discount, 
-                OpportunityType.Quality_Premium, 
-                OpportunityType.Urgent_Sale, 
-                OpportunityType.Seasonal_Special 
+                OpportunityType.Buy, 
+                OpportunityType.Sell, 
+                OpportunityType.Arbitrage, 
+                OpportunityType.Special 
             };
 
             var selectedType = opportunityTypes[UnityEngine.Random.Range(0, opportunityTypes.Length)];
@@ -216,20 +334,21 @@ namespace ProjectChimera.Systems.Services.Economy
             var opportunity = new TradingOpportunity
             {
                 OpportunityId = Guid.NewGuid().ToString(),
-                OpportunityType = selectedType,
-                TradingPost = tradingPost,
-                PriceModifier = GetOpportunityPriceModifier(selectedType),
-                QualityRequirement = GetOpportunityQualityRequirement(selectedType),
-                MinQuantity = UnityEngine.Random.Range(10f, 50f),
-                MaxQuantity = UnityEngine.Random.Range(50f, 200f),
-                ExpirationDate = DateTime.Now.AddHours(UnityEngine.Random.Range(6, 72)),
-                IsActive = true,
-                CreatedDate = DateTime.Now
+                Name = "Trading Opportunity",
+                Description = "Limited time trading opportunity",
+                Type = selectedType,
+                SourcePost = tradingPost,
+                PotentialProfit = UnityEngine.Random.Range(100f, 1000f),
+                ProfitMargin = UnityEngine.Random.Range(0.1f, 0.3f),
+                RequiredCapital = UnityEngine.Random.Range(500f, 5000f),
+                ExpirationTime = DateTime.Now.AddHours(UnityEngine.Random.Range(6, 72)),
+                RiskLevel = UnityEngine.Random.Range(0.1f, 0.8f),
+                RecommendedAction = "Evaluate for profitability"
             };
 
             _currentOpportunities.Add(opportunity);
-            OnTradingOpportunityCreated?.Invoke(opportunity);
-            Debug.Log($"Generated trading opportunity: {selectedType} at {tradingPost.TradingPostName}");
+            OnTradingOpportunityAdded?.Invoke(opportunity);
+            Debug.Log($"Generated trading opportunity: {opportunity.Type} at {tradingPost.Name}");
         }
         
         #endregion
@@ -272,21 +391,25 @@ namespace ProjectChimera.Systems.Services.Economy
             var dispensary = new TradingPost
             {
                 TradingPostId = "dispensary_001",
-                TradingPostName = "Green Valley Dispensary",
-                TradingPostType = TradingPostType.Dispensary,
-                Location = "Downtown",
-                AcceptedProductTypes = new List<ProductType> { ProductType.Flower, ProductType.Concentrate },
-                IsActive = true
+                Name = "Green Valley Dispensary",
+                Description = "Downtown dispensary specializing in premium flower and concentrates",
+                Type = TradingPostType.Dispensary,
+                Location = new Vector3(10f, 0f, 15f), // Downtown coordinates
+                AvailableProducts = new List<string> { "Flower", "Concentrate" },
+                Status = TradingPostStatus.Open,
+                ContactInfo = "Downtown Location"
             };
 
             var processor = new TradingPost
             {
                 TradingPostId = "processor_001",
-                TradingPostName = "Premium Extracts Co",
-                TradingPostType = TradingPostType.Processor,
-                Location = "Industrial District",
-                AcceptedProductTypes = new List<ProductType> { ProductType.Biomass, ProductType.Trim },
-                IsActive = true
+                Name = "Premium Extracts Co",
+                Description = "Industrial processing facility for biomass and trim",
+                Type = TradingPostType.Processor,
+                Location = new Vector3(-20f, 0f, 30f), // Industrial district coordinates
+                AvailableProducts = new List<string> { "Biomass", "Trim" },
+                Status = TradingPostStatus.Open,
+                ContactInfo = "Industrial District Location"
             };
 
             _availableTradingPosts.Add(dispensary);
@@ -297,12 +420,15 @@ namespace ProjectChimera.Systems.Services.Economy
         {
             var state = new TradingPostState
             {
-                TradingPost = tradingPost,
-                IsOpen = true,
+                TradingPostId = tradingPost.TradingPostId,
+                CurrentStatus = TradingPostStatus.Open,
                 PriceMarkup = _basePriceMarkup,
-                ReputationWithPlayer = 0.5f,
-                LastRestockDate = DateTime.Now.AddHours(-UnityEngine.Random.Range(1, 12)),
-                AvailableProducts = new List<TradingPostProduct>()
+                LastUpdate = DateTime.Now.AddHours(-UnityEngine.Random.Range(1, 12)),
+                CurrentInventory = new Dictionary<string, float>(),
+                DynamicData = new Dictionary<string, object>
+                {
+                    ["PlayerReputation"] = 0.5f
+                }
             };
 
             RestockTradingPost(state);
@@ -327,45 +453,54 @@ namespace ProjectChimera.Systems.Services.Economy
 
         private void RestockTradingPost(TradingPostState state)
         {
-            state.AvailableProducts.Clear();
+            // Get the actual trading post from our list
+            var tradingPost = _availableTradingPosts.FirstOrDefault(tp => tp.TradingPostId == state.TradingPostId);
+            if (tradingPost == null) return;
 
-            foreach (var productType in state.TradingPost.AcceptedProductTypes)
+            state.CurrentInventory.Clear();
+
+            foreach (var productName in tradingPost.AvailableProducts)
             {
                 if (UnityEngine.Random.Range(0f, 1f) < 0.7f) // 70% chance to have each type
                 {
-                    var product = new TradingPostProduct
-                    {
-                        AvailableQuantity = UnityEngine.Random.Range(10f, 100f),
-                        QualityRange = new Vector2(0.6f, 0.9f),
-                        PriceModifier = UnityEngine.Random.Range(0.9f, 1.1f)
-                    };
-
-                    state.AvailableProducts.Add(product);
+                    float quantity = UnityEngine.Random.Range(10f, 100f);
+                    state.CurrentInventory[productName] = quantity;
                 }
             }
 
-            state.LastRestockDate = DateTime.Now;
-            OnTradingPostRestocked?.Invoke(state.TradingPost);
-            Debug.Log($"Restocked trading post: {state.TradingPost.TradingPostName}");
+            state.LastUpdate = DateTime.Now;
+            OnTradingPostRestocked?.Invoke(tradingPost);
+            Debug.Log($"Restocked trading post: {tradingPost.Name}");
         }
 
         private void UpdateTradingPostPrices(TradingPostState state)
         {
-            float reputationBonus = (state.ReputationWithPlayer - 0.5f) * _reputationPriceModifier;
+            // Get the actual trading post from our list
+            var tradingPost = _availableTradingPosts.FirstOrDefault(tp => tp.TradingPostId == state.TradingPostId);
+            if (tradingPost == null) return;
+
+            // Get reputation from dynamic data since ReputationWithPlayer doesn't exist
+            float reputation = 0.5f; // Default reputation
+            if (state.DynamicData.ContainsKey("PlayerReputation"))
+            {
+                reputation = (float)state.DynamicData["PlayerReputation"];
+            }
+
+            float reputationBonus = (reputation - 0.5f) * _reputationPriceModifier;
             float oldMarkup = state.PriceMarkup;
             state.PriceMarkup = Mathf.Clamp(oldMarkup - reputationBonus, 1.0f, _maxPriceMarkup);
             
-            OnTradingPostPricesUpdated?.Invoke(state.TradingPost, state.PriceMarkup);
+            OnTradingPostPricesUpdated?.Invoke(tradingPost, state.PriceMarkup);
         }
 
         private float GetOpportunityPriceModifier(OpportunityType type)
         {
             return type switch
             {
-                OpportunityType.Bulk_Discount => 0.8f,
-                OpportunityType.Quality_Premium => 1.3f,
-                OpportunityType.Urgent_Sale => 0.7f,
-                OpportunityType.Seasonal_Special => 0.9f,
+                OpportunityType.Buy => 0.8f,
+                OpportunityType.Sell => 1.3f,
+                OpportunityType.Arbitrage => 1.2f,
+                OpportunityType.Special => 0.9f,
                 _ => 1.0f
             };
         }
@@ -374,8 +509,8 @@ namespace ProjectChimera.Systems.Services.Economy
         {
             return type switch
             {
-                OpportunityType.Quality_Premium => 0.8f,
-                OpportunityType.Seasonal_Special => 0.7f,
+                OpportunityType.Special => 0.8f,
+                OpportunityType.Arbitrage => 0.7f,
                 _ => 0.5f
             };
         }
@@ -423,7 +558,7 @@ namespace ProjectChimera.Systems.Services.Economy
             foreach (var kvp in _tradingPostStates)
             {
                 var state = kvp.Value;
-                if ((DateTime.Now - state.LastRestockDate).TotalHours >= _restockInterval)
+                if ((DateTime.Now - state.LastUpdate).TotalHours >= _restockInterval)
                 {
                     RestockTradingPost(state);
                 }
@@ -440,7 +575,7 @@ namespace ProjectChimera.Systems.Services.Economy
 
         private void CleanupExpiredOpportunities()
         {
-            _currentOpportunities.RemoveAll(o => o.ExpirationDate < DateTime.Now);
+            _currentOpportunities.RemoveAll(o => o.ExpirationTime < DateTime.Now);
         }
         
         #endregion

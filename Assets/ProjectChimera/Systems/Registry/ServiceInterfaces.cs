@@ -65,6 +65,11 @@ using TradingPostState = ProjectChimera.Data.Economy.TradingPostState;
 using PlayerFinances = ProjectChimera.Data.Economy.PlayerFinances;
 using LoanType = ProjectChimera.Data.Economy.LoanType;
 using CreditRating = ProjectChimera.Data.Economy.CreditRating;
+// Financial data types from FinanceDataStructures.cs
+using LoanContract = ProjectChimera.Data.Economy.LoanContract;
+using CreditProfile = ProjectChimera.Data.Economy.CreditProfile;
+using FinancialAnalysis = ProjectChimera.Data.Economy.FinancialAnalysis;
+using LoanStatus = ProjectChimera.Data.Economy.LoanStatus;
 
 // Additional Economy type aliases for services
 using MarketProductSO = ProjectChimera.Data.Economy.MarketProductSO;
