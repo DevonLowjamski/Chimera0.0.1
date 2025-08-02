@@ -155,14 +155,10 @@ namespace ProjectChimera.Systems.Registry
                     return CreateProgressionManagerDecompositionPlan();
                 case "TradingManager":
                     return CreateTradingManagerDecompositionPlan();
-                case "NPCRelationshipManager":
-                    return CreateNPCRelationshipDecompositionPlan();
                 case "AdvancedSpeedTreeManager":
                     return CreateSpeedTreeDecompositionPlan();
                 case "LiveEventsManager":
                     return CreateLiveEventsDecompositionPlan();
-                case "NPCInteractionManager":
-                    return CreateNPCInteractionDecompositionPlan();
                 default:
                     Debug.LogWarning($"No predefined plan available for {managerName}");
                     return null;
@@ -528,21 +524,6 @@ namespace ProjectChimera.Systems.Registry
             };
         }
 
-        private ManagerAnalysisResult CreateNPCRelationshipDecompositionPlan()
-        {
-            return new ManagerAnalysisResult
-            {
-                ManagerName = "NPCRelationshipManager",
-                TotalLines = 1454,
-                ProposedServices = new List<ProposedService>
-                {
-                    new ProposedService { Name = "RelationshipTrackingService", Domain = ServiceDomain.AI, EstimatedLines = 485, Priority = ServicePriority.High },
-                    new ProposedService { Name = "ReputationSystemService", Domain = ServiceDomain.AI, EstimatedLines = 485, Priority = ServicePriority.High },
-                    new ProposedService { Name = "SocialBenefitsService", Domain = ServiceDomain.AI, EstimatedLines = 484, Priority = ServicePriority.Medium }
-                },
-                IsValid = true
-            };
-        }
 
         private ManagerAnalysisResult CreateSpeedTreeDecompositionPlan()
         {
@@ -577,21 +558,6 @@ namespace ProjectChimera.Systems.Registry
             };
         }
 
-        private ManagerAnalysisResult CreateNPCInteractionDecompositionPlan()
-        {
-            return new ManagerAnalysisResult
-            {
-                ManagerName = "NPCInteractionManager",
-                TotalLines = 1320,
-                ProposedServices = new List<ProposedService>
-                {
-                    new ProposedService { Name = "DialogueSystemService", Domain = ServiceDomain.AI, EstimatedLines = 440, Priority = ServicePriority.High },
-                    new ProposedService { Name = "NPCPersonalityService", Domain = ServiceDomain.AI, EstimatedLines = 440, Priority = ServicePriority.High },
-                    new ProposedService { Name = "InteractionTrackingService", Domain = ServiceDomain.AI, EstimatedLines = 440, Priority = ServicePriority.Medium }
-                },
-                IsValid = true
-            };
-        }
 
         #endregion
 

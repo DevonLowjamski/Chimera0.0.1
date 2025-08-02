@@ -17,7 +17,7 @@ namespace ProjectChimera.Data.Economy
         [SerializeField] private ContractType _contractType = ContractType.Supply_Agreement;
         [SerializeField] private ContractCategory _category = ContractCategory.Processing;
         [SerializeField, TextArea(3, 5)] private string _description;
-        [SerializeField] private NPCProfileSO _contractorNPC;
+        [SerializeField] private string _contractorName;
         
         [Header("Contract Terms")]
         [SerializeField] private ContractTerms _terms;
@@ -66,7 +66,7 @@ namespace ProjectChimera.Data.Economy
         public ContractType ContractType => _contractType;
         public ContractCategory Category => _category;
         public string Description => _description;
-        public NPCProfileSO ContractorNPC => _contractorNPC;
+        public string ContractorName => _contractorName;
         public ContractTerms Terms => _terms;
         public PaymentStructure PaymentStructure => _paymentStructure;
         public List<DeliveryRequirement> DeliveryRequirements => _deliveryRequirements;
@@ -289,9 +289,9 @@ namespace ProjectChimera.Data.Economy
                 isValid = false;
             }
                 
-            if (_contractorNPC == null)
+            if (string.IsNullOrEmpty(_contractorName))
             {
-                Debug.LogError($"Contract {name}: Contractor NPC must be assigned", this);
+                Debug.LogError($"Contract {name}: Contractor name must be assigned", this);
                 isValid = false;
             }
                 

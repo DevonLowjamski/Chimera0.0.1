@@ -138,7 +138,7 @@ namespace ProjectChimera.Data.Economy
     public class IndustryConnection
     {
         public string ConnectionName;
-        public NPCProfileSO ConnectedNPC;
+        public string ConnectedEntity;
         public ConnectionType ConnectionType;
         [Range(0f, 1f)] public float ConnectionStrength = 0.5f;
         public bool IsPublicConnection = true;
@@ -299,7 +299,7 @@ namespace ProjectChimera.Data.Economy
         public int TimeToResolve;
         public float FinancialImpact;
         public float ReputationImpact;
-        public NPCProfileSO SourceNPC;
+        public string SourceEntity;
         public List<ResolutionOption> ResolutionOptions = new List<ResolutionOption>();
     }
     
@@ -316,19 +316,6 @@ namespace ProjectChimera.Data.Economy
     }
     
     // Enums for the economic system
-    public enum NPCType
-    {
-        Buyer,
-        Supplier,
-        Processor,
-        Distributor,
-        Retailer,
-        Regulator,
-        Investor,
-        Consultant,
-        Competitor,
-        Service_Provider
-    }
     
     public enum IndustryRole
     {

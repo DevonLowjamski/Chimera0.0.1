@@ -43,7 +43,7 @@ using ResourceType = ProjectChimera.Data.Research.ResourceType;
 using FacilityStatus = ProjectChimera.Data.Research.FacilityStatus;
 using EquipmentStatus = ProjectChimera.Data.Research.EquipmentStatus;
 
-// Trading-specific type aliases
+// Trading-specific type aliases - Only for types that actually exist
 using CompletedTransaction = ProjectChimera.Data.Economy.CompletedTransaction;
 using PendingTransaction = ProjectChimera.Data.Economy.PendingTransaction;
 using TransactionResult = ProjectChimera.Data.Economy.TransactionResult;
@@ -61,6 +61,13 @@ using TradingPerformanceMetrics = ProjectChimera.Data.Economy.TradingPerformance
 using PlayerInventory = ProjectChimera.Data.Economy.PlayerInventory;
 using InventoryItem = ProjectChimera.Data.Economy.InventoryItem;
 using FinancialMetrics = ProjectChimera.Data.Economy.FinancialMetrics;
+using TradingPostState = ProjectChimera.Data.Economy.TradingPostState;
+using PlayerFinances = ProjectChimera.Data.Economy.PlayerFinances;
+using LoanType = ProjectChimera.Data.Economy.LoanType;
+using CreditRating = ProjectChimera.Data.Economy.CreditRating;
+
+// Additional Economy type aliases for services
+using MarketProductSO = ProjectChimera.Data.Economy.MarketProductSO;
 
 // Only include aliases for types that actually exist and are needed
 // Most progression types are already defined in existing files
