@@ -29,7 +29,8 @@ namespace ProjectChimera.Data.Achievements
         Innovation,        // Research and development achievements
         Seasonal,          // Time-based and event achievements
         Hidden,            // Secret and easter egg achievements
-        Legacy            // Long-term impact achievements
+        Legacy,            // Long-term impact achievements
+        Competition        // Competition and tournament achievements
     }
     
     /// <summary>

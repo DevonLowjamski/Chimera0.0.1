@@ -126,7 +126,12 @@ namespace ProjectChimera.Data.Progression
     {
         public string MilestoneID;
         public string MilestoneName;
+        public string Name; // Alias for MilestoneName
+        public string Description; // Alias for MilestoneDescription
         public ResearchMilestoneType MilestoneType;
+        public MilestoneType Type; // Generic milestone type
+        public float RequiredValue;
+        public string Category;
         [Range(1, 365)] public int TargetDay = 30;
         public bool IsCriticalMilestone = false;
         public List<string> DeliverableCriteria = new List<string>();

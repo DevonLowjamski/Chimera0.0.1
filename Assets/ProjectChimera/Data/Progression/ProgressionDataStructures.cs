@@ -54,12 +54,15 @@ namespace ProjectChimera.Data.Progression
     [System.Serializable]
     public class AchievementReward
     {
+        public string RewardID;
+        public string AchievementID;
         public AchievementRewardType RewardType;
         public RewardType Type; // Additional type field for compatibility
         public string RewardDescription;
         public string Description; // Alias for RewardDescription
         public float RewardValue;
         public float Amount { get => RewardValue; set => RewardValue = value; } // Writable alias for RewardValue for compatibility
+        public DateTime DateAwarded;
         public SkillNodeSO UnlockedSkill;
         public ResearchProjectSO UnlockedResearch;
         public EquipmentDataSO UnlockedEquipment;

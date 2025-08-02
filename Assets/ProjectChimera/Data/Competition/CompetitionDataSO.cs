@@ -11,12 +11,12 @@ namespace ProjectChimera.Data.Competition
     // Core Competition Enums
     public enum CompetitionType
     {
-        Local, Regional, National, International, Invitational, Online
+        Local, Regional, National, International, Invitational, Online, Championship, Community
     }
     
     public enum CompetitionTier
     {
-        Amateur, Professional, Elite, Championship, WorldClass
+        Novice, Amateur, Professional, Elite, Championship, WorldClass
     }
     
     public enum CompetitorLevel
