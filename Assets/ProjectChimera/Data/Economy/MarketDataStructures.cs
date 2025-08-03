@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Data.Genetics;
 
-namespace ProjectChimera.Data.Economy
+namespace ProjectChimera.Data.Economy.Market
 {
     /// <summary>
     /// Market-focused data structures extracted from EconomicDataStructures.cs

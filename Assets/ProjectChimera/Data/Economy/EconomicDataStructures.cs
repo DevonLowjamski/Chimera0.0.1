@@ -3,6 +3,13 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Economy.Investments;
+using ProjectChimera.Data.Economy.Market;
+using ProjectChimera.Data.Economy.Trading;
+using ProjectChimera.Data.Economy.Pricing;
+using ProjectChimera.Data.Economy.Transactions;
+using ProjectChimera.Data.Economy.Indicators;
+using ProjectChimera.Data.Economy.ResourceFlow;
+using ProjectChimera.Data.Economy.Configuration;
 
 namespace ProjectChimera.Data.Economy
 {
@@ -1716,27 +1723,7 @@ namespace ProjectChimera.Data.Economy
         public GovernanceStructure Governance;
     }
 
-    [System.Serializable]
-    public class JointVentureProposal
-    {
-        public string ProposalId;
-        public string ProposingPlayerId;
-        public List<string> TargetPartners = new List<string>();
-        public string BusinessObjective;
-        public decimal RequiredInvestment;
-        public Dictionary<string, decimal> ProposedContributions = new Dictionary<string, decimal>();
-        public int ProjectedDurationMonths;
-        public decimal ExpectedReturns;
-        public RiskAssessment Risks;
-        public DateTime ProposalDate;
-        public ProposalStatus Status;
-        
-        // Additional properties needed by EnhancedEconomicGamingManager
-        public string VentureName;
-        public string Objective;
-        public List<string> Partners = new List<string>();
-        public Dictionary<string, decimal> ResourceContributions = new Dictionary<string, decimal>();
-    }
+    // JointVentureProposal class moved to InvestmentDataStructures.cs
 
     // System Classes for Economic Gaming
     [System.Serializable]
@@ -3080,7 +3067,7 @@ namespace ProjectChimera.Data.Economy
     {
         public string IndicatorName;
         public List<float> HistoricalValues;
-        public TrendDirection Direction;
+        public ProjectChimera.Data.Economy.Indicators.TrendDirection Direction;
         public float TrendStrength;
         public DateTime LastUpdate;
     }
