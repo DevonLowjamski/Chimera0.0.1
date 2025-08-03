@@ -5,9 +5,10 @@ using System.IO;
 using UnityEngine;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Progression;
-using AchievementCategory = ProjectChimera.Data.Progression.AchievementCategory;
-using AchievementRarity = ProjectChimera.Data.Progression.AchievementRarity;
-using ProgressionAchievementProgress = ProjectChimera.Data.Progression.AchievementProgress;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
+using AchievementProgress = ProjectChimera.Data.Progression.Achievements.AchievementProgress;
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -486,7 +487,7 @@ namespace ProjectChimera.Systems.Progression
             // Repair null collections
             if (playerData.AchievementProgress == null)
             {
-                playerData.AchievementProgress = new List<ProgressionAchievementProgress>();
+                playerData.AchievementProgress = new List<AchievementProgress>();
                 repaired = true;
             }
             
@@ -629,7 +630,7 @@ namespace ProjectChimera.Systems.Progression
                 PlayerID = playerId,
                 CreationDate = DateTime.Now,
                 LastModified = DateTime.Now,
-                AchievementProgress = new List<ProgressionAchievementProgress>(),
+                AchievementProgress = new List<AchievementProgress>(),
                 UnlockedAchievements = new List<string>(),
                 TotalPoints = 0f,
                 CompletionPercentage = 0f
@@ -791,7 +792,7 @@ namespace ProjectChimera.Systems.Progression
         public string PlayerID = "";
         public DateTime CreationDate = DateTime.Now;
         public DateTime LastModified = DateTime.Now;
-        public List<ProgressionAchievementProgress> AchievementProgress = new List<ProgressionAchievementProgress>();
+        public List<AchievementProgress> AchievementProgress = new List<AchievementProgress>();
         public List<string> UnlockedAchievements = new List<string>();
         public float TotalPoints = 0f;
         public float CompletionPercentage = 0f;

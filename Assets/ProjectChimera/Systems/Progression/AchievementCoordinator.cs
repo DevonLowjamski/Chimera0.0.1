@@ -6,10 +6,10 @@ using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
-using AchievementCategory = ProjectChimera.Data.Progression.AchievementCategory;
-using AchievementRarity = ProjectChimera.Data.Progression.AchievementRarity;
-using AchievementProgress = ProjectChimera.Data.Achievements.AchievementProgress;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
+using AchievementProgress = ProjectChimera.Data.Progression.Achievements.AchievementProgress;
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -49,7 +49,7 @@ namespace ProjectChimera.Systems.Progression
         private bool _isInitialized = false;
         private Dictionary<string, DateTime> _playerAchievementTimes = new Dictionary<string, DateTime>();
         private Dictionary<string, int> _playerStreakCounts = new Dictionary<string, int>();
-        private Dictionary<ProjectChimera.Data.Progression.AchievementCategory, CategoryMasteryStatus> _categoryMastery = new Dictionary<ProjectChimera.Data.Progression.AchievementCategory, CategoryMasteryStatus>();
+        private Dictionary<AchievementCategory, CategoryMasteryStatus> _categoryMastery = new Dictionary<AchievementCategory, CategoryMasteryStatus>();
         private List<MetaAchievementRule> _metaAchievementRules = new List<MetaAchievementRule>();
         private Coroutine _coordinationUpdateCoroutine;
         private Coroutine _serviceHealthCheckCoroutine;
@@ -61,7 +61,7 @@ namespace ProjectChimera.Systems.Progression
         // Events for coordination
         public event Action<Achievement, RewardBundle> OnAchievementCompleted;
         public event Action<string, int> OnAchievementStreak;
-        public event Action<ProjectChimera.Data.Progression.AchievementCategory, float> OnCategoryMasteryUpdated;
+        public event Action<AchievementCategory, float> OnCategoryMasteryUpdated;
         public event Action<string, float> OnPointMilestoneReached;
         public event Action<MetaAchievementRule> OnMetaAchievementTriggered;
         public event Action<ServiceHealthStatus> OnServiceHealthUpdated;
@@ -321,7 +321,7 @@ namespace ProjectChimera.Systems.Progression
             _playerAchievementTimes[playerId] = now;
         }
 
-        private void UpdateCategoryMastery(ProjectChimera.Data.Progression.AchievementCategory category, string playerId)
+        private void UpdateCategoryMastery(AchievementCategory category, string playerId)
         {
             if (!_categoryMastery.ContainsKey(category))
             {
@@ -353,12 +353,12 @@ namespace ProjectChimera.Systems.Progression
             }
         }
 
-        private int GetTotalAchievementsInCategory(ProjectChimera.Data.Progression.AchievementCategory category)
+        private int GetTotalAchievementsInCategory(AchievementCategory category)
         {
             if (_trackingService != null)
             {
                 // Convert from Data.Progression.AchievementCategory to Data.Achievements.AchievementCategory
-                var achievementsCategory = (ProjectChimera.Data.Achievements.AchievementCategory)(int)category;
+                var achievementsCategory = (AchievementCategory)(int)category;
                 return _trackingService.GetAchievementsByCategory(achievementsCategory).Count;
             }
             return 10; // Default estimate
@@ -469,7 +469,7 @@ namespace ProjectChimera.Systems.Progression
 
         #region Service Event Handlers
 
-        private void OnAchievementUnlocked(string achievementId, ProjectChimera.Data.Achievements.AchievementProgress progress)
+        private void OnAchievementUnlocked(string achievementId, AchievementProgress progress)
         {
             var achievement = _trackingService?.GetAchievementById(achievementId);
             if (achievement != null)
@@ -630,14 +630,14 @@ namespace ProjectChimera.Systems.Progression
             return new List<MetaAchievementRule>(_metaAchievementRules);
         }
 
-        public CategoryMasteryStatus GetCategoryMastery(ProjectChimera.Data.Progression.AchievementCategory category)
+        public CategoryMasteryStatus GetCategoryMastery(AchievementCategory category)
         {
             return _categoryMastery.TryGetValue(category, out var mastery) ? mastery : null;
         }
 
-        public Dictionary<ProjectChimera.Data.Progression.AchievementCategory, CategoryMasteryStatus> GetAllCategoryMastery()
+        public Dictionary<AchievementCategory, CategoryMasteryStatus> GetAllCategoryMastery()
         {
-            return new Dictionary<ProjectChimera.Data.Progression.AchievementCategory, CategoryMasteryStatus>(_categoryMastery);
+            return new Dictionary<AchievementCategory, CategoryMasteryStatus>(_categoryMastery);
         }
 
         public void ForceMetaAchievementCheck(string playerId)
@@ -683,7 +683,7 @@ namespace ProjectChimera.Systems.Progression
     [System.Serializable]
     public class CategoryMasteryStatus
     {
-        public ProjectChimera.Data.Progression.AchievementCategory Category;
+        public AchievementCategory Category;
         public int CompletedAchievements = 0;
         public int TotalAchievements = 0;
         public float MasteryPercentage = 0f;

@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
 
 namespace ProjectChimera.Data.Progression
 {

@@ -4,8 +4,12 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Competition;
+using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Systems.Registry;
 using ProjectChimera.Systems.Progression;
+using Achievement = ProjectChimera.Systems.Progression.Achievement;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 using PlacementPosition = ProjectChimera.Data.Competition.PlacementPosition;
 using PrizeRarity = ProjectChimera.Data.Competition.PrizeRarity;
 using Prize = ProjectChimera.Data.Competition.Prize;
@@ -44,7 +48,7 @@ namespace ProjectChimera.Systems.Services.Competition
         [Header("Prize Pool")]
         [SerializeField] private List<Prize> _availablePrizes = new List<Prize>();
         [SerializeField] private Dictionary<CompetitionType, PrizeStructure> _prizeStructures = new Dictionary<CompetitionType, PrizeStructure>();
-        [SerializeField] private List<ProjectChimera.Data.Achievements.Achievement> _competitionAchievements = new List<ProjectChimera.Data.Achievements.Achievement>();
+        [SerializeField] private List<Achievement> _competitionAchievements = new List<Achievement>();
         
         [Header("Distributed Rewards")]
         [SerializeField] private List<DistributedPrize> _distributedPrizes = new List<DistributedPrize>();
@@ -236,9 +240,9 @@ namespace ProjectChimera.Systems.Services.Competition
             ProcessSpecialCompetitionAchievements(competitionId, results);
         }
 
-        public List<ProjectChimera.Data.Achievements.Achievement> GetCompetitionAchievements()
+        public List<Achievement> GetCompetitionAchievements()
         {
-            return new List<ProjectChimera.Data.Achievements.Achievement>(_competitionAchievements);
+            return new List<Achievement>(_competitionAchievements);
         }
 
         public bool UnlockAchievement(string playerId, string achievementId)
@@ -416,24 +420,24 @@ namespace ProjectChimera.Systems.Services.Competition
 
         private void InitializeCompetitionAchievements()
         {
-            _competitionAchievements.Add(new ProjectChimera.Data.Achievements.Achievement
+            _competitionAchievements.Add(new Achievement
             {
                 AchievementID = "first_competition",
                 AchievementName = "First Timer",
                 Description = "Participate in your first competition",
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Competition,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Common,
+                Category = AchievementCategory.Business_Success,
+                Rarity = AchievementRarity.Common,
                 Points = 50f,
                 TriggerEvent = "competition_participation"
             });
             
-            _competitionAchievements.Add(new ProjectChimera.Data.Achievements.Achievement
+            _competitionAchievements.Add(new Achievement
             {
                 AchievementID = "competition_winner",
                 AchievementName = "Champion",
                 Description = "Win first place in any competition",
-                Category = ProjectChimera.Data.Achievements.AchievementCategory.Competition,
-                Rarity = ProjectChimera.Data.Achievements.AchievementRarity.Epic,
+                Category = AchievementCategory.Business_Success,
+                Rarity = AchievementRarity.Epic,
                 Points = 500f,
                 TriggerEvent = "first_place_win"
             });

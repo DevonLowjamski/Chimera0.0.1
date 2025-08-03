@@ -5,10 +5,9 @@ using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
-using AchievementCategory = ProjectChimera.Data.Progression.AchievementCategory;
-using AchievementRarity = ProjectChimera.Data.Progression.AchievementRarity;
-using AchievementProgress = ProjectChimera.Data.Achievements.AchievementProgress;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Systems.Progression
 {

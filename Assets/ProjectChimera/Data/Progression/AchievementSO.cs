@@ -2,6 +2,9 @@ using UnityEngine;
 using ProjectChimera.Core;
 using System.Collections.Generic;
 using ProjectChimera.Data.Genetics.Scientific;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Data.Progression
 {

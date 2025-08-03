@@ -10,6 +10,8 @@ using ProjectChimera.Data.Progression.Skills;
 using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Data.Progression.Leveling;
 using ProjectChimera.Data.Progression.Unlocks;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Data.Progression
 {
@@ -322,25 +324,6 @@ namespace ProjectChimera.Data.Progression
     }
     
     // Enumerations
-    public enum AchievementCategory
-    {
-        Cultivation_Mastery,
-        Genetics_Innovation,
-        Research_Excellence,
-        Business_Success,
-        Teaching_Mentorship,
-        Collaboration_Leadership,
-        Quality_Achievement,
-        Efficiency_Optimization,
-        Innovation_Pioneer,
-        Community_Builder,
-        Breeding,
-        Social,
-        Genetics,
-        Aromatic,
-        Ultimate,
-        Special
-    }
     
     public enum AchievementType
     {
@@ -1245,15 +1228,6 @@ namespace ProjectChimera.Data.Progression
         Legendary
     }
 
-    public enum AchievementRarity
-    {
-        Common,
-        Uncommon,
-        Rare,
-        Epic,
-        Legendary,
-        Mythic
-    }
 
     public enum MilestoneCalculationType
     {
@@ -1445,6 +1419,11 @@ namespace ProjectChimera.Data.Progression
         public System.DateTime StartDate = System.DateTime.Now;
         public System.DateTime LastUpdated = System.DateTime.Now;
         public System.DateTime CompletionDate = System.DateTime.MinValue;
+        
+        // Compatibility aliases for AchievementTrackingService
+        public System.DateTime StartedDate { get => StartDate; set => StartDate = value; }
+        public System.DateTime LastUpdateDate { get => LastUpdated; set => LastUpdated = value; }
+        public System.DateTime CompletedDate { get => CompletionDate; set => CompletionDate = value; }
         
         // Constructor for compatibility
         public AchievementProgress() { }

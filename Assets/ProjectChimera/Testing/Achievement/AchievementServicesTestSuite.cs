@@ -6,11 +6,11 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using ProjectChimera.Systems.Progression;
-using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
+using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Core.Logging;
 using AchievementData = ProjectChimera.Systems.Progression.Achievement;
-using AchievementRarity = ProjectChimera.Data.Achievements.AchievementRarity;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Testing.Achievement
 {

@@ -5,7 +5,9 @@ using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Systems.Progression;
 using ProjectChimera.Data.Automation;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Testing
 {

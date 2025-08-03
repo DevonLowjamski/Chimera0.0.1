@@ -4,8 +4,9 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Progression;
-using AchievementCategory = ProjectChimera.Data.Progression.AchievementCategory;
-using AchievementRarity = ProjectChimera.Data.Progression.AchievementRarity;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
 
 namespace ProjectChimera.Systems.Progression
 {

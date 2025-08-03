@@ -4,9 +4,11 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Data.Genetics.Scientific;
 using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
 using AchievementRarity = ProjectChimera.Data.Progression.Achievements.AchievementRarity;
+using AchievementProgress = ProjectChimera.Data.Progression.Achievements.AchievementProgress;
 
 namespace ProjectChimera.Systems.Progression
 {

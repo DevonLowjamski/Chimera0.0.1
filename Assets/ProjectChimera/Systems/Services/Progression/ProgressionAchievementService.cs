@@ -4,14 +4,16 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
+using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Systems.Registry;
 
 // Type disambiguation
 using ProgressionAchievementReward = ProjectChimera.Data.Progression.AchievementReward;
-using AchievementType = ProjectChimera.Data.Achievements.AchievementType;
-using AchievementDifficulty = ProjectChimera.Data.Achievements.AchievementDifficulty;
+using AchievementType = ProjectChimera.Data.Progression.Achievements.AchievementType;
+using AchievementDifficulty = ProjectChimera.Data.Progression.Achievements.AchievementDifficulty;
+using AchievementRewardType = ProjectChimera.Data.Progression.Achievements.AchievementRewardType;
 using MilestoneRewardType = ProjectChimera.Data.Progression.MilestoneRewardType;
+using Achievement = ProjectChimera.Systems.Progression.Achievement;
 
 namespace ProjectChimera.Systems.Services.Progression
 {
@@ -285,7 +287,7 @@ namespace ProjectChimera.Systems.Services.Progression
             {
                 RewardID = $"achievement_{achievementId}_{DateTime.Now.Ticks}",
                 AchievementID = achievementId,
-                RewardType = AchievementRewardType.Experience_Bonus,
+                // RewardType = AchievementRewardType.Experience_Bonus, // Use Type field instead
                 RewardValue = CalculateAchievementRewardValue(achievement),
                 Description = $"Reward for completing {achievement.Name}",
                 DateAwarded = DateTime.Now
@@ -376,8 +378,8 @@ namespace ProjectChimera.Systems.Services.Progression
                 AchievementID = "level_10",
                 Name = "Getting Started",
                 Description = "Reach level 10",
-                Type = AchievementType.Progression,
-                Difficulty = AchievementDifficulty.Medium,
+                Type = AchievementType.Progressive,
+                Difficulty = AchievementDifficulty.Normal,
                 PointValue = 200
             });
 
@@ -386,7 +388,7 @@ namespace ProjectChimera.Systems.Services.Progression
                 AchievementID = "skill_master",
                 Name = "Skill Master",
                 Description = "Unlock 10 skills",
-                Type = AchievementType.Skills,
+                Type = AchievementType.SkillLevel,
                 Difficulty = AchievementDifficulty.Hard,
                 PointValue = 500
             });

@@ -3,11 +3,21 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
-using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Progression.Skills;
 using ProjectChimera.Data.Progression.Achievements;
 using ProjectChimera.Data.Progression.Leveling;
 using ProjectChimera.Data.Progression.Unlocks;
+using SkillSynergy = ProjectChimera.Data.Progression.Skills.SkillSynergy;
+using ExpertiseArea = ProjectChimera.Data.Progression.Skills.ExpertiseArea;
+using LearningPath = ProjectChimera.Data.Progression.Skills.LearningPath;
+using SkillTreeBranch = ProjectChimera.Data.Progression.Skills.SkillTreeBranch;
+using AchievementDefinition = ProjectChimera.Data.Progression.Achievements.AchievementDefinition;
+using PlayerAchievementProfile = ProjectChimera.Data.Progression.Achievements.PlayerAchievementProfile;
+using HiddenAchievementDefinition = ProjectChimera.Data.Progression.Achievements.HiddenAchievementDefinition;
+using AchievementTier = ProjectChimera.Data.Progression.Achievements.AchievementTier;
+using PlayerProgressionData = ProjectChimera.Data.Progression.Leveling.PlayerProgressionData;
+using ProgressionEvent = ProjectChimera.Data.Progression.Leveling.ProgressionEvent;
+using UnlockableContent = ProjectChimera.Data.Progression.Unlocks.UnlockableContent;
 
 namespace ProjectChimera.Testing.Progression
 {

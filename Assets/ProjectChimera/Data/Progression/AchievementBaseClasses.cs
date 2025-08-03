@@ -4,10 +4,12 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Progression.Achievements;
 
 // Resolve RewardType namespace conflicts
 using ProgressionRewardType = ProjectChimera.Data.Progression.RewardType;
 using EventRewardType = ProjectChimera.Data.Events.RewardType;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
 
 // Force recompilation to recognize aliases
 

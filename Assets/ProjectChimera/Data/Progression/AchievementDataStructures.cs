@@ -87,7 +87,8 @@ namespace ProjectChimera.Data.Progression.Achievements
         Uncommon,
         Rare,
         Epic,
-        Legendary
+        Legendary,
+        Mythic
     }
 
     #endregion
@@ -450,10 +451,25 @@ namespace ProjectChimera.Data.Progression.Achievements
         public bool IsCompleted = false;
         public DateTime StartTime;
         public DateTime LastUpdateTime;
+        public DateTime CompletedDate = DateTime.MinValue;
         public List<ProgressStep> ProgressHistory = new List<ProgressStep>();
         public Dictionary<string, float> SubProgress = new Dictionary<string, float>(); // For multi-part achievements
         public bool IsTracking = true;
         public float EstimatedTimeToComplete = -1f; // In hours, -1 = unknown
+        
+        // Compatibility aliases for AchievementTrackingService and other services
+        public DateTime StartedDate { get => StartTime; set => StartTime = value; }
+        public DateTime LastUpdateDate { get => LastUpdateTime; set => LastUpdateTime = value; }
+        public float CurrentValue { get => CurrentProgress; set => CurrentProgress = value; }
+        
+        // Additional compatibility properties
+        public DateTime StartDate { get => StartTime; set => StartTime = value; }
+        public DateTime LastUpdated { get => LastUpdateTime; set => LastUpdateTime = value; }
+        public DateTime LastUpdate { get => LastUpdateTime; set => LastUpdateTime = value; }
+        
+        // ID compatibility aliases
+        public string AchievementID { get => AchievementId; set => AchievementId = value; }
+        public string PlayerID { get => PlayerId; set => PlayerId = value; }
     }
 
     /// <summary>

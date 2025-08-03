@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Data.Progression;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementCategory = ProjectChimera.Data.Progression.Achievements.AchievementCategory;
+using AchievementType = ProjectChimera.Data.Progression.Achievements.AchievementType;
+using AchievementDifficulty = ProjectChimera.Data.Progression.Achievements.AchievementDifficulty;
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -27,10 +31,22 @@ namespace ProjectChimera.Systems.Progression
         public DateTime UnlockDate;
         public string Icon;
         public string CelebrationStyle;
+        
+        // Compatibility properties for ProgressionAchievementService
+        public string Name { get => AchievementName; set => AchievementName = value; }
+        public AchievementType Type { get; set; } = AchievementType.One_Time;
+        public AchievementType Progression { get => AchievementType.Progressive; set => Type = value; }
+        public AchievementDifficulty Difficulty { get; set; } = AchievementDifficulty.Easy;
+        public float PointValue { get => Points; set => Points = value; }
+        public AchievementType Skills { get => AchievementType.SkillLevel; set => Type = value; }
+        
+        // Additional compatibility properties to match expected enum values
+        public static AchievementType ProgressionType => AchievementType.Progressive;
+        public static AchievementDifficulty MediumDifficulty => AchievementDifficulty.Normal;
     }
     
     [System.Serializable]
-    public class AchievementProgress
+    public class LegacyAchievementProgress
     {
         public string AchievementID;
         public string PlayerID;

@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Equipment;
+using ProjectChimera.Data.Progression.Achievements;
 
 namespace ProjectChimera.Data.Progression.Unlocks
 {
@@ -746,28 +747,6 @@ namespace ProjectChimera.Data.Progression.Unlocks
         Custom
     }
 
-    /// <summary>
-    /// Achievement category enumeration (for compatibility)
-    /// </summary>
-    public enum AchievementCategory
-    {
-        Cultivation_Mastery,
-        Genetics_Innovation,
-        Research_Excellence,
-        Business_Success,
-        Teaching_Mentorship,
-        Collaboration_Leadership,
-        Quality_Achievement,
-        Efficiency_Optimization,
-        Innovation_Pioneer,
-        Community_Builder,
-        Breeding,
-        Social,
-        Genetics,
-        Aromatic,
-        Ultimate,
-        Special
-    }
 
     public enum GateType
     {

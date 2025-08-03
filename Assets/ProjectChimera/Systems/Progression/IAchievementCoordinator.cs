@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementProgress = ProjectChimera.Data.Progression.Achievements.AchievementProgress;
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -26,7 +27,7 @@ namespace ProjectChimera.Systems.Progression
         
         event Action<Achievement, RewardBundle> OnAchievementCompleted;
         event Action<string, int> OnAchievementStreak;
-        event Action<ProjectChimera.Data.Progression.AchievementCategory, float> OnCategoryMasteryUpdated;
+        event Action<AchievementCategory, float> OnCategoryMasteryUpdated;
         event Action<string, float> OnPointMilestoneReached;
         event Action<MetaAchievementRule> OnMetaAchievementTriggered;
         event Action<ServiceHealthStatus> OnServiceHealthUpdated;
@@ -39,8 +40,8 @@ namespace ProjectChimera.Systems.Progression
         CoordinatorStatistics GetStatistics();
         ServiceHealthStatus GetServiceHealth();
         List<MetaAchievementRule> GetMetaAchievementRules();
-        CategoryMasteryStatus GetCategoryMastery(ProjectChimera.Data.Progression.AchievementCategory category);
-        Dictionary<ProjectChimera.Data.Progression.AchievementCategory, CategoryMasteryStatus> GetAllCategoryMastery();
+        CategoryMasteryStatus GetCategoryMastery(AchievementCategory category);
+        Dictionary<AchievementCategory, CategoryMasteryStatus> GetAllCategoryMastery();
         void ForceMetaAchievementCheck(string playerId);
         void ResetPlayerStreak(string playerId);
         

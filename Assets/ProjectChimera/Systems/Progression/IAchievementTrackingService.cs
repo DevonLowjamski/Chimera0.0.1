@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Data.Progression;
-using ProjectChimera.Data.Achievements;
+using ProjectChimera.Data.Progression.Achievements;
+using AchievementProgress = ProjectChimera.Data.Progression.Achievements.AchievementProgress;
 
 namespace ProjectChimera.Systems.Progression
 {
@@ -24,7 +25,7 @@ namespace ProjectChimera.Systems.Progression
         #region Events
         
         event Action<string, float> OnProgressUpdated;
-        event Action<string, ProjectChimera.Data.Achievements.AchievementProgress> OnAchievementUnlocked;
+        event Action<string, AchievementProgress> OnAchievementUnlocked;
         event Action<string, string> OnProgressMilestone;
         event Action<ProgressValidationResult> OnValidationCompleted;
         
@@ -33,8 +34,8 @@ namespace ProjectChimera.Systems.Progression
         #region Progress Tracking
         
         void UpdateProgress(string triggerEvent, float value = 1f, string playerId = "current_player");
-        ProjectChimera.Data.Achievements.AchievementProgress GetProgress(string achievementId);
-        List<ProjectChimera.Data.Achievements.AchievementProgress> GetAllProgress();
+        AchievementProgress GetProgress(string achievementId);
+        List<AchievementProgress> GetAllProgress();
         bool IsAchievementCompleted(string achievementId);
         float GetEventCounter(string eventName);
         
@@ -49,8 +50,8 @@ namespace ProjectChimera.Systems.Progression
         #region Achievement Queries
         
         Achievement GetAchievementById(string achievementId);
-        List<Achievement> GetAchievementsByCategory(ProjectChimera.Data.Achievements.AchievementCategory category);
-        List<Achievement> GetAchievementsByRarity(ProjectChimera.Data.Achievements.AchievementRarity rarity);
+        List<Achievement> GetAchievementsByCategory(AchievementCategory category);
+        List<Achievement> GetAchievementsByRarity(AchievementRarity rarity);
         int GetCompletedAchievementCount(string playerId);
         float GetTotalAchievementPoints(string playerId);
         
