@@ -5,6 +5,12 @@ using ProjectChimera.Data.Genetics;
 using System.Collections.Generic;
 using System.Linq;
 
+// Import all new progression modules for backwards compatibility
+using ProjectChimera.Data.Progression.Skills;
+using ProjectChimera.Data.Progression.Achievements;
+using ProjectChimera.Data.Progression.Leveling;
+using ProjectChimera.Data.Progression.Unlocks;
+
 namespace ProjectChimera.Data.Progression
 {
     /// <summary>
