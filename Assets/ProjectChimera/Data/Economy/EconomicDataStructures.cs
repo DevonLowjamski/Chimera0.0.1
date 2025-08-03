@@ -291,15 +291,7 @@ namespace ProjectChimera.Data.Economy
         Service_Provider
     }
     
-    public enum MarketPosition
-    {
-        Startup,
-        Emerging,
-        Established,
-        Dominant,
-        Struggling,
-        Declining
-    }
+    // MarketPosition enum moved to MarketDataStructures.cs
     
     public enum BusinessPhilosophy
     {
@@ -1304,32 +1296,11 @@ namespace ProjectChimera.Data.Economy
         Expired
     }
 
-    public enum TrendDirection
-    {
-        Bullish,
-        Bearish,
-        Sideways,
-        Volatile
-    }
+    // TrendDirection enum moved to MarketDataStructures.cs
 
-    public enum Region
-    {
-        NorthAmerica,
-        Europe,
-        Asia,
-        SouthAmerica,
-        Africa,
-        Oceania
-    }
+    // Region enum moved to MarketDataStructures.cs
 
-    public enum CompetitionIntensity
-    {
-        Low,
-        Moderate,
-        High,
-        VeryHigh,
-        Extreme
-    }
+    // CompetitionIntensity enum moved to MarketDataStructures.cs
 
     // Strategy and parameter types
     // MarketAnalysisScope moved to MarketDataStructures.cs
@@ -1430,13 +1401,7 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Additional enums for strategies
-    public enum AnalysisDepth
-    {
-        Basic,
-        Standard,
-        Comprehensive,
-        Expert
-    }
+    // AnalysisDepth enum moved to MarketDataStructures.cs
 
     public enum ExpansionType
     {
@@ -1583,15 +1548,7 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Supporting Classes for Market Operations
-    [System.Serializable]
-    public class MarketData
-    {
-        public string AssetId;
-        public decimal Price;
-        public decimal Volume;
-        public DateTime Timestamp;
-        public Dictionary<string, object> AdditionalData = new Dictionary<string, object>();
-    }
+    // MarketData moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class PriceHistory
@@ -1647,26 +1604,7 @@ namespace ProjectChimera.Data.Economy
 
     // RegulatoryChange class removed
 
-    [System.Serializable]
-    public class MarketForecast
-    {
-        public DateTime ForecastDate;
-        public TimeSpan TimeHorizon;
-        public List<Region> CoveredRegions = new List<Region>();
-        public List<string> CoveredCommodities = new List<string>();
-        public Dictionary<string, float> PricePredictions = new Dictionary<string, float>();
-        public float ConfidenceLevel;
-    }
-
-    [System.Serializable]
-    public class ForecastParameters
-    {
-        public TimeSpan TimeHorizon;
-        public List<Region> Regions = new List<Region>();
-        public List<string> Commodities = new List<string>();
-        public bool IncludeGeopoliticalFactors = true;
-        public bool IncludeRegulatoryFactors = true;
-    }
+    // MarketForecast and ForecastParameters moved to MarketDataStructures.cs
 
     // Enums for Market Simulation
     public enum MaturityLevel
@@ -1733,18 +1671,7 @@ namespace ProjectChimera.Data.Economy
 
     // CompetitiveIntelligenceReport class removed
 
-    [System.Serializable]
-    public class CompetitorAnalysis
-    {
-        public string CompanyId;
-        public string CompanyName;
-        public decimal EstimatedRevenue;
-        public float MarketShare;
-        public List<string> Strengths = new List<string>();
-        public List<string> Weaknesses = new List<string>();
-        public List<string> Opportunities = new List<string>();
-        public List<string> Threats = new List<string>();
-    }
+    // CompetitorAnalysis moved to MarketDataStructures.cs
 
     // MergerAcquisitionStrategy class removed
 
@@ -2180,13 +2107,7 @@ namespace ProjectChimera.Data.Economy
         public List<string> AvailableReports = new List<string>();
     }
 
-    [System.Serializable]
-    public class MarketAnalysisTools
-    {
-        public bool IsActive;
-        public DateTime LastAnalysis;
-        public List<MarketAnalysisReport> Reports = new List<MarketAnalysisReport>();
-    }
+    // MarketAnalysisTools moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class CompetitorIntelligenceSystem
@@ -2206,14 +2127,7 @@ namespace ProjectChimera.Data.Economy
 
 
 
-    [System.Serializable]
-    public class MarketAnalysisReport
-    {
-        public string ReportId;
-        public DateTime GeneratedDate;
-        public List<string> KeyFindings = new List<string>();
-        public MarketTrend OverallTrend;
-    }
+    // MarketAnalysisReport moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class BusinessScenario
@@ -2901,45 +2815,13 @@ namespace ProjectChimera.Data.Economy
         public List<string> Recommendations = new List<string>();
     }
 
-    [System.Serializable]
-    public class MarketAnalyticsData
-    {
-        public DateTime LastUpdate;
-        public Dictionary<string, float> MarketIndicators = new Dictionary<string, float>();
-        public List<MarketTrend> DetectedTrends = new List<MarketTrend>();
-        public float OverallMarketHealth;
-    }
+    // MarketAnalyticsData moved to MarketDataStructures.cs
 
-    [System.Serializable]
-    public class TrendAnalysisSystem
-    {
-        public bool IsActive;
-        public List<TrendPattern> DetectedPatterns = new List<TrendPattern>();
-        public Dictionary<string, float> TrendStrengths = new Dictionary<string, float>();
-        public DateTime LastAnalysis;
-    }
+    // TrendAnalysisSystem moved to MarketDataStructures.cs
 
-    [System.Serializable]
-    public class TrendPattern
-    {
-        public string PatternId;
-        public string PatternName;
-        public TrendDirection Direction;
-        public float Strength;
-        public float Confidence;
-        public DateTime DetectedDate;
-    }
+    // TrendPattern moved to MarketDataStructures.cs
 
-    [System.Serializable]
-    public class PredictiveModel
-    {
-        public string ModelId;
-        public string ModelName;
-        public float Accuracy;
-        public bool IsActive;
-        public DateTime LastTrained;
-        public Dictionary<string, object> Parameters = new Dictionary<string, object>();
-    }
+    // PredictiveModel moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class PredictionAccuracy
@@ -2949,28 +2831,9 @@ namespace ProjectChimera.Data.Economy
         public DateTime LastCalculated;
     }
 
-    [System.Serializable]
-    public class MarketPrediction
-    {
-        public string PredictionId;
-        public string AssetId;
-        public DateTime PredictionDate;
-        public DateTime TargetDate;
-        public decimal PredictedPrice;
-        public float Confidence;
-        public string ModelUsed;
-    }
+    // MarketPrediction moved to MarketDataStructures.cs
 
-    [System.Serializable]
-    public class CompetitorProfile
-    {
-        public string CompetitorId;
-        public string CompetitorName;
-        public string CompanyName;
-        public List<string> KnownStrategies = new List<string>();
-        public float ThreatLevel;
-        public DateTime LastUpdated;
-    }
+    // CompetitorProfile moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class IntelligenceNetwork
@@ -3027,18 +2890,7 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Trading Infrastructure Classes - Missing from EconomicGamingDataStructures.cs
-    [System.Serializable]
-    public class MarketSegmentKnowledge
-    {
-        public string SegmentId;
-        public string SegmentName;
-        public float KnowledgeLevel;
-        public List<MarketInsight> Insights = new List<MarketInsight>();
-        public List<CompetitiveIntelligence> CompetitorData = new List<CompetitiveIntelligence>();
-        public List<PriceDataPoint> PriceHistory = new List<PriceDataPoint>();
-        public List<VolumeDataPoint> VolumeHistory = new List<VolumeDataPoint>();
-        public DateTime LastUpdated;
-    }
+    // MarketSegmentKnowledge moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class Position
@@ -3119,21 +2971,7 @@ namespace ProjectChimera.Data.Economy
         public DateTime LastUpdate;
     }
 
-    [System.Serializable]
-    public class MarketDataFeed
-    {
-        public string Symbol;
-        public decimal LastPrice;
-        public decimal BidPrice;
-        public decimal AskPrice;
-        public decimal Volume;
-        public decimal DayHigh;
-        public decimal DayLow;
-        public decimal PreviousClose;
-        public float DayChange;
-        public float DayChangePercent;
-        public DateTime LastUpdateTime;
-    }
+    // MarketDataFeed moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class TradingAccount
@@ -3151,21 +2989,7 @@ namespace ProjectChimera.Data.Economy
     public enum AccountType { Cash, Margin, Portfolio, Corporate }
 
     // Economic Warfare and Intelligence Classes
-    [System.Serializable]
-    public class MarketAttackCampaign
-    {
-        public string CampaignId;
-        public AttackStrategy Strategy;
-        public DateTime LaunchTime;
-        public CampaignStatus Status;
-        public PriceWarfareResult PriceWarfare;
-        public SupplyDisruptionResult SupplyDisruption;
-        public QualityOffensiveResult QualityCompetition;
-        public InnovationRaceResult InnovationRace;
-        public TalentPoachingResult TalentPoaching;
-        public MarketCaptureResult MarketShare;
-        public float EffectivenessRating;
-    }
+    // MarketAttackCampaign moved to MarketDataStructures.cs
 
 
 
@@ -3386,14 +3210,7 @@ namespace ProjectChimera.Data.Economy
     }
     
     // Additional Supporting Classes - proper implementations for M&A system
-    [System.Serializable]
-    public class MarketInsight
-    {
-        public string InsightId;
-        public string Description;
-        public float Confidence;
-        public DateTime GeneratedAt;
-    }
+    // MarketInsight moved to MarketDataStructures.cs
     
     [System.Serializable]
     public class TargetIdentification
@@ -3647,31 +3464,9 @@ namespace ProjectChimera.Data.Economy
         public string Symbol;
     }
     
-    [System.Serializable]
-    public class AttackStrategy
-    {
-        public string StrategyId;
-        public string StrategyName;
-        public string TargetCompetitor;
-        public string AttackVector;
-        public float AggressivenessLevel;
-        public decimal BudgetAllocated;
-        public List<string> TacticalMoves = new List<string>();
-        public float ExpectedEffectiveness;
-    }
+    // AttackStrategy class moved to MarketDataStructures.cs (now enum)
     
-    [System.Serializable]
-    public class DefenseStrategy
-    {
-        public string StrategyId;
-        public string StrategyName;
-        public string ThreatSource;
-        public string DefenseVector;
-        public float DefensiveStrength;
-        public decimal BudgetAllocated;
-        public List<string> CounterMeasures = new List<string>();
-        public float ExpectedEffectiveness;
-    }
+    // DefenseStrategy class moved to MarketDataStructures.cs (now enum)
     
     [System.Serializable]
     public class PriceWarfareResult
@@ -3723,15 +3518,7 @@ namespace ProjectChimera.Data.Economy
         public List<string> KeyHires = new List<string>();
     }
     
-    [System.Serializable]
-    public class MarketCaptureResult
-    {
-        public float Effectiveness;
-        public float MarketShareGained;
-        public decimal RevenueIncrease;
-        public List<string> CapturedSegments = new List<string>();
-        public float CompetitorMarketLoss;
-    }
+    // MarketCaptureResult moved to MarketDataStructures.cs
     
     [System.Serializable]
     public class EarlyWarningSystem
@@ -3744,15 +3531,7 @@ namespace ProjectChimera.Data.Economy
         public List<string> ActiveAlerts = new List<string>();
     }
     
-    [System.Serializable]
-    public class MarketProtectionSystem
-    {
-        public string SystemId;
-        public List<string> ProtectedMarkets = new List<string>();
-        public float ProtectionStrength;
-        public List<string> DefensiveMeasures = new List<string>();
-        public decimal ProtectionBudget;
-    }
+    // MarketProtectionSystem moved to MarketDataStructures.cs
     
     [System.Serializable]
     public class CustomerRetentionSystem
@@ -3805,17 +3584,7 @@ namespace ProjectChimera.Data.Economy
         public List<string> InformationNeeds = new List<string>();
     }
     
-    [System.Serializable]
-    public class MarketResearch
-    {
-        public string ResearchId;
-        public string MarketSegment;
-        public string ResearchType;
-        public DateTime CompletionDate;
-        public List<string> KeyFindings = new List<string>();
-        public float MarketSize;
-        public float GrowthRate;
-    }
+    // MarketResearch moved to MarketDataStructures.cs
     
     [System.Serializable]
     public class IndustryNetworking

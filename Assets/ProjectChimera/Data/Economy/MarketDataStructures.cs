@@ -180,6 +180,7 @@ namespace ProjectChimera.Data.Economy
         public float TrendDetectionSensitivity = 0.7f;
         public int MinimumDataPoints = 5;
         public bool EnableAutomaticDetection = true;
+        public bool IsActive = true; // Added for backwards compatibility
         public DateTime LastAnalysis;
     }
 
@@ -220,9 +221,11 @@ namespace ProjectChimera.Data.Economy
     [System.Serializable]
     public class PredictiveModel
     {
+        public string ModelId;
         public string ModelName;
         public ModelType Type = ModelType.TechnicalAnalysis;
         [Range(0f, 1f)] public float ModelAccuracy = 0.8f;
+        [Range(0f, 1f)] public float Accuracy = 0.8f; // Alias for ModelAccuracy for backwards compatibility
         public List<string> InputParameters = new List<string>();
         public DateTime LastTraining;
         public bool IsActive = true;
@@ -260,7 +263,7 @@ namespace ProjectChimera.Data.Economy
     [System.Serializable]
     public class MarketSegmentKnowledge
     {
-        public MarketSegment Segment = MarketSegment.Premium;
+        public MarketSegment Segment = MarketSegment.Premium_Buyers;
         [Range(0f, 1f)] public float SegmentUnderstanding = 0.6f;
         public List<string> KeyInsights = new List<string>();
         public List<CompetitorProfile> KnownCompetitors = new List<CompetitorProfile>();
@@ -523,6 +526,8 @@ namespace ProjectChimera.Data.Economy
         Experiment,
         SecondaryData
     }
+
+    // MarketSegment enum exists in MarketProductSO.cs with cannabis-specific segments
 
     #endregion
 
