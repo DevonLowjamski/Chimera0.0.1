@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Economy;
+using ProjectChimera.Data.Economy.Investments;
 
 namespace ProjectChimera.Systems.Economy
 {

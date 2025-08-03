@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Data.Genetics;
+using ProjectChimera.Data.Economy.Investments;
 
 namespace ProjectChimera.Data.Economy
 {
@@ -897,49 +898,9 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Additional types for EnhancedEconomicGamingManager
-    [System.Serializable]
-    public class InvestmentPortfolio
-    {
-        public string PlayerId;
-        public string AccountId;
-        public decimal CashPosition;
-        public Dictionary<string, StockPosition> StockHoldings = new Dictionary<string, StockPosition>();
-        public Dictionary<string, CommodityPosition> CommodityHoldings = new Dictionary<string, CommodityPosition>();
-        public Dictionary<string, FuturesPosition> FuturesPositions = new Dictionary<string, FuturesPosition>();
-        public Dictionary<string, OptionsPosition> OptionsPositions = new Dictionary<string, OptionsPosition>();
-        public Dictionary<string, RealEstatePosition> RealEstateHoldings = new Dictionary<string, RealEstatePosition>();
-        public decimal TotalValue;
-        public DateTime LastUpdated;
-        
-        // Additional property for Holdings collection
-        public List<InvestmentHolding> Holdings 
-        { 
-            get
-            {
-                var holdings = new List<InvestmentHolding>();
-                foreach (var stock in StockHoldings.Values)
-                {
-                    holdings.Add(new InvestmentHolding { CurrentValue = (float)stock.CurrentValue });
-                }
-                foreach (var commodity in CommodityHoldings.Values)
-                {
-                    holdings.Add(new InvestmentHolding { CurrentValue = (float)commodity.CurrentValue });
-                }
-                return holdings;
-            }
-        }
-    }
+    // InvestmentPortfolio moved to InvestmentDataStructures.cs
 
-    [System.Serializable]
-    public class InvestmentHolding
-    {
-        public string HoldingId;
-        public string Symbol;
-        public float CurrentValue;
-        public int Quantity;
-        public DateTime PurchaseDate;
-        public float PurchasePrice;
-    }
+    // InvestmentHolding moved to InvestmentDataStructures.cs
 
     [System.Serializable]
     public class TradingStrategy
@@ -973,47 +934,11 @@ namespace ProjectChimera.Data.Economy
         public bool IsActive = true; // Added missing IsActive property
     }
 
-    [System.Serializable]
-    public class JointVenture
-    {
-        public string VentureId;
-        public string VentureName;
-        public List<string> PartnerIds = new List<string>();
-        public string BusinessObjective;
-        public DateTime StartDate;
-        public DateTime? EndDate;
-        public decimal TotalInvestment;
-        public Dictionary<string, decimal> PartnerContributions = new Dictionary<string, decimal>();
-        public JointVentureStatus Status;
-        
-        // Additional properties needed by EnhancedEconomicGamingManager
-        public string InitiatorId;
-        public List<string> Partners = new List<string>();
-        public Dictionary<string, decimal> ResourceAllocation = new Dictionary<string, decimal>();
-        public DateTime CreationDate;
-        public bool IsActive;
-    }
+    // JointVenture moved to InvestmentDataStructures.cs
 
-    [System.Serializable]
-    public class StrategicAlliance
-    {
-        public string AllianceId;
-        public string AllianceName;
-        public List<string> MemberIds = new List<string>();
-        public AllianceType AllianceType;
-        public DateTime FormationDate;
-        public List<string> SharedObjectives = new List<string>();
-        public AllianceStatus Status;
-    }
+    // StrategicAlliance moved to InvestmentDataStructures.cs
 
-    [System.Serializable]
-    public class JointVentureResult
-    {
-        public bool Success;
-        public string Reason;
-        public JointVenture JointVenture;
-        public string VentureId;
-    }
+    // JointVentureResult moved to InvestmentDataStructures.cs
 
     // Position classes for portfolio
     [System.Serializable]
@@ -2054,7 +1979,7 @@ namespace ProjectChimera.Data.Economy
     public class StrategicPlanningTools
     {
         public bool IsActive;
-        public MarketAnalysisTools MarketAnalysis;
+        public object MarketAnalysis; // MarketAnalysisTools moved to MarketDataStructures.cs
         public CompetitorIntelligenceSystem CompetitorIntelligence;
         public ScenarioModelingSystem ScenarioModeling;
     }
@@ -2660,15 +2585,14 @@ namespace ProjectChimera.Data.Economy
     {
         public bool IsActive;
         public Dictionary<string, AnalyticsReport> PlayerAnalytics = new Dictionary<string, AnalyticsReport>();
-        public MarketAnalyticsData GlobalAnalytics;
-        public TrendAnalysisSystem TrendAnalysis;
+        public object GlobalAnalytics; // MarketAnalyticsData moved to EconomicIndicatorsDataStructures.cs
+        public object TrendAnalysis; // TrendAnalysisSystem moved to EconomicIndicatorsDataStructures.cs
         public DateTime LastUpdate;
         
         public void Initialize()
         {
             IsActive = true;
-            TrendAnalysis = new TrendAnalysisSystem { IsActive = true };
-            GlobalAnalytics = new MarketAnalyticsData();
+            // TrendAnalysisSystem and MarketAnalyticsData initialization moved to EconomicIndicatorsDataStructures.cs
             LastUpdate = System.DateTime.Now;
         }
         
@@ -2683,9 +2607,9 @@ namespace ProjectChimera.Data.Economy
     public class PredictiveModelingSystem
     {
         public bool IsActive;
-        public Dictionary<string, PredictiveModel> Models = new Dictionary<string, PredictiveModel>();
+        public Dictionary<string, object> Models = new Dictionary<string, object>(); // PredictiveModel moved to MarketDataStructures.cs
         public PredictionAccuracy AccuracyMetrics;
-        public List<MarketPrediction> ActivePredictions = new List<MarketPrediction>();
+        public List<object> ActivePredictions = new List<object>(); // MarketPrediction moved to MarketDataStructures.cs
         public DateTime LastUpdate;
         
         public void Initialize()
@@ -2704,13 +2628,7 @@ namespace ProjectChimera.Data.Economy
         
         private void SetupPredictiveModels()
         {
-            Models["price_prediction"] = new PredictiveModel
-            {
-                ModelId = "price_prediction",
-                ModelName = "Price Prediction Model",
-                Accuracy = 0.78f,
-                IsActive = true
-            };
+            // PredictiveModel setup moved to MarketDataStructures.cs
         }
     }
 
@@ -2718,7 +2636,7 @@ namespace ProjectChimera.Data.Economy
     public class CompetitorIntelligence
     {
         public bool IsActive;
-        public Dictionary<string, CompetitorProfile> TrackedCompetitors = new Dictionary<string, CompetitorProfile>();
+        public Dictionary<string, object> TrackedCompetitors = new Dictionary<string, object>(); // CompetitorProfile moved to MarketDataStructures.cs
         public List<object> Reports = new List<object>(); // CompetitiveIntelligenceReport removed
         public IntelligenceNetwork Network;
         public DateTime LastUpdate;
@@ -3000,7 +2918,7 @@ namespace ProjectChimera.Data.Economy
         public DefenseStrategy Strategy;
         public DateTime ImplementationTime;
         public EarlyWarningSystem CompetitiveMonitoring;
-        public MarketProtectionSystem MarketProtection;
+        public object MarketProtection; // MarketProtectionSystem moved to MarketDataStructures.cs
         public CustomerRetentionSystem CustomersRetention;
         public InnovationAcceleration InnovationAcceleration;
         public AllianceNetwork StrategicAlliances;
@@ -3014,7 +2932,7 @@ namespace ProjectChimera.Data.Economy
         public IntelligenceTarget Target;
         public DateTime StartTime;
         public IntelligenceOperationType OperationType;
-        public MarketResearch MarketResearch;
+        public object MarketResearch; // MarketResearch moved to MarketDataStructures.cs
         public CompetitiveAnalysis CompetitiveAnalysis;
         public IndustryNetworking IndustryNetworking;
         public TechnologyScanning TechnologyScanning;
