@@ -67,49 +67,7 @@ namespace ProjectChimera.Data.Economy
         public string ModifierDescription;
     }
     
-    [System.Serializable]
-    public class MarketPreferences
-    {
-        public List<ProductCategory> PreferredCategories = new List<ProductCategory>();
-        public List<MarketTier> PreferredTiers = new List<MarketTier>();
-        [Range(0f, 100f)] public float PriceSensitivity = 50f;
-        [Range(0f, 100f)] public float QualitySensitivity = 70f;
-        [Range(0f, 100f)] public float BrandLoyalty = 40f;
-        public bool PrefersExclusiveDeals = false;
-        public bool PrefersVolumeDiscounts = true;
-    }
-    
-    [System.Serializable]
-    public class ProductPreference
-    {
-        public ProductType ProductType;
-        [Range(0f, 1f)] public float PreferenceStrength = 0.7f;
-        public Vector2 PreferredPriceRange = new Vector2(10f, 30f);
-        public Vector2 PreferredQualityRange = new Vector2(0.7f, 1f);
-        public List<string> PreferredAttributes = new List<string>();
-        public string PreferenceReason;
-    }
-    
-    [System.Serializable]
-    public class QualityExpectations
-    {
-        [Range(0f, 1f)] public float MinimumQualityThreshold = 0.7f;
-        [Range(0f, 1f)] public float PreferredQualityLevel = 0.85f;
-        public bool RequiresConsistentQuality = true;
-        public bool AcceptsVariableQuality = false;
-        [Range(0f, 1f)] public float QualityToleranceRange = 0.1f;
-        public List<QualityAttribute> CriticalAttributes = new List<QualityAttribute>();
-    }
-    
-    [System.Serializable]
-    public class QualityAttribute
-    {
-        public string AttributeName;
-        [Range(0f, 1f)] public float MinimumValue = 0.7f;
-        [Range(0f, 1f)] public float ImportanceWeight = 1f;
-        public bool IsCritical = false;
-        public string AttributeDescription;
-    }
+    // Market-related types moved to MarketDataStructures.cs
     
     [System.Serializable]
     public class ComplianceExpectation
@@ -656,30 +614,14 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Economic Gaming Event Types for EnhancedEconomicGamingManager
-    [System.Serializable]
-    public class MarketOpening
-    {
-        public string MarketId;
-        public DateTime OpeningTime;
-        public string MarketType;
-        public float InitialVolume;
-    }
-
+    // MarketOpening and MarketCrash moved to MarketDataStructures.cs
+    
     [System.Serializable]
     public class TradeExecution
     {
         public EconomicProfile Profile;
         public TradeExecutionResult Result;
         public DateTime ExecutionTime;
-    }
-
-    [System.Serializable]
-    public class MarketCrash
-    {
-        public string MarketId;
-        public float CrashSeverity;
-        public DateTime CrashTime;
-        public List<string> AffectedAssets;
     }
 
     [System.Serializable]
@@ -910,13 +852,7 @@ namespace ProjectChimera.Data.Economy
         MarketDomination
     }
 
-    [System.Serializable]
-    public class MarketKnowledge
-    {
-        public Dictionary<string, float> RegionKnowledge = new Dictionary<string, float>();
-        public Dictionary<string, float> ProductKnowledge = new Dictionary<string, float>();
-        public float OverallExperience;
-    }
+    // MarketKnowledge moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class TradeRecord
@@ -1333,37 +1269,7 @@ namespace ProjectChimera.Data.Economy
         public DateTime? ExpirationTime;
     }
 
-    [System.Serializable]
-    public class GlobalMarketAnalysis
-    {
-        public DateTime AnalysisDate;
-        public Dictionary<Region, MarketOpportunity> RegionalOpportunities = new Dictionary<Region, MarketOpportunity>();
-        public List<MarketTrend> GlobalTrends = new List<MarketTrend>();
-        public float OverallMarketSentiment;
-        public List<string> KeyInsights = new List<string>();
-        public RiskAssessment GlobalRisks;
-    }
-
-    [System.Serializable]
-    public class MarketOpportunity
-    {
-        public decimal MarketSize;
-        public float GrowthPotential;
-        public float RegulatoryRisk;
-        public CompetitionIntensity CompetitiveIntensity;
-        public List<string> EntryBarriers = new List<string>();
-        public decimal ProfitPotential;
-    }
-
-    [System.Serializable]
-    public class MarketTrend
-    {
-        public string Category;
-        public TrendDirection TrendDirection;
-        public float ChangePercentage;
-        public float MarketShare;
-        public float Demand;
-    }
+    // GlobalMarketAnalysis, MarketOpportunity, and MarketTrend moved to MarketDataStructures.cs
 
 
 
@@ -1426,16 +1332,7 @@ namespace ProjectChimera.Data.Economy
     }
 
     // Strategy and parameter types
-    [System.Serializable]
-    public class MarketAnalysisScope
-    {
-        public List<Region> TargetRegions = new List<Region>();
-        public List<string> ProductCategories = new List<string>();
-        public int TimeHorizonDays = 30;
-        public AnalysisDepth Depth = AnalysisDepth.Standard;
-        public bool IncludeCompetitorAnalysis = true;
-        public bool IncludeRiskAssessment = true;
-    }
+    // MarketAnalysisScope moved to MarketDataStructures.cs
 
     [System.Serializable]
     public class GlobalExpansionStrategy

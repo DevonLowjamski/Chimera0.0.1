@@ -74,6 +74,9 @@ using LoanStatus = ProjectChimera.Data.Economy.LoanStatus;
 // Additional Economy type aliases for services
 using MarketProductSO = ProjectChimera.Data.Economy.MarketProductSO;
 
+// SpeedTree type aliases removed - using concrete types defined in service files
+// SpeedTree data types are defined within the service implementations to avoid circular dependencies
+
 // Only include aliases for types that actually exist and are needed
 // Most progression types are already defined in existing files
 
@@ -574,6 +577,144 @@ namespace ProjectChimera.Systems.Registry
         event Action<string, float, float> OnCashChanged; // playerId, oldAmount, newAmount
         event Action<string, InventoryItem, float> OnInventoryChanged; // playerId, item, quantityChange
         event Action<string, FinancialMetrics> OnFinancialMetricsUpdated; // playerId, metrics
+    }
+
+    #endregion
+
+    #region SpeedTree Services (AdvancedSpeedTreeManager → 4 services)
+
+    /// <summary>
+    /// PC014-5a: SpeedTree Asset Management Service Interface
+    /// Handles SpeedTree asset loading, renderer management, and cannabis-specific configurations
+    /// </summary>
+    public interface ISpeedTreeAssetService : IService
+    {
+        // Asset Management
+        System.Threading.Tasks.Task<UnityEngine.Object> LoadSpeedTreeAssetAsync(string assetPath);
+        void UnloadSpeedTreeAsset(string assetPath);
+        UnityEngine.Object GetSpeedTreeAssetForStrain(string strainId);
+        bool IsAssetLoaded(string assetPath);
+        
+        // Renderer Management
+        UnityEngine.GameObject CreateSpeedTreeRenderer(int plantId, Vector3 position, Quaternion rotation);
+        void DestroySpeedTreeRenderer(UnityEngine.GameObject renderer);
+        void ConfigureRendererForCannabis(UnityEngine.GameObject renderer, int plantId);
+        
+        // Material Management
+        void ApplyGeneticVariationsToRenderer(UnityEngine.GameObject renderer, object genetics);
+        void ApplyMorphologicalVariations(UnityEngine.GameObject renderer, object genetics);
+        void UpdatePlantAppearanceForStage(int plantId, object stage);
+        
+        // Physics Integration
+        void AddPhysicsInteraction(UnityEngine.GameObject renderer, int plantId);
+        void RemovePhysicsInteraction(UnityEngine.GameObject renderer);
+        
+        // Events
+        event System.Action<UnityEngine.GameObject> OnRendererCreated;
+        event System.Action<UnityEngine.GameObject> OnRendererDestroyed;
+        event System.Action<UnityEngine.Object> OnAssetLoaded;
+    }
+
+    /// <summary>
+    /// PC014-5b: Cannabis Genetics Service Interface
+    /// Manages genetic variation processing, growth stages, and cannabis-specific trait expression
+    /// </summary>
+    public interface ICannabisGeneticsService : IService
+    {
+        // Genetics Processing
+        object GenerateGeneticVariation(string strainId, object genotype);
+        void ProcessGeneticExpression(int plantId);
+        void ValidateGeneticData(object genetics);
+        
+        // Growth Management
+        void InitializePlantGrowth(int plantId);
+        void UpdatePlantGrowth(int plantId, float deltaTime);
+        void TriggerGrowthStageTransition(int plantId, object newStage);
+        
+        // Strain Management
+        void RegisterStrain(string strainId, object strain);
+        void UnregisterStrain(string strainId);
+        object GetCannabisStrain(string strainId);
+        
+        // Growth Animation
+        void AnimateStageTransition(int plantId, object oldStage, object newStage);
+        void UpdateGrowthAnimations(System.Collections.Generic.IEnumerable<int> plantIds);
+        
+        // Events
+        event System.Action<int, object, object> OnGrowthStageChanged;
+        event System.Action<int, object> OnGeneticExpressionUpdated;
+        event System.Action<string> OnStrainRegistered;
+    }
+
+    /// <summary>
+    /// PC014-5c: Environmental Response Service Interface
+    /// Handles environmental conditions, wind systems, stress visualization, and seasonal changes
+    /// </summary>
+    public interface ISpeedTreeEnvironmentalService : IService
+    {
+        // Environmental Response
+        void UpdateEnvironmentalResponse(int plantId, object conditions);
+        void ApplyEnvironmentalConditions(int plantId, object conditions);
+        void UpdateSeasonalChanges(System.Collections.Generic.IEnumerable<int> plantIds);
+        
+        // Wind System
+        void UpdateWindSystem();
+        void UpdateWindZone(WindZone windZone);
+        void ApplyWindSettings(object settings);
+        void SetWindEnabled(bool enabled);
+        
+        // Stress Management
+        void UpdateStressVisualization(System.Collections.Generic.IEnumerable<int> plantIds);
+        void UpdatePlantHealthVisualization(int plantId, float health);
+        void ApplyHealthVisualization(int plantId, float healthFactor, float stressFactor);
+        
+        // Lighting System
+        void UpdatePlantLighting(int plantId, float intensity, Color color);
+        void HandleLightingChange(object lightingConditions);
+        
+        // Events
+        event System.Action<object> OnEnvironmentalConditionsChanged;
+        event System.Action<float> OnWindStrengthChanged;
+        event System.Action<int, float> OnPlantStressChanged;
+    }
+
+    /// <summary>
+    /// PC014-5d: Performance Optimization Service Interface
+    /// Manages LOD, batching, culling, performance metrics, and memory optimization
+    /// </summary>
+    public interface ISpeedTreePerformanceService : IService
+    {
+        // Performance Monitoring
+        object GetCurrentMetrics();
+        void UpdatePerformanceMetrics();
+        void StartPerformanceMonitoring();
+        void StopPerformanceMonitoring();
+        
+        // LOD Management
+        void UpdateLODSystem(System.Collections.Generic.IEnumerable<int> plantIds);
+        void SetQualityLevel(object quality);
+        void ApplyQualitySettings(object quality);
+        
+        // Batching & Instancing
+        void ProcessBatching();
+        void RegisterRenderer(UnityEngine.GameObject renderer);
+        void UnregisterRenderer(UnityEngine.GameObject renderer);
+        void SetGPUInstancingEnabled(bool enabled);
+        
+        // Culling System
+        void UpdateCullingSystem(System.Collections.Generic.IEnumerable<int> plantIds);
+        void SetCullingDistance(float distance);
+        int GetVisiblePlantCount();
+        
+        // Memory Management
+        float GetMemoryUsage();
+        void OptimizeMemoryUsage();
+        void CleanupUnusedAssets();
+        
+        // Events
+        event System.Action<object> OnPerformanceMetricsUpdated;
+        event System.Action<object> OnQualityLevelChanged;
+        event System.Action<float> OnMemoryUsageChanged;
     }
 
     #endregion
