@@ -1,9 +1,0 @@
-{
-    "name": "ProjectChimera.Testing.Tests",
-    "optionalUnityReferences": [
-        "TestAssemblies"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ]
-}

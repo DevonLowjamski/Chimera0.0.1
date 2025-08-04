@@ -4,6 +4,22 @@ using ProjectChimera.Core;
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum FlavorProfileType
+    {
+        Sweet, Citrus, Earthy, Pine, Floral, Spicy, Fruity, Herbal, Woody, Diesel
+    }
+    
+    public enum TerpeneRole
+    {
+        Primary, Secondary, Accent, Modifier
+    }
+    
+    public enum TerpeneCategory 
+    {
+        Monoterpenes, Sesquiterpenes, Phenolic, Alcohol, Ketone, Ester
+    }
+
     /// <summary>
     /// Aromatic Profile Database - Collection of aromatic profiles for blending and analysis
     /// Contains flavor profiles, aromatic combinations, and quality standards

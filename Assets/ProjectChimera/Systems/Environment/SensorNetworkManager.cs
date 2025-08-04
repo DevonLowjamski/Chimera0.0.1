@@ -3,12 +3,33 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
-using ProjectChimera.Data.Automation;
+// using ProjectChimera.Data.Automation; // Removed - namespace deleted during cleanup
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
-using SensorType = ProjectChimera.Data.Automation.SensorType;
+// using SensorType = ProjectChimera.Data.Automation.SensorType; // Removed - namespace deleted during cleanup
 
 namespace ProjectChimera.Systems.Environment
 {
+    // Local type definitions to replace deleted automation types
+    public enum SensorType
+    {
+        Temperature, Humidity, TempHumidity, Light, CO2, pH, EC, Pressure, Flow
+    }
+    
+    [System.Serializable]
+    public class SensorReading
+    {
+        public string SensorId;
+        public float Value;
+        public System.DateTime Timestamp;
+        public SensorReadingStatus Status;
+        public string Unit;
+    }
+    
+    public enum SensorReadingStatus
+    {
+        Valid, Invalid, OutOfRange, Calibrating, Error
+    }
+
     /// <summary>
     /// PC013-6d: Specialized service for sensor network management
     /// Extracted from monolithic EnvironmentalManager.cs to handle environmental

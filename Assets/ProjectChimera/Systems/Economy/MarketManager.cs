@@ -5,8 +5,9 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Economy;
 using ProjectChimera.Data.Economy.Market;
 using ProjectChimera.Data.Economy.Configuration;
-// Explicit alias to resolve TransactionStatus ambiguity - use Configuration version for SimpleTransactionRecord
-using TransactionStatus = ProjectChimera.Data.Economy.Configuration.TransactionStatus;
+// Explicit aliases to resolve TransactionStatus and TransactionType ambiguity
+using ConfigTransactionStatus = ProjectChimera.Data.Economy.Configuration.TransactionStatus;
+using MarketTransactionType = ProjectChimera.Data.Economy.Market.TransactionType;
 
 namespace ProjectChimera.Systems.Economy
 {
@@ -97,7 +98,7 @@ namespace ProjectChimera.Systems.Economy
         {
             foreach (var product in _availableProducts)
             {
-                _productCatalog[product.UniqueID] = product;
+                _productCatalog[product.ProductId] = product;
             }
         }
         
@@ -170,7 +171,7 @@ namespace ProjectChimera.Systems.Economy
                 Quantity = quantity,
                 UnitPrice = unitPrice,
                 TotalValue = totalValue,
-                Type = TransactionType.Purchase,
+                Type = MarketTransactionType.Purchase,
                 TransactionDate = System.DateTime.Now,
                 Success = true
             };
@@ -187,7 +188,7 @@ namespace ProjectChimera.Systems.Economy
                 TotalValue = totalValue,
                 TaxAmount = taxAmount,
                 CommissionAmount = commissionAmount,
-                Status = TransactionStatus.Completed,
+                Status = ConfigTransactionStatus.Completed,
                 TransactionDate = System.DateTime.Now,
                 Notes = "Marketplace purchase"
             };
@@ -227,7 +228,7 @@ namespace ProjectChimera.Systems.Economy
                 Quantity = quantity,
                 UnitPrice = unitPrice,
                 TotalValue = totalValue,
-                Type = TransactionType.Sale,
+                Type = MarketTransactionType.Sale,
                 TransactionDate = System.DateTime.Now,
                 Success = true
             };
@@ -244,7 +245,7 @@ namespace ProjectChimera.Systems.Economy
                 TotalValue = totalValue,
                 TaxAmount = taxAmount,
                 CommissionAmount = commissionAmount,
-                Status = TransactionStatus.Completed,
+                Status = ConfigTransactionStatus.Completed,
                 TransactionDate = System.DateTime.Now,
                 Notes = "Marketplace sale"
             };

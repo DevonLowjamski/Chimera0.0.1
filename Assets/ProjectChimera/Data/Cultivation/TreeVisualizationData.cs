@@ -4,6 +4,12 @@ using ProjectChimera.Data.Genetics;
 
 namespace ProjectChimera.Data.Cultivation
 {
+    // Local type definitions to replace deleted types
+    public enum TreeGrowthLevel
+    {
+        Seed, Seedling, Vegetative, Mature, Flowering, FullyFlowered
+    }
+
     /// <summary>
     /// Data structures for tree visualization and skill tree rendering
     /// </summary>

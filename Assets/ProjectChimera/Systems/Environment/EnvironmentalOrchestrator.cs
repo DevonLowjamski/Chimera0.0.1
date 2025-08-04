@@ -5,15 +5,17 @@ using ProjectChimera.Core;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Automation;
+// using ProjectChimera.Data.Automation; // Removed - namespace deleted during cleanup
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
-using SensorReading = ProjectChimera.Data.Automation.SensorReading;
-using SensorType = ProjectChimera.Data.Automation.SensorType;
+// using SensorReading = ProjectChimera.Data.Automation.SensorReading; // Removed - namespace deleted during cleanup
+// using SensorType = ProjectChimera.Data.Automation.SensorType; // Removed - namespace deleted during cleanup
 
 namespace ProjectChimera.Systems.Environment
 {
+    // Note: Sensor types moved to SensorNetworkManager.cs to avoid duplicates
+
     /// <summary>
     /// PC013-6e: Main coordinator class for environmental operations
     /// Orchestrates specialized environmental services to provide a unified interface

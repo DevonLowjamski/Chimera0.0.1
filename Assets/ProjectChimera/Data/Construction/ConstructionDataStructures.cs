@@ -45,6 +45,12 @@ namespace ProjectChimera.Data.Construction
     }
 
     [System.Serializable]
+    public enum ComplexityLevel
+    {
+        Simple, Moderate, Complex, Very_Complex, Extreme
+    }
+
+    [System.Serializable]
     public enum BuildingMaterial
     {
         Wood,

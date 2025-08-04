@@ -1141,7 +1141,7 @@ namespace ProjectChimera.Systems.Environment
             var alert = new LightAlert
             {
                 AlertType = LightAlertType.Thermal,
-                Severity = ProjectChimera.Data.Automation.AlertSeverity.Warning,
+                Severity = AlertSeverity.Warning,
                 Message = $"Light overheating: {_operatingTemperature:F1}°C",
                 LightId = gameObject.name,
                 Timestamp = DateTime.Now
@@ -1483,7 +1483,7 @@ namespace ProjectChimera.Systems.Environment
     public class LightAlert
     {
         public LightAlertType AlertType;
-        public ProjectChimera.Data.Automation.AlertSeverity Severity;
+        public AlertSeverity Severity;
         public string Message;
         public string LightId;
         public DateTime Timestamp;
@@ -1496,5 +1496,13 @@ namespace ProjectChimera.Systems.Environment
         Spectrum,
         Efficiency,
         Maintenance
+    }
+    
+    public enum AlertSeverity
+    {
+        Info,
+        Warning,
+        Error,
+        Critical
     }
 }

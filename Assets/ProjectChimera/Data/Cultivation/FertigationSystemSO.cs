@@ -6,6 +6,25 @@ using System;
 
 namespace ProjectChimera.Data.Cultivation
 {
+    // Local type definitions to replace deleted types
+    public enum CultivationGoal
+    {
+        MaxYield, MaxPotency, MaxTerpenes, MaxQuality, FastFlower, EnergyEfficient
+    }
+    
+    public enum SensorType
+    {
+        pH, EC, Temperature, Humidity, Light, CO2, Moisture
+    }
+    
+    [System.Serializable]
+    public class EnvironmentalOptimization
+    {
+        public string OptimizationType;
+        public float Value;
+        public string Description;
+    }
+
     /// <summary>
     /// Advanced Automated Fertigation System for precision cannabis cultivation.
     /// Combines irrigation and fertilization with real-time monitoring and stage-specific nutrient delivery.

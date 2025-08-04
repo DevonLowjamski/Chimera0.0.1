@@ -481,10 +481,7 @@ namespace ProjectChimera.Systems.Registry
                 TotalLines = 1840,
                 ProposedServices = new List<ProposedService>
                 {
-                    new ProposedService { Name = "ResearchProjectService", Domain = ServiceDomain.Research, EstimatedLines = 460, Priority = ServicePriority.Critical },
-                    new ProposedService { Name = "TechnologyTreeService", Domain = ServiceDomain.Research, EstimatedLines = 460, Priority = ServicePriority.Critical },
-                    new ProposedService { Name = "DiscoverySystemService", Domain = ServiceDomain.Research, EstimatedLines = 460, Priority = ServicePriority.High },
-                    new ProposedService { Name = "ResearchResourceService", Domain = ServiceDomain.Research, EstimatedLines = 460, Priority = ServicePriority.High }
+                    // Note: Research services removed - research system deleted from Project Chimera
                 },
                 IsValid = true
             };

@@ -4,6 +4,12 @@ using ProjectChimera.Core;
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum SkillCategory
+    {
+        Cultivation, Genetics, Science, Business, Processing, Management
+    }
+
     /// <summary>
     /// Tree Visualization Configuration - Configuration for skill tree and progression visualization
     /// Defines visual styles, layouts, animations, and UI presentation

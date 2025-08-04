@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Events;
+// using ProjectChimera.Data.Events; // Removed - namespace deleted during cleanup
 using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
 
 namespace ProjectChimera.Systems.Cultivation

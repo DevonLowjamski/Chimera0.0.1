@@ -4,6 +4,17 @@ using ProjectChimera.Core;
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum SensoryTrainingType
+    {
+        Visual, Olfactory, Taste, Texture, Sound
+    }
+    
+    public enum BlendingChallengeType
+    {
+        Flavor, Aroma, Color, Consistency, Balance
+    }
+
     /// <summary>
     /// Aromatic Visualization Configuration - Visual settings for aromatic gaming interface
     /// Defines terpene displays, sensory training visuals, and blending interface elements

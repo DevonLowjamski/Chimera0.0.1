@@ -1,10 +1,21 @@
 using UnityEngine;
 using System.Collections.Generic;
-using ProjectChimera.Data.Genetics.Scientific;
-using ScientificResearchField = ProjectChimera.Data.Genetics.Scientific.ResearchField;
+// using ProjectChimera.Data.Genetics.Scientific; // Removed - namespace deleted during cleanup
+// using ScientificResearchField = ProjectChimera.Data.Genetics.Scientific.ResearchField; // Removed - namespace deleted during cleanup
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum ResearchField
+    {
+        Genetics, Breeding, Chemistry, Biology, Agriculture, Botany, Research
+    }
+    
+    public enum ScientificResearchField
+    {
+        Genetics, Breeding, Chemistry, Biology, Agriculture, Botany, Research
+    }
+
     /// <summary>
     /// Scientific system data structures for research, reputation, and statistics.
     /// </summary>

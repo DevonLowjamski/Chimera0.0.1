@@ -4,6 +4,12 @@ using System;
 
 namespace ProjectChimera.Data.Cultivation
 {
+    // Local type definitions to replace deleted types
+    public enum SkillBranch
+    {
+        Cultivation, Automation, Science, Business, Genetics, Processing
+    }
+
     /// <summary>
     /// Additional data structures for cultivation gaming systems
     /// Contains missing types referenced by various cultivation managers

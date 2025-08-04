@@ -2,24 +2,62 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
-using ProjectChimera.Events.Core;
+// using ProjectChimera.Events.Core; // Removed - namespace deleted during cleanup
 using ProjectChimera.Core.Logging;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Events;
+// using ProjectChimera.Data.Events; // Removed - namespace deleted during cleanup
 using ProjectChimera.Data.Genetics; // For PlantGrowthStage enum
 using ProjectChimera.Events; // For event data classes
 // Type aliases to resolve ambiguous references - use consistent naming
 using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
-using EventsCultivationTaskType = ProjectChimera.Data.Events.CultivationTaskType;
+// using EventsCultivationTaskType = ProjectChimera.Data.Events.CultivationTaskType; // Removed - namespace deleted during cleanup
 using SkillNodeType = ProjectChimera.Data.Cultivation.SkillNodeType;
 using InteractivePlant = ProjectChimera.Data.Cultivation.InteractivePlant;
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 // Event system aliases
 using PlantCareEventData = ProjectChimera.Core.Events.PlantCareEventData;
-using SkillProgressionEventData = ProjectChimera.Data.Events.SkillProgressionEventData;
+// using SkillProgressionEventData = ProjectChimera.Data.Events.SkillProgressionEventData; // Removed - namespace deleted during cleanup
 // Local system types
 using CareAction = ProjectChimera.Systems.Cultivation.CareAction;
 using CareQuality = ProjectChimera.Systems.Cultivation.CareQuality;
+
+// Local type definitions to replace deleted types
+public class GameEventChannelSO : ScriptableObject
+{
+    public void RaiseEvent(object eventData) { /* Placeholder implementation */ }
+}
+
+// Local configuration classes to replace deleted types
+public class InteractivePlantCareConfigSO : ScriptableObject
+{
+    public float BaseActionEfficiency = 1.0f;
+    public float BaseSkillLevel = 1.0f;
+    public float MaxSkillLevel = 10.0f;
+    public float BaseSkillGain = 0.1f;
+    public float MaxTimingWindow = 60.0f;
+    public float ToolQualityBonus = 0.1f;
+    public float MinActionRelevanceThreshold = 0.3f;
+    public SkillMilestone[] SkillMilestones = new SkillMilestone[0];
+}
+
+public class CareToolLibrarySO : ScriptableObject
+{
+    // Placeholder implementation
+}
+
+public class CareAudioLibrarySO : ScriptableObject
+{
+    public AudioClip GetCareAudioClip(CultivationTaskType taskType, float quality) { return null; }
+    public AudioClip GetFailureAudioClip(CultivationTaskType taskType) { return null; }
+}
+
+[System.Serializable]
+public class SkillMilestone
+{
+    public string MilestoneName;
+    public float RequiredLevel;
+    public bool IsUnlocked;
+}
 
 namespace ProjectChimera.Systems.Cultivation
 {

@@ -5,6 +5,12 @@ using ProjectChimera.Data.Cultivation;
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum DifficultyLevel
+    {
+        Beginner, Easy, Intermediate, Advanced, Expert
+    }
+
     /// <summary>
     /// Defines a specific cannabis strain with its unique genetic profile, characteristics, and breeding history.
     /// Inherits base parameters from PlantSpeciesSO and adds strain-specific modifications and traits.

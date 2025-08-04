@@ -1532,9 +1532,24 @@ namespace ProjectChimera.Data.Economy
         public string Description;
     }
 
-    // GeopoliticalEvent class removed
-
-    // RegulatoryChange class removed
+    // Local replacement classes for deleted types
+    [System.Serializable]
+    public class GeopoliticalEvent
+    {
+        public string EventId;
+        public string Description;
+        public float Impact;
+        public DateTime StartDate;
+    }
+    
+    [System.Serializable]
+    public class RegulatoryChange
+    {
+        public string ChangeId;
+        public string Description;
+        public float Impact;
+        public DateTime EffectiveDate;
+    }
 
     // MarketForecast and ForecastParameters moved to MarketDataStructures.cs
 

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ProjectChimera.Data.Automation;
+// using ProjectChimera.Data.Automation; // Commented out - namespace removed
 
 namespace ProjectChimera.Systems.Environment
 {
@@ -15,6 +15,5 @@ namespace ProjectChimera.Systems.Environment
         void SetAlertThresholds(string sensorId, float minValue, float maxValue);
     }
 
-    // Use SensorReading and SensorType from ProjectChimera.Data.Automation.AutomationDataStructures
-    // to avoid duplicate definitions
+    // Note: Sensor types moved to SensorNetworkManager.cs to avoid duplicates
 }

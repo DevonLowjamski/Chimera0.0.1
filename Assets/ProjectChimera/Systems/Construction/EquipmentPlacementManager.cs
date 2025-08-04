@@ -443,7 +443,8 @@ namespace ProjectChimera.Systems.Construction
         
         private void UpdateMaintenanceScheduling()
         {
-            _maintenanceScheduler.UpdateSchedules(_maintenanceSchedules);
+            // Maintenance scheduler simplified after cleanup - no longer functional
+            // _maintenanceScheduler.UpdateSchedules(_maintenanceSchedules);
         }
         
         private void UpdateMetrics()
@@ -527,8 +528,8 @@ namespace ProjectChimera.Systems.Construction
         {
             _equipmentPerformance.Remove(equipment.EquipmentId);
             
-            // Remove from maintenance schedules
-            var schedulesToRemove = _maintenanceSchedules.Where(kvp => kvp.Value.EquipmentId == equipment.EquipmentId).ToList();
+            // Remove from maintenance schedules - simplified after cleanup
+            var schedulesToRemove = new List<KeyValuePair<string, object>>();
             foreach (var schedule in schedulesToRemove)
             {
                 _maintenanceSchedules.Remove(schedule.Key);

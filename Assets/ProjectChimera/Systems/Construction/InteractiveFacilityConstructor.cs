@@ -28,12 +28,14 @@ using ConstructionProject = ProjectChimera.Data.Construction.Processes.Construct
 using ConstructionBuildingQuality = ProjectChimera.Data.Construction.Buildings.BuildingQuality;
 using ConstructionProjectStatus = ProjectChimera.Data.Construction.Processes.ProjectStatus;
 using ConstructionFacilityTemplate = ProjectChimera.Data.Construction.Buildings.FacilityTemplate;
-// using ConstructionSettings = ProjectChimera.Data.Construction.Buildings.ConstructionSettings; // Type not found in decomposed modules
+// Additional type aliases to resolve ambiguous references
+using ConstructionSettings = ProjectChimera.Data.Construction.Processes.ConstructionSettings;
 using FacilityDesignTool = ProjectChimera.Data.Construction.Processes.FacilityDesignTool;
 using BuildingValidator = ProjectChimera.Data.Construction.Processes.BuildingValidator;
 using ConstructionPlanner = ProjectChimera.Data.Construction.Processes.ConstructionPlanner;
 using ConstructionWorkforce = ProjectChimera.Data.Construction.Resources.ConstructionWorkforce;
 using MaterialInventory = ProjectChimera.Data.Construction.Resources.MaterialInventory;
+// Duplicate aliases removed
 using ConstructionTask = ProjectChimera.Data.Construction.Processes.ConstructionTask;
 using ConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
 using PermitApplication = ProjectChimera.Data.Construction.Processes.PermitApplication;

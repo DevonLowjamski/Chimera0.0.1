@@ -4,6 +4,12 @@ using ProjectChimera.Core;
 
 namespace ProjectChimera.Data.Genetics
 {
+    // Local type definitions to replace deleted types
+    public enum GeneticPuzzleType
+    {
+        Inheritance, Crossing, Selection, Breeding, Analysis
+    }
+
     /// <summary>
     /// Genetic Visualization Configuration - Visual settings for genetic gaming interface
     /// Defines genetic puzzle visuals, inheritance displays, and breeding interface elements

@@ -3,11 +3,11 @@ using ProjectChimera.Core;
 using ProjectChimera.Core.DependencyInjection;
 using ProjectChimera.Data.Environment;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Data.Automation;
+// using ProjectChimera.Data.Automation; // Removed - namespace deleted during cleanup
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using LightSpectrumData = ProjectChimera.Data.Environment.LightSpectrumData;
 using SeasonType = ProjectChimera.Data.Environment.SeasonType;
-using SensorReading = ProjectChimera.Data.Automation.SensorReading;
+// using SensorReading = ProjectChimera.Data.Automation.SensorReading; // Removed - namespace deleted during cleanup
 using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 using EnvironmentalZone = ProjectChimera.Data.Environment.EnvironmentalZone;
 using System.Collections.Generic;
@@ -17,6 +17,8 @@ using System;
 
 namespace ProjectChimera.Systems.Environment
 {
+    // Note: Sensor types moved to SensorNetworkManager.cs to avoid duplicates
+
     /// <summary>
     /// Sophisticated Environmental Management System for advanced cannabis cultivation simulation.
     /// Provides comprehensive environmental control, stress modeling, and cannabinoid optimization
