@@ -1,9 +1,13 @@
 using UnityEngine;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Facilities;
 using ProjectChimera.Systems.Construction;
 // Explicit type aliases to resolve ambiguous references
-using ConstructionRoomType = ProjectChimera.Data.Construction.RoomType;
+using ConstructionRoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
 using FacilitiesRoomType = ProjectChimera.Data.Facilities.RoomType;
 
 namespace ProjectChimera

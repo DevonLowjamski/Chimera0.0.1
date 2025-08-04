@@ -1,9 +1,14 @@
 using UnityEngine;
 using ProjectChimera.Systems.Construction;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Equipment;
 // Explicit type aliases to resolve ambiguous references
-using ConstructionRoomType = ProjectChimera.Data.Construction.RoomType;
+using ConstructionRoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
+// Note: EquipmentStatus may be in original file if not found in decomposed modules
 using ConstructionEquipmentStatus = ProjectChimera.Data.Construction.EquipmentStatus;
 
 namespace ProjectChimera

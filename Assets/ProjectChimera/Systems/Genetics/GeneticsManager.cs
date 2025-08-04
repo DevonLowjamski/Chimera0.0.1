@@ -282,7 +282,7 @@ namespace ProjectChimera.Systems.Genetics
         /// <summary>
         /// Optimizes breeding selection using genetic analysis service
         /// </summary>
-        public ProjectChimera.Data.AI.BreedingRecommendation OptimizeBreedingSelection(List<PlantInstanceSO> candidates, TraitSelectionCriteria criteria)
+        public string OptimizeBreedingSelection(List<PlantInstanceSO> candidates, TraitSelectionCriteria criteria) // Simplified - AI namespace removed
         {
             if (_geneticAnalysisEngine != null)
             {
@@ -511,14 +511,10 @@ namespace ProjectChimera.Systems.Genetics
             };
         }
         
-        private ProjectChimera.Data.AI.BreedingRecommendation CreateFallbackBreedingRecommendation(List<PlantInstanceSO> candidates)
+        private string CreateFallbackBreedingRecommendation(List<PlantInstanceSO> candidates)
         {
-            return new ProjectChimera.Data.AI.BreedingRecommendation
-            {
-                RecommendedPairs = new List<string>(), // Keep as List<string> to avoid assembly dependency
-                ExpectedGeneticGain = 0.0f,
-                Strategy = ProjectChimera.Data.Genetics.BreedingStrategyType.LineBreeding
-            };
+            // Simplified - AI namespace removed during cleanup
+            return "Basic breeding recommendation for " + (candidates?.Count ?? 0) + " candidates";
         }
         
         private GenerationalSimulationResult CreateFallbackGenerationSimulation(List<PlantInstanceSO> population, int generations)
@@ -632,18 +628,14 @@ namespace ProjectChimera.Systems.Genetics
         }
         
         /// <summary>
-        /// PC014-FIX-32: Convert Systems.Genetics.BreedingRecommendation to Data.AI.BreedingRecommendation
+        /// PC014-FIX-32: Convert Systems.Genetics.BreedingRecommendation to string - AI namespace removed
         /// </summary>
-        private ProjectChimera.Data.AI.BreedingRecommendation ConvertToDataBreedingRecommendation(ProjectChimera.Systems.Genetics.BreedingRecommendation systemsRecommendation)
+        private string ConvertToDataBreedingRecommendation(ProjectChimera.Systems.Genetics.BreedingRecommendation systemsRecommendation)
         {
-            if (systemsRecommendation == null) return null;
+            if (systemsRecommendation == null) return "No recommendation available";
             
-            return new ProjectChimera.Data.AI.BreedingRecommendation
-            {
-                RecommendedPairs = new List<string>(), // Convert BreedingPair list to string list
-                ExpectedGeneticGain = systemsRecommendation.ExpectedGeneticGain,
-                Strategy = ProjectChimera.Data.Genetics.BreedingStrategyType.LineBreeding // Default strategy
-            };
+            // Simplified - AI namespace removed during cleanup
+            return $"Breeding recommendation with expected gain: {systemsRecommendation.ExpectedGeneticGain:F2}";
         }
         
         protected override void OnManagerUpdate()

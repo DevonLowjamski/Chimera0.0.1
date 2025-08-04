@@ -4,7 +4,16 @@ using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
+// Explicit type aliases to resolve ambiguous references
+using ConstructionRoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
+using Room = ProjectChimera.Data.Construction.Buildings.Room;
 using DataCultivationApproach = ProjectChimera.Data.Cultivation.CultivationApproach;
+// Explicit type alias to resolve SkillLevel ambiguity
+using SkillLevel = ProjectChimera.Data.Construction.Processes.SkillLevel;
 
 namespace ProjectChimera.Systems.Cultivation
 {

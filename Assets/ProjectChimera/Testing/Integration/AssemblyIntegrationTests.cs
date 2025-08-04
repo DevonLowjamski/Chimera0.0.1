@@ -9,8 +9,8 @@ using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.UI.Core;
 using ProjectChimera.UI.Panels;
-using ProjectChimera.Systems.AI;
-using ProjectChimera.Systems.Automation;
+// using ProjectChimera.Systems.AI; // Removed - namespace deleted during cleanup
+// using ProjectChimera.Systems.Automation; // Removed - namespace deleted during cleanup
 using ProjectChimera.Systems.Genetics;
 using ProjectChimera.Systems.Cultivation;
 using ProjectChimera.Data.Cultivation;

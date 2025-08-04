@@ -4,6 +4,10 @@ using System.Linq;
 using UnityEngine;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Facilities;
 
 namespace ProjectChimera.Systems.Construction

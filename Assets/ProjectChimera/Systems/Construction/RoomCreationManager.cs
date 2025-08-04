@@ -4,14 +4,46 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Environment;
 // Explicit aliases to resolve ambiguous references
 using FacilitiesRoomTemplate = ProjectChimera.Data.Facilities.RoomTemplate;
-using ConstructionRoomType = ProjectChimera.Data.Construction.RoomType;
-using ConstructionEnvironmentalConditions = ProjectChimera.Data.Construction.EnvironmentalConditions;
-using ConstructionComplianceStatus = ProjectChimera.Data.Construction.ComplianceStatus;
-using ConstructionSecurityLevel = ProjectChimera.Data.Construction.SecurityLevel;
+using RoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
+using EnvironmentalConditions = ProjectChimera.Data.Construction.Buildings.EnvironmentalConditions;
+using ComplianceStatus = ProjectChimera.Data.Construction.Buildings.ComplianceStatus;
+using SecurityLevel = ProjectChimera.Data.Construction.Buildings.SecurityLevel;
+using Room = ProjectChimera.Data.Construction.Buildings.Room;
+using RoomConfiguration = ProjectChimera.Data.Construction.Buildings.RoomConfiguration;
+using RoomPerformanceData = ProjectChimera.Data.Construction.Buildings.RoomPerformanceData;
 using RoomTemplate = ProjectChimera.Data.Facilities.RoomTemplate;
+using ConstructionEnvironmentalConditions = ProjectChimera.Data.Construction.Buildings.EnvironmentalConditions;
+using ConstructionSecurityLevel = ProjectChimera.Data.Construction.Buildings.SecurityLevel;
+using ConstructionRoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
+using ConstructionComplianceStatus = ProjectChimera.Data.Construction.Buildings.ComplianceStatus;
+using OptimizationOpportunity = ProjectChimera.Data.Construction.Buildings.OptimizationOpportunity;
+using ValidationResult = ProjectChimera.Data.Construction.Buildings.ValidationResult;
+using OptimizationCriteria = ProjectChimera.Data.Construction.Buildings.OptimizationCriteria;
+using LayoutOptimizationResult = ProjectChimera.Data.Construction.Buildings.LayoutOptimizationResult;
+using FacilityOptimizationCriteria = ProjectChimera.Data.Construction.Buildings.FacilityOptimizationCriteria;
+using FacilityOptimizationResult = ProjectChimera.Data.Construction.Buildings.FacilityOptimizationResult;
+using RegulatoryRequirement = ProjectChimera.Data.Construction.Buildings.RegulatoryRequirement;
+using EnvironmentalSettings = ProjectChimera.Data.Construction.Buildings.EnvironmentalSettings;
+using SecuritySettings = ProjectChimera.Data.Construction.Buildings.SecuritySettings;
+using AccessControlLevel = ProjectChimera.Data.Construction.Buildings.AccessControlLevel;
+using MonitoringLevel = ProjectChimera.Data.Construction.Buildings.MonitoringLevel;
+// using RoomDesignSession = ProjectChimera.Data.Construction.Buildings.RoomDesignSession; // Type not found in decomposed modules
+// Additional type aliases for remaining construction ambiguities
+// Note: These types don't exist in decomposed modules - keeping commented out
+// using RoomLayoutOptimizer = ProjectChimera.Data.Construction.Buildings.RoomLayoutOptimizer;
+// using EnvironmentalValidator = ProjectChimera.Data.Construction.Buildings.EnvironmentalValidator;
+// using RegulatoryComplianceChecker = ProjectChimera.Data.Construction.Buildings.RegulatoryComplianceChecker;
+// using RoomVisualizationSystem = ProjectChimera.Data.Construction.Buildings.RoomVisualizationSystem;
+// using InteractiveRoomDesigner = ProjectChimera.Data.Construction.Buildings.InteractiveRoomDesigner;
+// using SmartLayoutGenerator = ProjectChimera.Data.Construction.Buildings.SmartLayoutGenerator;
+// using EnvironmentalConfigurationWizard = ProjectChimera.Data.Construction.Buildings.EnvironmentalConfigurationWizard;
 
 namespace ProjectChimera.Systems.Construction
 {
@@ -51,7 +83,7 @@ namespace ProjectChimera.Systems.Construction
         // Core room management
         private Dictionary<string, Room> _activeRooms = new Dictionary<string, Room>();
         private Dictionary<string, RoomConfiguration> _roomConfigurations = new Dictionary<string, RoomConfiguration>();
-        private List<RoomDesignSession> _activeDesignSessions = new List<RoomDesignSession>();
+        // private List<RoomDesignSession> _activeDesignSessions = new List<RoomDesignSession>(); // Type not found in decomposed modules
         
         // Design and validation systems
         private RoomLayoutOptimizer _layoutOptimizer;
@@ -105,12 +137,13 @@ namespace ProjectChimera.Systems.Construction
         protected override void OnManagerShutdown()
         {
             // Cleanup all active design sessions
-            foreach (var session in _activeDesignSessions)
-            {
-                session.IsActive = false;
-                session.IsComplete = true;
-            }
-            _activeDesignSessions.Clear();
+            // Note: RoomDesignSession type not available - commented out
+            // foreach (var session in _activeDesignSessions)
+            // {
+            //     session.IsActive = false;
+            //     session.IsComplete = true;
+            // }
+            // _activeDesignSessions.Clear();
             
             // Cleanup visualization system
             _visualizationSystem = null;
@@ -407,14 +440,15 @@ namespace ProjectChimera.Systems.Construction
         
         private void UpdateActiveDesignSessions()
         {
-            foreach (var session in _activeDesignSessions.ToList())
-            {
-                session.Update();
-                if (session.IsComplete)
-                {
-                    _activeDesignSessions.Remove(session);
-                }
-            }
+            // Note: RoomDesignSession type not available - commented out
+            // foreach (var session in _activeDesignSessions.ToList())
+            // {
+            //     session.Update();
+            //     if (session.IsComplete)
+            //     {
+            //         _activeDesignSessions.Remove(session);
+            //     }
+            // }
         }
         
         private void UpdateRoomPerformance()

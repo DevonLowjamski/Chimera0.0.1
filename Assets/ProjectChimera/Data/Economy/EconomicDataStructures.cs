@@ -679,7 +679,7 @@ namespace ProjectChimera.Data.Economy
         public RiskProfile RiskProfile;
         public int TradingExperience;
         public float BusinessReputation;
-        public MarketKnowledge MarketKnowledge;
+        public string MarketKnowledge; // Simplified to string after cleanup
         public List<TradeRecord> TradingHistory;
         public List<BusinessAchievement> BusinessAchievements;
         public DateTime CreationTime;
@@ -1240,7 +1240,7 @@ namespace ProjectChimera.Data.Economy
     [System.Serializable]
     public class GlobalExpansionStrategy
     {
-        public Region TargetRegion;
+        public string TargetRegion; // Simplified to string after cleanup
         public ExpansionType ExpansionType;
         public decimal InvestmentBudget;
         public int TimelineMonths;
@@ -1528,7 +1528,7 @@ namespace ProjectChimera.Data.Economy
         public EconomicEventType EventType;
         public DateTime EventDate;
         public float Impact;
-        public List<Region> AffectedRegions = new List<Region>();
+        public List<string> AffectedRegions = new List<string>(); // Simplified to string list after cleanup
         public string Description;
     }
 
@@ -2902,7 +2902,7 @@ namespace ProjectChimera.Data.Economy
     public class DefensiveMeasures
     {
         public string DefenseId;
-        public DefenseStrategy Strategy;
+        public string Strategy; // Simplified to string after cleanup
         public DateTime ImplementationTime;
         public EarlyWarningSystem CompetitiveMonitoring;
         public object MarketProtection; // MarketProtectionSystem moved to MarketDataStructures.cs
@@ -2942,7 +2942,7 @@ namespace ProjectChimera.Data.Economy
         public DateTime AwardDate;
         public DateTime ExpirationDate;
         public CertificationEvidence Evidence;
-        public DigitalBadge DigitalBadge;
+        public string DigitalBadge; // Simplified to string after cleanup
         public IndustryRecognition IndustryRecognition;
         public List<CareerOpportunity> CareerPathways = new List<CareerOpportunity>();
         public NetworkAccess NetworkingAccess;

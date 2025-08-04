@@ -368,7 +368,7 @@ namespace ProjectChimera.Systems.Services.Progression
                 AchievementID = "first_level",
                 Name = "First Steps",
                 Description = "Reach level 2",
-                Type = AchievementType.Progression,
+                Type = AchievementType.Progressive,
                 Difficulty = AchievementDifficulty.Easy,
                 PointValue = 50
             });
@@ -554,7 +554,7 @@ namespace ProjectChimera.Systems.Services.Progression
             return achievement.Difficulty switch
             {
                 AchievementDifficulty.Easy => 100f,
-                AchievementDifficulty.Medium => 250f,
+                AchievementDifficulty.Normal => 250f,
                 AchievementDifficulty.Hard => 500f,
                 AchievementDifficulty.Expert => 1000f,
                 AchievementDifficulty.Legendary => 2500f,

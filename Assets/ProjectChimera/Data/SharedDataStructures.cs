@@ -1,10 +1,21 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectChimera.Data.Community;
+// using ProjectChimera.Data.Community; // Removed - namespace no longer exists after cleanup
 
 namespace ProjectChimera.Data
 {
+    /// <summary>
+    /// Simple badge data for player achievements
+    /// </summary>
+    [System.Serializable]
+    public class Badge
+    {
+        public string BadgeId;
+        public string BadgeName;
+        public string Description;
+        public DateTime EarnedDate;
+    }
     /// <summary>
     /// Shared data structures used across multiple systems in Project Chimera.
     /// This centralizes common data types to avoid duplication and ensure consistency.

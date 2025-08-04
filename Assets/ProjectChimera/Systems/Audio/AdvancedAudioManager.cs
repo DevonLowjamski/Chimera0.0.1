@@ -18,7 +18,11 @@ using EnvironmentSystems = ProjectChimera.Systems.Environment;
 using DataPlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 
 // Explicit namespace aliases to resolve ambiguity
-using DataConstructionIssue = ProjectChimera.Data.Construction.ConstructionIssue;
+using DataConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using EnvironmentalAlert = ProjectChimera.Systems.Environment.EnvironmentalAlert;
 using EnvironmentalManager = ProjectChimera.Systems.Environment.EnvironmentalManager;
 

@@ -5,6 +5,10 @@ using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Events;
 using ProjectChimera.Events.Core;
 using ProjectChimera.Data.Progression;
@@ -14,6 +18,8 @@ using PlantGrowthStage = ProjectChimera.Data.Genetics.PlantGrowthStage;
 using CultivationTaskType = ProjectChimera.Data.Cultivation.CultivationTaskType;
 // Type alias to use AutomationSystemType from Events namespace
 using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+// Explicit type alias to resolve SkillLevel ambiguity - using Construction.Processes version
+using SkillLevel = ProjectChimera.Data.Construction.Processes.SkillLevel;
 
 namespace ProjectChimera.Systems.Cultivation
 {

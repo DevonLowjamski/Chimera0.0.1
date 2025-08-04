@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Genetics;
 
-// Type alias to use AutomationSystemType from Events namespace
-using AutomationSystemType = ProjectChimera.Data.Events.AutomationSystemType;
+// Type alias removed - Events namespace no longer exists after cleanup
 
 namespace ProjectChimera.Data.Cultivation
 {
@@ -68,7 +67,7 @@ namespace ProjectChimera.Data.Cultivation
         public CultivationContainer Container;
         public GrowingMedium GrowingMedium;
         public bool IsAutomated = false;
-        public List<AutomationSystemType> ActiveAutomationSystems = new List<AutomationSystemType>();
+        public List<string> ActiveAutomationSystems = new List<string>(); // Changed from AutomationSystemType to string after Events namespace cleanup
         
         [Header("Gaming Properties")]
         public float PlayerAttentionLevel = 1f;

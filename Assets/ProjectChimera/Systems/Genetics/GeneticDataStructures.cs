@@ -9,7 +9,7 @@ using TraitStabilityAnalysis = ProjectChimera.Systems.Genetics.TraitStabilityAna
 using TraitExpressionStats = ProjectChimera.Systems.Genetics.TraitExpressionStats;
 using TraitType = ProjectChimera.Data.Genetics.TraitType;
 using BreedingStrategyType = ProjectChimera.Data.Genetics.BreedingStrategyType;
-using BreedingRecommendation = ProjectChimera.Data.AI.BreedingRecommendation;
+// using BreedingRecommendation = ProjectChimera.Data.AI.BreedingRecommendation; // Removed - AI namespace deleted during cleanup
 using BreedingPair = ProjectChimera.Systems.Genetics.BreedingPair;
 
 namespace ProjectChimera.Systems.Genetics

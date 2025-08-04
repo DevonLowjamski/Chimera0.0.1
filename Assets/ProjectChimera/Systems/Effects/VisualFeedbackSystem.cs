@@ -5,7 +5,11 @@ using ProjectChimera.Systems.Cultivation;
 using EnvironmentSystems = ProjectChimera.Systems.Environment;
 using ProjectChimera.Systems.Construction;
 using ProjectChimera.Data.Construction;
-using DataConstructionIssue = ProjectChimera.Data.Construction.ConstructionIssue;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
+using DataConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
 using ProjectChimera.Data.Economy;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Effects;

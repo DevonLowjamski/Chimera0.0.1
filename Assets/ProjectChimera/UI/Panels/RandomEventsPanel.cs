@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using ProjectChimera.Core;
-using ProjectChimera.Systems.Events;
+// using ProjectChimera.Systems.Events; // Removed - namespace deleted during cleanup
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using ProjectChimera.UI.Core;
 
-// Use aliases to resolve ambiguous references
-using EventDisplayData = ProjectChimera.Data.Events.EventDisplayData;
-using ActiveRandomEvent = ProjectChimera.Data.Events.ActiveRandomEvent;
-using EventChoice = ProjectChimera.Data.Events.EventChoice;
-using EventSeverity = ProjectChimera.Data.Events.EventSeverity;
+// Event system aliases removed - namespace deleted during cleanup
+// using EventDisplayData = ProjectChimera.Data.Events.EventDisplayData;
+// using ActiveRandomEvent = ProjectChimera.Data.Events.ActiveRandomEvent;
+// using EventChoice = ProjectChimera.Data.Events.EventChoice;
+// using EventSeverity = ProjectChimera.Data.Events.EventSeverity;
 using RandomEventData = ProjectChimera.Data.UI.RandomEventData;
 
 namespace ProjectChimera.UI.Panels

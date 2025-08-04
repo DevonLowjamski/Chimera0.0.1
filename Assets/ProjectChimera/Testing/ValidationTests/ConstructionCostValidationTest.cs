@@ -1,12 +1,37 @@
 using UnityEngine;
 using ProjectChimera.Systems.Construction;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Equipment;
-// Explicit type aliases to resolve ambiguous references
-using ConstructionResourceType = ProjectChimera.Data.Construction.ResourceType;
-using ConstructionCostType = ProjectChimera.Data.Construction.CostType;
-using ConstructionBudgetAlert = ProjectChimera.Data.Construction.BudgetAlert;
-using ConstructionBudgetStatus = ProjectChimera.Data.Construction.BudgetStatus;
+// Explicit type aliases to resolve ambiguous references - Note: These types may be in original file
+using ConstructionResourceType = ProjectChimera.Data.Construction.Resources.ResourceType;
+using ConstructionCostType = ProjectChimera.Data.Construction.Resources.CostType;
+using ConstructionBudgetAlert = ProjectChimera.Data.Construction.Resources.BudgetAlert;
+using ConstructionBudgetStatus = ProjectChimera.Data.Construction.Resources.BudgetStatus;
+using ConstructionProjectData = ProjectChimera.Data.Construction.Processes.ConstructionProjectData;
+using ConstructionProjectType = ProjectChimera.Data.Construction.Processes.ConstructionProjectType;
+using ConstructionCostEstimate = ProjectChimera.Data.Construction.Resources.ConstructionCostEstimate;
+using EstimateStatus = ProjectChimera.Data.Construction.Resources.EstimateStatus;
+using ProjectBudget = ProjectChimera.Data.Construction.Resources.ProjectBudget;
+using CostRecord = ProjectChimera.Data.Construction.Resources.CostRecord;
+using ResourceInventory = ProjectChimera.Data.Construction.Resources.ResourceInventory;
+using ResourceAllocation = ProjectChimera.Data.Construction.Resources.ResourceAllocation;
+using AllocationStatus = ProjectChimera.Data.Construction.Resources.AllocationStatus;
+using BudgetAlertType = ProjectChimera.Data.Construction.Resources.BudgetAlertType;
+using CostPerformanceData = ProjectChimera.Data.Construction.Resources.CostPerformanceData;
+using CostOptimizationResult = ProjectChimera.Data.Construction.Resources.CostOptimizationResult;
+using CannabisOptimizationResult = ProjectChimera.Data.Construction.Resources.CannabisOptimizationResult;
+using ConstructionCostCalculator = ProjectChimera.Data.Construction.Resources.ConstructionCostCalculator;
+using ResourceAllocationOptimizer = ProjectChimera.Data.Construction.Resources.ResourceAllocationOptimizer;
+using BudgetTracker = ProjectChimera.Data.Construction.Resources.BudgetTracker;
+using CostAnalyzer = ProjectChimera.Data.Construction.Resources.CostAnalyzer;
+using CannabisConstructionCostAnalyzer = ProjectChimera.Data.Construction.Resources.CannabisConstructionCostAnalyzer;
+using ComplianceCostCalculator = ProjectChimera.Data.Construction.Resources.ComplianceCostCalculator;
+using SecurityCostOptimizer = ProjectChimera.Data.Construction.Resources.SecurityCostOptimizer;
+using ConstructionCostMetrics = ProjectChimera.Data.Construction.Resources.ConstructionCostMetrics;
 
 namespace ProjectChimera
 {

@@ -2,10 +2,23 @@ using UnityEngine;
 using System.Collections.Generic;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Cultivation;
-using ProjectChimera.Data.Progression;
+// Progression modules were removed during cleanup - using local definitions instead
 
 namespace ProjectChimera.Data.Genetics
 {
+    /// <summary>
+    /// Simple skill effect data
+    /// </summary>
+    [System.Serializable]
+    public class SkillEffect
+    {
+        public string EffectId;
+        public string EffectName;
+        public float Value;
+        public string Description;
+    }
+    
+    // Note: SkillCategory enum is defined in ScientificGamingEnums.cs
     /// <summary>
     /// Skill Tree Configuration - Defines skill trees, nodes, and progression paths
     /// for scientific gaming systems

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Economy;
+// Use local TransactionStatus enum to avoid conflicts with Configuration namespace
+using TradingTransactionStatus = ProjectChimera.Systems.Economy.TransactionStatus;
 
 namespace ProjectChimera.Systems.Economy
 {
@@ -142,7 +144,7 @@ namespace ProjectChimera.Systems.Economy
                 return result;
             }
             
-            float unitPrice = marketManager.GetCurrentPrice(product, false); // Wholesale price for buying
+            float unitPrice = marketManager.GetProductPrice(product.UniqueID); // Use UniqueID for product identification
             float totalCost = unitPrice * quantity;
             
             // Apply trading post markup
@@ -178,7 +180,7 @@ namespace ProjectChimera.Systems.Economy
                 PaymentMethod = paymentMethod,
                 InitiationTime = System.DateTime.Now,
                 EstimatedCompletionTime = CalculateTransactionTime(tradingPost, paymentMethod),
-                Status = TransactionStatus.Pending
+                Status = TradingTransactionStatus.Pending
             };
             
             _pendingTransactions.Enqueue(pendingTransaction);
@@ -220,7 +222,7 @@ namespace ProjectChimera.Systems.Economy
                 return result;
             }
             
-            float unitPrice = marketManager.GetCurrentPrice(inventoryItem.Product, true, inventoryItem.QualityScore); // Retail price for selling
+            float unitPrice = marketManager.GetProductPrice(inventoryItem.Product.UniqueID); // Use UniqueID for product identification
             float totalRevenue = unitPrice * quantity;
             
             // Apply trading post commission
@@ -249,7 +251,7 @@ namespace ProjectChimera.Systems.Economy
                 PaymentMethod = paymentMethod,
                 InitiationTime = System.DateTime.Now,
                 EstimatedCompletionTime = CalculateTransactionTime(tradingPost, paymentMethod),
-                Status = TransactionStatus.Pending,
+                Status = TradingTransactionStatus.Pending,
                 SourceInventoryItem = inventoryItem
             };
             
@@ -333,8 +335,8 @@ namespace ProjectChimera.Systems.Economy
             if (transactionType == TradingTransactionType.Purchase)
             {
                 // Analyze buy opportunity
-                float buyPrice = marketManager.GetCurrentPrice(product, false) * quantity;
-                float sellPrice = marketManager.GetCurrentPrice(product, true) * quantity;
+                float buyPrice = marketManager.GetProductPrice(product.UniqueID) * quantity;
+                float sellPrice = marketManager.GetProductPrice(product.UniqueID) * quantity;
                 
                 analysis.EstimatedCost = buyPrice;
                 analysis.EstimatedRevenue = sellPrice;
@@ -349,8 +351,7 @@ namespace ProjectChimera.Systems.Economy
                 {
                     float averageCost = inventoryItems.Sum(item => item.AcquisitionCost * item.Quantity) / 
                                       inventoryItems.Sum(item => item.Quantity);
-                    float sellPrice = marketManager.GetCurrentPrice(product, true, 
-                        inventoryItems.Average(item => item.QualityScore)) * quantity;
+                    float sellPrice = marketManager.GetProductPrice(product.UniqueID) * quantity; // Use UniqueID for product identification
                     
                     analysis.EstimatedCost = averageCost * quantity;
                     analysis.EstimatedRevenue = sellPrice;
@@ -840,7 +841,7 @@ namespace ProjectChimera.Systems.Economy
             {
                 foreach (var item in _playerInventory.InventoryItems)
                 {
-                    float currentPrice = marketManager.GetCurrentPrice(item.Product, true, item.QualityScore);
+                    float currentPrice = marketManager.GetProductPrice(item.Product.UniqueID); // Use UniqueID for product identification
                     totalValue += currentPrice * item.Quantity;
                 }
             }
@@ -1363,7 +1364,7 @@ namespace ProjectChimera.Systems.Economy
         public PaymentMethod PaymentMethod;
         public System.DateTime InitiationTime;
         public System.DateTime EstimatedCompletionTime;
-        public TransactionStatus Status;
+        public TradingTransactionStatus Status;
         public InventoryItem SourceInventoryItem; // For sell transactions
     }
     

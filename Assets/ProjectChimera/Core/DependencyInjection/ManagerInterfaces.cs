@@ -4,7 +4,7 @@ using UnityEngine;
 using ProjectChimera.Data.Cultivation;
 using EnvironmentalConditions = ProjectChimera.Data.Environment.EnvironmentalConditions;
 using ProjectChimera.Data.Genetics;
-using ProjectChimera.Data.Progression;
+// using ProjectChimera.Data.Progression; // Removed - namespace deleted during cleanup
 // using ProjectChimera.Systems.SpeedTree; // Removed to prevent circular dependency
 
 namespace ProjectChimera.Core
@@ -145,21 +145,15 @@ namespace ProjectChimera.Core
     }
 
     /// <summary>
-    /// Interface for Research Manager - handles research projects and technology unlocks
+    /// Interface for Research Manager - simplified after research system cleanup
     /// </summary>
     public interface IResearchManager : IChimeraManager
     {
-        IEnumerable<ResearchProjectSO> AvailableProjects { get; }
-        IEnumerable<ResearchProjectSO> CompletedProjects { get; }
-        ResearchProjectSO CurrentProject { get; }
         float CurrentProjectProgress { get; }
-
-        void StartResearch(ResearchProjectSO project);
+        bool HasActiveResearch { get; }
+        
         void AddResearchProgress(float amount);
         void CompleteCurrentProject();
-        bool IsProjectCompleted(ResearchProjectSO project);
-        bool IsProjectAvailable(ResearchProjectSO project);
-        IEnumerable<ResearchProjectSO> GetProjectsByCategory(ResearchCategory category);
     }
 
     /// <summary>

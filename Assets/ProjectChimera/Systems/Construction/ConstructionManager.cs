@@ -4,10 +4,26 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 // Explicit type aliases to resolve ambiguous references
-using ConstructionProjectType = ProjectChimera.Data.Construction.ProjectType;
-using ConstructionPhaseType = ProjectChimera.Data.Construction.ConstructionPhase;
-using DataConstructionIssue = ProjectChimera.Data.Construction.ConstructionIssue;
+using ConstructionProjectType = ProjectChimera.Data.Construction.Processes.ProjectType;
+using ConstructionPhaseType = ProjectChimera.Data.Construction.Processes.ConstructionPhase;
+using DataConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
+using BuildingQuality = ProjectChimera.Data.Construction.Buildings.BuildingQuality;
+using ProjectStatus = ProjectChimera.Data.Construction.Processes.ProjectStatus;
+using ConstructionProject = ProjectChimera.Data.Construction.Processes.ConstructionProject;
+using ConstructionSchedule = ProjectChimera.Data.Construction.Processes.ConstructionSchedule;
+using ConstructionTask = ProjectChimera.Data.Construction.Processes.ConstructionTask;
+using ConstructionWorker = ProjectChimera.Data.Construction.Resources.ConstructionWorker;
+using ConstructionMetrics = ProjectChimera.Data.Construction.Processes.ConstructionMetrics;
+using FacilityTemplate = ProjectChimera.Data.Construction.Buildings.FacilityTemplate;
+using PermitApplication = ProjectChimera.Data.Construction.Processes.PermitApplication;
+using PermitType = ProjectChimera.Data.Construction.Processes.PermitType;
+using PlannedRoom = ProjectChimera.Data.Construction.Buildings.PlannedRoom;
+using WorkerAssignment = ProjectChimera.Data.Construction.Resources.WorkerAssignment;
 
 namespace ProjectChimera.Systems.Construction
 {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using ProjectChimera.Data.Events;  // Added to access Season enum
+// using ProjectChimera.Data.Events;  // Removed - namespace no longer exists after cleanup
 
 namespace ProjectChimera.Data.Environment
 {

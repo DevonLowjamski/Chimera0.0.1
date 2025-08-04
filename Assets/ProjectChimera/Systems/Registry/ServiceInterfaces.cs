@@ -4,10 +4,9 @@ using UnityEngine;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Environment;
-using ProjectChimera.Data.Progression;
 using ProjectChimera.Data.Achievements;
 using ProjectChimera.Data.Competition;
-using ProjectChimera.Data.Research;
+// Research and Progression namespaces removed during cleanup
 using ProjectChimera.Data.Economy;
 using ProjectChimera.Systems.Registry;
 
@@ -17,31 +16,8 @@ using Competition = ProjectChimera.Data.Competition.Competition;
 using CompetitionRules = ProjectChimera.Data.Competition.CompetitionRules;
 using CompetitionFormat = ProjectChimera.Data.Competition.CompetitionFormat;
 using CompetitionStatus = ProjectChimera.Data.Competition.CompetitionStatus;
-using MilestoneReward = ProjectChimera.Data.Progression.MilestoneReward;
-using ProgressionAchievementReward = ProjectChimera.Data.Progression.AchievementReward;
-using ResearchCategory = ProjectChimera.Data.Research.ResearchCategory;
-using ResearchProject = ProjectChimera.Data.Research.ResearchProject;
-using ResourceRequirements = ProjectChimera.Data.Research.ResourceRequirements;
-using ResearchRequirements = ProjectChimera.Data.Research.ResearchRequirements;
+// Research and Progression type aliases removed - namespaces deleted during cleanup
 using Achievement = ProjectChimera.Systems.Progression.Achievement;
-using Discovery = ProjectChimera.Data.Research.Discovery;
-using Innovation = ProjectChimera.Data.Research.Innovation;
-using Breakthrough = ProjectChimera.Data.Research.Breakthrough;
-using DiscoveryContext = ProjectChimera.Data.Research.DiscoveryContext;
-using DiscoveryEvent = ProjectChimera.Data.Research.DiscoveryEvent;
-using InnovationTrigger = ProjectChimera.Data.Research.InnovationTrigger;
-using BreakthroughConditions = ProjectChimera.Data.Research.BreakthroughConditions;
-using Technology = ProjectChimera.Data.Research.Technology;
-using UnlockRequirements = ProjectChimera.Data.Research.UnlockRequirements;
-using TechnologyPathAnalysis = ProjectChimera.Data.Research.TechnologyPathAnalysis;
-using ResourceAllocation = ProjectChimera.Data.Research.ResourceAllocation;
-using ResourceBudget = ProjectChimera.Data.Research.ResourceBudget;
-using ResearchFacility = ProjectChimera.Data.Research.ResearchFacility;
-using FacilityUpgrade = ProjectChimera.Data.Research.FacilityUpgrade;
-using ResearchEquipment = ProjectChimera.Data.Research.ResearchEquipment;
-using ResourceType = ProjectChimera.Data.Research.ResourceType;
-using FacilityStatus = ProjectChimera.Data.Research.FacilityStatus;
-using EquipmentStatus = ProjectChimera.Data.Research.EquipmentStatus;
 
 // Trading-specific type aliases - Only for types that actually exist
 using CompletedTransaction = ProjectChimera.Data.Economy.CompletedTransaction;
@@ -214,128 +190,7 @@ namespace ProjectChimera.Systems.Registry
 
     #endregion
 
-    #region Research Services (ResearchManager → 4 services)
-
-    /// <summary>
-    /// PC014-2a: Research Project Service Interface
-    /// Individual project management and progress tracking
-    /// </summary>
-    public interface IResearchProjectService : IService
-    {
-        // Project Management
-        string CreateProject(string name, ResearchCategory category, ResearchRequirements requirements);
-        bool StartProject(string projectId);
-        bool CompleteProject(string projectId);
-        ResearchProject GetProject(string projectId);
-        List<ResearchProject> GetActiveProjects();
-        
-        // Progress Tracking
-        void UpdateProgress(string projectId, float progressDelta);
-        float GetProgress(string projectId);
-        TimeSpan GetEstimatedTimeToCompletion(string projectId);
-        bool IsProjectComplete(string projectId);
-        
-        // Resource Management
-        bool ValidateResources(string projectId);
-        ResearchRequirements GetResourceRequirements(string projectId);
-        void ConsumeResources(string projectId);
-        
-        // Events
-        event Action<string> OnProjectStarted;
-        event Action<string> OnProjectCompleted;
-        event Action<string, float> OnProgressUpdated;
-    }
-
-    /// <summary>
-    /// PC014-2b: Technology Tree Service Interface
-    /// Technology dependency management and unlock progression
-    /// </summary>
-    public interface ITechnologyTreeService : IService
-    {
-        // Tree Navigation
-        List<Technology> GetAvailableTechnologies();
-        List<Technology> GetUnlockedTechnologies();
-        List<Technology> GetDependencies(string technologyId);
-        List<Technology> GetDependents(string technologyId);
-        
-        // Unlock System
-        bool UnlockTechnology(string technologyId);
-        bool IsTechnologyUnlocked(string technologyId);
-        bool CanUnlockTechnology(string technologyId);
-        UnlockRequirements GetUnlockRequirements(string technologyId);
-        
-        // Path Optimization
-        List<string> FindOptimalPath(string targetTechnologyId);
-        TechnologyPathAnalysis AnalyzePath(string targetTechnologyId);
-        List<Technology> GetRecommendedTechnologies();
-        
-        // Events
-        event Action<string> OnTechnologyUnlocked;
-        event Action<List<string>> OnPathUpdated;
-    }
-
-    /// <summary>
-    /// PC014-2c: Discovery System Service Interface
-    /// New technology discovery and innovation events
-    /// </summary>
-    public interface IDiscoverySystemService : IService
-    {
-        // Discovery Mechanics
-        Discovery TriggerDiscovery(DiscoveryContext context);
-        bool ProcessDiscoveryEvent(DiscoveryEvent discoveryEvent);
-        List<Discovery> GetRecentDiscoveries();
-        Discovery GetDiscovery(string discoveryId);
-        
-        // Innovation System
-        Innovation ProcessInnovation(InnovationTrigger trigger);
-        List<Innovation> GetPlayerInnovations(string playerId);
-        bool ValidateInnovation(Innovation innovation);
-        
-        // Breakthrough Mechanics
-        Breakthrough ProcessBreakthrough(BreakthroughConditions conditions);
-        List<Breakthrough> GetBreakthroughs();
-        bool IsBreakthroughEligible(BreakthroughConditions conditions);
-        
-        // Events
-        event Action<Discovery> OnDiscoveryMade;
-        event Action<Innovation> OnInnovationAchieved;
-        event Action<Breakthrough> OnBreakthroughOccurred;
-    }
-
-    /// <summary>
-    /// PC014-2d: Research Resource Service Interface
-    /// Resource allocation, budgeting, and facility management
-    /// </summary>
-    public interface IResearchResourceService : IService
-    {
-        // Resource Allocation
-        bool AllocateResources(string projectId, ResourceAllocation allocation);
-        ResourceAllocation GetResourceAllocation(string projectId);
-        float GetAvailableResources(ResourceType resourceType);
-        void UpdateResourceBudget(string projectId, ResourceBudget budget);
-        
-        // Resource Validation and Consumption
-        bool ValidateResources(string projectId);
-        bool ConsumeResources(string projectId, ResourceRequirements requirements);
-        
-        // Facility Management
-        List<ResearchFacility> GetAvailableFacilities();
-        bool ReserveFacility(string facilityId, string projectId, TimeSpan duration);
-        FacilityStatus GetFacilityStatus(string facilityId);
-        void UpgradeFacility(string facilityId, FacilityUpgrade upgrade);
-        
-        // Equipment Tracking
-        List<ResearchEquipment> GetAvailableEquipment();
-        bool AssignEquipment(string equipmentId, string projectId);
-        EquipmentStatus GetEquipmentStatus(string equipmentId);
-        void MaintenanceEquipment(string equipmentId);
-        
-        // Events
-        event Action<string, ResourceAllocation> OnResourcesAllocated;
-        event Action<string, string> OnFacilityReserved;
-    }
-
-    #endregion
+    // Research Services section removed - Research namespace deleted during cleanup
 
     #region Progression Services (ComprehensiveProgressionManager → 5 services)
 
@@ -345,23 +200,23 @@ namespace ProjectChimera.Systems.Registry
     /// </summary>
     public interface IExperienceManagementService : IService
     {
-        // Experience System
-        void AwardExperience(string playerId, ExperienceSourceData source, float amount);
+        // Experience System - simplified after Progression namespace cleanup
+        void AwardExperience(string playerId, string source, float amount);
         float GetExperience(string playerId);
         int GetLevel(string playerId);
         int GetLevelFromExperience(float experience);
         float GetExperienceForLevel(int level);
         float GetExperienceToNextLevel(string playerId);
         
-        // Level Progression
+        // Level Progression - simplified types
         bool CheckLevelUp(string playerId);
-        LevelUpResult ProcessLevelUp(string playerId);
-        List<LevelReward> GetLevelRewards(int level);
+        string ProcessLevelUp(string playerId); // Simplified return type
+        List<string> GetLevelRewards(int level); // Simplified to string list
         
-        // Experience Sources
-        void RegisterExperienceSource(ExperienceSourceData source);
-        List<ExperienceSourceData> GetExperienceSources();
-        ExperienceMultiplier GetExperienceMultiplier(string playerId);
+        // Experience Sources - simplified
+        void RegisterExperienceSource(string sourceName);
+        List<string> GetExperienceSources();
+        float GetExperienceMultiplier(string playerId);
         
         // Events
         event Action<string, float> OnExperienceAwarded;
@@ -380,17 +235,17 @@ namespace ProjectChimera.Systems.Registry
         int GetTotalSkillPoints(string playerId);
         bool SpendSkillPoints(string playerId, string skillId, int points);
         
-        // Skill Management
+        // Skill Management - simplified types
         bool UnlockSkill(string playerId, string skillId);
         bool IsSkillUnlocked(string playerId, string skillId);
         int GetSkillLevel(string playerId, string skillId);
         bool CanUnlockSkill(string playerId, string skillId);
         
-        // Tree Navigation
-        List<Skill> GetAvailableSkills(string playerId);
-        List<Skill> GetUnlockedSkills(string playerId);
-        List<Skill> GetSkillDependencies(string skillId);
-        SkillPath FindOptimalSkillPath(string playerId, string targetSkillId);
+        // Tree Navigation - simplified types
+        List<string> GetAvailableSkills(string playerId);
+        List<string> GetUnlockedSkills(string playerId);
+        List<string> GetSkillDependencies(string skillId);
+        string FindOptimalSkillPath(string playerId, string targetSkillId); // Simplified return type
         
         // Events
         event Action<string, string> OnSkillUnlocked;
@@ -403,21 +258,21 @@ namespace ProjectChimera.Systems.Registry
     /// </summary>
     public interface IProgressionAchievementService : IService
     {
-        // Achievement Tracking
+        // Achievement Tracking - simplified after namespace cleanup
         void TrackAchievementProgress(string playerId, string achievementId, float progress);
         float GetAchievementProgress(string playerId, string achievementId);
         bool IsAchievementUnlocked(string playerId, string achievementId);
         List<Achievement> GetUnlockedAchievements(string playerId);
         
-        // Milestone System
-        void RegisterMilestone(Milestone milestone);
+        // Milestone System - simplified types
+        void RegisterMilestone(string playerId, string milestoneId);
         bool CheckMilestone(string playerId, string milestoneId);
-        List<Milestone> GetAchievedMilestones(string playerId);
-        MilestoneReward GetMilestoneReward(string milestoneId);
+        List<string> GetAchievedMilestones(string playerId);
+        string GetMilestoneReward(string milestoneId); // Simplified return type
         
-        // Reward Distribution
+        // Reward Distribution - simplified types
         void DistributeAchievementReward(string playerId, string achievementId);
-        List<ProgressionAchievementReward> GetPendingRewards(string playerId);
+        List<string> GetPendingRewards(string playerId); // Simplified to string list
         void ClaimReward(string playerId, string rewardId);
         
         // Events
@@ -431,24 +286,24 @@ namespace ProjectChimera.Systems.Registry
     /// </summary>
     public interface IProgressionAnalyticsService : IService
     {
-        // Analytics Collection
-        void RecordProgressionEvent(string playerId, ProgressionEvent progressionEvent);
-        ProgressionAnalytics GetPlayerAnalytics(string playerId);
-        List<ProgressionMetric> GetProgressionMetrics(string playerId, TimeSpan timeRange);
+        // Analytics Collection - simplified after namespace cleanup
+        void RecordProgressionEvent(string playerId, string eventName);
+        string GetPlayerAnalytics(string playerId); // Simplified return type
+        List<string> GetProgressionMetrics(string playerId, TimeSpan timeRange);
         
-        // Performance Insights
-        ProgressionInsight GenerateInsights(string playerId);
-        List<ProgressionRecommendation> GetRecommendations(string playerId);
-        ProgressionEfficiency CalculateEfficiency(string playerId);
+        // Performance Insights - simplified types
+        string GenerateInsights(string playerId); // Simplified return type
+        List<string> GetRecommendations(string playerId);
+        float CalculateEfficiency(string playerId);
         
-        // Comparative Analysis
-        PlayerRanking GetPlayerRanking(string playerId);
-        ProgressionComparison CompareWithPeers(string playerId);
-        List<ProgressionBenchmark> GetBenchmarks();
+        // Comparative Analysis - simplified types
+        int GetPlayerRanking(string playerId);
+        string CompareWithPeers(string playerId); // Simplified return type
+        List<string> GetBenchmarks();
         
         // Events
-        event Action<string, ProgressionEvent> OnProgressionEventRecorded;
-        event Action<string, ProgressionInsight> OnInsightGenerated;
+        event Action<string, string> OnProgressionEventRecorded;
+        event Action<string, string> OnInsightGenerated;
     }
 
     /// <summary>
@@ -457,26 +312,26 @@ namespace ProjectChimera.Systems.Registry
     /// </summary>
     public interface IMilestoneTrackingService : IService
     {
-        // Milestone Management
-        void RegisterMilestone(string playerId, Milestone milestone);
+        // Milestone Management - simplified after namespace cleanup
+        void RegisterMilestone(string playerId, string milestoneId);
         bool CheckMilestoneCompletion(string playerId, string milestoneId);
-        List<Milestone> GetActiveMilestones(string playerId);
-        List<Milestone> GetCompletedMilestones(string playerId);
+        List<string> GetActiveMilestones(string playerId);
+        List<string> GetCompletedMilestones(string playerId);
         
         // Progress Tracking
         void UpdateMilestoneProgress(string playerId, string milestoneId, float progress);
         float GetMilestoneProgress(string playerId, string milestoneId);
         TimeSpan GetEstimatedTimeToCompletion(string playerId, string milestoneId);
         
-        // Reward System
+        // Reward System - simplified types
         void DistributeMilestoneReward(string playerId, string milestoneId);
-        MilestoneReward GetMilestoneReward(string milestoneId);
-        List<MilestoneReward> GetPendingRewards(string playerId);
+        string GetMilestoneReward(string milestoneId); // Simplified return type
+        List<string> GetPendingRewards(string playerId);
         
-        // Long-term Goals
-        void SetLongTermGoal(string playerId, LongTermGoal goal);
-        LongTermGoal GetLongTermGoal(string playerId);
-        GoalProgress GetGoalProgress(string playerId);
+        // Long-term Goals - simplified types
+        void SetLongTermGoal(string playerId, string goalDescription);
+        string GetLongTermGoal(string playerId);
+        float GetGoalProgress(string playerId);
         
         // Events
         event Action<string, string> OnMilestoneCompleted;

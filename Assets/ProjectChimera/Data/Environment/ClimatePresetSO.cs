@@ -2,10 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectChimera.Core;
-using ProjectChimera.Data.Events;  // Added to use Season enum from Events
+// using ProjectChimera.Data.Events;  // Removed - namespace no longer exists after cleanup
 
 namespace ProjectChimera.Data.Environment
 {
+    /// <summary>
+    /// Simple season enumeration for climate variations
+    /// </summary>
+    public enum Season
+    {
+        Spring,
+        Summer,
+        Autumn,
+        Winter
+    }
     /// <summary>
     /// Defines a complete climate preset with environmental parameters, seasonal variations, and diurnal cycles.
     /// Used for different geographical regions, cultivation methods, and facility types.

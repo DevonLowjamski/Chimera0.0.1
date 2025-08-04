@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Equipment;
 using ProjectChimera.Data.Economy;
-// Explicit type aliases to resolve ambiguous references
+// Explicit type aliases to resolve ambiguous references - Note: These types may need to be located in original file
 using ConstructionResourceType = ProjectChimera.Data.Construction.ResourceType;
 using ConstructionCostType = ProjectChimera.Data.Construction.CostType;
 using ConstructionBudgetAlert = ProjectChimera.Data.Construction.BudgetAlert;

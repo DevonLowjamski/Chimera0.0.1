@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectChimera.Core;
 using ProjectChimera.Data.Equipment;
+// New decomposed namespaces for cross-references
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 
 namespace ProjectChimera.Data.Construction
 {

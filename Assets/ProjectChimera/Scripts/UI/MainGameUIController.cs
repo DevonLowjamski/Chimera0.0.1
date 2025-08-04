@@ -11,6 +11,10 @@ using ProjectChimera.Scripts.Facilities;
 using ProjectChimera.Data.Facilities;
 using ProjectChimera.Data.Community;
 using ProjectChimera.Data.Construction;
+// New decomposed namespaces
+using ProjectChimera.Data.Construction.Buildings;
+using ProjectChimera.Data.Construction.Processes;
+using ProjectChimera.Data.Construction.Resources;
 using ProjectChimera.Data.Economy;
 using TMPro;
 // Explicit aliases to resolve ambiguity
