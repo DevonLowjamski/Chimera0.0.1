@@ -91,7 +91,7 @@ namespace ProjectChimera.Systems.Visuals
         private SpeedTreeVFXIntegrationManager _speedTreeIntegration;
         private TrichromeVFXController _trichromeController;
         private DynamicGrowthAnimationSystem _dynamicGrowthSystem;
-        private SeasonalAdaptationVFXController _seasonalAdaptationController;
+        // private SeasonalAdaptationVFXController _seasonalAdaptationController; // TODO: Implement SeasonalAdaptationVFXController
         
         // LOD Configuration
         private Dictionary<CannabisLODLevel, LODConfiguration> _lodConfigurations;
@@ -361,7 +361,7 @@ namespace ProjectChimera.Systems.Visuals
             _speedTreeIntegration = FindObjectOfType<SpeedTreeVFXIntegrationManager>();
             _trichromeController = FindObjectOfType<TrichromeVFXController>();
             _dynamicGrowthSystem = FindObjectOfType<DynamicGrowthAnimationSystem>();
-            _seasonalAdaptationController = FindObjectOfType<SeasonalAdaptationVFXController>();
+            // _seasonalAdaptationController = FindObjectOfType<SeasonalAdaptationVFXController>(); // TODO: Implement SeasonalAdaptationVFXController
             
             int connectedSystems = 0;
             
@@ -389,11 +389,11 @@ namespace ProjectChimera.Systems.Visuals
                 LogInfo("✅ Connected to Dynamic Growth Animation System");
             }
             
-            if (_seasonalAdaptationController != null)
-            {
-                connectedSystems++;
-                LogInfo("✅ Connected to Seasonal Adaptation VFX Controller");
-            }
+            // if (_seasonalAdaptationController != null)
+            // {
+            //     connectedSystems++;
+            //     LogInfo("✅ Connected to Seasonal Adaptation VFX Controller");
+            // }
             
             LogInfo($"✅ Connected to {connectedSystems}/5 VFX systems for LOD integration");
         }
@@ -680,10 +680,10 @@ namespace ProjectChimera.Systems.Visuals
                 // Apply growth animation LOD settings
             }
             
-            if (_seasonalAdaptationController != null && config.EnableEnvironmentalResponse)
-            {
-                // Apply seasonal adaptation LOD settings
-            }
+            // if (_seasonalAdaptationController != null && config.EnableEnvironmentalResponse)
+            // {
+            //     // Apply seasonal adaptation LOD settings
+            // }
         }
         
         private void SetPlantCullingState(PlantLODInstance lodInstance, bool shouldCull)
@@ -939,7 +939,7 @@ namespace ProjectChimera.Systems.Visuals
             _speedTreeIntegration = null;
             _trichromeController = null;
             _dynamicGrowthSystem = null;
-            _seasonalAdaptationController = null;
+            // _seasonalAdaptationController = null;
         }
         
         private void StartLODProcessing()

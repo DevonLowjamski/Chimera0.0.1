@@ -11,6 +11,18 @@ namespace ProjectChimera.Data.Cultivation
     }
 
     /// <summary>
+    /// Skill node types for cultivation data
+    /// </summary>
+    public enum SkillNodeType
+    {
+        Basic,
+        Intermediate,
+        Advanced,
+        Expert,
+        Master
+    }
+
+    /// <summary>
     /// Additional data structures for cultivation gaming systems
     /// Contains missing types referenced by various cultivation managers
     /// Only includes types that don't already exist elsewhere

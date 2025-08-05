@@ -4,20 +4,20 @@ using UnityEngine;
 using ProjectChimera.Data.Cultivation;
 using ProjectChimera.Data.Genetics;
 using ProjectChimera.Data.Environment;
-using ProjectChimera.Data.Achievements;
-using ProjectChimera.Data.Competition;
+// using ProjectChimera.Data.Achievements; // Removed - namespace deleted during cleanup
+// using ProjectChimera.Data.Competition; // Removed - namespace deleted during cleanup
 // Research and Progression namespaces removed during cleanup
 using ProjectChimera.Data.Economy;
 using ProjectChimera.Systems.Registry;
 
 // Type disambiguation aliases
-using CompetitionType = ProjectChimera.Data.Competition.CompetitionType;
-using Competition = ProjectChimera.Data.Competition.Competition;
-using CompetitionRules = ProjectChimera.Data.Competition.CompetitionRules;
-using CompetitionFormat = ProjectChimera.Data.Competition.CompetitionFormat;
-using CompetitionStatus = ProjectChimera.Data.Competition.CompetitionStatus;
+using CompetitionType = ProjectChimera.Systems.Registry.CompetitionType;
+using Competition = ProjectChimera.Systems.Registry.Competition;
+using CompetitionRules = ProjectChimera.Systems.Registry.CompetitionRules;
+using CompetitionFormat = ProjectChimera.Systems.Registry.CompetitionFormat;
+using CompetitionStatus = ProjectChimera.Systems.Registry.CompetitionStatus;
 // Research and Progression type aliases removed - namespaces deleted during cleanup
-using Achievement = ProjectChimera.Systems.Progression.Achievement;
+using Achievement = ProjectChimera.Systems.Registry.Achievement;
 
 // Trading-specific type aliases - Only for types that actually exist
 using CompletedTransaction = ProjectChimera.Data.Economy.CompletedTransaction;

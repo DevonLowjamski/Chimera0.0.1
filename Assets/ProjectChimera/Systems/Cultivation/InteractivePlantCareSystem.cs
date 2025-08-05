@@ -229,7 +229,7 @@ namespace ProjectChimera.Systems.Cultivation
         public PlantCareResult ProcessCareAction(ProjectChimera.Data.Cultivation.InteractivePlant plant, CareAction action)
         {
             if (!_isInitialized || plant == null || action == null)
-                return PlantCareResult.Failed;
+                return new PlantCareResult { Success = false, Quality = CareQuality.Failed, Message = "Care action failed" };
             
             try
             {
@@ -238,7 +238,7 @@ namespace ProjectChimera.Systems.Cultivation
                 if (!validation.IsValid)
                 {
                     TriggerFailedCareAudio(action.TaskType, validation.FailureReason);
-                    return PlantCareResult.Failed;
+                    return new PlantCareResult { Success = false, Quality = CareQuality.Failed, Message = "Care action failed" };
                 }
                 
                 // Calculate care quality based on skill, timing, and plant state
@@ -265,7 +265,7 @@ namespace ProjectChimera.Systems.Cultivation
             catch (System.Exception ex)
             {
                 ChimeraLogger.LogError($"Error processing care action: {ex.Message}", this);
-                return PlantCareResult.Failed;
+                return new PlantCareResult { Success = false, Quality = CareQuality.Failed, Message = "Care action failed" };
             }
         }
         
@@ -837,11 +837,11 @@ namespace ProjectChimera.Systems.Cultivation
         {
             return quality switch
             {
-                CareQuality.Perfect => PlantCareResult.Perfect,
-                CareQuality.Excellent or CareQuality.Good => PlantCareResult.Successful,
-                CareQuality.Average => PlantCareResult.Adequate,
-                CareQuality.Poor => PlantCareResult.Suboptimal,
-                _ => PlantCareResult.Failed
+                CareQuality.Perfect => new PlantCareResult { Success = true, Quality = CareQuality.Perfect, Message = "Perfect care action" },
+                CareQuality.Excellent or CareQuality.Good => new PlantCareResult { Success = true, Quality = CareQuality.Excellent, Message = "Care action successful" },
+                CareQuality.Average => new PlantCareResult { Success = true, Quality = CareQuality.Adequate, Message = "Care action adequate" },
+                CareQuality.Poor => new PlantCareResult { Success = false, Quality = CareQuality.Suboptimal, Message = "Care action suboptimal" },
+                _ => new PlantCareResult { Success = false, Quality = CareQuality.Failed, Message = "Care action failed" }
             };
         }
         
@@ -866,7 +866,7 @@ namespace ProjectChimera.Systems.Cultivation
         {
             var eventData = new SkillProgressionEventData
             {
-                TaskType = (EventsCultivationTaskType)taskType,
+                TaskType = taskType,
                 Milestone = milestone,
                 CurrentSkillLevel = GetCurrentSkillLevel(taskType),
                 Timestamp = Time.time

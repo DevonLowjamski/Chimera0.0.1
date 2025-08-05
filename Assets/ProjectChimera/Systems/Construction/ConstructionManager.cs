@@ -18,12 +18,14 @@ using ConstructionProject = ProjectChimera.Data.Construction.Processes.Construct
 using ConstructionSchedule = ProjectChimera.Data.Construction.Processes.ConstructionSchedule;
 using ConstructionTask = ProjectChimera.Data.Construction.Processes.ConstructionTask;
 using ConstructionWorker = ProjectChimera.Data.Construction.Resources.ConstructionWorker;
-using ConstructionMetrics = ProjectChimera.Data.Construction.Processes.ConstructionMetrics;
-using FacilityTemplate = ProjectChimera.Data.Construction.Buildings.FacilityTemplate;
-using PermitApplication = ProjectChimera.Data.Construction.Processes.PermitApplication;
-using PermitType = ProjectChimera.Data.Construction.Processes.PermitType;
-using PlannedRoom = ProjectChimera.Data.Construction.Buildings.PlannedRoom;
+using ProcessesFacilityTemplate = ProjectChimera.Data.Construction.Processes.FacilityTemplate;
+using ProcessesPlannedRoom = ProjectChimera.Data.Construction.Processes.PlannedRoom;
+using ConstructionRoomTemplate = ProjectChimera.Data.Construction.Processes.ConstructionRoomTemplate;
+using ConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
 using WorkerAssignment = ProjectChimera.Data.Construction.Resources.WorkerAssignment;
+using PermitType = ProjectChimera.Data.Construction.Processes.PermitType;
+using ConstructionMetrics = ProjectChimera.Data.Construction.Processes.ConstructionMetrics;
+using PermitApplication = ProjectChimera.Data.Construction.Processes.PermitApplication;
 
 namespace ProjectChimera.Systems.Construction
 {
@@ -57,7 +59,7 @@ namespace ProjectChimera.Systems.Construction
         
         // Core Construction Data
         private List<ConstructionProject> _activeProjects = new List<ConstructionProject>();
-        private Dictionary<string, FacilityTemplate> _availableBlueprints = new Dictionary<string, FacilityTemplate>();
+        private Dictionary<string, ProcessesFacilityTemplate> _availableBlueprints = new Dictionary<string, ProcessesFacilityTemplate>();
         private List<ConstructionWorker> _availableWorkers = new List<ConstructionWorker>();
         private Dictionary<string, string> _suppliers = new Dictionary<string, string>();
         
@@ -79,7 +81,7 @@ namespace ProjectChimera.Systems.Construction
         
         // Public Properties
         public List<ConstructionProject> ActiveProjects => _activeProjects;
-        public List<FacilityTemplate> AvailableBlueprints => _availableBlueprints.Values.ToList();
+        public List<ProcessesFacilityTemplate> AvailableBlueprints => _availableBlueprints.Values.ToList();
         public List<ConstructionWorker> AvailableWorkers => _availableWorkers.Where(w => w.IsAvailable).ToList();
         public ConstructionMetrics OverallMetrics => _overallMetrics;
         public float TotalActiveBudget => _activeProjects.Sum(p => p.TotalBudget);
@@ -124,7 +126,7 @@ namespace ProjectChimera.Systems.Construction
             return _activeProjects.FirstOrDefault(p => p.ProjectId == projectId);
         }
         
-        public string CreateProject(string projectName, FacilityTemplate template, Vector3 location, BuildingQuality quality = BuildingQuality.Standard)
+        public string CreateProject(string projectName, ProcessesFacilityTemplate template, Vector3 location, BuildingQuality quality = BuildingQuality.Standard)
         {
             var project = new ConstructionProject
             {
@@ -151,8 +153,8 @@ namespace ProjectChimera.Systems.Construction
                 Permits = new List<PermitApplication>(),
                 PermitsApproved = false,
                 Tasks = new List<ConstructionTask>(),
-                PlannedRooms = new List<PlannedRoom>(),
-                Issues = new List<DataConstructionIssue>(),
+                PlannedRooms = new List<ProcessesPlannedRoom>(),
+                Issues = new List<ConstructionIssue>(),
                 WorkerAssignments = new List<WorkerAssignment>()
             };
             
@@ -169,14 +171,14 @@ namespace ProjectChimera.Systems.Construction
         public string StartConstructionProject(string blueprintId, Vector3 location, BuildingQuality quality = BuildingQuality.Standard)
         {
             // Create a default template if blueprint doesn't exist
-            var template = new FacilityTemplate
+            var template = new ProcessesFacilityTemplate
             {
                 TemplateId = blueprintId,
                 TemplateName = blueprintId,
                 Description = $"Default template for {blueprintId}",
-                BaseConstructionCost = 100000f,
-                EstimatedConstructionDays = 30,
-                RequiredPermits = new List<PermitType>()
+                Dimensions = new Vector2(100, 100),
+                TotalArea = 10000f,
+                RoomTemplates = new List<ConstructionRoomTemplate>()
             };
             
             return CreateProject(blueprintId, template, location, quality);

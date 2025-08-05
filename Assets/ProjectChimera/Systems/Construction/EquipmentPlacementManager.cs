@@ -13,7 +13,7 @@ using ProjectChimera.Data.Equipment;
 // Explicit type aliases to resolve ambiguous references
 using ConstructionRoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
 using FacilitiesRoomType = ProjectChimera.Data.Facilities.RoomType;
-using ConstructionEquipmentStatus = ProjectChimera.Data.Construction.Resources.EquipmentStatus;
+using EquipmentStatus = ProjectChimera.Data.Construction.EquipmentStatus;
 // MaintenanceSchedule type simplified to object after cleanup
 using ConstructionComplianceStatus = ProjectChimera.Data.Construction.Buildings.ComplianceStatus;
 using ConstructionRoom = ProjectChimera.Data.Construction.Buildings.Room;
@@ -259,7 +259,9 @@ namespace ProjectChimera.Systems.Construction
             
             var existingEquipment = _roomEquipment.GetValueOrDefault(roomId, new List<PlacedEquipment>());
             
-            return _smartPlacement.CalculateOptimalPosition(room, equipmentData, existingEquipment);
+            // Convert Buildings.Room to Construction.Room for compatibility
+            var constructionRoom = ConvertToConstructionRoom(room);
+            return _smartPlacement.CalculateOptimalPosition(constructionRoom, equipmentData, existingEquipment);
         }
         
         /// <summary>
@@ -281,7 +283,9 @@ namespace ProjectChimera.Systems.Construction
                 return null;
             }
             
-            var optimizationResult = _placementOptimizer.OptimizeLayout(room, equipment);
+            // Convert Buildings.Room to Construction.Room for compatibility
+            var constructionRoom = ConvertToConstructionRoom(room);
+            var optimizationResult = _placementOptimizer.OptimizeLayout(constructionRoom, equipment);
             
             if (optimizationResult.IsSuccessful)
             {
@@ -577,10 +581,24 @@ namespace ProjectChimera.Systems.Construction
                                         .FirstOrDefault(eq => eq.EquipmentId == equipmentId);
         }
         
-        private Room GetRoomReference(string roomId)
+        private ConstructionRoom GetRoomReference(string roomId)
         {
             // This would integrate with RoomCreationManager to get room data
             return null; // Placeholder implementation
+        }
+        
+        private ProjectChimera.Data.Construction.Room ConvertToConstructionRoom(ConstructionRoom buildingsRoom)
+        {
+            if (buildingsRoom == null) return null;
+            
+            return new ProjectChimera.Data.Construction.Room
+            {
+                RoomId = buildingsRoom.RoomId,
+                RoomName = buildingsRoom.RoomName,
+                RoomType = (ProjectChimera.Data.Construction.RoomType)buildingsRoom.RoomType,
+                FloorArea = buildingsRoom.FloorArea,
+                CeilingHeight = buildingsRoom.CeilingHeight
+            };
         }
         
         private float CalculateAverageRoomUtilization()
@@ -657,9 +675,9 @@ namespace ProjectChimera.Systems.Construction
             return _maintenanceSchedules.Values.ToList();
         }
         
-        private List<OptimizationOpportunity> IdentifyOptimizationOpportunities(string roomId)
+        private List<ConstructionOptimizationOpportunity> IdentifyOptimizationOpportunities(string roomId)
         {
-            return new List<OptimizationOpportunity>();
+            return new List<ConstructionOptimizationOpportunity>();
         }
         
         private ConstructionComplianceStatus CheckEquipmentCompliance(string roomId)

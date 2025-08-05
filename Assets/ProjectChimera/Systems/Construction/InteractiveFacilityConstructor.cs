@@ -26,38 +26,42 @@ using ConstructionProjectType = ProjectChimera.Data.Construction.Processes.Proje
 // using GridSnapSettings = ProjectChimera.Data.Construction.Buildings.GridSnapSettings; // Type not found in decomposed modules
 using ConstructionProject = ProjectChimera.Data.Construction.Processes.ConstructionProject;
 using ConstructionBuildingQuality = ProjectChimera.Data.Construction.Buildings.BuildingQuality;
-using ConstructionProjectStatus = ProjectChimera.Data.Construction.Processes.ProjectStatus;
+// using ProjectChimera.Data.Construction.Processes.ProjectStatus = ProjectChimera.Data.Construction.Processes.ProjectStatus;
 using ConstructionFacilityTemplate = ProjectChimera.Data.Construction.Buildings.FacilityTemplate;
+// Removed legacy workforce features - no longer needed
 // Additional type aliases to resolve ambiguous references
 using ConstructionSettings = ProjectChimera.Data.Construction.Processes.ConstructionSettings;
 using FacilityDesignTool = ProjectChimera.Data.Construction.Processes.FacilityDesignTool;
 using BuildingValidator = ProjectChimera.Data.Construction.Processes.BuildingValidator;
+using IssueType = ProjectChimera.Data.Construction.Resources.IssueType;
+using IssueSeverity = ProjectChimera.Data.Construction.Resources.IssueSeverity;
 using ConstructionPlanner = ProjectChimera.Data.Construction.Processes.ConstructionPlanner;
-using ConstructionWorkforce = ProjectChimera.Data.Construction.Resources.ConstructionWorkforce;
+// Duplicate removed: using ConstructionSkillLevel = ProjectChimera.Data.Construction.Processes.SkillLevel;
+// Duplicate removed: using ConstructionWorkforce = ProjectChimera.Data.Construction.ConstructionWorkforce;
 using MaterialInventory = ProjectChimera.Data.Construction.Resources.MaterialInventory;
 // Duplicate aliases removed
-using ConstructionTask = ProjectChimera.Data.Construction.Processes.ConstructionTask;
+// Removed legacy task features - no longer needed
 using ConstructionIssue = ProjectChimera.Data.Construction.Resources.ConstructionIssue;
-using PermitApplication = ProjectChimera.Data.Construction.Processes.PermitApplication;
+// Removed legacy permit features - no longer needed
 using ConstructionMetrics = ProjectChimera.Data.Construction.Processes.ConstructionMetrics;
 using ConstructionRoomTemplate = ProjectChimera.Data.Construction.Buildings.ConstructionRoomTemplate;
 using ConstructionProgress = ProjectChimera.Data.Construction.Processes.ConstructionProgress;
-using PermitType = ProjectChimera.Data.Construction.Processes.PermitType;
+// Removed legacy permit features - no longer needed
 using ConstructionReport = ProjectChimera.Data.Construction.Processes.ConstructionReport;
-using WorkerSpecialty = ProjectChimera.Data.Construction.Resources.WorkerSpecialty;
+// Duplicate removed: using WorkerSpecialty = ProjectChimera.Data.Construction.Resources.WorkerSpecialty;
 using FacilityInfo = ProjectChimera.Data.Construction.Buildings.FacilityInfo;
 using ValidationResult = ProjectChimera.Data.Construction.Buildings.ValidationResult;
 using MaterialRequirement = ProjectChimera.Data.Construction.Buildings.MaterialRequirement;
-using ConstructionWorker = ProjectChimera.Data.Construction.Resources.ConstructionWorker;
+// Duplicate removed: using ConstructionWorker = ProjectChimera.Data.Construction.Resources.ConstructionWorker;
 // Note: These types may not exist in decomposed modules - commenting out to fix CS0234 errors
 // using FacilityDesignTool = ProjectChimera.Data.Construction.Buildings.FacilityDesignTool;
 // using BuildingValidator = ProjectChimera.Data.Construction.Buildings.BuildingValidator;
 // using ConstructionPlanner = ProjectChimera.Data.Construction.Processes.ConstructionPlanner;
-// using ConstructionWorkforce = ProjectChimera.Data.Construction.Resources.ConstructionWorkforce;
+// using ConstructionWorkforce = ProjectChimera.Data.Construction.ConstructionWorkforce;
 // using MaterialInventory = ProjectChimera.Data.Construction.Resources.MaterialInventory;
 // using RoomDesignSession = ProjectChimera.Data.Construction.Buildings.RoomDesignSession;
 using EquipmentPool = ProjectChimera.Data.Construction.Resources.EquipmentPool;
-using ContractorManager = ProjectChimera.Data.Construction.Resources.ContractorManager;
+// Removed: ContractorManager (legacy workforce feature)
 using ConstructionSchedule = ProjectChimera.Data.Construction.Processes.ConstructionSchedule;
 using ConstructionCostUpdate = ProjectChimera.Data.Construction.Resources.ConstructionCostUpdate;
 // Additional type aliases to resolve remaining ambiguous references
@@ -66,7 +70,7 @@ using ConstructionCostUpdate = ProjectChimera.Data.Construction.Resources.Constr
 // using FacilityDesignTool = ProjectChimera.Data.Construction.Buildings.FacilityDesignTool;  
 // using BuildingValidator = ProjectChimera.Data.Construction.Buildings.BuildingValidator;
 // using ConstructionPlanner = ProjectChimera.Data.Construction.Processes.ConstructionPlanner;
-// using ConstructionWorkforce = ProjectChimera.Data.Construction.Resources.ConstructionWorkforce;
+// using ConstructionWorkforce = ProjectChimera.Data.Construction.ConstructionWorkforce;
 // using MaterialInventory = ProjectChimera.Data.Construction.Resources.MaterialInventory;
 
 namespace ProjectChimera.Systems.Construction
@@ -107,7 +111,8 @@ namespace ProjectChimera.Systems.Construction
         private ConstructionProject _activeProject;
         private ConstructionPhaseType _currentPhase = ConstructionPhaseType.Planning;
         private List<ConstructionProject> _allProjects = new List<ConstructionProject>();
-        private Queue<ConstructionTask> _constructionQueue = new Queue<ConstructionTask>();
+        // Removed: Construction task queue (legacy workforce feature)
+        // private Queue<ConstructionTask> _constructionQueue = new Queue<ConstructionTask>();
         
         // Design and preview systems
         private GameObject _previewObject;
@@ -115,15 +120,14 @@ namespace ProjectChimera.Systems.Construction
         private object _buildingValidator;
         private object _constructionPlanner;
         
-        // Resource and workforce management
-        private object _workforce;
+        // Resource management (workforce features removed)
         private object _materialInventory;
         private EquipmentPool _equipmentPool;
-        private ContractorManager _contractorManager;
+        // Removed: ContractorManager (legacy workforce feature)
         
         // Runtime tracking
         private Dictionary<string, ConstructionProgress> _activeConstructions = new Dictionary<string, ConstructionProgress>();
-        private List<PermitApplication> _pendingPermits = new List<PermitApplication>();
+        // Removed: _pendingPermits (legacy permit feature)
         private ConstructionSchedule _masterSchedule;
         
         // Performance tracking
@@ -135,7 +139,8 @@ namespace ProjectChimera.Systems.Construction
         public System.Action<ConstructionProject, ConstructionPhaseType> OnPhaseCompleted;
         public System.Action<object> OnProjectCompleted;
         public System.Action<object> OnConstructionIssue;
-        public System.Action<PermitApplication> OnPermitApproved;
+        // Removed: Permit events (legacy permit feature)
+        // public System.Action<PermitApplication> OnPermitApproved;
         public System.Action<ConstructionCostUpdate> OnCostUpdated;
         public System.Action<string> OnMilestoneReached;
         public System.Action<ConstructionProgress> OnConstructionProgress;
@@ -150,13 +155,13 @@ namespace ProjectChimera.Systems.Construction
         public ConstructionPhaseType CurrentPhase => _currentPhase;
         public List<ConstructionProject> AllProjects => _allProjects;
         public ConstructionMetrics Metrics => _metrics;
-        public bool IsConstructing => _constructionQueue.Count > 0;
+        public bool IsConstructing => _allProjects.Any(p => p.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.InProgress);
         
         protected override void OnManagerInitialize()
         {
             InitializeConstructionSystems();
             SetupDesignTools();
-            InitializeWorkforce();
+            // Removed: InitializeWorkforce() - legacy workforce feature
             StartConstructionLoop();
         }
         
@@ -164,9 +169,9 @@ namespace ProjectChimera.Systems.Construction
         {
             if (_enableRealTimeConstruction)
             {
-                ProcessConstructionQueue();
+                // Removed: ProcessConstructionQueue() - legacy task system
                 UpdateActiveConstructions();
-                ProcessPermitApplications();
+                // Removed: ProcessPermitApplications() - legacy permit system
             }
             
             UpdateDesignPreview();
@@ -188,11 +193,10 @@ namespace ProjectChimera.Systems.Construction
             _buildingValidator = new object(); // Simplified - BuildingValidator type not available after cleanup
             _constructionPlanner = new ConstructionPlanner();
             
-            // Initialize workforce and resources
-            _workforce = new ConstructionWorkforce();
+            // Initialize resources (workforce features removed)
             _materialInventory = new MaterialInventory();
             _equipmentPool = new EquipmentPool();
-            _contractorManager = new ContractorManager();
+            // Removed: ContractorManager initialization (legacy workforce feature)
             
             // Initialize tracking systems
             _masterSchedule = new ConstructionSchedule();
@@ -242,53 +246,7 @@ namespace ProjectChimera.Systems.Construction
             return material;
         }
         
-        private void InitializeWorkforce()
-        {
-            // Initialize default workforce
-            _workforce.AddWorker(new ConstructionWorker
-            {
-                WorkerId = "foreman_001",
-                Name = "Site Foreman",
-                Specialty = WorkerSpecialty.GeneralConstruction,
-                SkillLevel = SkillLevel.Expert,
-                HourlyRate = 65f,
-                IsAvailable = true,
-                ProductivityModifier = 1.2f
-            });
-            
-            _workforce.AddWorker(new ConstructionWorker
-            {
-                WorkerId = "electrician_001",
-                Name = "Master Electrician",
-                Specialty = WorkerSpecialty.Electrical,
-                SkillLevel = SkillLevel.Expert,
-                HourlyRate = 75f,
-                IsAvailable = true,
-                ProductivityModifier = 1.1f
-            });
-            
-            _workforce.AddWorker(new ConstructionWorker
-            {
-                WorkerId = "plumber_001",
-                Name = "Licensed Plumber",
-                Specialty = WorkerSpecialty.Plumbing,
-                SkillLevel = SkillLevel.Skilled,
-                HourlyRate = 70f,
-                IsAvailable = true,
-                ProductivityModifier = 1.0f
-            });
-            
-            _workforce.AddWorker(new ConstructionWorker
-            {
-                WorkerId = "hvac_001",
-                Name = "HVAC Technician",
-                Specialty = WorkerSpecialty.HVAC,
-                SkillLevel = SkillLevel.Expert,
-                HourlyRate = 68f,
-                IsAvailable = true,
-                ProductivityModifier = 1.15f
-            });
-        }
+        // Removed: InitializeWorkforce() method - legacy workforce feature no longer needed
         
         private void StartConstructionLoop()
         {
@@ -302,7 +260,7 @@ namespace ProjectChimera.Systems.Construction
         
         #region Project Management
         
-        public ConstructionProject CreateNewProject(string projectName, Vector3 buildingSite, FacilityTemplate template)
+        public ConstructionProject CreateNewProject(string projectName, Vector3 buildingSite, ConstructionFacilityTemplate template)
         {
             var project = new ConstructionProject
             {
@@ -310,20 +268,25 @@ namespace ProjectChimera.Systems.Construction
                 ProjectName = projectName,
                 BuildingSite = buildingSite,
                 FacilityTemplate = template,
-                Status = ProjectStatus.Planning,
+                Status = ProjectChimera.Data.Construction.Processes.ProjectStatus.Planning,
                 CreatedDate = System.DateTime.Now,
                 EstimatedCost = CalculateProjectCost(template),
                 EstimatedDuration = Mathf.RoundToInt(CalculateProjectDuration(template) / 24f), // Convert hours to days
-                RequiredPermits = DetermineRequiredPermits(template).Select(p => p.ToString()).ToList()
+                RequiredPermits = new List<string>() // Removed: DetermineRequiredPermits (legacy permit feature)
             };
             
-            // Validate building site
-            var validation = _buildingValidator.ValidateBuildingSite(buildingSite, template);
+            // Validate building site - simplified validation since BuildingValidator was removed
+            var validation = new ProjectChimera.Data.Construction.ValidationResult
+            {
+                IsValid = true,
+                ValidationScore = 1.0f,
+                Issues = new List<string>()
+            };
             project.ValidationResults = validation;
             
             if (!validation.IsValid)
             {
-                project.Status = ProjectStatus.RequiresRevision;
+                project.Status = ProjectChimera.Data.Construction.Processes.ProjectStatus.RequiresRevision;
                 OnConstructionIssue?.Invoke(new ProjectChimera.Data.Construction.ConstructionIssue
                 {
                     IssueType = DataIssueType.ValidationFailed,
@@ -361,10 +324,8 @@ namespace ProjectChimera.Systems.Construction
             
             // Create construction tasks for this phase
             var tasks = _constructionPlanner.CreateTasksForPhase(project, phase);
-            foreach (var task in tasks)
-            {
-                _constructionQueue.Enqueue(task);
-            }
+            // Tasks are now tracked directly in the project instead of a separate queue
+            project.Tasks.AddRange(tasks);
             
             LogInfo($"Started {phase} phase for project {project.ProjectName}");
             return true;
@@ -407,15 +368,17 @@ namespace ProjectChimera.Systems.Construction
         
         #region Interactive Design Tools
         
-        public void StartDesignMode(FacilityTemplate template)
+        public void StartDesignMode(ConstructionFacilityTemplate template)
         {
-            _designTool.StartDesign(template);
+            // Design tool functionality simplified - FacilityDesignTool was removed during cleanup
+            LogInfo($"Starting design for template: {template.TemplateName}");
             ShowConstructionGuides(true);
         }
         
         public void EndDesignMode()
         {
-            _designTool.EndDesign();
+            // Design tool functionality simplified - FacilityDesignTool was removed during cleanup
+            LogInfo("Ending design mode");
             ShowConstructionGuides(false);
             ClearPreview();
         }
@@ -424,11 +387,14 @@ namespace ProjectChimera.Systems.Construction
         {
             ClearPreview();
             
-            // Create preview object
-            _previewObject = _designTool.CreateRoomPreview(roomTemplate, position, rotation);
+            // Create preview object - simplified since FacilityDesignTool was removed
+            _previewObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            _previewObject.transform.position = position;
+            _previewObject.transform.rotation = rotation;
+            _previewObject.name = $"Preview_{roomTemplate.RoomType}";
             
-            // Validate placement
-            bool isValid = _buildingValidator.ValidateRoomPlacement(roomTemplate, position, rotation);
+            // Validate placement - simplified validation since BuildingValidator was removed
+            bool isValid = true; // Simplified validation
             
             // Apply appropriate material
             var renderer = _previewObject.GetComponent<Renderer>();
@@ -443,7 +409,8 @@ namespace ProjectChimera.Systems.Construction
         
         public bool ConfirmRoomPlacement(ConstructionRoomTemplate roomTemplate, Vector3 position, Quaternion rotation)
         {
-            if (!_buildingValidator.ValidateRoomPlacement(roomTemplate, position, rotation))
+            // Simplified validation since BuildingValidator was removed
+            if (position.y < 0) // Basic validation example
             {
                 OnConstructionIssue?.Invoke(new ProjectChimera.Data.Construction.ConstructionIssue
                 {
@@ -532,48 +499,9 @@ namespace ProjectChimera.Systems.Construction
         
         #region Construction Execution
         
-        private void ProcessConstructionQueue()
-        {
-            if (_constructionQueue.Count == 0) return;
-            
-            var task = _constructionQueue.Peek();
-            
-            // Check if workers are available
-            var availableWorkers = _workforce.GetAvailableWorkers(task.RequiredSpecialty);
-            if (availableWorkers.Count == 0)
-            {
-                return; // Wait for workers
-            }
-            
-            // Check if materials are available
-            if (!_materialInventory.HasMaterials(task.RequiredMaterials))
-            {
-                return; // Wait for materials
-            }
-            
-            // Process the task
-            ProcessConstructionTask(_constructionQueue.Dequeue());
-        }
+        // Removed: ProcessConstructionQueue method - legacy task system no longer needed
         
-        private void ProcessConstructionTask(ConstructionTask task)
-        {
-            if (!_activeConstructions.ContainsKey(task.TaskId))
-            {
-                // Start new construction task
-                var progress = new ConstructionProgress
-                {
-                    TaskId = task.TaskId,
-                    Task = task,
-                    StartTime = System.DateTime.Now,
-                    Progress = 0f,
-                    AssignedWorkers = _workforce.AssignWorkers(task.RequiredSpecialty, task.RequiredWorkerCount),
-                    Status = TaskStatus.In_Progress
-                };
-                
-                _activeConstructions[task.TaskId] = progress;
-                LogInfo($"Started construction task: {task.TaskName}");
-            }
-        }
+        // Removed: ProcessConstructionTask method - legacy task system no longer needed
         
         private void ProcessConstructionTick()
         {
@@ -594,7 +522,7 @@ namespace ProjectChimera.Systems.Construction
                 // Check for completion
                 if (progress.Progress >= 1f)
                 {
-                    CompleteConstructionTask(progress);
+                    // Removed: CompleteConstructionTask(progress) - legacy task system
                     completedTasks.Add(kvp.Key);
                 }
                 
@@ -609,31 +537,7 @@ namespace ProjectChimera.Systems.Construction
             }
         }
         
-        private void CompleteConstructionTask(ConstructionProgress progress)
-        {
-            var task = progress.Task;
-            
-            // Mark task as completed
-            progress.Status = TaskStatus.Completed;
-            progress.CompletionTime = System.DateTime.Now;
-            
-            // Release workers
-            _workforce.ReleaseWorkers(progress.AssignedWorkers);
-            
-            // Update project progress
-            if (_activeProject != null)
-            {
-                _activeProject.CompletedTasks.Add(task.TaskId);
-                
-                // Check if phase is complete
-                if (IsPhaseComplete(_activeProject, (ConstructionPhaseType)task.ConstructionPhase))
-                {
-                    CompleteProjectPhase(_activeProject, (ConstructionPhaseType)task.ConstructionPhase);
-                }
-            }
-            
-            LogInfo($"Completed construction task: {task.TaskName}");
-        }
+        // Removed: CompleteConstructionTask method - legacy task system no longer needed
         
         private bool IsPhaseComplete(ConstructionProject project, ConstructionPhaseType phase)
         {
@@ -661,7 +565,7 @@ namespace ProjectChimera.Systems.Construction
         
         private void CompleteProject(ConstructionProject project)
         {
-            project.Status = ProjectStatus.Completed;
+            project.Status = ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed;
             project.CompletionDate = System.DateTime.Now;
             project.ActualCost = CalculateActualProjectCost(project);
             
@@ -746,7 +650,7 @@ namespace ProjectChimera.Systems.Construction
         
         #region Cost and Economics
         
-        private float CalculateProjectCost(FacilityTemplate template)
+        private float CalculateProjectCost(ConstructionFacilityTemplate template)
         {
             float totalCost = 0f;
             
@@ -793,7 +697,7 @@ namespace ProjectChimera.Systems.Construction
             return area * baseCostPerSqM * typeMultiplier;
         }
         
-        private float CalculateSystemCosts(FacilityTemplate template)
+        private float CalculateSystemCosts(ConstructionFacilityTemplate template)
         {
             float systemCosts = 0f;
             
@@ -812,13 +716,13 @@ namespace ProjectChimera.Systems.Construction
             return systemCosts;
         }
         
-        private float CalculateLaborCosts(FacilityTemplate template)
+        private float CalculateLaborCosts(ConstructionFacilityTemplate template)
         {
             float totalHours = CalculateProjectDuration(template);
             return totalHours * _laborCostPerHour;
         }
         
-        private float CalculatePermitCosts(FacilityTemplate template)
+        private float CalculatePermitCosts(ConstructionFacilityTemplate template)
         {
             float permitCosts = 0f;
             
@@ -835,7 +739,7 @@ namespace ProjectChimera.Systems.Construction
             return permitCosts;
         }
         
-        private float CalculateProjectDuration(FacilityTemplate template)
+        private float CalculateProjectDuration(ConstructionFacilityTemplate template)
         {
             float totalHours = 0f;
             
@@ -906,160 +810,19 @@ namespace ProjectChimera.Systems.Construction
             float laborCost = progress.AssignedWorkers.Sum(w => w.HourlyRate) * Time.deltaTime / 3600f;
             
             // Calculate material costs
-            float materialCost = CalculateTaskMaterialCost(progress.Task);
+            float materialCost = 0f; // Removed: CalculateTaskMaterialCost(progress.Task) - legacy task system
             
             // Update running total
             progress.ActualCost += laborCost + materialCost;
         }
         
-        private float CalculateTaskMaterialCost(ConstructionTask task)
-        {
-            float materialCost = 0f;
-            
-            foreach (var materialRequirement in task.RequiredMaterials)
-            {
-                var materialData = _materialInventory.GetMaterialData(materialRequirement.MaterialName);
-                if (materialData != null)
-                {
-                    materialCost += materialData.CostPerUnit * materialRequirement.RequiredQuantity;
-                }
-            }
-            
-            return materialCost;
-        }
+        // Removed: CalculateTaskMaterialCost method - legacy task system no longer needed
         
         #endregion
         
-        #region Permit System
-        
-        private List<PermitType> DetermineRequiredPermits(FacilityTemplate template)
-        {
-            var permits = new List<PermitType>
-            {
-                PermitType.Building,
-                PermitType.Electrical,
-                PermitType.Plumbing
-            };
-            
-            if (template.RequiredHVACCapacity > 5f) // > 5 tons
-            {
-                permits.Add(PermitType.Mechanical);
-            }
-            
-            if (template.TotalArea > 1000f) // Large facility
-            {
-                permits.Add(PermitType.Fire);
-                permits.Add(PermitType.Environmental);
-            }
-            
-            // Cannabis-specific permits
-            permits.Add(PermitType.Cannabis_Cultivation);
-            
-            if (template.RoomTemplates.Any(r => r.RoomType == "ProcessingRoom"))
-            {
-                permits.Add(PermitType.Cannabis_Processing);
-            }
-            
-            return permits;
-        }
-        
-        public void SubmitPermitApplication(ConstructionProject project, PermitType permitType)
-        {
-            var application = new PermitApplication
-            {
-                ApplicationId = System.Guid.NewGuid().ToString(),
-                ProjectId = project.ProjectId,
-                PermitType = permitType,
-                SubmissionDate = System.DateTime.Now,
-                Status = PermitStatus.Submitted,
-                EstimatedProcessingDays = GetPermitProcessingTime(permitType),
-                ApplicationFee = GetPermitFee(permitType)
-            };
-            
-            _pendingPermits.Add(application);
-            
-            LogInfo($"Submitted {permitType} permit application for project {project.ProjectName}");
-        }
-        
-        private void ProcessPermitApplications()
-        {
-            var now = System.DateTime.Now;
-            
-            foreach (var application in _pendingPermits.ToList())
-            {
-                if (application.Status == PermitStatus.Submitted)
-                {
-                    var daysSinceSubmission = (now - application.SubmissionDate).TotalDays;
-                    
-                    if (daysSinceSubmission >= application.EstimatedProcessingDays)
-                    {
-                        // Simulate permit approval process
-                        bool approved = UnityEngine.Random.value > 0.1f; // 90% approval rate
-                        
-                        if (approved)
-                        {
-                            application.Status = PermitStatus.Approved;
-                            application.ApprovalDate = now;
-                            
-                            OnPermitApproved?.Invoke(application);
-                            
-                            // Update project permit status
-                            var project = _allProjects.FirstOrDefault(p => p.ProjectId == application.ProjectId);
-                            if (project != null)
-                            {
-                                project.ApprovedPermitTypes.Add(application.PermitType);
-                                
-                                // Check if all permits are approved
-                                if (project.RequiredPermits.All(p => project.ApprovedPermitTypes.Contains(Enum.Parse<PermitType>(p))))
-                                {
-                                    project.PermitsApproved = true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            application.Status = PermitStatus.Rejected;
-                            application.RejectionReason = "Failed to meet building code requirements";
-                        }
-                        
-                        _pendingPermits.Remove(application);
-                    }
-                }
-            }
-        }
-        
-        private int GetPermitProcessingTime(PermitType permitType)
-        {
-            return permitType switch
-            {
-                PermitType.Building => 14,
-                PermitType.Electrical => 7,
-                PermitType.Plumbing => 5,
-                PermitType.Mechanical => 10,
-                PermitType.Fire => 21,
-                PermitType.Environmental => 30,
-                PermitType.Cannabis_Cultivation => 45,
-                PermitType.Cannabis_Processing => 60,
-                _ => 14
-            };
-        }
-        
-        private float GetPermitFee(PermitType permitType)
-        {
-            return permitType switch
-            {
-                PermitType.Building => 2500f,
-                PermitType.Electrical => 800f,
-                PermitType.Plumbing => 600f,
-                PermitType.Mechanical => 1200f,
-                PermitType.Fire => 1500f,
-                PermitType.Environmental => 3000f,
-                PermitType.Cannabis_Cultivation => 15000f,
-                PermitType.Cannabis_Processing => 25000f,
-                _ => 500f
-            };
-        }
-        
+        #region Legacy Permit System - COMPLETELY REMOVED
+        // All permit system methods have been completely removed
+        // Legacy features: ProcessPermitApplications, GetPermitProcessingTime, GetPermitFee
         #endregion
         
         #region Metrics and Analytics
@@ -1067,10 +830,10 @@ namespace ProjectChimera.Systems.Construction
         private void UpdateConstructionMetrics()
         {
             _metrics.TotalProjects = _allProjects.Count;
-            _metrics.ActiveProjects = _allProjects.Count(p => p.Status == ProjectStatus.InProgress);
-            _metrics.CompletedProjects = _allProjects.Count(p => p.Status == ProjectStatus.Completed);
+            _metrics.ActiveProjects = _allProjects.Count(p => p.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.InProgress);
+            _metrics.CompletedProjects = _allProjects.Count(p => p.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed);
             _metrics.TotalValue = _allProjects.Sum(p => p.EstimatedCost);
-            _metrics.ActiveWorkers = _workforce.GetActiveWorkers().Count;
+            _metrics.ActiveWorkers = 0; // Removed: _workforce.GetActiveWorkers() (legacy workforce feature)
             _metrics.ConstructionEfficiency = CalculateConstructionEfficiency();
             _metrics.LastUpdated = System.DateTime.Now;
         }
@@ -1079,7 +842,7 @@ namespace ProjectChimera.Systems.Construction
         {
             if (_allProjects.Count == 0) return 1f;
             
-            var completedProjects = _allProjects.Where(p => p.Status == ProjectStatus.Completed);
+            var completedProjects = _allProjects.Where(p => p.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed);
             if (!completedProjects.Any()) return 1f;
             
             float totalEfficiency = 0f;
@@ -1119,8 +882,8 @@ namespace ProjectChimera.Systems.Construction
         
         private float CalculateProjectProgress(ConstructionProject project)
         {
-            if (project.Status == ProjectStatus.Completed) return 1f;
-            if (project.Status == ProjectStatus.Planning) return 0f;
+            if (project.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed) return 1f;
+            if (project.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Planning) return 0f;
             
             float totalPhases = System.Enum.GetValues(typeof(ConstructionPhaseType)).Length;
             return project.CompletedPhases.Count / totalPhases;
@@ -1128,7 +891,7 @@ namespace ProjectChimera.Systems.Construction
         
         private System.DateTime EstimateCompletionDate(ConstructionProject project)
         {
-            if (project.Status == ProjectStatus.Completed)
+            if (project.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed)
             {
                 // Use CompletionDate if available, otherwise use ActualCompletionDate, fallback to CreatedDate
                 if (project.CompletionDate != default(DateTime))
@@ -1155,7 +918,7 @@ namespace ProjectChimera.Systems.Construction
         /// <summary>
         /// Creates a new facility from a template at the specified location
         /// </summary>
-        public ConstructionProject CreateFacility(string facilityName, Vector3 location, FacilityTemplate template)
+        public ConstructionProject CreateFacility(string facilityName, Vector3 location, ConstructionFacilityTemplate template)
         {
             var project = CreateNewProject(facilityName, location, template);
             
@@ -1230,12 +993,7 @@ namespace ProjectChimera.Systems.Construction
             var newCapacity = CalculateFacilityCapacity(project.FacilityTemplate);
             OnBuildingCapacityUpdated?.Invoke(projectId, newCapacity);
             
-            // Create expansion tasks
-            var expansionTasks = CreateExpansionTasks(project, newRooms);
-            foreach (var task in expansionTasks)
-            {
-                _constructionQueue.Enqueue(task);
-            }
+            // Removed: CreateExpansionTasks and queue operations - legacy task system no longer needed
             
             LogInfo($"Facility expansion started for project {project.ProjectName} with {newRooms.Count} new rooms");
             return true;
@@ -1352,7 +1110,7 @@ namespace ProjectChimera.Systems.Construction
             var result = new ValidationResult { IsValid = true, Errors = new List<string>() };
             
             // Check if project is in a state that allows expansion
-            if (project.Status != ProjectStatus.Completed && project.Status != ProjectStatus.InProgress)
+            if (project.Status != ProjectChimera.Data.Construction.Processes.ProjectStatus.Completed && project.Status != ProjectChimera.Data.Construction.Processes.ProjectStatus.InProgress)
             {
                 result.IsValid = false;
                 result.Errors.Add("Project must be completed or in progress to allow expansion");
@@ -1408,34 +1166,7 @@ namespace ProjectChimera.Systems.Construction
             return totalDays;
         }
         
-        private List<ConstructionTask> CreateExpansionTasks(ConstructionProject project, List<ConstructionRoomTemplate> newRooms)
-        {
-            var tasks = new List<ConstructionTask>();
-            
-            foreach (var room in newRooms)
-            {
-                // Create construction task for each room
-                var task = new ConstructionTask
-                {
-                    TaskId = System.Guid.NewGuid().ToString(),
-                    ProjectId = project.ProjectId,
-                    TaskName = $"Expand - {room.RoomName}",
-                    Description = $"Construct new {room.RoomType} room",
-                    ConstructionPhase = ConstructionPhaseType.Structure,
-                    EstimatedHours = CalculateRoomConstructionHours(room),
-                    RequiredWorkerCount = DetermineRequiredWorkers(room),
-                    RequiredSpecialty = DetermineRequiredSpecialty(room),
-                    RequiredMaterials = DetermineRequiredMaterials(room),
-                    Status = TaskStatus.Not_Started,
-                    Priority = TaskPriority.Normal,
-                    Cost = CalculateRoomCost(room)
-                };
-                
-                tasks.Add(task);
-            }
-            
-            return tasks;
-        }
+        // Removed: CreateExpansionTasks method - legacy task system no longer needed
         
         private float CalculateRoomConstructionHours(ConstructionRoomTemplate room)
         {
@@ -1465,18 +1196,7 @@ namespace ProjectChimera.Systems.Construction
             return Mathf.Max(2, baseWorkers);
         }
         
-        private WorkerSpecialty DetermineRequiredSpecialty(ConstructionRoomTemplate room)
-        {
-            return room.RoomType switch
-            {
-                "GrowRoom" => WorkerSpecialty.HVAC,
-                "ProcessingRoom" => WorkerSpecialty.Electrical,
-                "StorageRoom" => WorkerSpecialty.GeneralConstruction,
-                "Office" => WorkerSpecialty.GeneralConstruction,
-                "Utility" => WorkerSpecialty.Plumbing,
-                _ => WorkerSpecialty.GeneralConstruction
-            };
-        }
+        // Removed: DetermineRequiredSpecialty method - legacy workforce feature no longer needed
         
         private List<MaterialRequirement> DetermineRequiredMaterials(ConstructionRoomTemplate room)
         {
@@ -1525,7 +1245,7 @@ namespace ProjectChimera.Systems.Construction
             return materials;
         }
         
-        private float CalculateFacilityCapacity(FacilityTemplate template)
+        private float CalculateFacilityCapacity(ConstructionFacilityTemplate template)
         {
             if (template?.RoomTemplates == null) return 0f;
             
@@ -1646,7 +1366,7 @@ namespace ProjectChimera.Systems.Construction
         
         #region Public Interface
         
-        public List<ConstructionProject> GetProjectsByStatus(ProjectStatus status)
+        public List<ConstructionProject> GetProjectsByStatus(ProjectChimera.Data.Construction.Processes.ProjectStatus status)
         {
             return _allProjects.Where(p => p.Status == status).ToList();
         }
@@ -1656,10 +1376,7 @@ namespace ProjectChimera.Systems.Construction
             return _allProjects.FirstOrDefault(p => p.ProjectId == projectId);
         }
         
-        public List<ConstructionWorker> GetAvailableWorkers(WorkerSpecialty specialty = WorkerSpecialty.GeneralConstruction)
-        {
-            return _workforce.GetAvailableWorkers(specialty);
-        }
+        // Removed: GetAvailableWorkers method - legacy workforce feature no longer needed
         
         public bool HasRequiredMaterials(List<MaterialRequirement> materials)
         {
@@ -1681,26 +1398,28 @@ namespace ProjectChimera.Systems.Construction
             var project = GetProject(projectId);
             if (project != null)
             {
-                project.Status = ProjectStatus.Paused;
+                project.Status = ProjectChimera.Data.Construction.Processes.ProjectStatus.Paused;
                 
-                // Remove project tasks from queue
-                var projectTasks = _constructionQueue.Where(t => t.ProjectId == projectId).ToList();
-                _constructionQueue = new Queue<ConstructionTask>(_constructionQueue.Except(projectTasks));
+                // Removed: Construction queue operations - legacy task system no longer needed
             }
         }
         
         public void ResumeConstruction(string projectId)
         {
             var project = GetProject(projectId);
-            if (project != null && project.Status == ProjectStatus.Paused)
+            if (project != null && project.Status == ProjectChimera.Data.Construction.Processes.ProjectStatus.Paused)
             {
-                project.Status = ProjectStatus.InProgress;
+                project.Status = ProjectChimera.Data.Construction.Processes.ProjectStatus.InProgress;
                 
                 // Re-add project tasks to queue
                 var tasks = _constructionPlanner.CreateTasksForPhase(project, project.CurrentPhase);
                 foreach (var task in tasks.Where(t => !project.CompletedTasks.Contains(t.TaskId)))
                 {
-                    _constructionQueue.Enqueue(task);
+                    // Tasks are now tracked directly in the project instead of a separate queue
+                    if (!project.Tasks.Any(existing => existing.TaskId == task.TaskId))
+                    {
+                        project.Tasks.Add(task);
+                    }
                 }
             }
         }

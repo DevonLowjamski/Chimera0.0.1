@@ -99,7 +99,7 @@ namespace ProjectChimera.Systems.Visuals
         private CannabisVFXTemplateManager _vfxTemplateManager;
         private SpeedTreeVFXIntegrationManager _speedTreeIntegration;
         private DynamicGrowthAnimationSystem _dynamicGrowthSystem;
-        private SeasonalAdaptationVFXController _seasonalAdaptationController;
+        // private SeasonalAdaptationVFXController _seasonalAdaptationController; // TODO: Implement this type
         
         // Asset Management
         private Dictionary<string, PlantAssetGroup> _loadedAssetGroups = new Dictionary<string, PlantAssetGroup>();
@@ -269,7 +269,7 @@ namespace ProjectChimera.Systems.Visuals
             _vfxTemplateManager = FindObjectOfType<CannabisVFXTemplateManager>();
             _speedTreeIntegration = FindObjectOfType<SpeedTreeVFXIntegrationManager>();
             _dynamicGrowthSystem = FindObjectOfType<DynamicGrowthAnimationSystem>();
-            _seasonalAdaptationController = FindObjectOfType<SeasonalAdaptationVFXController>();
+            // _seasonalAdaptationController = FindObjectOfType<SeasonalAdaptationVFXController>(); // TODO: Implement this type
             
             int connectedSystems = 0;
             
@@ -297,11 +297,11 @@ namespace ProjectChimera.Systems.Visuals
                 LogInfo("✅ Connected to Dynamic Growth Animation System");
             }
             
-            if (_seasonalAdaptationController != null)
-            {
-                connectedSystems++;
-                LogInfo("✅ Connected to Seasonal Adaptation VFX Controller");
-            }
+            // if (_seasonalAdaptationController != null) // TODO: Implement SeasonalAdaptationVFXController
+            // {
+            //     connectedSystems++;
+            //     LogInfo("✅ Connected to Seasonal Adaptation VFX Controller");
+            // }
             
             LogInfo($"✅ Connected to {connectedSystems}/5 systems for large-scale integration");
         }
@@ -1025,7 +1025,7 @@ namespace ProjectChimera.Systems.Visuals
             _vfxTemplateManager = null;
             _speedTreeIntegration = null;
             _dynamicGrowthSystem = null;
-            _seasonalAdaptationController = null;
+            // _seasonalAdaptationController = null; // TODO: Implement SeasonalAdaptationVFXController
         }
         
         private void StartRenderingProcessing()

@@ -13,6 +13,7 @@ using ProjectChimera.Data.Environment;
 using FacilitiesRoomTemplate = ProjectChimera.Data.Facilities.RoomTemplate;
 using RoomType = ProjectChimera.Data.Construction.Buildings.RoomType;
 using EnvironmentalConditions = ProjectChimera.Data.Construction.Buildings.EnvironmentalConditions;
+using ConstructionRoomStatus = ProjectChimera.Data.Construction.Buildings.RoomStatus;
 using ComplianceStatus = ProjectChimera.Data.Construction.Buildings.ComplianceStatus;
 using SecurityLevel = ProjectChimera.Data.Construction.Buildings.SecurityLevel;
 using Room = ProjectChimera.Data.Construction.Buildings.Room;
@@ -174,7 +175,7 @@ namespace ProjectChimera.Systems.Construction
                 CeilingHeight = _defaultCeilingHeight,
                 ProjectId = projectId,
                 CreationDate = DateTime.Now,
-                Status = RoomStatus.Planning,
+                Status = ConstructionRoomStatus.Planning,
                 Configuration = CreateDefaultConfiguration(roomType),
                 EnvironmentalRequirements = GetEnvironmentalRequirements(roomType),
                 SecurityLevel = GetRequiredSecurityLevel(roomType),
@@ -297,7 +298,7 @@ namespace ProjectChimera.Systems.Construction
                 return null;
             }
             
-            var result = _layoutOptimizer.OptimizeLayout(room, criteria);
+            var result = _layoutOptimizer.OptimizeLayout(ConvertRoom(room), criteria);
             
             if (result.IsSuccessful)
             {
@@ -321,7 +322,7 @@ namespace ProjectChimera.Systems.Construction
                 return null;
             }
             
-            var result = _layoutOptimizer.OptimizeFacility(projectRooms, criteria);
+            var result = _layoutOptimizer.OptimizeFacility(projectRooms.Select(ConvertRoom).ToList(), criteria);
             
             if (result.IsSuccessful)
             {
@@ -843,6 +844,22 @@ namespace ProjectChimera.Systems.Construction
                 ProjectChimera.Data.Facilities.RoomType.Maintenance => ConstructionRoomType.Utility,
                 ProjectChimera.Data.Facilities.RoomType.Trimming => ConstructionRoomType.Processing,
                 _ => ConstructionRoomType.General
+            };
+        }
+        
+        /// <summary>
+        /// Convert Buildings.Room to Construction.Room for optimizer compatibility
+        /// </summary>
+        private ProjectChimera.Data.Construction.Room ConvertRoom(Room buildingsRoom)
+        {
+            return new ProjectChimera.Data.Construction.Room
+            {
+                RoomId = buildingsRoom.RoomId,
+                RoomName = buildingsRoom.RoomName,
+                RoomType = (ProjectChimera.Data.Construction.RoomType)buildingsRoom.RoomType,
+                FloorArea = buildingsRoom.FloorArea,
+                CeilingHeight = buildingsRoom.CeilingHeight,
+                // Add other necessary property mappings as needed
             };
         }
         
